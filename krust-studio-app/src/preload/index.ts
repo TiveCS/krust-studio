@@ -1,0 +1,125 @@
+import { contextBridge, ipcRenderer } from 'electron'
+import { electronAPI } from '@electron-toolkit/preload'
+import type {
+  KrustApi,
+  SaveConnectionInput,
+  TestConnectionInput,
+  EntityRef,
+  EntityType,
+  Filter,
+  ChangeSet,
+  Sort,
+  CreateTableSpec,
+  SchemaOp,
+  IndexSpec,
+  HistoryQuery,
+  HistoryStream
+} from '../shared/types'
+
+const api: KrustApi = {
+  connections: {
+    list: () => ipcRenderer.invoke('connections:list'),
+    save: (input: SaveConnectionInput) =>
+      ipcRenderer.invoke('connections:save', input),
+    remove: (id: string) => ipcRenderer.invoke('connections:remove', id),
+    test: (input: TestConnectionInput) =>
+      ipcRenderer.invoke('connections:test', input),
+    reveal: (id: string) => ipcRenderer.invoke('connections:reveal', id),
+    duplicate: (id: string) => ipcRenderer.invoke('connections:duplicate', id)
+  },
+  sessions: {
+    connect: (id: string) => ipcRenderer.invoke('session:connect', id),
+    listEntities: (id: string) => ipcRenderer.invoke('session:listEntities', id),
+    listEnums: (id: string) => ipcRenderer.invoke('session:listEnums', id),
+    describeTable: (id: string, entity: EntityRef) =>
+      ipcRenderer.invoke('session:describeTable', id, entity),
+    getCreateSql: (id: string, entity: EntityRef) =>
+      ipcRenderer.invoke('session:getCreateSql', id, entity),
+    createTable: (id: string, spec: CreateTableSpec) =>
+      ipcRenderer.invoke('session:createTable', id, spec),
+    alterTable: (id: string, entity: EntityRef, ops: SchemaOp[]) =>
+      ipcRenderer.invoke('session:alterTable', id, entity, ops),
+    dropEntity: (id: string, entity: EntityRef, type: EntityType) =>
+      ipcRenderer.invoke('session:dropEntity', id, entity, type),
+    renameTable: (id: string, entity: EntityRef, newName: string) =>
+      ipcRenderer.invoke('session:renameTable', id, entity, newName),
+    truncateTable: (id: string, entity: EntityRef) =>
+      ipcRenderer.invoke('session:truncateTable', id, entity),
+    createIndex: (id: string, entity: EntityRef, spec: IndexSpec) =>
+      ipcRenderer.invoke('session:createIndex', id, entity, spec),
+    dropIndex: (id: string, entity: EntityRef, name: string) =>
+      ipcRenderer.invoke('session:dropIndex', id, entity, name),
+    readRows: (
+      id: string,
+      entity: EntityRef,
+      limit: number,
+      offset: number,
+      filters?: Filter[],
+      orderBy?: Sort[]
+    ) =>
+      ipcRenderer.invoke(
+        'session:readRows',
+        id,
+        entity,
+        limit,
+        offset,
+        filters,
+        orderBy
+      ),
+    countRows: (id: string, entity: EntityRef, filters?: Filter[]) =>
+      ipcRenderer.invoke('session:countRows', id, entity, filters),
+    exportAllRows: (
+      id: string,
+      entity: EntityRef,
+      filters?: Filter[],
+      orderBy?: Sort[]
+    ) => ipcRenderer.invoke('session:exportAllRows', id, entity, filters, orderBy),
+    searchRows: (
+      id: string,
+      entity: EntityRef,
+      term: string,
+      limit: number,
+      offset: number
+    ) => ipcRenderer.invoke('session:searchRows', id, entity, term, limit, offset),
+    applyChanges: (id: string, entity: EntityRef, changes: ChangeSet) =>
+      ipcRenderer.invoke('session:applyChanges', id, entity, changes),
+    disconnect: (id: string) => ipcRenderer.invoke('session:disconnect', id)
+  },
+  dialog: {
+    saveText: (defaultName: string, content: string) =>
+      ipcRenderer.invoke('dialog:saveText', defaultName, content)
+  },
+  history: {
+    list: (query: HistoryQuery) => ipcRenderer.invoke('history:list', query),
+    clear: (connectionId: string, stream: HistoryStream) =>
+      ipcRenderer.invoke('history:clear', connectionId, stream),
+    listChangesets: (connectionId: string) =>
+      ipcRenderer.invoke('history:listChangesets', connectionId),
+    createChangeset: (connectionId: string, name: string, ticket?: string) =>
+      ipcRenderer.invoke('history:createChangeset', connectionId, name, ticket),
+    renameChangeset: (id: number, name: string, ticket?: string) =>
+      ipcRenderer.invoke('history:renameChangeset', id, name, ticket),
+    deleteChangeset: (id: number) =>
+      ipcRenderer.invoke('history:deleteChangeset', id),
+    setActiveChangeset: (connectionId: string, changesetId: number | null) =>
+      ipcRenderer.invoke('history:setActiveChangeset', connectionId, changesetId),
+    assignEntries: (entryIds: number[], changesetId: number | null) =>
+      ipcRenderer.invoke('history:assignEntries', entryIds, changesetId),
+    exportChangeset: (id: number) =>
+      ipcRenderer.invoke('history:exportChangeset', id)
+  }
+}
+
+if (process.contextIsolated) {
+  try {
+    contextBridge.exposeInMainWorld('electron', electronAPI)
+    contextBridge.exposeInMainWorld('api', api)
+  } catch (error) {
+    console.error(error)
+  }
+} else {
+  // @ts-ignore (define in dts)
+  window.electron = electronAPI
+  // @ts-ignore (define in dts)
+  window.api = api
+}
