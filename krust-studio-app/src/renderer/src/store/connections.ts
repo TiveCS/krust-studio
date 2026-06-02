@@ -10,11 +10,20 @@ import type {
   RowEdit,
   CreateTableSpec,
   NewColumnSpec,
+  QueryResult,
   RowsResult,
   SaveConnectionInput,
   Sort,
   TableStructure
 } from '../../../shared/types'
+
+export interface QueryState {
+  sql: string
+  results: QueryResult[]
+  running: boolean
+  /** auto-LIMIT for SELECTs; 0 = off */
+  autoLimit: number
+}
 
 export type TabView = 'data' | 'structure'
 
@@ -48,6 +57,8 @@ export interface Tab {
   structureLoading: boolean
   /** present => this tab is an unsaved "new table" draft (no entity yet) */
   draft: { name: string; columns: NewColumnSpec[] } | null
+  /** present => this tab is a SQL editor */
+  query: QueryState | null
 }
 
 export function editKey(rowIndex: number, column: string): string {
@@ -94,6 +105,11 @@ interface ConnectionsState {
   pageSize: number
   openTable: (entity: EntityRef, initialFilters?: Filter[]) => Promise<void>
   openNewTable: () => void
+  openQuery: () => void
+  setQuerySql: (sql: string) => void
+  setQueryAutoLimit: (n: number) => void
+  runQuery: (sql: string) => Promise<void>
+  cancelRunningQuery: () => Promise<void>
   patchDraft: (p: Partial<{ name: string; columns: NewColumnSpec[] }>) => void
   closeTab: (tabId: string) => void
   setActiveTab: (tabId: string) => void
@@ -347,7 +363,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         view: 'data',
         structure: null,
         structureLoading: false,
-        draft: null
+        draft: null,
+        query: null
       }
       set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id, screen: 'tables' }))
       await fetchTab(tab.id)
@@ -376,9 +393,83 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         draft: {
           name: '',
           columns: [{ name: 'id', type: '', nullable: false, pk: true }]
-        }
+        },
+        query: null
       }
       set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id, screen: 'tables' }))
+    },
+
+    openQuery: () => {
+      const tab: Tab = {
+        id: crypto.randomUUID(),
+        entity: { name: 'Query' },
+        data: null,
+        loading: false,
+        error: null,
+        pageIndex: 0,
+        total: null,
+        counting: false,
+        filters: [],
+        orderBy: [],
+        edits: {},
+        deletes: [],
+        inserts: [],
+        colWidths: {},
+        committing: false,
+        view: 'data',
+        structure: null,
+        structureLoading: false,
+        draft: null,
+        query: { sql: '', results: [], running: false, autoLimit: 500 }
+      }
+      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id, screen: 'tables' }))
+    },
+
+    setQuerySql: (sql) => {
+      const { activeTabId, tabs } = get()
+      const tab = tabs.find((t) => t.id === activeTabId)
+      if (tab?.query) patchTab(tab.id, { query: { ...tab.query, sql } })
+    },
+    setQueryAutoLimit: (n) => {
+      const { activeTabId, tabs } = get()
+      const tab = tabs.find((t) => t.id === activeTabId)
+      if (tab?.query) patchTab(tab.id, { query: { ...tab.query, autoLimit: n } })
+    },
+    runQuery: async (sql) => {
+      const { openConnectionId, activeTabId, tabs } = get()
+      const tab = tabs.find((t) => t.id === activeTabId)
+      if (!openConnectionId || !tab?.query || !sql.trim()) return
+      patchTab(tab.id, { query: { ...tab.query, running: true } })
+      try {
+        const results = await window.api.sessions.runScript(
+          openConnectionId,
+          sql,
+          tab.query.autoLimit || undefined
+        )
+        const cur = get().tabs.find((t) => t.id === tab.id)
+        if (cur?.query)
+          patchTab(tab.id, { query: { ...cur.query, results, running: false } })
+      } catch (err) {
+        const cur = get().tabs.find((t) => t.id === tab.id)
+        if (cur?.query)
+          patchTab(tab.id, {
+            query: {
+              ...cur.query,
+              running: false,
+              results: [
+                {
+                  statement: sql,
+                  kind: 'error',
+                  error: err instanceof Error ? err.message : String(err)
+                }
+              ]
+            }
+          })
+      }
+    },
+    cancelRunningQuery: async () => {
+      const id = get().openConnectionId
+      if (id) await window.api.sessions.cancelQuery(id)
     },
 
     patchDraft: (p) => {

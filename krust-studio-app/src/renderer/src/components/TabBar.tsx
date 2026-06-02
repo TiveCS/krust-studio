@@ -1,10 +1,11 @@
-import { X, Table2 } from 'lucide-react'
+import { X, Table2, SquareTerminal, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useConnections } from '@/store/connections'
 
 export function TabBar(): React.JSX.Element | null {
-  const { tabs, activeTabId, setActiveTab, closeTab } = useConnections()
-  if (tabs.length === 0) return null
+  const { tabs, activeTabId, openConnectionId, setActiveTab, closeTab, openQuery } =
+    useConnections()
+  if (tabs.length === 0 && !openConnectionId) return null
 
   return (
     <div className="flex h-9 shrink-0 items-stretch overflow-x-auto border-b border-border bg-card/30">
@@ -19,7 +20,11 @@ export function TabBar(): React.JSX.Element | null {
               : 'text-muted-foreground hover:bg-accent/40'
           )}
         >
-          <Table2 className="size-3.5 opacity-60" />
+          {t.query ? (
+            <SquareTerminal className="size-3.5 opacity-60" />
+          ) : (
+            <Table2 className="size-3.5 opacity-60" />
+          )}
           <span className="font-mono">{t.entity.name}</span>
           <button
             onClick={(e) => {
@@ -33,6 +38,15 @@ export function TabBar(): React.JSX.Element | null {
           </button>
         </div>
       ))}
+      <button
+        onClick={() => openQuery()}
+        disabled={!openConnectionId}
+        title="New SQL query"
+        className="flex items-center gap-1 px-3 text-xs text-muted-foreground hover:bg-accent/40 hover:text-foreground disabled:opacity-40"
+      >
+        <Plus className="size-3.5" />
+        <SquareTerminal className="size-3.5" />
+      </button>
     </div>
   )
 }

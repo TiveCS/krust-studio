@@ -128,12 +128,19 @@ Prioritized. Top group = highest value (matches CONTEXT.md + Beekeeper parity).
       rename/delete (delete reverts entries to Unassigned); **export commented
       `.sql`** (header + per-stmt timestamp·target, raw chronological order, no
       squash) via OS save dialog → marks Draft→Exported.
-- [ ] **Capture hand-typed DDL too** — needs the SQL query editor first.
+- [x] **Capture hand-typed DDL too.** Done with the SQL editor — `runScript`
+      captures every statement with `source: 'manual'`, classified into the right
+      stream (DDL → Table Mutation, auto-attaches to active changeset).
 
 ## P5 — bigger surfaces (own cycles)
 
-- [ ] **SQL query editor (Monaco)** + schema autocomplete, run-selection,
-      multi-statement, query cancel (Driver contract), optional auto-LIMIT.
+- [x] **SQL query editor.** Done (CodeMirror 6, not Monaco — custom teal theme).
+      Dedicated query tabs (+SQL in tab bar): editor + per-statement results.
+      Quote/comment/dollar-quote-aware `splitStatements`; run whole script or the
+      selection (Ctrl+Enter); SELECT→rows / writes→affected; optional auto-LIMIT
+      500. Schema-name autocomplete. **Query cancel**: pg (`pg_cancel_backend`) +
+      mysql (`KILL QUERY`); sqlite unsupported (synchronous). Every run captured
+      (source=manual) → **Data Retrieval** stream now live (3rd History rail view).
 - [ ] **Backup / Restore** (self-contained SQL dump, per-table granularity;
       restore with create-target + dry-run). CONTEXT.md "Backup"/"Restore".
 - [ ] **MCP server** (post-MVP nice-to-have, ADR-0003) — read-only structured

@@ -319,6 +319,12 @@ export function HistoryView(): React.JSX.Element {
         >
           Data Mutation (all)
         </button>
+        <button
+          onClick={() => setView({ kind: 'stream', stream: 'data_retrieval' })}
+          className={railItem(view.kind === 'stream' && view.stream === 'data_retrieval')}
+        >
+          Data Retrieval (all)
+        </button>
       </aside>
 
       {/* right pane */}
@@ -331,7 +337,9 @@ export function HistoryView(): React.JSX.Element {
                 ? 'Unassigned'
                 : view.stream === 'table_mutation'
                   ? 'Table Mutation'
-                  : 'Data Mutation'}
+                  : view.stream === 'data_mutation'
+                    ? 'Data Mutation'
+                    : 'Data Retrieval'}
           </span>
           <span className="text-xs text-muted-foreground">
             {conn?.name ?? 'No connection'}
