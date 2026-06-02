@@ -1,0 +1,78 @@
+name: Release
+
+# Build production installers for all platforms.
+# - push a tag like `v1.0.0`  -> builds + attaches installers to a GitHub Release
+# - manual run (workflow_dispatch) -> builds + uploads installers as run artifacts
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            build: pnpm run build:win
+          - os: macos-latest
+            build: pnpm run build:mac
+          - os: ubuntu-latest
+            # snap needs snapcraft/lxd (flaky in CI) -> AppImage + deb only
+            build: pnpm exec electron-vite build && pnpm exec electron-builder --linux AppImage deb
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: krust-studio-app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: krust-studio-app/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: ${{ matrix.build }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # no signing certs in CI -> don't try to sign/notarize
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Upload run artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: installers-${{ matrix.os }}
+          if-no-files-found: ignore
+          path: |
+            krust-studio-app/dist/*.exe
+            krust-studio-app/dist/*.dmg
+            krust-studio-app/dist/*.zip
+            krust-studio-app/dist/*.AppImage
+            krust-studio-app/dist/*.deb
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          fail_on_unmatched_files: false
+          files: |
+            krust-studio-app/dist/*.exe
+            krust-studio-app/dist/*.dmg
+            krust-studio-app/dist/*.zip
+            krust-studio-app/dist/*.AppImage
+            krust-studio-app/dist/*.deb
