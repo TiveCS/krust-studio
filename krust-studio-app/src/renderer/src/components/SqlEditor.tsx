@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { EditorView, basicSetup } from 'codemirror'
 import { keymap } from '@codemirror/view'
-import { EditorState } from '@codemirror/state'
+import { EditorState, Prec } from '@codemirror/state'
 import { sql, SQLDialect } from '@codemirror/lang-sql'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { tags as t } from '@lezer/highlight'
@@ -65,20 +65,24 @@ export function SqlEditor({ value, onChange, onRun, schema }: Props): React.JSX.
     const state = EditorState.create({
       doc: value,
       extensions: [
-        basicSetup,
-        keymap.of([
-          {
-            key: 'Mod-Enter',
-            run: (v) => {
-              const sel = v.state.selection.main
-              const text = sel.empty
-                ? v.state.doc.toString()
-                : v.state.sliceDoc(sel.from, sel.to)
-              onRunRef.current(text)
-              return true
+        // highest precedence so basicSetup's keymap can't swallow Ctrl/Cmd-Enter
+        Prec.highest(
+          keymap.of([
+            {
+              key: 'Mod-Enter',
+              preventDefault: true,
+              run: (v) => {
+                const sel = v.state.selection.main
+                const text = sel.empty
+                  ? v.state.doc.toString()
+                  : v.state.sliceDoc(sel.from, sel.to)
+                onRunRef.current(text)
+                return true
+              }
             }
-          }
-        ]),
+          ])
+        ),
+        basicSetup,
         sql({ dialect: SQLDialect.define({}), schema, upperCaseKeywords: true }),
         syntaxHighlighting(highlight),
         theme,
