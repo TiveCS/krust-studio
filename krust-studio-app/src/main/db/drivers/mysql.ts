@@ -1,0 +1,443 @@
+import type {
+  Connection,
+  FieldPacket,
+  RowDataPacket,
+  ResultSetHeader
+} from 'mysql2/promise'
+import {
+  type DbDriver,
+  type DriverDeps,
+  safePaging,
+  buildWhere,
+  buildSearch,
+  buildOrderBy,
+  buildUpdate,
+  buildDelete,
+  buildInsert,
+  buildCreateTable,
+  fkActionClause,
+  defaultIndexName,
+  renderSql
+} from '../driver'
+import type {
+  ApplyResult,
+  ChangeSet,
+  CreateTableSpec,
+  EntityInfo,
+  EntityRef,
+  EntityType,
+  EnumType,
+  Filter,
+  ForeignKey,
+  IndexSpec,
+  RowsResult,
+  SchemaOp,
+  SearchResult,
+  Sort,
+  TableStructure
+} from '../../../shared/types'
+
+function quoteIdent(name: string): string {
+  return '`' + name.replace(/`/g, '``') + '`'
+}
+
+const MYSQL_INDEX_METHODS = new Set(['BTREE', 'HASH'])
+
+export class MysqlDriver implements DbDriver {
+  private conn: Connection | null = null
+
+  constructor(private deps: DriverDeps) {}
+
+  async connect(): Promise<void> {
+    const mysql = await import('mysql2/promise')
+    const { config, password } = this.deps
+    this.conn = await mysql.createConnection({
+      host: config.host,
+      port: config.port ?? 3306,
+      user: config.user,
+      password,
+      database: config.database,
+      ssl: config.ssl ? {} : undefined,
+      connectTimeout: 8000
+    })
+    // Idle connections can be dropped by the server; mysql2 emits an async
+    // 'error' that would crash the main process. Swallow + mark dead so the
+    // next query reconnects.
+    this.conn.on('error', () => {
+      this.conn = null
+    })
+  }
+
+  /** Reconnect if the connection was dropped (idle timeout, server kill). */
+  private async ensure(): Promise<Connection> {
+    if (!this.conn) await this.connect()
+    return this.conn!
+  }
+
+  async listEntities(): Promise<EntityInfo[]> {
+    const [rows] = await (await this.ensure()).query(
+      `SELECT TABLE_NAME AS name, TABLE_TYPE AS type
+         FROM information_schema.TABLES
+        WHERE TABLE_SCHEMA = DATABASE()
+        ORDER BY TABLE_NAME`
+    )
+    return (rows as Array<{ name: string; type: string }>).map((r) => ({
+      name: r.name,
+      type: r.type === 'VIEW' ? 'view' : 'table'
+    }))
+  }
+
+  async listEnums(): Promise<EnumType[]> {
+    return [] // MySQL enums are inline in the column type, not named types
+  }
+
+  async readRows(
+    entity: EntityRef,
+    limit: number,
+    offset: number,
+    filters?: Filter[],
+    orderBy?: Sort[]
+  ): Promise<RowsResult> {
+    const { limit: l, offset: o } = safePaging(limit, offset)
+    const where = buildWhere(filters, quoteIdent, () => '?')
+    const order = buildOrderBy(orderBy, quoteIdent)
+    const [rows, fields] = (await (await this.ensure()).query(
+      `SELECT * FROM ${quoteIdent(entity.name)}${where.clause}${order} LIMIT ${l} OFFSET ${o}`,
+      where.params
+    )) as [RowDataPacket[], FieldPacket[]]
+    const [pkRows] = (await (await this.ensure()).query(
+      `SELECT COLUMN_NAME AS name
+         FROM information_schema.KEY_COLUMN_USAGE
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
+          AND CONSTRAINT_NAME = 'PRIMARY'
+        ORDER BY ORDINAL_POSITION`,
+      [entity.name]
+    )) as [RowDataPacket[], FieldPacket[]]
+    const [typeRows] = (await (await this.ensure()).query(
+      `SELECT COLUMN_NAME AS name, COLUMN_TYPE AS type, IS_NULLABLE AS nullable
+         FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?`,
+      [entity.name]
+    )) as [RowDataPacket[], FieldPacket[]]
+    const metaMap = new Map(
+      (typeRows as Array<{ name: string; type: string; nullable: string }>).map(
+        (t) => [t.name, t]
+      )
+    )
+    const [fkRows] = (await (await this.ensure()).query(
+      `SELECT COLUMN_NAME AS col, REFERENCED_TABLE_NAME AS refTable,
+              REFERENCED_COLUMN_NAME AS refColumn
+         FROM information_schema.KEY_COLUMN_USAGE
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
+          AND REFERENCED_TABLE_NAME IS NOT NULL`,
+      [entity.name]
+    )) as [RowDataPacket[], FieldPacket[]]
+    const foreignKeys: ForeignKey[] = (
+      fkRows as Array<{ col: string; refTable: string; refColumn: string }>
+    ).map((f) => ({
+      column: f.col,
+      refTable: f.refTable,
+      refColumn: f.refColumn
+    }))
+    return {
+      columns: fields.map((f) => {
+        const m = metaMap.get(f.name)
+        return { name: f.name, type: m?.type, nullable: m?.nullable === 'YES' }
+      }),
+      rows: rows as Record<string, unknown>[],
+      primaryKey: (pkRows as Array<{ name: string }>).map((r) => r.name),
+      foreignKeys
+    }
+  }
+
+  async searchRows(
+    entity: EntityRef,
+    term: string,
+    limit: number,
+    offset: number
+  ): Promise<SearchResult> {
+    const { limit: l, offset: o } = safePaging(limit, offset)
+    const [colRows] = (await (await this.ensure()).query(
+      `SELECT COLUMN_NAME AS name, COLUMN_TYPE AS type
+         FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
+        ORDER BY ORDINAL_POSITION`,
+      [entity.name]
+    )) as [RowDataPacket[], FieldPacket[]]
+    const cols = colRows as Array<{ name: string; type: string }>
+    const names = cols.map((c) => c.name)
+    const search = buildSearch(
+      names,
+      term,
+      quoteIdent,
+      () => '?',
+      (col) => `CAST(${col} AS CHAR)`
+    )
+    const order = names.length ? ` ORDER BY ${quoteIdent(names[0])}` : ''
+    const [rows] = (await (await this.ensure()).query(
+      `SELECT * FROM ${quoteIdent(entity.name)}${search.clause}${order} LIMIT ${l} OFFSET ${o}`,
+      search.params
+    )) as [RowDataPacket[], FieldPacket[]]
+    return {
+      columns: cols.map((c) => ({ name: c.name, type: c.type })),
+      rows: rows as Record<string, unknown>[]
+    }
+  }
+
+  async countRows(entity: EntityRef, filters?: Filter[]): Promise<number> {
+    const where = buildWhere(filters, quoteIdent, () => '?')
+    const [rows] = (await (await this.ensure()).query(
+      `SELECT count(*) AS c FROM ${quoteIdent(entity.name)}${where.clause}`,
+      where.params
+    )) as [RowDataPacket[], FieldPacket[]]
+    return Number((rows[0] as { c: number | bigint }).c)
+  }
+
+  async applyChanges(
+    entity: EntityRef,
+    changes: ChangeSet
+  ): Promise<ApplyResult> {
+    const target = quoteIdent(entity.name)
+    const statements: string[] = []
+    await (await this.ensure()).beginTransaction()
+    try {
+      let affected = 0
+      const run = async (sql: string, params: unknown[]): Promise<void> => {
+        const [res] = (await this.conn!.query(sql, params)) as [
+          ResultSetHeader,
+          FieldPacket[]
+        ]
+        affected += res.affectedRows ?? 0
+        statements.push(renderSql(sql, params, '?'))
+      }
+      for (const row of changes.inserts) {
+        const built = buildInsert(target, row, quoteIdent, () => '?')
+        if (built) await run(built.sql, built.params)
+      }
+      for (const e of changes.updates) {
+        const { sql, params } = buildUpdate(
+          target,
+          e.changes,
+          e.pk,
+          quoteIdent,
+          () => '?'
+        )
+        await run(sql, params)
+      }
+      for (const pk of changes.deletes) {
+        const { sql, params } = buildDelete(target, pk, quoteIdent, () => '?')
+        await run(sql, params)
+      }
+      await this.conn?.commit()
+      return { affected, statements }
+    } catch (err) {
+      await this.conn?.rollback()
+      throw err
+    }
+  }
+
+  async describeTable(entity: EntityRef): Promise<TableStructure> {
+    const [colRows] = (await (await this.ensure()).query(
+      `SELECT COLUMN_NAME AS name, COLUMN_TYPE AS type, IS_NULLABLE AS nullable,
+              COLUMN_DEFAULT AS dflt, COLUMN_KEY AS ckey
+         FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
+        ORDER BY ORDINAL_POSITION`,
+      [entity.name]
+    )) as [RowDataPacket[], FieldPacket[]]
+    const [fkRows] = (await (await this.ensure()).query(
+      `SELECT kcu.COLUMN_NAME AS col, kcu.REFERENCED_TABLE_NAME AS refTable,
+              kcu.REFERENCED_COLUMN_NAME AS refColumn, kcu.CONSTRAINT_NAME AS conname,
+              rc.UPDATE_RULE AS onUpdate, rc.DELETE_RULE AS onDelete
+         FROM information_schema.KEY_COLUMN_USAGE kcu
+         JOIN information_schema.REFERENTIAL_CONSTRAINTS rc
+           ON rc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME
+          AND rc.CONSTRAINT_SCHEMA = kcu.TABLE_SCHEMA
+        WHERE kcu.TABLE_SCHEMA = DATABASE() AND kcu.TABLE_NAME = ?
+          AND kcu.REFERENCED_TABLE_NAME IS NOT NULL`,
+      [entity.name]
+    )) as [RowDataPacket[], FieldPacket[]]
+    const fkList = fkRows as Array<{
+      col: string
+      refTable: string
+      refColumn: string
+      conname: string
+      onUpdate: string
+      onDelete: string
+    }>
+    const fkMap = new Map(
+      fkList.map((f) => [
+        f.col,
+        {
+          refTable: f.refTable,
+          refColumn: f.refColumn,
+          onUpdate: f.onUpdate,
+          onDelete: f.onDelete,
+          constraint: f.conname
+        }
+      ])
+    )
+    const relations = fkList.map((f) => ({
+      column: f.col,
+      refTable: f.refTable,
+      refColumn: f.refColumn,
+      onUpdate: f.onUpdate,
+      onDelete: f.onDelete
+    }))
+    const columns = (
+      colRows as Array<{
+        name: string
+        type: string
+        nullable: string
+        dflt: string | null
+        ckey: string
+      }>
+    ).map((c) => ({
+      name: c.name,
+      type: c.type,
+      nullable: c.nullable === 'YES',
+      default: c.dflt,
+      pk: c.ckey === 'PRI',
+      fk: fkMap.get(c.name)
+    }))
+    const [idxRows] = (await (await this.ensure()).query(
+      `SELECT INDEX_NAME AS name, NON_UNIQUE AS nonuniq, COLUMN_NAME AS col,
+              INDEX_TYPE AS method, SEQ_IN_INDEX AS seq
+         FROM information_schema.STATISTICS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
+        ORDER BY INDEX_NAME, SEQ_IN_INDEX`,
+      [entity.name]
+    )) as [RowDataPacket[], FieldPacket[]]
+    const idxMap = new Map<
+      string,
+      { unique: boolean; columns: string[]; method: string }
+    >()
+    for (const r of idxRows as Array<{
+      name: string
+      nonuniq: number
+      col: string
+      method: string
+    }>) {
+      const e = idxMap.get(r.name) ?? {
+        unique: r.nonuniq === 0,
+        columns: [],
+        method: (r.method ?? '').toLowerCase()
+      }
+      e.columns.push(r.col)
+      idxMap.set(r.name, e)
+    }
+    const indexes = [...idxMap].map(([name, v]) => ({ name, ...v }))
+    return { columns, indexes, relations }
+  }
+
+  async getCreateSql(entity: EntityRef): Promise<string> {
+    const [tt] = (await (await this.ensure()).query(
+      `SELECT TABLE_TYPE AS t FROM information_schema.TABLES
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?`,
+      [entity.name]
+    )) as [RowDataPacket[], FieldPacket[]]
+    const isView = (tt[0] as { t?: string } | undefined)?.t === 'VIEW'
+    const [rows] = (await (await this.ensure()).query(
+      `SHOW CREATE ${isView ? 'VIEW' : 'TABLE'} ${quoteIdent(entity.name)}`
+    )) as [RowDataPacket[], FieldPacket[]]
+    const r = rows[0] as Record<string, string> | undefined
+    const ddl = r?.['Create Table'] ?? r?.['Create View'] ?? ''
+    return ddl ? ddl.trim() + ';' : `-- no DDL found for ${entity.name}`
+  }
+
+  async createTable(spec: CreateTableSpec): Promise<{ ddl: string }> {
+    const ddl = buildCreateTable(spec, quoteIdent, { dialect: 'mysql' })
+    await (await this.ensure()).query(ddl)
+    return { ddl }
+  }
+
+  async alterTable(
+    entity: EntityRef,
+    ops: SchemaOp[]
+  ): Promise<{ statements: string[] }> {
+    const t = quoteIdent(entity.name)
+    const statements = ops.map((op) => {
+      switch (op.kind) {
+        case 'addColumn': {
+          const c = op.column
+          const def = c.default && c.default.trim() ? ` DEFAULT ${c.default}` : ''
+          return `ALTER TABLE ${t} ADD COLUMN ${quoteIdent(c.name)} ${c.type}${def}${c.nullable ? '' : ' NOT NULL'}`
+        }
+        case 'dropColumn':
+          return `ALTER TABLE ${t} DROP COLUMN ${quoteIdent(op.name)}`
+        case 'setDefault':
+          return `ALTER TABLE ${t} ALTER COLUMN ${quoteIdent(op.name)} SET DEFAULT ${op.default}`
+        case 'dropDefault':
+          return `ALTER TABLE ${t} ALTER COLUMN ${quoteIdent(op.name)} DROP DEFAULT`
+        case 'renameColumn':
+          return `ALTER TABLE ${t} RENAME COLUMN ${quoteIdent(op.from)} TO ${quoteIdent(op.to)}`
+        case 'alterColumn':
+          return `ALTER TABLE ${t} MODIFY ${quoteIdent(op.name)} ${op.type}${op.nullable ? ' NULL' : ' NOT NULL'}`
+        case 'addForeignKey':
+          return `ALTER TABLE ${t} ADD FOREIGN KEY (${quoteIdent(op.column)}) REFERENCES ${quoteIdent(op.refTable)} (${quoteIdent(op.refColumn)})${fkActionClause(op.onUpdate, op.onDelete)}`
+        case 'dropForeignKey':
+          return `ALTER TABLE ${t} DROP FOREIGN KEY ${quoteIdent(op.constraint)}`
+      }
+    })
+    await (await this.ensure()).beginTransaction()
+    try {
+      for (const s of statements) await (await this.ensure()).query(s)
+      await this.conn?.commit()
+      return { statements }
+    } catch (err) {
+      await this.conn?.rollback()
+      throw err
+    }
+  }
+
+  async dropEntity(
+    entity: EntityRef,
+    type: EntityType
+  ): Promise<{ statements: string[] }> {
+    const sql = `DROP ${type === 'view' ? 'VIEW' : 'TABLE'} ${quoteIdent(entity.name)}`
+    await (await this.ensure()).query(sql)
+    return { statements: [sql] }
+  }
+
+  async renameTable(
+    entity: EntityRef,
+    newName: string
+  ): Promise<{ statements: string[] }> {
+    const sql = `RENAME TABLE ${quoteIdent(entity.name)} TO ${quoteIdent(newName)}`
+    await (await this.ensure()).query(sql)
+    return { statements: [sql] }
+  }
+
+  async truncateTable(entity: EntityRef): Promise<{ statements: string[] }> {
+    const sql = `TRUNCATE TABLE ${quoteIdent(entity.name)}`
+    await (await this.ensure()).query(sql)
+    return { statements: [sql] }
+  }
+
+  async createIndex(
+    entity: EntityRef,
+    spec: IndexSpec
+  ): Promise<{ statements: string[] }> {
+    const name = spec.name?.trim() || defaultIndexName(entity.name, spec.columns)
+    const cols = spec.columns.map(quoteIdent).join(', ')
+    const m = spec.method?.toUpperCase()
+    const using = m && MYSQL_INDEX_METHODS.has(m) ? ` USING ${m}` : ''
+    const sql = `CREATE ${spec.unique ? 'UNIQUE ' : ''}INDEX ${quoteIdent(name)} ON ${quoteIdent(entity.name)} (${cols})${using}`
+    await (await this.ensure()).query(sql)
+    return { statements: [sql] }
+  }
+
+  async dropIndex(
+    entity: EntityRef,
+    name: string
+  ): Promise<{ statements: string[] }> {
+    const sql = `DROP INDEX ${quoteIdent(name)} ON ${quoteIdent(entity.name)}`
+    await (await this.ensure()).query(sql)
+    return { statements: [sql] }
+  }
+
+  async close(): Promise<void> {
+    await this.conn?.end()
+    this.conn = null
+  }
+}
