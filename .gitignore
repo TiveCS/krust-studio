@@ -1,0 +1,11 @@
+# agent / editor local state
+.claude/
+
+# node / build (app has its own too)
+node_modules/
+dist/
+out/
+*.log
+
+.DS_Store
+Thumbs.db
