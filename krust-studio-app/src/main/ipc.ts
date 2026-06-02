@@ -26,6 +26,8 @@ import {
   truncateTable,
   createIndex,
   dropIndex,
+  runScript,
+  cancelQuery,
   disconnectSession
 } from './db/session'
 import {
@@ -180,6 +182,12 @@ export function registerIpc(): void {
     (_e, id: string, entity: EntityRef, name: string) =>
       dropIndex(id, entity, name)
   )
+  ipcMain.handle(
+    'session:runScript',
+    (_e, id: string, sql: string, autoLimit?: number) =>
+      runScript(id, sql, autoLimit)
+  )
+  ipcMain.handle('session:cancelQuery', (_e, id: string) => cancelQuery(id))
   ipcMain.handle('session:disconnect', (_e, id: string) =>
     disconnectSession(id)
   )

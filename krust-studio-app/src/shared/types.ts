@@ -108,6 +108,25 @@ export interface SearchResult {
   rows: Record<string, unknown>[]
 }
 
+/** one statement's outcome in the SQL editor */
+export interface QueryResult {
+  statement: string
+  kind: 'rows' | 'affected' | 'error'
+  columns?: ColumnInfo[]
+  rows?: Record<string, unknown>[]
+  affected?: number
+  error?: string
+  /** wall-clock ms for the statement */
+  ms?: number
+}
+
+/** raw result a driver returns for one statement (kind decided by session) */
+export interface RawQueryResult {
+  columns?: ColumnInfo[]
+  rows?: Record<string, unknown>[]
+  affected?: number
+}
+
 /** one row's staged changes, identified by its primary-key values */
 export interface RowEdit {
   pk: Record<string, unknown>
@@ -404,6 +423,14 @@ export interface SessionApi {
     changes: ChangeSet
   ) => Promise<ApplyResult>
   disconnect: (id: string) => Promise<void>
+  /** SQL editor: run a script (split into statements), capturing each */
+  runScript: (
+    id: string,
+    sql: string,
+    autoLimit?: number
+  ) => Promise<QueryResult[]>
+  /** cancel the currently running query on a connection (pg/mysql) */
+  cancelQuery: (id: string) => Promise<void>
 }
 
 export interface DialogApi {

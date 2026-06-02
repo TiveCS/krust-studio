@@ -30,6 +30,7 @@ import type {
   Filter,
   ForeignKey,
   IndexSpec,
+  RawQueryResult,
   RowsResult,
   SchemaOp,
   SearchResult,
@@ -45,6 +46,7 @@ const MYSQL_INDEX_METHODS = new Set(['BTREE', 'HASH'])
 
 export class MysqlDriver implements DbDriver {
   private conn: Connection | null = null
+  private connectionId: number | null = null
 
   constructor(private deps: DriverDeps) {}
 
@@ -66,6 +68,15 @@ export class MysqlDriver implements DbDriver {
     this.conn.on('error', () => {
       this.conn = null
     })
+    try {
+      const [r] = (await this.conn.query('SELECT CONNECTION_ID() AS id')) as [
+        RowDataPacket[],
+        FieldPacket[]
+      ]
+      this.connectionId = Number((r[0] as { id: number }).id)
+    } catch {
+      this.connectionId = null
+    }
   }
 
   /** Reconnect if the connection was dropped (idle timeout, server kill). */
@@ -434,6 +445,36 @@ export class MysqlDriver implements DbDriver {
     const sql = `DROP INDEX ${quoteIdent(name)} ON ${quoteIdent(entity.name)}`
     await (await this.ensure()).query(sql)
     return { statements: [sql] }
+  }
+
+  async query(sql: string): Promise<RawQueryResult> {
+    const [result, fields] = await (await this.ensure()).query(sql)
+    if (Array.isArray(result))
+      return {
+        columns: (fields as FieldPacket[]).map((f) => ({ name: f.name })),
+        rows: result as unknown as Record<string, unknown>[]
+      }
+    return { affected: (result as ResultSetHeader).affectedRows ?? 0 }
+  }
+
+  async cancel(): Promise<void> {
+    if (this.connectionId == null) return
+    const mysql = await import('mysql2/promise')
+    const { config, password } = this.deps
+    const c = await mysql.createConnection({
+      host: config.host,
+      port: config.port ?? 3306,
+      user: config.user,
+      password,
+      database: config.database,
+      ssl: config.ssl ? {} : undefined,
+      connectTimeout: 8000
+    })
+    try {
+      await c.query(`KILL QUERY ${this.connectionId}`)
+    } finally {
+      await c.end()
+    }
   }
 
   async close(): Promise<void> {

@@ -10,6 +10,7 @@ import type {
   Filter,
   FilterOp,
   IndexSpec,
+  RawQueryResult,
   RowsResult,
   SchemaOp,
   SearchResult,
@@ -56,7 +57,106 @@ export interface DbDriver {
   truncateTable(entity: EntityRef): Promise<{ statements: string[] }>
   createIndex(entity: EntityRef, spec: IndexSpec): Promise<{ statements: string[] }>
   dropIndex(entity: EntityRef, name: string): Promise<{ statements: string[] }>
+  /** run one arbitrary statement (SQL editor); returns rows or affected count */
+  query(sql: string): Promise<RawQueryResult>
+  /** cancel the in-flight query (pg/mysql); no-op/throw on sqlite */
+  cancel(): Promise<void>
   close(): Promise<void>
+}
+
+/**
+ * Split a SQL script into statements on top-level `;`, skipping semicolons
+ * inside '…' "…" `…` strings, -- line and /* *\/ block comments, and pg $tag$
+ * dollar-quoted bodies. Good enough for the editor's run-script.
+ */
+export function splitStatements(sql: string): string[] {
+  const out: string[] = []
+  let buf = ''
+  let i = 0
+  const n = sql.length
+  let quote: string | null = null // ' " `
+  let dollarTag: string | null = null // $tag$
+  while (i < n) {
+    const c = sql[i]
+    const c2 = sql[i + 1]
+    if (quote) {
+      buf += c
+      if (c === quote) {
+        if (c === "'" && c2 === "'") {
+          buf += c2
+          i += 2
+          continue
+        }
+        quote = null
+      }
+      i++
+      continue
+    }
+    if (dollarTag) {
+      if (sql.startsWith(dollarTag, i)) {
+        buf += dollarTag
+        i += dollarTag.length
+        dollarTag = null
+        continue
+      }
+      buf += c
+      i++
+      continue
+    }
+    if (c === '-' && c2 === '-') {
+      const eol = sql.indexOf('\n', i)
+      const end = eol === -1 ? n : eol
+      buf += sql.slice(i, end)
+      i = end
+      continue
+    }
+    if (c === '/' && c2 === '*') {
+      const close = sql.indexOf('*/', i + 2)
+      const end = close === -1 ? n : close + 2
+      buf += sql.slice(i, end)
+      i = end
+      continue
+    }
+    if (c === "'" || c === '"' || c === '`') {
+      quote = c
+      buf += c
+      i++
+      continue
+    }
+    if (c === '$') {
+      const m = /^\$[A-Za-z0-9_]*\$/.exec(sql.slice(i))
+      if (m) {
+        dollarTag = m[0]
+        buf += m[0]
+        i += m[0].length
+        continue
+      }
+    }
+    if (c === ';') {
+      if (buf.trim()) out.push(buf.trim())
+      buf = ''
+      i++
+      continue
+    }
+    buf += c
+    i++
+  }
+  if (buf.trim()) out.push(buf.trim())
+  return out
+}
+
+/** classify a statement by leading keyword → history stream + result kind */
+export function classifyStatement(sql: string): {
+  stream: 'data_retrieval' | 'data_mutation' | 'table_mutation'
+  reads: boolean
+} {
+  const kw = sql.replace(/^\s*(\/\*[\s\S]*?\*\/|--[^\n]*\n)*\s*/, '').trimStart()
+  const head = kw.slice(0, 12).toUpperCase()
+  if (/^(SELECT|WITH|SHOW|EXPLAIN|PRAGMA|DESCRIBE|DESC|VALUES|TABLE)\b/.test(head))
+    return { stream: 'data_retrieval', reads: true }
+  if (/^(CREATE|ALTER|DROP|TRUNCATE|RENAME|COMMENT|GRANT|REVOKE)\b/.test(head))
+    return { stream: 'table_mutation', reads: false }
+  return { stream: 'data_mutation', reads: false }
 }
 
 /** Default index name when the user leaves it blank: `idx_<table>_<cols>`. */

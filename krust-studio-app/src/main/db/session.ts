@@ -9,6 +9,7 @@ import type {
   Filter,
   CreateTableSpec,
   IndexSpec,
+  QueryResult,
   RowsResult,
   SchemaOp,
   SearchResult,
@@ -16,6 +17,7 @@ import type {
   TableStructure
 } from '../../shared/types'
 import type { DbDriver } from './driver'
+import { splitStatements, classifyStatement } from './driver'
 import { MysqlDriver } from './drivers/mysql'
 import { PostgresDriver } from './drivers/postgres'
 import { SqliteDriver } from './drivers/sqlite'
@@ -258,6 +260,73 @@ export async function dropIndex(
   const res = await sessions.get(id)!.dropIndex(entity, name)
   await captureAll(id, 'table_mutation', res.statements, entity.name)
   return res
+}
+
+export async function runScript(
+  id: string,
+  sql: string,
+  autoLimit?: number
+): Promise<QueryResult[]> {
+  const config = getConnectionConfig(id)
+  if (!sessions.has(id)) await connectSession(id)
+  const driver = sessions.get(id)!
+  const results: QueryResult[] = []
+  for (const stmt of splitStatements(sql)) {
+    const cls = classifyStatement(stmt)
+    if (config?.readOnly && !cls.reads) {
+      const error = 'Connection is read-only; only read statements are allowed'
+      await capture({
+        connectionId: id,
+        stream: cls.stream,
+        source: 'manual',
+        statement: stmt,
+        status: 'error',
+        error
+      })
+      results.push({ statement: stmt, kind: 'error', error })
+      break
+    }
+    const exec =
+      cls.reads && autoLimit && autoLimit > 0 && !/\blimit\b/i.test(stmt)
+        ? `${stmt} LIMIT ${autoLimit}`
+        : stmt
+    const t0 = Date.now()
+    try {
+      const r = await driver.query(exec)
+      const ms = Date.now() - t0
+      results.push(
+        r.rows
+          ? { statement: stmt, kind: 'rows', columns: r.columns, rows: r.rows, ms }
+          : { statement: stmt, kind: 'affected', affected: r.affected ?? 0, ms }
+      )
+      await capture({
+        connectionId: id,
+        stream: cls.stream,
+        source: 'manual',
+        statement: stmt,
+        status: 'success',
+        affected: r.affected ?? null
+      })
+    } catch (err) {
+      const error = err instanceof Error ? err.message : String(err)
+      results.push({ statement: stmt, kind: 'error', error, ms: Date.now() - t0 })
+      await capture({
+        connectionId: id,
+        stream: cls.stream,
+        source: 'manual',
+        statement: stmt,
+        status: 'error',
+        error
+      })
+      break
+    }
+  }
+  return results
+}
+
+export async function cancelQuery(id: string): Promise<void> {
+  const driver = sessions.get(id)
+  if (driver) await driver.cancel()
 }
 
 export async function disconnectSession(id: string): Promise<void> {

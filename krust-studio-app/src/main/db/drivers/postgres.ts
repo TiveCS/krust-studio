@@ -25,6 +25,7 @@ import type {
   Filter,
   ForeignKey,
   IndexSpec,
+  RawQueryResult,
   RowsResult,
   SchemaOp,
   SearchResult,
@@ -47,6 +48,7 @@ const PG_INDEX_METHODS = new Set([
 
 export class PostgresDriver implements DbDriver {
   private client: Client | null = null
+  private backendPid: number | null = null
 
   constructor(private deps: DriverDeps) {}
 
@@ -71,6 +73,12 @@ export class PostgresDriver implements DbDriver {
       this.client = null
     })
     await this.client.connect()
+    try {
+      const r = await this.client.query('SELECT pg_backend_pid() AS pid')
+      this.backendPid = (r.rows[0] as { pid: number } | undefined)?.pid ?? null
+    } catch {
+      this.backendPid = null
+    }
   }
 
   /** Reconnect if the connection was dropped (idle timeout, admin kill). */
@@ -596,6 +604,37 @@ export class PostgresDriver implements DbDriver {
     const sql = `DROP INDEX ${qname}`
     await (await this.ensure()).query(sql)
     return { statements: [sql] }
+  }
+
+  async query(sql: string): Promise<RawQueryResult> {
+    const res = await (await this.ensure()).query(sql)
+    if (Array.isArray(res.fields) && res.fields.length > 0)
+      return {
+        columns: res.fields.map((f: { name: string }) => ({ name: f.name })),
+        rows: res.rows as Record<string, unknown>[]
+      }
+    return { affected: res.rowCount ?? 0 }
+  }
+
+  async cancel(): Promise<void> {
+    if (this.backendPid == null) return
+    const { Client } = await import('pg')
+    const { config, password } = this.deps
+    const c = new Client({
+      host: config.host,
+      port: config.port ?? 5432,
+      user: config.user,
+      password,
+      database: config.database,
+      ssl: config.ssl ? { rejectUnauthorized: false } : undefined,
+      connectionTimeoutMillis: 8000
+    })
+    await c.connect()
+    try {
+      await c.query('SELECT pg_cancel_backend($1)', [this.backendPid])
+    } finally {
+      await c.end()
+    }
   }
 
   async close(): Promise<void> {

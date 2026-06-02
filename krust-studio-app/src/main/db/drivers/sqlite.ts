@@ -12,6 +12,7 @@ import {
   buildInsert,
   buildCreateTable,
   defaultIndexName,
+  classifyStatement,
   renderSql
 } from '../driver'
 import type {
@@ -25,6 +26,7 @@ import type {
   Filter,
   ForeignKey,
   IndexSpec,
+  RawQueryResult,
   RowsResult,
   SchemaOp,
   SearchResult,
@@ -392,6 +394,21 @@ export class SqliteDriver implements DbDriver {
     const sql = `DROP INDEX ${quoteIdent(name)}`
     this.db.exec(sql)
     return { statements: [sql] }
+  }
+
+  async query(sql: string): Promise<RawQueryResult> {
+    if (!this.db) throw new Error('Not connected')
+    if (classifyStatement(sql).reads) {
+      const rows = this.db.prepare(sql).all() as Record<string, unknown>[]
+      const names = rows.length > 0 ? Object.keys(rows[0]) : []
+      return { columns: names.map((name) => ({ name })), rows }
+    }
+    const info = this.db.prepare(sql).run()
+    return { affected: Number(info.changes ?? 0) }
+  }
+
+  async cancel(): Promise<void> {
+    throw new Error('SQLite runs synchronously and cannot cancel a query')
   }
 
   async close(): Promise<void> {
