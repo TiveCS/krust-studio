@@ -235,7 +235,9 @@ export function registerIpc(): void {
       })
       if (res.canceled || !res.filePath)
         return { saved: false, tablesWritten: 0, rowsWritten: 0 }
-      return runBackup(id, spec, res.filePath)
+      return runBackup(id, spec, res.filePath, (p) =>
+        e.sender.send('backup:progress', p)
+      )
     }
   )
   ipcMain.handle('backup:restorePreview', async (e) => {

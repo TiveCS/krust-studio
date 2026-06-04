@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Loader2,
@@ -52,6 +52,21 @@ export function BackupDialog({ open, onOpenChange }: Props): React.JSX.Element {
   const [modes, setModes] = useState<Record<string, BackupTableMode>>({})
   const [dropFirst, setDropFirst] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [progress, setProgress] = useState<{
+    table: string
+    index: number
+    total: number
+  } | null>(null)
+
+  // backup progress events from main (only meaningful while a backup runs)
+  useEffect(() => {
+    const off = window.electron.ipcRenderer.on(
+      'backup:progress',
+      (_: unknown, p: { table: string; index: number; total: number }) =>
+        setProgress(p)
+    )
+    return () => off()
+  }, [])
 
   const keyOf = (e: { name: string; schema?: string }): string =>
     `${e.schema ?? ''}.${e.name}`
@@ -73,6 +88,7 @@ export function BackupDialog({ open, onOpenChange }: Props): React.JSX.Element {
       mode: modeOf(e)
     }))
     setBusy(true)
+    setProgress(null)
     try {
       const res = await window.api.backup.run(openConnectionId, {
         tables: specTables,
@@ -89,6 +105,7 @@ export function BackupDialog({ open, onOpenChange }: Props): React.JSX.Element {
       toast.error(err instanceof Error ? err.message : String(err))
     } finally {
       setBusy(false)
+      setProgress(null)
     }
   }
 
@@ -234,7 +251,9 @@ export function BackupDialog({ open, onOpenChange }: Props): React.JSX.Element {
 
             <div className="flex items-center justify-end gap-2">
               <span className="mr-auto text-xs text-muted-foreground">
-                {selectedCount} object(s) selected
+                {busy && progress
+                  ? `Backing up ${progress.table} (${progress.index}/${progress.total})…`
+                  : `${selectedCount} object(s) selected`}
               </span>
               <Button variant="ghost" onClick={() => onOpenChange(false)}>
                 Cancel

@@ -70,10 +70,18 @@ function sqlLiteral(driver: DriverType, v: unknown): string {
  * Schema via getCreateSql; data paged through readRows (auto-retry aware) and
  * written incrementally so large tables stream rather than buffer in memory.
  */
+export interface BackupProgress {
+  table: string
+  index: number
+  total: number
+  rowsWritten: number
+}
+
 export async function runBackup(
   id: string,
   spec: BackupSpec,
-  filePath: string
+  filePath: string,
+  onProgress?: (p: BackupProgress) => void
 ): Promise<BackupResult> {
   const config = getConnectionConfig(id)
   if (!config) throw new Error('Connection not found')
@@ -96,8 +104,11 @@ export async function runBackup(
         `-- connection: ${config.name} (${driver})\n\n`
     )
     await write(guards.head)
-    for (const t of spec.tables) {
-      if (t.mode === 'skip') continue
+    const included = spec.tables.filter((t) => t.mode !== 'skip')
+    let tableIndex = 0
+    for (const t of included) {
+      tableIndex++
+      onProgress?.({ table: t.name, index: tableIndex, total: included.length, rowsWritten })
       const entity: EntityRef = { name: t.name, schema: t.schema }
       const tgt = target(driver, entity)
       await write(`-- ---------- ${t.name} ----------\n`)
