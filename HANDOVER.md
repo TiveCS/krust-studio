@@ -66,15 +66,31 @@ App lives in `krust-studio-app/`. Docs (this file, CONTEXT.md, ADRs) at repo roo
     read-only connections block all writes here (main-process enforced). Also
     exposes `listDatabases`/`currentDatabase`/`useDatabase`. `runScript`
     records the **executed** SQL (auto-LIMIT inlined) to results + history.
+    `withRetry()` wraps reads + transactional writes for **idle-drop auto-retry**
+    (drops the dead driver, reconnects once, retries — `isConnectionFatal()` in
+    `driver.ts` classifies). `reconnectSession()` backs manual reconnect;
+    `execRestoreStatement()` runs one restore statement (no auto-retry, DDL-only
+    capture). `listReferencingTables()` powers the reverse-FK sub-tab.
+  - `db/backup.ts` — **Backup / Restore**. `runBackup()` streams an engine-aware
+    `.sql` dump (schema via `getCreateSql`, data paged via `readRows` ordered by
+    PK, engine-aware literal/identifier quoting, FK-disable guards so it restores
+    regardless of table order), emits `backup:progress`. `restorePreview()`
+    dry-runs (parse + classify + flag DROP/DELETE/TRUNCATE); `restoreRun()`
+    executes (no auto-retry, FK-guard statements soft-fail, stop-on-error).
   - `store/connections.ts` — connections.json + password encryption via
-    `safeStorage` (DPAPI).
+    `safeStorage` (DPAPI). `getConnectionConfig()` reads driver/name for backup.
+  - `store/workspace.ts` — `workspace.json` (userData): `loadWorkspace()` /
+    `saveWorkspace()` — open tabs + activeTabId **per connection+database key**
+    (`connectionId:dbName`) + `lastConnectionId`. Debounced + flushed by the
+    renderer store; fail-soft restore.
   - `store/history.ts` — Query History + Changeset store: `history.db`
     (node:sqlite) in the data dir. `capture()` (best-effort, auto-attaches DDL to
     the connection's active changeset) + `listHistory`/`clearHistory` +
     changeset CRUD (`listChangesets`/`create`/`rename`/`delete`/`setActive`/
     `assignEntries`) + `buildChangesetSql`/`markExported`. Fed by `session.ts`
     after each successful mutation (ADR 0008, ADR 0002).
-  - `ipc.ts` — all `connections:*`, `session:*`, `history:*` handlers.
+  - `ipc.ts` — all `connections:*`, `session:*`, `history:*`, `workspace:*`,
+    `backup:*` handlers.
   - `index.ts` — window + **auto-updater** (`electron-updater`, GitHub Releases,
     ADR-0009): checks ~5s after show, downloads in background, sends
     `update:available`/`update:downloaded` to the renderer; `update:install`
@@ -105,15 +121,23 @@ App lives in `krust-studio-app/`. Docs (this file, CONTEXT.md, ADRs) at repo roo
     Presentational (props `columns`/`value`/`onApply`, no store coupling).
   - `components/TableTabView.tsx` — routes draft→NewTableEditor,
     else Data/Structure (bottom toggle).
-  - `components/StructureView.tsx` — Columns/Indexes/Relations/DDL sub-tabs +
-    refresh. **Owns the unified staged-commit**: column draft + staged index
-    add/drop, one `ops = [...dropIndex, ...colOps, ...addIndex]`, shared footer
-    (pending count · **Commit…** · Discard) + DDL review **Sheet** (`previewAlter`
-    dry-run → confirm → `alterTable`). Index add/drop stage (green/red), never
-    fire on click.
+  - `components/StructureView.tsx` — Columns/Indexes/Relations/**Referenced
+    by**/DDL sub-tabs + refresh. Sub-tab lives in **tab state**
+    (`tab.structureSub`, persisted) not local — powers **walkable relations**
+    (click a refTable in Relations or Referenced-by → opens it at Structure →
+    Relations via `openTable(ref, undefined, { view, structureSub })`).
+    Referenced-by lazy-fetched + cached on the tab. Fetches structure on mount
+    if null (covers restored structure tabs). **Owns the unified staged-commit**:
+    column draft + staged index add/drop, one `ops = [...dropIndex, ...colOps,
+    ...addIndex]`, shared footer + DDL review **Sheet**.
   - `components/StructureEditor.tsx` — controlled column editor (props: draft,
-    onDraftChange, movedNames); per-engine limitation banner + ColumnsEditor.
-    Drag-to-reorder (canReorder=mysql). No longer owns commit.
+    onDraftChange, movedNames); per-engine limitation banner + ColumnsEditor +
+    **column search** input (`nameFilter`, display-only; reorder disabled while
+    filtering). Drag-to-reorder (canReorder=mysql). No longer owns commit.
+  - `components/BackupDialog.tsx` — Backup/Restore (sidebar toolbar). Backup:
+    per-object mode rows (skip/schema/schema+data) + set-all + dropFirst, live
+    `backup:progress`. Restore: choose file → preview (destructive rows red) →
+    stop-on-error → two-step destructive confirm → refreshes the tree after.
   - `lib/columnDiff.ts` — `seed` + `diff` (draft vs original → SchemaOp[],
     incl. minimal LIS `moveColumn` ops). Shared by StructureView.
   - `components/NewTableEditor.tsx` — new-table draft; shares `ColumnsEditor`.
