@@ -61,7 +61,9 @@ export function FkInlinePicker({
 }: Props): React.JSX.Element {
   const [term, setTerm] = useState('')
   const [filters, setFilters] = useState<Filter[]>(() =>
-    currentValue != null
+    // pre-filter to the current value so the selected row is immediately visible
+    // — but NOT for new/empty cells (would filter to refColumn = '' → no rows)
+    currentValue != null && String(currentValue) !== ''
       ? [{ column: refColumn, op: 'eq' as const, value: String(currentValue) }]
       : []
   )

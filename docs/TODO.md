@@ -259,3 +259,10 @@ CONTEXT.md **Session** + **Workspace & Tabs** + **Referenced By (Reverse FK)**.
   (sqlite). Leave PK untouched for auto-increment.
 - SQLite: existing-column type/nullability + FK add/drop unsupported (native
   ALTER limit; banner shown). No table-rebuild fallback by design (ADR-0002).
+- Backup data export formats Postgres array columns (`text[]`, etc.) as JSON
+  (`'["a","b"]'`) rather than pg array literal (`'{a,b}'`) — restoring such a
+  column would fail. Niche; pg-array-literal formatting deferred. Scalars,
+  JSON/JSONB, bytea (hex), dates all dump correctly.
+- Backup uses Postgres's reconstructed (approximate) CREATE TABLE for the schema
+  dump — same caveat as the Structure → DDL sub-tab. mysql/sqlite use native
+  SHOW CREATE / sqlite_master (exact).
