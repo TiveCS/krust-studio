@@ -4,6 +4,17 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [1.2.1] — 2026-06-04
+
+### Fixed
+- **Windows build** — NSIS `oneClick: false` so the install-directory picker
+  works (`allowToChangeInstallationDirectory` needs the assisted installer).
+- **Release safety** — tag builds now publish a **draft** GitHub Release; review
+  and publish manually so a failed/partial build never reaches auto-update
+  clients.
+
+(No app-behavior changes vs 1.2.0 — packaging/release fixes only.)
+
 ## [1.2.0] — 2026-06-03
 
 ### Added
@@ -67,6 +78,7 @@ All notable changes to Krust Studio. Format loosely follows
   pagination, FK navigation/expansion/picker, structure editor, Captured DDL →
   Changesets, query history, CSV/JSON export.
 
+[1.2.1]: https://github.com/TiveCS/krust-studio/releases/tag/v1.2.1
 [1.2.0]: https://github.com/TiveCS/krust-studio/releases/tag/v1.2.0
 [1.1.0]: https://github.com/TiveCS/krust-studio/releases/tag/v1.1.0
 [1.0.0]: https://github.com/TiveCS/krust-studio/releases/tag/v1.0.0
