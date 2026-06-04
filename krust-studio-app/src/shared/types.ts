@@ -522,10 +522,70 @@ export interface WorkspaceApi {
   save: (data: WorkspaceData) => Promise<void>
 }
 
+/** per-table backup choice: schema-only, schema+data, or skip the table */
+export type BackupTableMode = 'schema' | 'schema+data' | 'skip'
+
+export interface BackupTableSpec {
+  name: string
+  schema?: string
+  type: EntityType
+  mode: BackupTableMode
+}
+
+export interface BackupSpec {
+  tables: BackupTableSpec[]
+  /** emit `DROP TABLE IF EXISTS` before each CREATE */
+  dropFirst: boolean
+}
+
+export interface BackupResult {
+  saved: boolean
+  path?: string
+  tablesWritten: number
+  rowsWritten: number
+}
+
+/** one parsed statement in a restore dry-run */
+export interface RestoreStatement {
+  statement: string
+  /** leading keyword classification */
+  kind: 'ddl' | 'dml' | 'read' | 'other'
+  /** true for DROP / DELETE / TRUNCATE — surfaced as a warning before run */
+  destructive: boolean
+}
+
+export interface RestorePreview {
+  statements: RestoreStatement[]
+  total: number
+  destructiveCount: number
+}
+
+/** per-statement outcome of an executed restore */
+export interface RestoreRunResult {
+  ran: number
+  failed: number
+  /** index + message of the first error (when stop-on-error or any failure) */
+  errors: { index: number; statement: string; error: string }[]
+}
+
+export interface BackupApi {
+  /** export selected tables (schema/data per table) to a chosen .sql file */
+  run: (id: string, spec: BackupSpec) => Promise<BackupResult>
+  /** parse a .sql dump (chosen via open dialog) without executing — dry run */
+  restorePreview: () => Promise<{ canceled: boolean; path?: string; preview?: RestorePreview }>
+  /** execute a previously-previewed dump against the connection */
+  restoreRun: (
+    id: string,
+    path: string,
+    stopOnError: boolean
+  ) => Promise<RestoreRunResult>
+}
+
 export interface KrustApi {
   connections: ConnectionsApi
   sessions: SessionApi
   history: HistoryApi
   dialog: DialogApi
   workspace: WorkspaceApi
+  backup: BackupApi
 }

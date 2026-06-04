@@ -14,7 +14,8 @@ import {
   ChevronRight,
   ChevronDown,
   Tags,
-  History as HistoryIcon
+  History as HistoryIcon,
+  DatabaseBackup
 } from 'lucide-react'
 import {
   Sidebar,
@@ -48,6 +49,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { DatabaseSwitcher } from '@/components/DatabaseSwitcher'
 import { ConnectionSwitcher } from '@/components/ConnectionSwitcher'
+import { BackupDialog } from '@/components/BackupDialog'
 import { useConnections } from '@/store/connections'
 import type { EntityRef, EntityType, EnumType } from '../../../shared/types'
 
@@ -81,6 +83,7 @@ export function AppSidebar(): React.JSX.Element {
   } | null>(null)
   const [confirmText, setConfirmText] = useState('')
   const [busy, setBusy] = useState(false)
+  const [backupOpen, setBackupOpen] = useState(false)
 
   const current = connections.find((c) => c.id === openConnectionId)
   const readOnly = current?.readOnly ?? false
@@ -227,6 +230,13 @@ export function AppSidebar(): React.JSX.Element {
               >
                 <HistoryIcon className="size-3.5" />
               </button>
+              <button
+                onClick={() => setBackupOpen(true)}
+                title="Backup / Restore"
+                className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+              >
+                <DatabaseBackup className="size-3.5" />
+              </button>
             </div>
             <EntityGroup
               label="Tables"
@@ -269,6 +279,9 @@ export function AppSidebar(): React.JSX.Element {
       <SidebarFooter>
         <ConnectionSwitcher />
       </SidebarFooter>
+
+      {/* Backup / Restore */}
+      <BackupDialog open={backupOpen} onOpenChange={setBackupOpen} />
 
       {/* Rename table */}
       <Dialog

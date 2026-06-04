@@ -376,6 +376,30 @@ export async function runScript(
   return results
 }
 
+/**
+ * Run one statement as part of a restore. **No auto-retry** — a partially
+ * applied write must not silently re-run. Only DDL (table_mutation) is captured
+ * to history; bulk DML (thousands of INSERTs) is skipped to avoid flooding the
+ * audit log — the restore was explicitly previewed + confirmed by the user.
+ */
+export async function execRestoreStatement(id: string, sql: string): Promise<void> {
+  const config = getConnectionConfig(id)
+  if (config?.readOnly)
+    throw new Error('Connection is read-only; restore is blocked')
+  if (!sessions.has(id)) await connectSession(id)
+  const cls = classifyStatement(sql)
+  await sessions.get(id)!.query(sql)
+  if (cls.stream === 'table_mutation') {
+    await capture({
+      connectionId: id,
+      stream: 'table_mutation',
+      source: 'manual',
+      statement: sql,
+      status: 'success'
+    })
+  }
+}
+
 export async function cancelQuery(id: string): Promise<void> {
   const driver = sessions.get(id)
   if (driver) await driver.cancel()

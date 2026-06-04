@@ -5,9 +5,11 @@ import {
   saveConnection,
   removeConnection,
   getStoredPassword,
-  duplicateConnection
+  duplicateConnection,
+  getConnectionConfig
 } from './store/connections'
 import { loadWorkspace, saveWorkspace } from './store/workspace'
+import { runBackup, restorePreview, restoreRun } from './db/backup'
 import { testConnection } from './db/test-connection'
 import {
   connectSession,
@@ -60,7 +62,8 @@ import type {
   IndexSpec,
   HistoryQuery,
   HistoryStream,
-  WorkspaceData
+  WorkspaceData,
+  BackupSpec
 } from '../shared/types'
 import type {
   SaveConnectionInput,
@@ -217,6 +220,41 @@ export function registerIpc(): void {
 
   ipcMain.handle('workspace:load', () => loadWorkspace())
   ipcMain.handle('workspace:save', (_e, data: WorkspaceData) => saveWorkspace(data))
+
+  ipcMain.handle(
+    'backup:run',
+    async (e, id: string, spec: BackupSpec) => {
+      const win = BrowserWindow.fromWebContents(e.sender) ?? undefined
+      const safeName =
+        (getConnectionConfig(id)?.name ?? 'backup').replace(/[^\w.-]+/g, '_').slice(0, 60) ||
+        'backup'
+      const res = await dialog.showSaveDialog(win!, {
+        title: 'Save backup',
+        defaultPath: `${safeName}.sql`,
+        filters: [{ name: 'SQL', extensions: ['sql'] }]
+      })
+      if (res.canceled || !res.filePath)
+        return { saved: false, tablesWritten: 0, rowsWritten: 0 }
+      return runBackup(id, spec, res.filePath)
+    }
+  )
+  ipcMain.handle('backup:restorePreview', async (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender) ?? undefined
+    const res = await dialog.showOpenDialog(win!, {
+      title: 'Choose a backup to restore',
+      properties: ['openFile'],
+      filters: [{ name: 'SQL', extensions: ['sql'] }]
+    })
+    if (res.canceled || !res.filePaths[0]) return { canceled: true }
+    const path = res.filePaths[0]
+    const preview = await restorePreview(path)
+    return { canceled: false, path, preview }
+  })
+  ipcMain.handle(
+    'backup:restoreRun',
+    (_e, id: string, path: string, stopOnError: boolean) =>
+      restoreRun(id, path, stopOnError)
+  )
 
   ipcMain.handle('history:list', (_e, query: HistoryQuery) => listHistory(query))
   ipcMain.handle(

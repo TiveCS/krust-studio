@@ -14,7 +14,8 @@ import type {
   IndexSpec,
   HistoryQuery,
   HistoryStream,
-  WorkspaceData
+  WorkspaceData,
+  BackupSpec
 } from '../shared/types'
 
 const api: KrustApi = {
@@ -101,6 +102,13 @@ const api: KrustApi = {
   workspace: {
     load: () => ipcRenderer.invoke('workspace:load'),
     save: (data: WorkspaceData) => ipcRenderer.invoke('workspace:save', data)
+  },
+  backup: {
+    run: (id: string, spec: BackupSpec) =>
+      ipcRenderer.invoke('backup:run', id, spec),
+    restorePreview: () => ipcRenderer.invoke('backup:restorePreview'),
+    restoreRun: (id: string, path: string, stopOnError: boolean) =>
+      ipcRenderer.invoke('backup:restoreRun', id, path, stopOnError)
   },
   dialog: {
     saveText: (defaultName: string, content: string) =>
