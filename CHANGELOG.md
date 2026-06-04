@@ -4,15 +4,20 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
-## [1.2.2] — 2026-06-04
+## [1.2.3] — 2026-06-04
 
 ### Fixed
-- **Packaged app crashed on launch** — `Cannot find module 'ms'`. pnpm's
-  symlinked store hid a deep transitive dep (`electron-updater` →
-  `builder-util-runtime` → `debug` → `ms`) from electron-builder's asar packer.
-  Switched to a flat install (`.npmrc` `node-linker=hoisted`).
+- **Packaged app crashed on launch** — `Cannot find module 'ms'` (for real this
+  time, verified with a local packaged build). `electron-builder` strips
+  `debug`/`ms` from the asar as its own build-tooling deps — but
+  `electron-updater` needs them at runtime (shared `builder-util-runtime` chain).
+  Fix: **bundle `electron-updater` into the main process**
+  (`externalizeDepsPlugin({ exclude: ['electron-updater'] })`) so the chain is
+  inlined and nothing external needs packing. (The 1.2.2 hoist attempt didn't
+  work — the exclusion is deliberate, not a hoisting gap.)
 
-(No app-behavior changes vs 1.2.0 — packaging fix only.)
+(No app-behavior changes vs 1.2.0 — packaging fix only. 1.2.1/1.2.2 builds were
+broken; use this.)
 
 ## [1.2.1] — 2026-06-04
 
@@ -88,6 +93,7 @@ All notable changes to Krust Studio. Format loosely follows
   pagination, FK navigation/expansion/picker, structure editor, Captured DDL →
   Changesets, query history, CSV/JSON export.
 
+[1.2.3]: https://github.com/TiveCS/krust-studio/releases/tag/v1.2.3
 [1.2.2]: https://github.com/TiveCS/krust-studio/releases/tag/v1.2.2
 [1.2.1]: https://github.com/TiveCS/krust-studio/releases/tag/v1.2.1
 [1.2.0]: https://github.com/TiveCS/krust-studio/releases/tag/v1.2.0
