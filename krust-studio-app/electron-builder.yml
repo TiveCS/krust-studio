@@ -45,3 +45,6 @@ publish:
   provider: github
   owner: TiveCS
   repo: krust-studio
+  # tag builds create a DRAFT release — review + publish manually so a failed or
+  # partial build never goes public (and never reaches auto-update clients)
+  releaseType: draft
