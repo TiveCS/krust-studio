@@ -119,9 +119,13 @@ function toConfig(v: FormValues): ConnectionConfig {
 interface Props {
   /** the existing connection being edited, or null for a new one */
   existing: ConnectionSummary | null
+  /** called after a successful save (new or update); receives the saved connection */
+  onSaved?: (saved: ConnectionSummary) => void
+  /** called when the user clicks Connect (to let the tab close itself) */
+  onConnected?: () => void
 }
 
-export function ConnectionForm({ existing }: Props): React.JSX.Element {
+export function ConnectionForm({ existing, onSaved, onConnected }: Props): React.JSX.Element {
   const save = useConnections((s) => s.save)
   const remove = useConnections((s) => s.remove)
   const duplicate = useConnections((s) => s.duplicate)
@@ -180,10 +184,11 @@ export function ConnectionForm({ existing }: Props): React.JSX.Element {
   }
 
   const onSubmit = handleSubmit(async (values) => {
-    await save({
+    const saved = await save({
       config: toConfig(values),
       password: values.password || undefined
     })
+    onSaved?.(saved)
   })
 
   return (
@@ -351,7 +356,10 @@ export function ConnectionForm({ existing }: Props): React.JSX.Element {
             <Button
               type="button"
               variant="secondary"
-              onClick={() => open(existing.id)}
+              onClick={() => {
+                void open(existing.id)
+                onConnected?.()
+              }}
               title="Connect and browse schema"
             >
               <Power />

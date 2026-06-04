@@ -1,6 +1,13 @@
-import { X, Table2, SquareTerminal, Plus } from 'lucide-react'
+import { X, Table2, SquareTerminal, Plus, History, Plug } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useConnections } from '@/store/connections'
+
+function TabIcon({ tab }: { tab: { kind?: string; query: unknown; draft: unknown } }): React.JSX.Element {
+  if (tab.kind === 'history') return <History className="size-3.5 opacity-60" />
+  if (tab.kind === 'connection-editor') return <Plug className="size-3.5 opacity-60" />
+  if (tab.query) return <SquareTerminal className="size-3.5 opacity-60" />
+  return <Table2 className="size-3.5 opacity-60" />
+}
 
 export function TabBar(): React.JSX.Element | null {
   const { tabs, activeTabId, openConnectionId, setActiveTab, closeTab, openQuery } =
@@ -20,11 +27,7 @@ export function TabBar(): React.JSX.Element | null {
               : 'text-muted-foreground hover:bg-accent/40'
           )}
         >
-          {t.query ? (
-            <SquareTerminal className="size-3.5 opacity-60" />
-          ) : (
-            <Table2 className="size-3.5 opacity-60" />
-          )}
+          <TabIcon tab={t} />
           <span className="font-mono">{t.entity.name}</span>
           <button
             onClick={(e) => {

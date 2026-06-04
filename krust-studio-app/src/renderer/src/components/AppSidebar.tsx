@@ -63,14 +63,14 @@ export function AppSidebar(): React.JSX.Element {
     refreshEntities,
     openTable,
     openNewTable,
+    openHistoryTab,
     dropEntity,
     renameTable,
     truncateTable,
-    screen,
-    setScreen,
     tabs,
     activeTabId
   } = useConnections()
+  const historyActive = tabs.find((t) => t.id === activeTabId)?.kind === 'history'
   const [filter, setFilter] = useState('')
   const [renameTarget, setRenameTarget] = useState<EntityRef | null>(null)
   const [renameValue, setRenameValue] = useState('')
@@ -218,13 +218,11 @@ export function AppSidebar(): React.JSX.Element {
                 <Plus className="size-3.5" />
               </button>
               <button
-                onClick={() => setScreen(screen === 'history' ? 'tables' : 'history')}
+                onClick={() => openHistoryTab()}
                 title="Query history"
                 className={cn(
                   'rounded p-1 hover:bg-accent hover:text-foreground',
-                  screen === 'history'
-                    ? 'text-primary'
-                    : 'text-muted-foreground'
+                  historyActive ? 'text-primary' : 'text-muted-foreground'
                 )}
               >
                 <HistoryIcon className="size-3.5" />

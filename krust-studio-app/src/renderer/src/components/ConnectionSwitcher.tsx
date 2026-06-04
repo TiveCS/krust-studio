@@ -41,8 +41,7 @@ export function ConnectionSwitcher(): React.JSX.Element {
     openConnectionId,
     sessionStatus,
     open,
-    startNew,
-    select,
+    openConnectionEditorTab,
     disconnect,
     reconnect
   } = useConnections()
@@ -97,7 +96,7 @@ export function ConnectionSwitcher(): React.JSX.Element {
               <CommandItem
                 onSelect={() => {
                   setSwitcherOpen(false)
-                  startNew()
+                  openConnectionEditorTab(null)
                 }}
               >
                 <Plus className="size-4" />
@@ -107,7 +106,7 @@ export function ConnectionSwitcher(): React.JSX.Element {
                 <CommandItem
                   onSelect={() => {
                     setSwitcherOpen(false)
-                    select(current.id)
+                    openConnectionEditorTab(current.id)
                   }}
                 >
                   <Pencil className="size-4" />

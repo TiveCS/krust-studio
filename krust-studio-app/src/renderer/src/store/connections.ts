@@ -34,6 +34,10 @@ type SessionStatus = 'idle' | 'connecting' | 'connected' | 'disconnected' | 'err
 export interface Tab {
   id: string
   entity: EntityRef
+  /** undefined / absent = regular table/query/new-table tab */
+  kind?: 'history' | 'connection-editor'
+  /** set on connection-editor tabs: which connection to edit (null = new) */
+  connectionEditor?: { connectionId: string | null }
   data: RowsResult | null
   loading: boolean
   error: string | null
@@ -71,12 +75,8 @@ function entityKey(e: EntityRef): string {
 
 interface ConnectionsState {
   connections: ConnectionSummary[]
-  selectedId: string | null
   loading: boolean
-  creatingNew: boolean
   load: () => Promise<void>
-  select: (id: string | null) => void
-  startNew: () => void
   save: (input: SaveConnectionInput) => Promise<ConnectionSummary>
   remove: (id: string) => Promise<void>
   duplicate: (id: string) => Promise<ConnectionSummary>
@@ -102,14 +102,17 @@ interface ConnectionsState {
   /** Force clean teardown + fresh connect. Reloads entities on success. */
   reconnect: () => Promise<void>
 
-  // which full-area screen is showing
-  screen: 'tables' | 'history'
-  setScreen: (screen: 'tables' | 'history') => void
-
   // open table tabs
   tabs: Tab[]
   activeTabId: string | null
   pageSize: number
+  /** Open/focus the History tab for the current connection (singleton). */
+  openHistoryTab: () => void
+  /** Open/focus a connection-editor tab. `connectionId` null = new connection. */
+  openConnectionEditorTab: (connectionId: string | null) => void
+  /** Update an editor tab's stored connectionId after saving a new connection. */
+  patchEditorTabConnection: (tabId: string, connectionId: string) => void
+
   openTable: (entity: EntityRef, initialFilters?: Filter[]) => Promise<void>
   openNewTable: () => void
   openQuery: () => void
@@ -171,9 +174,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
 
   return {
     connections: [],
-    selectedId: null,
     loading: false,
-    creatingNew: false,
 
     load: async () => {
       set({ loading: true })
@@ -181,27 +182,21 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       set({ loading: false, connections })
     },
 
-    select: (id) => set({ selectedId: id, creatingNew: false }),
-
-    startNew: () => set({ selectedId: null, creatingNew: true }),
-
     save: async (input) => {
       const saved = await window.api.connections.save(input)
       await get().load()
-      set({ selectedId: saved.id, creatingNew: false })
       return saved
     },
 
     remove: async (id) => {
       await window.api.connections.remove(id)
       await get().load()
-      if (get().selectedId === id) set({ selectedId: null })
     },
 
     duplicate: async (id) => {
       const copy = await window.api.connections.duplicate(id)
       await get().load()
-      set({ selectedId: copy.id, creatingNew: false })
+      get().openConnectionEditorTab(copy.id)
       return copy
     },
 
@@ -216,8 +211,6 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     open: async (id) => {
       set({
         openConnectionId: id,
-        selectedId: null,
-        creatingNew: false,
         sessionStatus: 'connecting',
         sessionError: null,
         entities: [],
@@ -272,8 +265,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
           enums,
           sessionStatus: 'connected',
           tabs: [],
-          activeTabId: null,
-          screen: 'tables'
+          activeTabId: null
         })
       } catch (err) {
         set({
@@ -401,24 +393,67 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       }
     },
 
-    screen: 'tables',
-    setScreen: (screen) => set({ screen }),
-
     tabs: [],
     activeTabId: null,
     pageSize: PAGE_SIZE,
+
+    openHistoryTab: () => {
+      const existing = get().tabs.find((t) => t.kind === 'history')
+      if (existing) {
+        set({ activeTabId: existing.id })
+        return
+      }
+      const tab: Tab = {
+        id: crypto.randomUUID(),
+        kind: 'history',
+        entity: { name: 'History' },
+        data: null, loading: false, error: null, pageIndex: 0, total: null,
+        counting: false, filters: [], orderBy: [], edits: {}, deletes: [],
+        inserts: [], colWidths: {}, committing: false, view: 'data',
+        structure: null, structureLoading: false, draft: null, query: null
+      }
+      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
+    },
+
+    openConnectionEditorTab: (connectionId) => {
+      const existing = get().tabs.find(
+        (t) => t.kind === 'connection-editor' &&
+               t.connectionEditor?.connectionId === connectionId
+      )
+      if (existing) {
+        set({ activeTabId: existing.id })
+        return
+      }
+      const conn = connectionId
+        ? get().connections.find((c) => c.id === connectionId)
+        : null
+      const tab: Tab = {
+        id: crypto.randomUUID(),
+        kind: 'connection-editor',
+        connectionEditor: { connectionId },
+        entity: { name: conn?.name ?? (connectionId ? 'Connection' : 'New connection') },
+        data: null, loading: false, error: null, pageIndex: 0, total: null,
+        counting: false, filters: [], orderBy: [], edits: {}, deletes: [],
+        inserts: [], colWidths: {}, committing: false, view: 'data',
+        structure: null, structureLoading: false, draft: null, query: null
+      }
+      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
+    },
+
+    patchEditorTabConnection: (tabId, connectionId) => {
+      const conn = get().connections.find((c) => c.id === connectionId)
+      patchTab(tabId, {
+        entity: { name: conn?.name ?? 'Connection' },
+        connectionEditor: { connectionId }
+      })
+    },
 
     openTable: async (entity, initialFilters) => {
       const existing = get().tabs.find(
         (t) => entityKey(t.entity) === entityKey(entity)
       )
       if (existing) {
-        set({
-          activeTabId: existing.id,
-          screen: 'tables',
-          selectedId: null,
-          creatingNew: false
-        })
+        set({ activeTabId: existing.id })
         if (initialFilters) {
           patchTab(existing.id, {
             filters: initialFilters,
@@ -454,13 +489,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         draft: null,
         query: null
       }
-      set((s) => ({
-        tabs: [...s.tabs, tab],
-        activeTabId: tab.id,
-        screen: 'tables',
-        selectedId: null,
-        creatingNew: false
-      }))
+      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
       await fetchTab(tab.id)
     },
 
@@ -490,13 +519,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         },
         query: null
       }
-      set((s) => ({
-        tabs: [...s.tabs, tab],
-        activeTabId: tab.id,
-        screen: 'tables',
-        selectedId: null,
-        creatingNew: false
-      }))
+      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
     },
 
     openQuery: () => {
@@ -522,13 +545,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         draft: null,
         query: { sql: '', results: [], running: false, autoLimit: 500 }
       }
-      set((s) => ({
-        tabs: [...s.tabs, tab],
-        activeTabId: tab.id,
-        screen: 'tables',
-        selectedId: null,
-        creatingNew: false
-      }))
+      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
     },
 
     setQuerySql: (sql) => {
@@ -599,7 +616,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     },
 
     setActiveTab: (tabId) =>
-      set({ activeTabId: tabId, selectedId: null, creatingNew: false }),
+      set({ activeTabId: tabId }),
 
     gotoPage: async (index) => {
       const id = get().activeTabId
