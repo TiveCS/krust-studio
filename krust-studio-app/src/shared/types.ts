@@ -111,7 +111,7 @@ export interface SearchResult {
 /** one statement's outcome in the SQL editor */
 export interface QueryResult {
   statement: string
-  kind: 'rows' | 'affected' | 'error'
+  kind: 'rows' | 'affected' | 'error' | 'reconnected'
   columns?: ColumnInfo[]
   rows?: Record<string, unknown>[]
   affected?: number

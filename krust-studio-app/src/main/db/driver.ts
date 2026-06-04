@@ -479,3 +479,31 @@ export interface DriverDeps {
   config: ConnectionConfig
   password?: string
 }
+
+/**
+ * True when an error indicates the transport/connection itself is dead — not a
+ * SQL error. Used by session.ts to decide whether to drop the driver and retry.
+ *
+ * Covers:
+ *  - mysql2: `fatal: true` flag, or network POSIX codes
+ *  - pg: SQLSTATE connection-failure codes (08xxx, 57P01), or socket errors
+ */
+export function isConnectionFatal(err: unknown): boolean {
+  if (!(err instanceof Error)) return false
+  const e = err as NodeJS.ErrnoException & { fatal?: boolean }
+  if (e.fatal === true) return true
+  const code = e.code ?? ''
+  if (
+    ['ECONNRESET', 'ETIMEDOUT', 'EPIPE', 'ENOTFOUND', 'PROTOCOL_CONNECTION_LOST'].includes(
+      code
+    )
+  )
+    return true
+  // pg SQLSTATE codes for connection-level failures
+  if (['08006', '08001', '08003', '57P01'].includes(code)) return true
+  if (
+    /connection terminated|connection refused|connection reset|broken pipe/i.test(err.message)
+  )
+    return true
+  return false
+}

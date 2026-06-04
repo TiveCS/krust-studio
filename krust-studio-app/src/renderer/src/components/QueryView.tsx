@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, useEffect, useCallback } from 'react'
-import { Play, Square, Loader2, CheckCircle2, XCircle } from 'lucide-react'
+import { Play, Square, Loader2, CheckCircle2, XCircle, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { SqlEditor } from '@/components/SqlEditor'
@@ -290,7 +290,13 @@ export function QueryView(): React.JSX.Element | null {
         ) : (
           q.results.map((r, i) => (
             <div key={i} className="border-b border-border">
-              {r.kind === 'error' ? (
+              {r.kind === 'reconnected' ? (
+                <div className="flex items-center gap-2 px-3 py-2 text-xs text-amber-500">
+                  <RefreshCw className="size-3.5 shrink-0" />
+                  Connection lost — reconnected. Re-run to execute.
+                  <span className="truncate font-mono opacity-60">{r.statement}</span>
+                </div>
+              ) : r.kind === 'error' ? (
                 <div className="flex items-start gap-2 px-3 py-2 text-xs text-destructive">
                   <XCircle className="mt-0.5 size-3.5 shrink-0" />
                   <div className="min-w-0">

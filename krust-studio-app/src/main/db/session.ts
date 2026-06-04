@@ -17,7 +17,7 @@ import type {
   TableStructure
 } from '../../shared/types'
 import type { DbDriver } from './driver'
-import { splitStatements, classifyStatement } from './driver'
+import { splitStatements, classifyStatement, isConnectionFatal } from './driver'
 import { MysqlDriver } from './drivers/mysql'
 import { PostgresDriver } from './drivers/postgres'
 import { SqliteDriver } from './drivers/sqlite'
@@ -26,6 +26,23 @@ import { capture } from '../store/history'
 import type { HistoryStream } from '../../shared/types'
 
 const sessions = new Map<string, DbDriver>()
+
+/**
+ * Run `fn` against the driver for `id`, retrying once after a connection-fatal
+ * error. On fatal: drops the dead driver, reconnects, then calls `fn` again.
+ * Only reads and transactional writes use this (non-transactional DDL does not).
+ */
+async function withRetry<T>(id: string, fn: (driver: DbDriver) => Promise<T>): Promise<T> {
+  if (!sessions.has(id)) await connectSession(id)
+  try {
+    return await fn(sessions.get(id)!)
+  } catch (err) {
+    if (!isConnectionFatal(err)) throw err
+    sessions.delete(id)
+    await connectSession(id)
+    return fn(sessions.get(id)!)
+  }
+}
 
 /** Record captured statements (best-effort; capture() swallows its own errors). */
 async function captureAll(
@@ -72,13 +89,11 @@ export async function connectSession(id: string): Promise<void> {
 }
 
 export async function listEntities(id: string): Promise<EntityInfo[]> {
-  if (!sessions.has(id)) await connectSession(id)
-  return sessions.get(id)!.listEntities()
+  return withRetry(id, (d) => d.listEntities())
 }
 
 export async function listDatabases(id: string): Promise<string[]> {
-  if (!sessions.has(id)) await connectSession(id)
-  return sessions.get(id)!.listDatabases()
+  return withRetry(id, (d) => d.listDatabases())
 }
 
 export async function currentDatabase(id: string): Promise<string | null> {
@@ -87,13 +102,11 @@ export async function currentDatabase(id: string): Promise<string | null> {
 }
 
 export async function useDatabase(id: string, name: string): Promise<void> {
-  if (!sessions.has(id)) await connectSession(id)
-  await sessions.get(id)!.useDatabase(name)
+  return withRetry(id, (d) => d.useDatabase(name))
 }
 
 export async function listEnums(id: string): Promise<EnumType[]> {
-  if (!sessions.has(id)) await connectSession(id)
-  return sessions.get(id)!.listEnums()
+  return withRetry(id, (d) => d.listEnums())
 }
 
 export async function readRows(
@@ -104,8 +117,7 @@ export async function readRows(
   filters?: Filter[],
   orderBy?: Sort[]
 ): Promise<RowsResult> {
-  if (!sessions.has(id)) await connectSession(id)
-  return sessions.get(id)!.readRows(entity, limit, offset, filters, orderBy)
+  return withRetry(id, (d) => d.readRows(entity, limit, offset, filters, orderBy))
 }
 
 export async function countRows(
@@ -113,8 +125,7 @@ export async function countRows(
   entity: EntityRef,
   filters?: Filter[]
 ): Promise<number> {
-  if (!sessions.has(id)) await connectSession(id)
-  return sessions.get(id)!.countRows(entity, filters)
+  return withRetry(id, (d) => d.countRows(entity, filters))
 }
 
 export async function searchRows(
@@ -124,8 +135,7 @@ export async function searchRows(
   limit: number,
   offset: number
 ): Promise<SearchResult> {
-  if (!sessions.has(id)) await connectSession(id)
-  return sessions.get(id)!.searchRows(entity, term, limit, offset)
+  return withRetry(id, (d) => d.searchRows(entity, term, limit, offset))
 }
 
 export async function exportAllRows(
@@ -134,15 +144,13 @@ export async function exportAllRows(
   filters?: Filter[],
   orderBy?: Sort[]
 ): Promise<SearchResult> {
-  if (!sessions.has(id)) await connectSession(id)
-  const driver = sessions.get(id)!
   const PAGE = 1000
-  const MAX = 500_000 // hard cap to avoid runaway exports
+  const MAX = 500_000
   let offset = 0
   let columns: SearchResult['columns'] = []
   const rows: Record<string, unknown>[] = []
   for (;;) {
-    const res = await driver.readRows(entity, PAGE, offset, filters, orderBy)
+    const res = await withRetry(id, (d) => d.readRows(entity, PAGE, offset, filters, orderBy))
     if (offset === 0) columns = res.columns
     rows.push(...res.rows)
     if (res.rows.length < PAGE || rows.length >= MAX) break
@@ -159,8 +167,7 @@ export async function applyChanges(
   const config = getConnectionConfig(id)
   if (config?.readOnly)
     throw new Error('Connection is read-only; writes are blocked')
-  if (!sessions.has(id)) await connectSession(id)
-  const res = await sessions.get(id)!.applyChanges(entity, changes)
+  const res = await withRetry(id, (d) => d.applyChanges(entity, changes))
   await captureAll(id, 'data_mutation', res.statements ?? [], entity.name)
   return res
 }
@@ -169,16 +176,14 @@ export async function describeTable(
   id: string,
   entity: EntityRef
 ): Promise<TableStructure> {
-  if (!sessions.has(id)) await connectSession(id)
-  return sessions.get(id)!.describeTable(entity)
+  return withRetry(id, (d) => d.describeTable(entity))
 }
 
 export async function getCreateSql(
   id: string,
   entity: EntityRef
 ): Promise<string> {
-  if (!sessions.has(id)) await connectSession(id)
-  return sessions.get(id)!.getCreateSql(entity)
+  return withRetry(id, (d) => d.getCreateSql(entity))
 }
 
 export async function createTable(
@@ -202,8 +207,7 @@ export async function alterTable(
   const config = getConnectionConfig(id)
   if (config?.readOnly)
     throw new Error('Connection is read-only; schema changes blocked')
-  if (!sessions.has(id)) await connectSession(id)
-  const res = await sessions.get(id)!.alterTable(entity, ops)
+  const res = await withRetry(id, (d) => d.alterTable(entity, ops))
   await captureAll(id, 'table_mutation', res.statements, entity.name)
   return res
 }
@@ -215,8 +219,7 @@ export async function previewAlter(
   entity: EntityRef,
   ops: SchemaOp[]
 ): Promise<{ statements: string[] }> {
-  if (!sessions.has(id)) await connectSession(id)
-  return sessions.get(id)!.alterTable(entity, ops, true)
+  return withRetry(id, (d) => d.alterTable(entity, ops, true))
 }
 
 export async function dropEntity(
@@ -336,8 +339,21 @@ export async function runScript(
         affected: r.affected ?? null
       })
     } catch (err) {
+      const ms = Date.now() - t0
+      if (isConnectionFatal(err)) {
+        // Transport died — reconnect silently, return marker, stop script.
+        // Don't capture: this isn't a SQL error, and the statement never ran.
+        sessions.delete(id)
+        try {
+          await connectSession(id)
+        } catch {
+          // reconnect failed; next op will surface the error
+        }
+        results.push({ statement: exec, kind: 'reconnected', ms })
+        break
+      }
       const error = err instanceof Error ? err.message : String(err)
-      results.push({ statement: exec, kind: 'error', error, ms: Date.now() - t0 })
+      results.push({ statement: exec, kind: 'error', error, ms })
       await capture({
         connectionId: id,
         stream: cls.stream,
