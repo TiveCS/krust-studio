@@ -198,10 +198,10 @@ export function StructureView(): React.JSX.Element | null {
   if (!tab) return null
 
   // walkable relations: open the referenced/referencing table at Structure →
-  // Relations so the user can keep walking the FK graph in either direction
+  // Referenced by so the user can keep walking the FK graph (see who/what links)
   const walkTo = (table: string, schema?: string): void => {
     const ref: EntityRef = { name: table, schema }
-    void openTable(ref, undefined, { view: 'structure', structureSub: 'relations' })
+    void openTable(ref, undefined, { view: 'structure', structureSub: 'referencedBy' })
   }
 
   const connRow = connections.find((c) => c.id === openConnectionId)
