@@ -108,11 +108,19 @@ Your connections, query history, and changesets live in a local folder
   connection.
 
 ### Change schema — and see the SQL
-- Add / rename / drop columns; edit defaults and auto-increment; add / drop
-  **indexes** (with index method on Postgres/MySQL).
+- Add / rename / drop columns; edit defaults and auto-increment; **reorder
+  columns** by drag (MySQL); add / drop **indexes** (engine-aware method picker).
+- **Everything stages first.** Column edits and index add/drop are pending,
+  **colour-coded** (green = new, amber = changed, red = dropped, blue = moved),
+  and committed **together in one batch** — never on click.
+- **Review before it runs.** Commit opens a panel showing the **exact DDL** that
+  will execute (generated without running it); you confirm, then it runs in a
+  transaction. No hidden mutations.
+- On MySQL, edits use a faithful `MODIFY` that **preserves** what you didn't
+  touch (auto-increment, collation, comment), and new columns keep their position
+  (`AFTER`).
 - Create, rename, **truncate**, or **drop** tables (destructive actions require
   you to type the name to confirm).
-- **Every schema change surfaces the DDL it generated** — no hidden mutations.
 
 ### Captured changes → a script for production *(the headline feature)*
 Many teams apply schema changes to production by hand and are wary of migration
@@ -133,9 +141,9 @@ statement, or copy them all.
 
 | Engine | Notes |
 |--------|-------|
-| **PostgreSQL** | Full schema editing, enums, index methods, CREATE reconstructed from the catalog. |
-| **MySQL / MariaDB** | Full schema editing (rename needs MySQL 8.0+). |
-| **SQLite** | Browse + edit data; add/rename/drop columns. (SQLite's `ALTER` can't change a column's type — by design, no risky table rebuilds.) |
+| **PostgreSQL** | Full schema editing, enums, index methods, CREATE reconstructed from the catalog. Transactional DDL (a failed commit rolls back). |
+| **MySQL / MariaDB** | Full schema editing incl. **column reorder** (rename needs 8.0+). Note: MySQL auto-commits each DDL statement, so a multi-statement commit isn't atomic — review the DDL first. |
+| **SQLite** | Browse + edit data; add/rename/drop columns. (SQLite's `ALTER` can't change a column's type or reorder columns — by design, no risky table rebuilds.) |
 
 SSL/TLS connections are supported for reaching managed/prod databases.
 
