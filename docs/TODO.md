@@ -148,6 +148,50 @@ Prioritized. Top group = highest value (matches CONTEXT.md + Beekeeper parity).
 
 ## Resolved
 
+- **Staged index changes** — Add/Drop index now stage (not fire immediately) and
+  commit together with column edits via one reviewed transaction. New `addIndex`/
+  `dropIndex` SchemaOps handled in every driver's `alterTable`; staged state +
+  unified commit/preview footer lifted to `StructureView`; column-diff extracted
+  to `lib/columnDiff.ts`; `StructureEditor` is now a controlled column editor.
+  MySQL DDL still auto-commits per statement (no true rollback) — the win is the
+  unified review-before-run, real atomicity only on pg.
+- **Preview SQL (structure editor)** — `previewAlter` (driver `alterTable(...,
+  dryRun=true)` → builds statements, no execute, no capture) + a review sheet
+  showing the DDL via `SqlDisplay`. Schema-edit analogue of the DML affected-row
+  preview (ADR-0005).
+- **Column reordering** (ADR-0011) — drag handle in the column-row editor.
+  New-table: free on any engine (CREATE order). Existing table: MySQL/MariaDB-only
+  via `moveColumn` SchemaOp → unified verbatim-spliced `MODIFY ... AFTER/FIRST`
+  (`db/mysql-coldef.ts`); pg/sqlite hidden + throw. Also fixes the latent
+  `alterColumn` bug that silently dropped auto_increment/default/collation on
+  type/null edits.
+- **Sidebar switchers** — connection (footer) + database (header) extracted to
+  own components (`ConnectionSwitcher`/`DatabaseSwitcher`); database switcher is a
+  searchable combobox. Self-contained state → opening either no longer
+  re-renders the 580-row schema tree (was a ~0.5s stall).
+- **Connection-editor stuck** — opening a table/tab now clears the
+  editing/creating state so the connection form closes (was stuck open).
+- **Connection wizard button order** — Save · Duplicate · Test · Connect · Delete.
+- **Optional database + multi-database switcher** (mysql/pg). Empty db connects
+  server-level; sidebar header lists & switches databases. mysql `USE` in place,
+  pg reconnects, sqlite single-file. ADR-0010. CONTEXT "Database Switching".
+- **Auto-update** via GitHub Releases (`electron-updater`, ADR-0009) +
+  installer **custom install path** (NSIS `allowToChangeInstallationDirectory`).
+- **Ctrl/⌘+P command palette** — fuzzy table switcher (own filter, capped for
+  500+ tables). CONTEXT "Command Palette".
+- **SQL editor autocomplete** upgraded: engine-aware dialect (backtick vs
+  double-quote), schema **column** completion (lazy per referenced table,
+  alias-resolving), live schema/dialect via CodeMirror `Compartment`.
+- **DDL syntax highlighting** — Structure → DDL now read-only CodeMirror
+  (`SqlDisplay`), shared theme `lib/cm-theme.ts`.
+- **Auto-LIMIT visibility** — result panel + history record the executed SQL
+  (`… LIMIT N`), not the typed text.
+- **Perf fixes** — DataGrid column-resize, QueryView editor/results split, and
+  SQL typing no longer re-render the 500-row grid/editor per interaction
+  (DOM-direct during drag/type, store-commit on release; SQL kept in a ref).
+- **Layout** — TabBar stays pinned on long tables (`h-svh overflow-hidden`
+  shell); QueryView results fill the pane (removed `max-h` cap).
+- **JSON viewer** — `Date` values now render as ISO strings, not `{0}`.
 - Idle serverless (Neon) connection drop crashed the main process — pg/mysql
   now swallow the connection `error` event + auto-reconnect on next query via
   `ensure()`. In-flight query may error once to a toast, then reconnects.

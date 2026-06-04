@@ -30,6 +30,10 @@ const api: KrustApi = {
   sessions: {
     connect: (id: string) => ipcRenderer.invoke('session:connect', id),
     listEntities: (id: string) => ipcRenderer.invoke('session:listEntities', id),
+    listDatabases: (id: string) => ipcRenderer.invoke('session:listDatabases', id),
+    currentDatabase: (id: string) => ipcRenderer.invoke('session:currentDatabase', id),
+    useDatabase: (id: string, name: string) =>
+      ipcRenderer.invoke('session:useDatabase', id, name),
     listEnums: (id: string) => ipcRenderer.invoke('session:listEnums', id),
     describeTable: (id: string, entity: EntityRef) =>
       ipcRenderer.invoke('session:describeTable', id, entity),
@@ -39,6 +43,8 @@ const api: KrustApi = {
       ipcRenderer.invoke('session:createTable', id, spec),
     alterTable: (id: string, entity: EntityRef, ops: SchemaOp[]) =>
       ipcRenderer.invoke('session:alterTable', id, entity, ops),
+    previewAlter: (id: string, entity: EntityRef, ops: SchemaOp[]) =>
+      ipcRenderer.invoke('session:previewAlter', id, entity, ops),
     dropEntity: (id: string, entity: EntityRef, type: EntityType) =>
       ipcRenderer.invoke('session:dropEntity', id, entity, type),
     renameTable: (id: string, entity: EntityRef, newName: string) =>

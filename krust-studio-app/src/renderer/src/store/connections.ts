@@ -87,8 +87,11 @@ interface ConnectionsState {
   sessionError: string | null
   entities: EntityInfo[]
   enums: EnumType[]
+  databases: string[]
+  currentDb: string | null
   open: (id: string) => Promise<void>
   refreshEntities: () => Promise<void>
+  switchDatabase: (name: string) => Promise<void>
   createTable: (spec: CreateTableSpec) => Promise<string>
   dropEntity: (entity: EntityRef, type: EntityType) => Promise<string[]>
   renameTable: (entity: EntityRef, newName: string) => Promise<string[]>
@@ -203,6 +206,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     sessionError: null,
     entities: [],
     enums: [],
+    databases: [],
+    currentDb: null,
 
     open: async (id) => {
       set({
@@ -213,6 +218,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         sessionError: null,
         entities: [],
         enums: [],
+        databases: [],
+        currentDb: null,
         tabs: [],
         activeTabId: null
       })
@@ -221,6 +228,15 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         const entities = await window.api.sessions.listEntities(id)
         const enums = await window.api.sessions.listEnums(id)
         set({ sessionStatus: 'connected', entities, enums })
+        // databases load lazily/non-blocking — don't gate connect on it
+        Promise.all([
+          window.api.sessions.listDatabases(id),
+          window.api.sessions.currentDatabase(id)
+        ])
+          .then(([databases, currentDb]) => {
+            if (get().openConnectionId === id) set({ databases, currentDb })
+          })
+          .catch(() => { /* listing not supported / no perms — leave empty */ })
       } catch (err) {
         set({
           sessionStatus: 'error',
@@ -235,6 +251,32 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       const entities = await window.api.sessions.listEntities(id)
       const enums = await window.api.sessions.listEnums(id)
       set({ entities, enums })
+    },
+
+    switchDatabase: async (name) => {
+      const id = get().openConnectionId
+      if (!id || name === get().currentDb) return
+      set({ sessionStatus: 'connecting', sessionError: null })
+      try {
+        await window.api.sessions.useDatabase(id, name)
+        const entities = await window.api.sessions.listEntities(id)
+        const enums = await window.api.sessions.listEnums(id)
+        // tabs belong to the old database — close them all
+        set({
+          currentDb: name,
+          entities,
+          enums,
+          sessionStatus: 'connected',
+          tabs: [],
+          activeTabId: null,
+          screen: 'tables'
+        })
+      } catch (err) {
+        set({
+          sessionStatus: 'error',
+          sessionError: err instanceof Error ? err.message : String(err)
+        })
+      }
     },
 
     createTable: async (spec) => {
@@ -330,7 +372,12 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         (t) => entityKey(t.entity) === entityKey(entity)
       )
       if (existing) {
-        set({ activeTabId: existing.id, screen: 'tables' })
+        set({
+          activeTabId: existing.id,
+          screen: 'tables',
+          selectedId: null,
+          creatingNew: false
+        })
         if (initialFilters) {
           patchTab(existing.id, {
             filters: initialFilters,
@@ -366,7 +413,13 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         draft: null,
         query: null
       }
-      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id, screen: 'tables' }))
+      set((s) => ({
+        tabs: [...s.tabs, tab],
+        activeTabId: tab.id,
+        screen: 'tables',
+        selectedId: null,
+        creatingNew: false
+      }))
       await fetchTab(tab.id)
     },
 
@@ -396,7 +449,13 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         },
         query: null
       }
-      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id, screen: 'tables' }))
+      set((s) => ({
+        tabs: [...s.tabs, tab],
+        activeTabId: tab.id,
+        screen: 'tables',
+        selectedId: null,
+        creatingNew: false
+      }))
     },
 
     openQuery: () => {
@@ -422,7 +481,13 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         draft: null,
         query: { sql: '', results: [], running: false, autoLimit: 500 }
       }
-      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id, screen: 'tables' }))
+      set((s) => ({
+        tabs: [...s.tabs, tab],
+        activeTabId: tab.id,
+        screen: 'tables',
+        selectedId: null,
+        creatingNew: false
+      }))
     },
 
     setQuerySql: (sql) => {
@@ -492,7 +557,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       })
     },
 
-    setActiveTab: (tabId) => set({ activeTabId: tabId }),
+    setActiveTab: (tabId) =>
+      set({ activeTabId: tabId, selectedId: null, creatingNew: false }),
 
     gotoPage: async (index) => {
       const id = get().activeTabId

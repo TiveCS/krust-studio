@@ -76,6 +76,21 @@ export async function listEntities(id: string): Promise<EntityInfo[]> {
   return sessions.get(id)!.listEntities()
 }
 
+export async function listDatabases(id: string): Promise<string[]> {
+  if (!sessions.has(id)) await connectSession(id)
+  return sessions.get(id)!.listDatabases()
+}
+
+export async function currentDatabase(id: string): Promise<string | null> {
+  if (!sessions.has(id)) await connectSession(id)
+  return sessions.get(id)!.currentDatabase()
+}
+
+export async function useDatabase(id: string, name: string): Promise<void> {
+  if (!sessions.has(id)) await connectSession(id)
+  await sessions.get(id)!.useDatabase(name)
+}
+
 export async function listEnums(id: string): Promise<EnumType[]> {
   if (!sessions.has(id)) await connectSession(id)
   return sessions.get(id)!.listEnums()
@@ -193,6 +208,17 @@ export async function alterTable(
   return res
 }
 
+/** Build the DDL that alterTable would run, without executing or capturing it
+ *  (pre-commit preview). Harmless on read-only connections. */
+export async function previewAlter(
+  id: string,
+  entity: EntityRef,
+  ops: SchemaOp[]
+): Promise<{ statements: string[] }> {
+  if (!sessions.has(id)) await connectSession(id)
+  return sessions.get(id)!.alterTable(entity, ops, true)
+}
+
 export async function dropEntity(
   id: string,
   entity: EntityRef,
@@ -294,27 +320,29 @@ export async function runScript(
     try {
       const r = await driver.query(exec)
       const ms = Date.now() - t0
+      // Use `exec` (not `stmt`) so result footer + history reflect the actual
+      // SQL that ran — auto-LIMIT appends LIMIT N and must be visible.
       results.push(
         r.rows
-          ? { statement: stmt, kind: 'rows', columns: r.columns, rows: r.rows, ms }
-          : { statement: stmt, kind: 'affected', affected: r.affected ?? 0, ms }
+          ? { statement: exec, kind: 'rows', columns: r.columns, rows: r.rows, ms }
+          : { statement: exec, kind: 'affected', affected: r.affected ?? 0, ms }
       )
       await capture({
         connectionId: id,
         stream: cls.stream,
         source: 'manual',
-        statement: stmt,
+        statement: exec,
         status: 'success',
         affected: r.affected ?? null
       })
     } catch (err) {
       const error = err instanceof Error ? err.message : String(err)
-      results.push({ statement: stmt, kind: 'error', error, ms: Date.now() - t0 })
+      results.push({ statement: exec, kind: 'error', error, ms: Date.now() - t0 })
       await capture({
         connectionId: id,
         stream: cls.stream,
         source: 'manual',
-        statement: stmt,
+        statement: exec,
         status: 'error',
         error
       })

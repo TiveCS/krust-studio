@@ -49,8 +49,13 @@ const PG_INDEX_METHODS = new Set([
 export class PostgresDriver implements DbDriver {
   private client: Client | null = null
   private backendPid: number | null = null
+  // a pg connection is bound to one db; switching reconnects with this override.
+  // Empty config.database → fall back to the `postgres` maintenance db.
+  private activeDb: string
 
-  constructor(private deps: DriverDeps) {}
+  constructor(private deps: DriverDeps) {
+    this.activeDb = deps.config.database || 'postgres'
+  }
 
   async connect(): Promise<void> {
     const { Client } = await import('pg')
@@ -60,7 +65,7 @@ export class PostgresDriver implements DbDriver {
       port: config.port ?? 5432,
       user: config.user,
       password,
-      database: config.database,
+      database: this.activeDb,
       ssl: config.ssl ? { rejectUnauthorized: false } : undefined,
       // serverless pg (Neon, etc.) can cold-start slowly; give it room
       connectionTimeoutMillis: 20000
@@ -85,6 +90,27 @@ export class PostgresDriver implements DbDriver {
   private async ensure(): Promise<Client> {
     if (!this.client) await this.connect()
     return this.client!
+  }
+
+  currentDatabase(): string | null {
+    return this.activeDb
+  }
+
+  async listDatabases(): Promise<string[]> {
+    const res = await (await this.ensure()).query(
+      `SELECT datname FROM pg_database
+        WHERE datistemplate = false AND datallowconn = true
+        ORDER BY datname`
+    )
+    return (res.rows as Array<{ datname: string }>).map((r) => r.datname)
+  }
+
+  async useDatabase(name: string): Promise<void> {
+    if (name === this.activeDb && this.client) return
+    // pg binds a connection to one db — must reconnect on switch
+    await this.close()
+    this.activeDb = name
+    await this.connect()
   }
 
   async listEntities(): Promise<EntityInfo[]> {
@@ -484,7 +510,8 @@ export class PostgresDriver implements DbDriver {
 
   async alterTable(
     entity: EntityRef,
-    ops: SchemaOp[]
+    ops: SchemaOp[],
+    dryRun = false
   ): Promise<{ statements: string[] }> {
     const t = entity.schema
       ? `${quoteIdent(entity.schema)}.${quoteIdent(entity.name)}`
@@ -538,8 +565,19 @@ export class PostgresDriver implements DbDriver {
             `ALTER TABLE ${t} DROP CONSTRAINT ${quoteIdent(op.constraint)}`
           )
           break
+        case 'moveColumn':
+          throw new Error(
+            'PostgreSQL cannot reorder table columns (no ALTER syntax; would need a table rebuild)'
+          )
+        case 'addIndex':
+          statements.push(this.createIndexSql(entity, op.spec))
+          break
+        case 'dropIndex':
+          statements.push(this.dropIndexSql(entity, op.name))
+          break
       }
     }
+    if (dryRun) return { statements }
     await (await this.ensure()).query('BEGIN')
     try {
       for (const s of statements) await (await this.ensure()).query(s)
@@ -581,15 +619,26 @@ export class PostgresDriver implements DbDriver {
     return { statements: [sql] }
   }
 
-  async createIndex(
-    entity: EntityRef,
-    spec: IndexSpec
-  ): Promise<{ statements: string[] }> {
+  private createIndexSql(entity: EntityRef, spec: IndexSpec): string {
     const name = spec.name?.trim() || defaultIndexName(entity.name, spec.columns)
     const cols = spec.columns.map(quoteIdent).join(', ')
     const m = spec.method?.toLowerCase()
     const using = m && PG_INDEX_METHODS.has(m) ? ` USING ${m}` : ''
-    const sql = `CREATE ${spec.unique ? 'UNIQUE ' : ''}INDEX ${quoteIdent(name)} ON ${this.target(entity)}${using} (${cols})`
+    return `CREATE ${spec.unique ? 'UNIQUE ' : ''}INDEX ${quoteIdent(name)} ON ${this.target(entity)}${using} (${cols})`
+  }
+
+  private dropIndexSql(entity: EntityRef, name: string): string {
+    const qname = entity.schema
+      ? `${quoteIdent(entity.schema)}.${quoteIdent(name)}`
+      : quoteIdent(name)
+    return `DROP INDEX ${qname}`
+  }
+
+  async createIndex(
+    entity: EntityRef,
+    spec: IndexSpec
+  ): Promise<{ statements: string[] }> {
+    const sql = this.createIndexSql(entity, spec)
     await (await this.ensure()).query(sql)
     return { statements: [sql] }
   }
@@ -598,10 +647,7 @@ export class PostgresDriver implements DbDriver {
     entity: EntityRef,
     name: string
   ): Promise<{ statements: string[] }> {
-    const qname = entity.schema
-      ? `${quoteIdent(entity.schema)}.${quoteIdent(name)}`
-      : quoteIdent(name)
-    const sql = `DROP INDEX ${qname}`
+    const sql = this.dropIndexSql(entity, name)
     await (await this.ensure()).query(sql)
     return { statements: [sql] }
   }

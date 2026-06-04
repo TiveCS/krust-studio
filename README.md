@@ -24,6 +24,11 @@ Grab the latest installer for your OS from the
 | **macOS** (Apple Silicon) | `krust-studio-app-<version>.dmg` |
 | **Linux** | `krust-studio-app-<version>.AppImage` or `.deb` |
 
+On **Windows** the installer lets you **choose the install folder** (no forced
+`Program Files` lock-in), and the app **auto-updates** from GitHub Releases:
+new versions download in the background and prompt you to **Restart now** when
+ready.
+
 The app is **not code-signed**, so your OS may warn the first time:
 
 - **Windows** — SmartScreen: click **More info → Run anyway**.
@@ -41,10 +46,14 @@ The app is **not code-signed**, so your OS may warn the first time:
    Pick a driver, fill host/port/user/password (or a file path for SQLite).
    - Passwords are **encrypted at rest** with your OS keychain — never stored in
      plain text.
+   - The **database name is optional** — leave it empty to connect at the server
+     level and **browse all databases**, switching between them from the sidebar
+     header (MySQL & PostgreSQL).
    - Tick **Read-only** for production: it blocks *every* write (data and schema)
      at the core, not just in the UI.
 2. **Open it** — the sidebar fills with your tables, views, and enums.
-3. **Double-click a table** to browse its data.
+3. **Double-click a table** to browse its data — or hit **Ctrl/⌘+P** to search
+   and jump to any table on the connection.
 
 Your connections, query history, and changesets live in a local folder
 (`%AppData%/KrustStudio` on Windows; the equivalent app-data dir elsewhere).
@@ -79,6 +88,24 @@ Your connections, query history, and changesets live in a local folder
 - A **Structure** tab per table: columns, indexes, relations, and the real
   **CREATE statement**.
 - Follow a foreign key to open the related table, filtered to that record.
+
+### Write SQL
+- A real **SQL editor** (CodeMirror) with syntax highlighting and **schema-aware
+  autocomplete** — table names, plus columns for tables referenced in your query
+  (resolving `AS` aliases).
+- Autocomplete and quoting are **engine-aware**: backtick identifiers on
+  MySQL/MariaDB, double-quote on Postgres/SQLite.
+- Run the whole script or just the selection (**Ctrl/⌘+Enter**); each statement
+  gets its own result panel. Optional **auto-LIMIT 500** — and when it's applied
+  the result header shows the *actual* SQL that ran (`… LIMIT 500`).
+- Long-running queries can be **cancelled**. The editor / results split is
+  **drag-resizable**.
+
+### Search & navigate
+- **Ctrl/⌘+P** opens a command palette to fuzzy-search every table/view on the
+  current connection and open it in a tab.
+- Switch the **active database** from the sidebar header without re-adding the
+  connection.
 
 ### Change schema — and see the SQL
 - Add / rename / drop columns; edit defaults and auto-increment; add / drop

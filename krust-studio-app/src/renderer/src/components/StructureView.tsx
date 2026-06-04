@@ -1,6 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Loader2, RefreshCw, Plus, Trash2, Copy } from 'lucide-react'
+import {
+  Loader2,
+  RefreshCw,
+  Plus,
+  Trash2,
+  Copy,
+  Check,
+  Undo2,
+  X,
+  Pencil
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
@@ -19,8 +29,20 @@ import {
   SelectItem,
   SelectTrigger
 } from '@/components/ui/select'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter
+} from '@/components/ui/sheet'
 import { StructureEditor } from '@/components/StructureEditor'
+import { SqlDisplay } from '@/components/SqlDisplay'
+import { type EditorColumn } from '@/components/ColumnsEditor'
+import { seed, diff } from '@/lib/columnDiff'
 import { useConnections } from '@/store/connections'
+import type { IndexSpec, SchemaOp } from '../../../shared/types'
 
 type Sub = 'columns' | 'indexes' | 'relations' | 'ddl'
 const SUBS: Sub[] = ['columns', 'indexes', 'relations', 'ddl']
@@ -31,10 +53,29 @@ const SUB_LABEL: Record<Sub, string> = {
   ddl: 'DDL'
 }
 
-// index methods offered per engine (sqlite: none — btree only, no USING)
+// index methods offered per engine (sqlite: none — btree only, no USING).
+// MySQL lists HASH but it's disabled unless the table's storage engine actually
+// supports it (MEMORY/NDB) — InnoDB/MyISAM silently store USING HASH as a B-tree.
 const INDEX_METHODS: Record<string, string[]> = {
   postgres: ['btree', 'hash', 'gist', 'gin', 'spgist', 'brin'],
   mysql: ['btree', 'hash']
+}
+
+// MySQL storage engines that implement real user-defined HASH indexes
+const MYSQL_HASH_ENGINES = new Set(['MEMORY', 'HEAP', 'NDB', 'NDBCLUSTER'])
+
+/** reason a method is unavailable for the current table, or null if usable */
+function methodDisabledReason(
+  driver: string | undefined,
+  method: string,
+  engine: string | undefined
+): string | null {
+  if (driver === 'mysql' && method === 'hash') {
+    const eng = (engine ?? '').toUpperCase()
+    if (!MYSQL_HASH_ENGINES.has(eng))
+      return `Needs a MEMORY or NDB table — ${engine ?? 'InnoDB'} stores USING HASH as a B-tree.`
+  }
+  return null
 }
 
 const METHOD_DESC: Record<string, string> = {
@@ -56,22 +97,66 @@ export function StructureView(): React.JSX.Element | null {
     tabs,
     activeTabId,
     refreshStructure,
-    createIndex,
-    dropIndex,
+    refreshEntities,
     connections,
     openConnectionId
   } = useConnections()
+  const tab = tabs.find((t) => t.id === activeTabId)
+  const st = tab?.structure ?? null
+
   const [sub, setSub] = useState<Sub>('columns')
+  const [ddl, setDdl] = useState<string | null>(null)
+  const [ddlLoading, setDdlLoading] = useState(false)
+
+  // ── staged structure changes (columns + indexes, committed together) ──────
+  const [colDraft, setColDraft] = useState<EditorColumn[]>(() =>
+    st ? seed(st.columns) : []
+  )
+  const [idxAdds, setIdxAdds] = useState<IndexSpec[]>([])
+  const [idxDrops, setIdxDrops] = useState<Set<string>>(new Set())
+
+  // add/edit-index dialog (editIdx = index into idxAdds, or null for a new one)
   const [addOpen, setAddOpen] = useState(false)
+  const [editIdx, setEditIdx] = useState<number | null>(null)
   const [ixName, setIxName] = useState('')
   const [ixUnique, setIxUnique] = useState(false)
   const [ixCols, setIxCols] = useState<string[]>([])
   const [ixMethod, setIxMethod] = useState('')
-  const [dropName, setDropName] = useState<string | null>(null)
+
+  // commit / preview
+  const [previewSql, setPreviewSql] = useState<string | null>(null)
+  const [previewing, setPreviewing] = useState(false)
   const [busy, setBusy] = useState(false)
-  const [ddl, setDdl] = useState<string | null>(null)
-  const [ddlLoading, setDdlLoading] = useState(false)
-  const tab = tabs.find((t) => t.id === activeTabId)
+
+  const driver = connections.find((c) => c.id === openConnectionId)?.driver
+  const canAlter = driver !== 'sqlite'
+  const canReorder = driver === 'mysql'
+
+  // reseed draft + clear staged whenever the structure (re)loads
+  useEffect(() => {
+    setColDraft(st ? seed(st.columns) : [])
+    setIdxAdds([])
+    setIdxDrops(new Set())
+  }, [st])
+
+  const colOps = useMemo(
+    () => (st ? diff(st.columns, colDraft, canAlter, canReorder) : []),
+    [st, colDraft, canAlter, canReorder]
+  )
+  const movedNames = useMemo(
+    () => new Set(colOps.filter((o) => o.kind === 'moveColumn').map((o) => o.name)),
+    [colOps]
+  )
+  // order: drop indexes → column changes → add indexes (safe on pg; mysql
+  // re-buckets internally regardless)
+  const ops = useMemo<SchemaOp[]>(
+    () => [
+      ...[...idxDrops].map((name) => ({ kind: 'dropIndex', name }) as SchemaOp),
+      ...colOps,
+      ...idxAdds.map((spec) => ({ kind: 'addIndex', spec }) as SchemaOp)
+    ],
+    [idxDrops, colOps, idxAdds]
+  )
 
   const entityKey = tab ? `${tab.entity.schema ?? ''}.${tab.entity.name}` : ''
   useEffect(() => {
@@ -92,7 +177,6 @@ export function StructureView(): React.JSX.Element | null {
 
   if (!tab) return null
 
-  const st = tab.structure
   const connRow = connections.find((c) => c.id === openConnectionId)
   const readOnly = connRow?.readOnly ?? false
   const methods = INDEX_METHODS[connRow?.driver ?? ''] ?? []
@@ -102,36 +186,93 @@ export function StructureView(): React.JSX.Element | null {
       prev.includes(name) ? prev.filter((c) => c !== name) : [...prev, name]
     )
 
-  const submitIndex = async (): Promise<void> => {
+  const resetIxForm = (): void => {
+    setIxName('')
+    setIxUnique(false)
+    setIxCols([])
+    setIxMethod('')
+    setEditIdx(null)
+  }
+
+  const openAddIndex = (): void => {
+    resetIxForm()
+    setAddOpen(true)
+  }
+
+  const openEditIndex = (i: number): void => {
+    const ix = idxAdds[i]
+    setIxName(ix.name ?? '')
+    setIxUnique(ix.unique)
+    setIxCols(ix.columns)
+    setIxMethod(ix.method ?? '')
+    setEditIdx(i)
+    setAddOpen(true)
+  }
+
+  const stageIndex = (): void => {
     if (ixCols.length === 0) return
-    setBusy(true)
+    const spec: IndexSpec = {
+      name: ixName.trim() || undefined,
+      columns: ixCols,
+      unique: ixUnique,
+      method: ixMethod || undefined
+    }
+    setIdxAdds((prev) =>
+      editIdx === null
+        ? [...prev, spec]
+        : prev.map((s, i) => (i === editIdx ? spec : s))
+    )
+    setAddOpen(false)
+    resetIxForm()
+  }
+
+  const toggleDropIndex = (name: string): void =>
+    setIdxDrops((prev) => {
+      const next = new Set(prev)
+      next.has(name) ? next.delete(name) : next.add(name)
+      return next
+    })
+
+  const discard = (): void => {
+    setColDraft(st ? seed(st.columns) : [])
+    setIdxAdds([])
+    setIdxDrops(new Set())
+  }
+
+  const preview = async (): Promise<void> => {
+    if (!openConnectionId || ops.length === 0) return
+    setPreviewing(true)
     try {
-      const [sql] = await createIndex({
-        name: ixName.trim() || undefined,
-        columns: ixCols,
-        unique: ixUnique,
-        method: ixMethod || undefined
-      })
-      toast.success('Index created', { description: sql })
-      setAddOpen(false)
-      setIxName('')
-      setIxUnique(false)
-      setIxCols([])
-      setIxMethod('')
+      const { statements } = await window.api.sessions.previewAlter(
+        openConnectionId,
+        tab.entity,
+        ops
+      )
+      setPreviewSql(
+        statements.length
+          ? statements.map((s) => `${s};`).join('\n\n')
+          : '-- no statements generated'
+      )
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err))
     } finally {
-      setBusy(false)
+      setPreviewing(false)
     }
   }
 
-  const submitDrop = async (): Promise<void> => {
-    if (!dropName) return
+  const commit = async (): Promise<void> => {
+    if (!openConnectionId || ops.length === 0) return
     setBusy(true)
     try {
-      const [sql] = await dropIndex(dropName)
-      toast.success('Index dropped', { description: sql })
-      setDropName(null)
+      const { statements } = await window.api.sessions.alterTable(
+        openConnectionId,
+        tab.entity,
+        ops
+      )
+      toast.success('Structure updated', { description: statements.join(';\n') })
+      setPreviewSql(null)
+      await refreshStructure()
+      await refreshEntities()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err))
     } finally {
@@ -198,11 +339,9 @@ export function StructureView(): React.JSX.Element | null {
                   <Loader2 className="size-4 animate-spin" />
                   Loading…
                 </div>
-              ) : (
-                <pre className="font-mono text-xs break-all whitespace-pre-wrap">
-                  {ddl}
-                </pre>
-              )}
+              ) : ddl ? (
+                <SqlDisplay value={ddl} />
+              ) : null}
             </div>
           </div>
         ) : tab.structureLoading || !st ? (
@@ -211,7 +350,12 @@ export function StructureView(): React.JSX.Element | null {
             Loading…
           </div>
         ) : sub === 'columns' ? (
-          <StructureEditor tab={tab} />
+          <StructureEditor
+            tab={tab}
+            draft={colDraft}
+            onDraftChange={setColDraft}
+            movedNames={movedNames}
+          />
         ) : sub === 'indexes' ? (
           <div className="flex h-full flex-col">
             <div className="flex shrink-0 items-center border-b border-border/60 px-3 py-1.5">
@@ -219,17 +363,15 @@ export function StructureView(): React.JSX.Element | null {
                 size="xs"
                 variant="ghost"
                 disabled={readOnly}
-                onClick={() => setAddOpen(true)}
+                onClick={openAddIndex}
               >
                 <Plus />
                 Add index
               </Button>
-              {readOnly && (
-                <span className="ml-2 text-amber-500/80">read-only</span>
-              )}
+              {readOnly && <span className="ml-2 text-amber-500/80">read-only</span>}
             </div>
             <div className="min-h-0 flex-1 overflow-auto">
-              {st.indexes.length === 0 ? (
+              {st.indexes.length === 0 && idxAdds.length === 0 ? (
                 <div className="px-3 py-3 text-muted-foreground">No indexes.</div>
               ) : (
                 <table className="w-full border-collapse">
@@ -243,12 +385,57 @@ export function StructureView(): React.JSX.Element | null {
                     </tr>
                   </thead>
                   <tbody>
-                    {st.indexes.map((ix) => (
-                      <tr
-                        key={ix.name}
-                        className="group border-b border-border/30"
-                      >
-                        <td className="px-3 py-1 font-mono">{ix.name}</td>
+                    {st.indexes.map((ix) => {
+                      const dropped = idxDrops.has(ix.name)
+                      const isPrimary = ix.name === 'PRIMARY'
+                      return (
+                        <tr
+                          key={ix.name}
+                          className={cn(
+                            'group border-b border-border/30',
+                            dropped && 'bg-delete-row line-through'
+                          )}
+                        >
+                          <td className="px-3 py-1 font-mono">{ix.name}</td>
+                          <td className="px-3 py-1">
+                            <Checkbox checked={ix.unique} disabled />
+                          </td>
+                          <td className="px-3 py-1 font-mono lowercase text-muted-foreground">
+                            {ix.method ?? '—'}
+                          </td>
+                          <td className="px-3 py-1 font-mono text-muted-foreground">
+                            {ix.columns.join(', ')}
+                          </td>
+                          <td className="px-3 py-1">
+                            {!readOnly && !isPrimary && (
+                              <button
+                                onClick={() => toggleDropIndex(ix.name)}
+                                title={dropped ? 'Undo drop' : 'Drop index'}
+                                className={cn(
+                                  'opacity-0 group-hover:opacity-100',
+                                  dropped
+                                    ? 'text-muted-foreground opacity-100 hover:text-foreground'
+                                    : 'text-muted-foreground hover:text-destructive'
+                                )}
+                              >
+                                {dropped ? (
+                                  <Undo2 className="size-3.5" />
+                                ) : (
+                                  <Trash2 className="size-3.5" />
+                                )}
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                    {idxAdds.map((ix, i) => (
+                      <tr key={`new-${i}`} className="group border-b border-border/30 bg-new-row">
+                        <td className="px-3 py-1 font-mono">
+                          {ix.name || (
+                            <span className="text-muted-foreground/60">(auto)</span>
+                          )}
+                        </td>
                         <td className="px-3 py-1">
                           <Checkbox checked={ix.unique} disabled />
                         </td>
@@ -259,14 +446,24 @@ export function StructureView(): React.JSX.Element | null {
                           {ix.columns.join(', ')}
                         </td>
                         <td className="px-3 py-1">
-                          <button
-                            disabled={readOnly}
-                            onClick={() => setDropName(ix.name)}
-                            title="Drop index"
-                            className="text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-destructive disabled:opacity-0"
-                          >
-                            <Trash2 className="size-3.5" />
-                          </button>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                            <button
+                              onClick={() => openEditIndex(i)}
+                              title="Edit staged index"
+                              className="text-muted-foreground hover:text-foreground"
+                            >
+                              <Pencil className="size-3.5" />
+                            </button>
+                            <button
+                              onClick={() =>
+                                setIdxAdds((prev) => prev.filter((_, idx) => idx !== i))
+                              }
+                              title="Remove staged index"
+                              className="text-muted-foreground hover:text-destructive"
+                            >
+                              <X className="size-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -311,12 +508,48 @@ export function StructureView(): React.JSX.Element | null {
         )}
       </div>
 
-      <Dialog open={addOpen} onOpenChange={(o) => !o && setAddOpen(false)}>
+      {/* shared commit footer — columns + indexes commit together */}
+      {st && !readOnly && (
+        <div className="flex h-9 shrink-0 items-center gap-2 border-t border-border px-3 text-xs text-muted-foreground">
+          <span>{ops.length} pending change(s)</span>
+          <div className="flex-1" />
+          <Button
+            size="xs"
+            onClick={() => void preview()}
+            disabled={previewing || busy || ops.length === 0}
+            title="Review the DDL, then commit"
+          >
+            {previewing ? <Loader2 className="animate-spin" /> : <Check />}
+            Commit…
+          </Button>
+          <Button
+            size="xs"
+            variant="ghost"
+            onClick={discard}
+            disabled={busy || ops.length === 0}
+          >
+            <Undo2 />
+            Discard
+          </Button>
+        </div>
+      )}
+
+      {/* Add-index dialog — stages the index (committed with the rest) */}
+      <Dialog
+        open={addOpen}
+        onOpenChange={(o) => {
+          if (!o) {
+            setAddOpen(false)
+            resetIxForm()
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add index</DialogTitle>
+            <DialogTitle>{editIdx === null ? 'Add index' : 'Edit index'}</DialogTitle>
             <DialogDescription>
-              on <span className="font-mono">{tab.entity.name}</span>
+              on <span className="font-mono">{tab.entity.name}</span> — staged until
+              you commit
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
@@ -364,16 +597,41 @@ export function StructureView(): React.JSX.Element | null {
                       <span className="truncate">{ixMethod || 'default'}</span>
                     </SelectTrigger>
                     <SelectContent className="w-[22rem]">
-                      {['default', ...methods].map((m) => (
-                        <SelectItem key={m} value={m} className="items-start py-1.5">
-                          <div className="flex flex-col gap-0.5">
-                            <span className="font-medium lowercase">{m}</span>
-                            <span className="text-[11px] leading-snug text-muted-foreground">
-                              {METHOD_DESC[m]}
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))}
+                      {['default', ...methods].map((m) => {
+                        const reason = methodDisabledReason(
+                          connRow?.driver,
+                          m,
+                          st?.engine
+                        )
+                        return (
+                          <SelectItem
+                            key={m}
+                            value={m}
+                            disabled={!!reason}
+                            title={reason ?? undefined}
+                            className="items-start py-1.5"
+                          >
+                            <div className="flex flex-col gap-0.5">
+                              <span className="font-medium lowercase">
+                                {m}
+                                {reason && (
+                                  <span className="ml-1.5 rounded bg-muted px-1 text-[9px] uppercase text-muted-foreground">
+                                    unavailable
+                                  </span>
+                                )}
+                              </span>
+                              <span
+                                className={cn(
+                                  'text-[11px] leading-snug',
+                                  reason ? 'text-amber-500/80' : 'text-muted-foreground'
+                                )}
+                              >
+                                {reason ?? METHOD_DESC[m]}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        )
+                      })}
                     </SelectContent>
                   </Select>
                 </div>
@@ -381,42 +639,73 @@ export function StructureView(): React.JSX.Element | null {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setAddOpen(false)}>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setAddOpen(false)
+                resetIxForm()
+              }}
+            >
               Cancel
             </Button>
-            <Button
-              onClick={() => void submitIndex()}
-              disabled={busy || ixCols.length === 0}
-            >
-              Create index
+            <Button onClick={stageIndex} disabled={ixCols.length === 0}>
+              {editIdx === null ? 'Add' : 'Save'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!dropName} onOpenChange={(o) => !o && setDropName(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Drop index</DialogTitle>
-            <DialogDescription>
-              Drop <span className="font-mono">{dropName}</span>? This only removes
-              the index, not data.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setDropName(null)}>
+      {/* DDL review sheet (shared with column commit) */}
+      <Sheet open={previewSql !== null} onOpenChange={(o) => !o && setPreviewSql(null)}>
+        <SheetContent
+          side="right"
+          className="w-[52vw] min-w-[34rem] gap-0 sm:max-w-[52vw]"
+        >
+          <SheetHeader className="border-b border-border">
+            <SheetTitle>Review generated DDL</SheetTitle>
+            <SheetDescription>
+              Exactly what will run on{' '}
+              <span className="font-mono">{tab.entity.name}</span>, in one
+              transaction. Nothing has run yet — review, then commit.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="min-h-0 flex-1 overflow-auto p-4">
+            <div className="rounded-md border border-border bg-card/40 p-3">
+              {previewSql && <SqlDisplay value={previewSql} />}
+            </div>
+          </div>
+          <SheetFooter className="flex-row justify-end gap-2 border-t border-border">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                if (previewSql) {
+                  void navigator.clipboard.writeText(previewSql)
+                  toast.success('Copied DDL')
+                }
+              }}
+            >
+              <Copy />
+              Copy
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setPreviewSql(null)}>
+              <X />
               Cancel
             </Button>
             <Button
-              variant="destructive"
-              onClick={() => void submitDrop()}
+              size="sm"
+              onClick={() => {
+                setPreviewSql(null)
+                void commit()
+              }}
               disabled={busy}
             >
-              Drop
+              {busy ? <Loader2 className="animate-spin" /> : <Check />}
+              Commit
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

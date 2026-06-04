@@ -25,6 +25,24 @@ tunnel and SSL/TLS for reaching/securing prod databases. Connections are
 personal (no team-share export in v1). Stored in the configurable data
 directory (see **Data Location**).
 
+The **database name is optional** for network drivers (MySQL/MariaDB,
+PostgreSQL): leaving it empty connects at the server level so the user can
+**browse all databases** and switch between them (see **Database Switching**).
+MySQL connects with no default schema (entities empty until one is picked);
+PostgreSQL falls back to the `postgres` maintenance database for the initial
+connection. SQLite is single-file — its "database" is the file path, not a name.
+
+### Database Switching
+The sidebar header is a **database switcher**: it lists every database the
+connection can see (`SHOW DATABASES` on MySQL, `pg_database` on Postgres) and
+switches the active one. The asymmetry is hidden behind one driver method:
+MySQL switches in place (`USE db` on the same connection — all introspection
+keys off `DATABASE()`); PostgreSQL **reconnects** bound to the new database
+(a pg connection is fixed to one database at connect time). Switching closes the
+old database's open tabs and reloads entities/enums. SQLite cannot switch
+(single file). Database listing loads lazily/non-blocking after connect, so a
+slow server never delays the schema tree.
+
 ### Driver
 Adapter for one database engine. v1 drivers: MySQL/MariaDB, PostgreSQL, SQLite.
 Each Driver knows how to connect, introspect schema, and run queries for its
@@ -173,7 +191,25 @@ The editor can run the selected text, the statement at the cursor, or the whole
 script; multiple statements run sequentially, each result in its own panel. A
 running query can be **cancelled** (killed on the server — this must be in every
 Driver's contract). SELECTs support an optional auto-`LIMIT` (toggle) with
-pagination for more. Statement timeout is deferred.
+pagination for more — and when auto-LIMIT is applied, the result panel and
+history record the **actual executed SQL** (`… LIMIT N`), not the typed text
+(the no-silent-mutation principle, applied to reads). Statement timeout is
+deferred.
+
+The editor (CodeMirror 6) provides **schema-aware autocomplete**: table names,
+plus columns for the tables referenced in the current statement (`FROM`/`JOIN`,
+resolving `AS` aliases). Columns load lazily per referenced table to stay snappy
+on schemas with hundreds of tables. Highlighting, identifier quoting, and
+keywords are **engine-aware** via the per-driver SQL dialect (backtick on
+MySQL/MariaDB, double-quote on Postgres/SQLite) — so autocompleted identifiers
+are quoted correctly for the target engine. The editor/results split is
+drag-resizable.
+
+### Command Palette
+A VSCode-style quick switcher (**Ctrl/⌘+P**) to fuzzy-search every table/view on
+the current connection and open it in a tab. Contains-match (startsWith ranked
+first), results capped for speed on large schemas. Convenience layer over the
+schema tree, not a replacement.
 
 ### Schema Browser
 The left-sidebar navigation: a lazy-loaded, virtualized, filterable tree
@@ -217,13 +253,28 @@ Destructive statements (UPDATE/DELETE without WHERE, DROP/TRUNCATE) require type
 confirmation even on writable connections.
 
 ### Table Editor
-The GUI surface for editing schema (create table, add/alter/drop column, indexes,
-constraints). Every action emits visible **Captured DDL** (see core principle).
-Data-type input is an **editable combobox**: a dropdown of the current engine's
-common types for convenience, but free-text is always allowed — Krust cannot
-enumerate every engine's full type space, so the database remains the source of
-truth and validates the type on apply (no client-side rejection of unknown
-types).
+The GUI surface for editing schema (create table, add/alter/drop column, reorder
+columns, indexes, constraints). Every action emits visible **Captured DDL** (see
+core principle). Column edits **and index add/drop** are **staged together** (not
+applied on click) and committed in one batch: committing opens a **confirmation
+showing the exact DDL** the commit will run, in one transaction (the schema-edit
+analogue of the data edit's affected-row preview) — generated server-side without
+executing or capturing it, so the user always reviews before anything runs. (On
+MySQL each DDL still auto-commits per statement — the review-before-run is the
+guarantee; true rollback only on Postgres.) Data-type input is an **editable combobox**: a dropdown of the
+current engine's common types for convenience, but free-text is always allowed —
+Krust cannot enumerate every engine's full type space, so the database remains
+the source of truth and validates the type on apply (no client-side rejection of
+unknown types).
+
+**Column Order** is editable, but its reach depends on context. When *creating a
+new table*, columns reorder freely on any engine (it is only the order of a
+not-yet-run `CREATE`). On an *existing table*, reordering physically moves the
+column and is **MySQL/MariaDB-only** — PostgreSQL and SQLite cannot reorder
+columns without a full table rebuild, which Krust refuses
+([ADR 0002](docs/adr/0002-captured-ddl-changesets-no-squash.md)), so the
+affordance is hidden there. See
+[ADR 0011](docs/adr/0011-column-reordering-and-unified-mysql-modify.md).
 
 ### MCP Server
 **Priority: post-MVP, nice-to-have — not a main feature.** Design is captured but

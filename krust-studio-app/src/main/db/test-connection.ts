@@ -39,7 +39,8 @@ async function testPostgres(
     port: config.port ?? 5432,
     user: config.user,
     password,
-    database: config.database,
+    // pg requires a db to connect; fall back to the maintenance db when empty
+    database: config.database || 'postgres',
     ssl: config.ssl ? { rejectUnauthorized: false } : undefined,
     connectionTimeoutMillis: CONNECT_TIMEOUT_MS
   })

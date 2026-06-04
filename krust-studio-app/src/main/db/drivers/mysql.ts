@@ -19,6 +19,14 @@ import {
   defaultIndexName,
   renderSql
 } from '../driver'
+import {
+  extractColumnDef,
+  spliceType,
+  spliceNullable,
+  spliceDefault,
+  dropDefault as dropDefaultClause,
+  positionClause
+} from '../mysql-coldef'
 import type {
   ApplyResult,
   ChangeSet,
@@ -47,8 +55,12 @@ const MYSQL_INDEX_METHODS = new Set(['BTREE', 'HASH'])
 export class MysqlDriver implements DbDriver {
   private conn: Connection | null = null
   private connectionId: number | null = null
+  // active database; survives reconnects (idle-drop) via `USE` in connect()
+  private activeDb: string | null = null
 
-  constructor(private deps: DriverDeps) {}
+  constructor(private deps: DriverDeps) {
+    this.activeDb = deps.config.database || null
+  }
 
   async connect(): Promise<void> {
     const mysql = await import('mysql2/promise')
@@ -58,7 +70,7 @@ export class MysqlDriver implements DbDriver {
       port: config.port ?? 3306,
       user: config.user,
       password,
-      database: config.database,
+      database: this.activeDb || undefined,
       ssl: config.ssl ? {} : undefined,
       connectTimeout: 8000
     })
@@ -85,7 +97,28 @@ export class MysqlDriver implements DbDriver {
     return this.conn!
   }
 
+  currentDatabase(): string | null {
+    return this.activeDb
+  }
+
+  async listDatabases(): Promise<string[]> {
+    const [rows] = await (await this.ensure()).query(
+      'SHOW DATABASES'
+    )
+    // mysql2 returns a single-column result keyed `Database`
+    return (rows as Array<Record<string, string>>)
+      .map((r) => Object.values(r)[0])
+      .filter(Boolean)
+  }
+
+  async useDatabase(name: string): Promise<void> {
+    await (await this.ensure()).query(`USE ${quoteIdent(name)}`)
+    this.activeDb = name
+  }
+
   async listEntities(): Promise<EntityInfo[]> {
+    // No database selected → nothing to list (user picks one from the switcher)
+    if (!this.activeDb) return []
     const [rows] = await (await this.ensure()).query(
       `SELECT TABLE_NAME AS name, TABLE_TYPE AS type
          FROM information_schema.TABLES
@@ -338,7 +371,13 @@ export class MysqlDriver implements DbDriver {
       idxMap.set(r.name, e)
     }
     const indexes = [...idxMap].map(([name, v]) => ({ name, ...v }))
-    return { columns, indexes, relations }
+    const [engRows] = (await (await this.ensure()).query(
+      `SELECT ENGINE AS engine FROM information_schema.TABLES
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?`,
+      [entity.name]
+    )) as [RowDataPacket[], FieldPacket[]]
+    const engine = (engRows[0] as { engine?: string } | undefined)?.engine
+    return { columns, indexes, relations, engine: engine ?? undefined }
   }
 
   async getCreateSql(entity: EntityRef): Promise<string> {
@@ -364,32 +403,130 @@ export class MysqlDriver implements DbDriver {
 
   async alterTable(
     entity: EntityRef,
-    ops: SchemaOp[]
+    ops: SchemaOp[],
+    dryRun = false
   ): Promise<{ statements: string[] }> {
     const t = quoteIdent(entity.name)
-    const statements = ops.map((op) => {
+
+    // Column-level changes (type/null/default/position) are coalesced into ONE
+    // verbatim-spliced MODIFY per column (ADR-0011) so they never fight and
+    // unmodeled attributes (auto_increment, collation, comment…) are preserved.
+    type Acc = {
+      type?: string
+      nullable?: boolean
+      setDef?: string
+      dropDef?: boolean
+      hasMove?: boolean
+      after?: string | null
+    }
+    const perCol = new Map<string, Acc>()
+    const moveOrder: string[] = []
+    const renameReverse = new Map<string, string>() // newName -> oldName
+    const acc = (n: string): Acc => {
+      let a = perCol.get(n)
+      if (!a) {
+        a = {}
+        perCol.set(n, a)
+      }
+      return a
+    }
+
+    // structural statements, bucketed for safe ordering
+    const dropFk: string[] = []
+    const dropIdx: string[] = []
+    const structural: string[] = [] // drop/add/rename columns
+    const addFk: string[] = []
+    const addIdx: string[] = []
+
+    for (const op of ops) {
       switch (op.kind) {
         case 'addColumn': {
           const c = op.column
           const def = c.default && c.default.trim() ? ` DEFAULT ${c.default}` : ''
-          return `ALTER TABLE ${t} ADD COLUMN ${quoteIdent(c.name)} ${c.type}${def}${c.nullable ? '' : ' NOT NULL'}`
+          const pos = positionClause(op.after, quoteIdent)
+          structural.push(
+            `ALTER TABLE ${t} ADD COLUMN ${quoteIdent(c.name)} ${c.type}${def}${c.nullable ? '' : ' NOT NULL'}${pos}`
+          )
+          break
         }
         case 'dropColumn':
-          return `ALTER TABLE ${t} DROP COLUMN ${quoteIdent(op.name)}`
-        case 'setDefault':
-          return `ALTER TABLE ${t} ALTER COLUMN ${quoteIdent(op.name)} SET DEFAULT ${op.default}`
-        case 'dropDefault':
-          return `ALTER TABLE ${t} ALTER COLUMN ${quoteIdent(op.name)} DROP DEFAULT`
+          structural.push(`ALTER TABLE ${t} DROP COLUMN ${quoteIdent(op.name)}`)
+          break
         case 'renameColumn':
-          return `ALTER TABLE ${t} RENAME COLUMN ${quoteIdent(op.from)} TO ${quoteIdent(op.to)}`
-        case 'alterColumn':
-          return `ALTER TABLE ${t} MODIFY ${quoteIdent(op.name)} ${op.type}${op.nullable ? ' NULL' : ' NOT NULL'}`
+          renameReverse.set(op.to, op.from)
+          structural.push(
+            `ALTER TABLE ${t} RENAME COLUMN ${quoteIdent(op.from)} TO ${quoteIdent(op.to)}`
+          )
+          break
+        case 'alterColumn': {
+          const a = acc(op.name)
+          a.type = op.type
+          a.nullable = op.nullable
+          break
+        }
+        case 'setDefault':
+          acc(op.name).setDef = op.default
+          break
+        case 'dropDefault':
+          acc(op.name).dropDef = true
+          break
+        case 'moveColumn': {
+          const a = acc(op.name)
+          a.hasMove = true
+          a.after = op.after
+          moveOrder.push(op.name)
+          break
+        }
         case 'addForeignKey':
-          return `ALTER TABLE ${t} ADD FOREIGN KEY (${quoteIdent(op.column)}) REFERENCES ${quoteIdent(op.refTable)} (${quoteIdent(op.refColumn)})${fkActionClause(op.onUpdate, op.onDelete)}`
+          addFk.push(
+            `ALTER TABLE ${t} ADD FOREIGN KEY (${quoteIdent(op.column)}) REFERENCES ${quoteIdent(op.refTable)} (${quoteIdent(op.refColumn)})${fkActionClause(op.onUpdate, op.onDelete)}`
+          )
+          break
         case 'dropForeignKey':
-          return `ALTER TABLE ${t} DROP FOREIGN KEY ${quoteIdent(op.constraint)}`
+          dropFk.push(`ALTER TABLE ${t} DROP FOREIGN KEY ${quoteIdent(op.constraint)}`)
+          break
+        case 'addIndex':
+          addIdx.push(this.createIndexSql(entity, op.spec))
+          break
+        case 'dropIndex':
+          dropIdx.push(this.dropIndexSql(entity, op.name))
+          break
       }
-    })
+    }
+
+    // Build coalesced MODIFYs from the verbatim SHOW CREATE TABLE definition.
+    const coalesced: string[] = []
+    if (perCol.size > 0) {
+      const createSql = await this.getCreateSql(entity)
+      const buildModify = (newName: string, a: Acc): string => {
+        const oldName = renameReverse.get(newName) ?? newName
+        const verbatim = extractColumnDef(createSql, oldName)
+        if (verbatim == null)
+          throw new Error(
+            `Could not read the definition for column "${oldName}" from SHOW CREATE TABLE`
+          )
+        let def = verbatim
+        if (a.type !== undefined) def = spliceType(def, a.type)
+        if (a.nullable !== undefined) def = spliceNullable(def, a.nullable)
+        if (a.setDef !== undefined) def = spliceDefault(def, a.setDef)
+        if (a.dropDef) def = dropDefaultClause(def)
+        const pos = a.hasMove ? positionClause(a.after, quoteIdent) : ''
+        return `ALTER TABLE ${t} MODIFY ${quoteIdent(newName)} ${def.trim()}${pos}`
+      }
+      // def-only columns first (no reposition), then moved columns in target order
+      for (const [name, a] of perCol) if (!a.hasMove) coalesced.push(buildModify(name, a))
+      for (const name of moveOrder) coalesced.push(buildModify(name, perCol.get(name)!))
+    }
+
+    const statements = [
+      ...dropFk,
+      ...dropIdx,
+      ...structural,
+      ...coalesced,
+      ...addFk,
+      ...addIdx
+    ]
+    if (dryRun) return { statements }
     await (await this.ensure()).beginTransaction()
     try {
       for (const s of statements) await (await this.ensure()).query(s)
@@ -425,15 +562,23 @@ export class MysqlDriver implements DbDriver {
     return { statements: [sql] }
   }
 
-  async createIndex(
-    entity: EntityRef,
-    spec: IndexSpec
-  ): Promise<{ statements: string[] }> {
+  private createIndexSql(entity: EntityRef, spec: IndexSpec): string {
     const name = spec.name?.trim() || defaultIndexName(entity.name, spec.columns)
     const cols = spec.columns.map(quoteIdent).join(', ')
     const m = spec.method?.toUpperCase()
     const using = m && MYSQL_INDEX_METHODS.has(m) ? ` USING ${m}` : ''
-    const sql = `CREATE ${spec.unique ? 'UNIQUE ' : ''}INDEX ${quoteIdent(name)} ON ${quoteIdent(entity.name)} (${cols})${using}`
+    return `CREATE ${spec.unique ? 'UNIQUE ' : ''}INDEX ${quoteIdent(name)} ON ${quoteIdent(entity.name)} (${cols})${using}`
+  }
+
+  private dropIndexSql(entity: EntityRef, name: string): string {
+    return `DROP INDEX ${quoteIdent(name)} ON ${quoteIdent(entity.name)}`
+  }
+
+  async createIndex(
+    entity: EntityRef,
+    spec: IndexSpec
+  ): Promise<{ statements: string[] }> {
+    const sql = this.createIndexSql(entity, spec)
     await (await this.ensure()).query(sql)
     return { statements: [sql] }
   }
@@ -442,7 +587,7 @@ export class MysqlDriver implements DbDriver {
     entity: EntityRef,
     name: string
   ): Promise<{ statements: string[] }> {
-    const sql = `DROP INDEX ${quoteIdent(name)} ON ${quoteIdent(entity.name)}`
+    const sql = this.dropIndexSql(entity, name)
     await (await this.ensure()).query(sql)
     return { statements: [sql] }
   }

@@ -11,11 +11,15 @@ import { testConnection } from './db/test-connection'
 import {
   connectSession,
   listEntities,
+  listDatabases,
+  currentDatabase,
+  useDatabase,
   listEnums,
   describeTable,
   getCreateSql,
   createTable,
   alterTable,
+  previewAlter,
   readRows,
   countRows,
   searchRows,
@@ -87,6 +91,11 @@ export function registerIpc(): void {
 
   ipcMain.handle('session:connect', (_e, id: string) => connectSession(id))
   ipcMain.handle('session:listEntities', (_e, id: string) => listEntities(id))
+  ipcMain.handle('session:listDatabases', (_e, id: string) => listDatabases(id))
+  ipcMain.handle('session:currentDatabase', (_e, id: string) => currentDatabase(id))
+  ipcMain.handle('session:useDatabase', (_e, id: string, name: string) =>
+    useDatabase(id, name)
+  )
   ipcMain.handle('session:listEnums', (_e, id: string) => listEnums(id))
   ipcMain.handle('session:describeTable', (_e, id: string, entity: EntityRef) =>
     describeTable(id, entity)
@@ -101,6 +110,11 @@ export function registerIpc(): void {
     'session:alterTable',
     (_e, id: string, entity: EntityRef, ops: SchemaOp[]) =>
       alterTable(id, entity, ops)
+  )
+  ipcMain.handle(
+    'session:previewAlter',
+    (_e, id: string, entity: EntityRef, ops: SchemaOp[]) =>
+      previewAlter(id, entity, ops)
   )
   ipcMain.handle(
     'session:readRows',

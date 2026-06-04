@@ -308,6 +308,8 @@ export interface TableStructure {
   columns: StructureColumn[]
   indexes: IndexInfo[]
   relations: Relation[]
+  /** storage engine (MySQL: InnoDB/MEMORY/NDB/…); undefined for pg/sqlite */
+  engine?: string
 }
 
 export interface NewColumnSpec {
@@ -334,12 +336,17 @@ export interface CreateTableSpec {
 }
 
 export type SchemaOp =
-  | { kind: 'addColumn'; column: NewColumnSpec }
+  // `after`: position the new column (MySQL only) — null = FIRST, string =
+  // AFTER that column, undefined = append. pg/sqlite ignore it (always append).
+  | { kind: 'addColumn'; column: NewColumnSpec; after?: string | null }
   | { kind: 'dropColumn'; name: string }
   | { kind: 'renameColumn'; from: string; to: string }
   | { kind: 'alterColumn'; name: string; type: string; nullable: boolean }
   | { kind: 'setDefault'; name: string; default: string }
   | { kind: 'dropDefault'; name: string }
+  /** reposition an existing column. `after` = null → FIRST, else AFTER that
+   *  column. MySQL/MariaDB only (pg/sqlite throw). Names are post-rename. */
+  | { kind: 'moveColumn'; name: string; after: string | null }
   | {
       kind: 'addForeignKey'
       column: string
@@ -349,10 +356,19 @@ export type SchemaOp =
       onDelete?: string
     }
   | { kind: 'dropForeignKey'; constraint: string }
+  /** create/drop an index as part of a staged structure commit */
+  | { kind: 'addIndex'; spec: IndexSpec }
+  | { kind: 'dropIndex'; name: string }
 
 export interface SessionApi {
   connect: (id: string) => Promise<void>
   listEntities: (id: string) => Promise<EntityInfo[]>
+  /** databases/catalogs visible to the connection (sqlite: the file) */
+  listDatabases: (id: string) => Promise<string[]>
+  /** the active database name, or null when none selected */
+  currentDatabase: (id: string) => Promise<string | null>
+  /** switch active database (mysql USE; pg reconnects; sqlite throws) */
+  useDatabase: (id: string, name: string) => Promise<void>
   /** named enum types (pg); empty for mysql/sqlite */
   listEnums: (id: string) => Promise<EnumType[]>
   describeTable: (id: string, entity: EntityRef) => Promise<TableStructure>
@@ -360,6 +376,12 @@ export interface SessionApi {
   getCreateSql: (id: string, entity: EntityRef) => Promise<string>
   createTable: (id: string, spec: CreateTableSpec) => Promise<{ ddl: string }>
   alterTable: (
+    id: string,
+    entity: EntityRef,
+    ops: SchemaOp[]
+  ) => Promise<{ statements: string[] }>
+  /** build the DDL alterTable would run, without executing it (preview) */
+  previewAlter: (
     id: string,
     entity: EntityRef,
     ops: SchemaOp[]

@@ -63,6 +63,7 @@ export function NewTableEditor({ tab }: { tab: Tab }): React.JSX.Element {
             tables={tables}
             enums={enums}
             allowFk
+            reorderable
           />
         </div>
       </div>

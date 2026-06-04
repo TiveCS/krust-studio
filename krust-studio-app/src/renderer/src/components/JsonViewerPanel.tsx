@@ -18,6 +18,9 @@ const MAX_W = 900
 
 /** Classify a value for tree rendering: object, array, or primitive. */
 function classify(v: unknown): { kind: 'obj' | 'arr' | 'prim'; data: unknown } {
+  // Date objects have no enumerable own-props → treat as primitive ISO string
+  if (v instanceof Date)
+    return { kind: 'prim', data: v.toISOString() }
   if (v && typeof v === 'object')
     return { kind: Array.isArray(v) ? 'arr' : 'obj', data: v }
   if (typeof v === 'string') {

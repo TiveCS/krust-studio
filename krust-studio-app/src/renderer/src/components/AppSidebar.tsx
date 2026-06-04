@@ -1,19 +1,14 @@
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Database,
   Table2,
   Eye,
-  ChevronsUpDown,
   Plus,
-  Check,
   Loader2,
   AlertCircle,
   AlertTriangle,
   Pencil,
   RefreshCw,
-  Lock,
-  HardDrive,
   Trash2,
   Eraser,
   ChevronRight,
@@ -34,26 +29,6 @@ import {
   SidebarInput
 } from '@/components/ui/sidebar'
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from '@/components/ui/popover'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator
-} from '@/components/ui/command'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
@@ -71,26 +46,10 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { DatabaseSwitcher } from '@/components/DatabaseSwitcher'
+import { ConnectionSwitcher } from '@/components/ConnectionSwitcher'
 import { useConnections } from '@/store/connections'
-import type {
-  ConnectionSummary,
-  EntityRef,
-  EntityType,
-  EnumType
-} from '../../../shared/types'
-
-const DRIVER_LABEL: Record<string, string> = {
-  mysql: 'MySQL',
-  postgres: 'Postgres',
-  sqlite: 'SQLite'
-}
-
-function databaseLabel(c?: ConnectionSummary): string {
-  if (!c) return ''
-  if (c.driver === 'sqlite')
-    return c.sqlitePath?.split(/[\\/]/).pop() ?? 'database'
-  return c.database || '(no database)'
-}
+import type { EntityRef, EntityType, EnumType } from '../../../shared/types'
 
 export function AppSidebar(): React.JSX.Element {
   const {
@@ -101,8 +60,6 @@ export function AppSidebar(): React.JSX.Element {
     entities,
     enums,
     open,
-    startNew,
-    select,
     refreshEntities,
     openTable,
     openNewTable,
@@ -114,7 +71,6 @@ export function AppSidebar(): React.JSX.Element {
     tabs,
     activeTabId
   } = useConnections()
-  const [switcherOpen, setSwitcherOpen] = useState(false)
   const [filter, setFilter] = useState('')
   const [renameTarget, setRenameTarget] = useState<EntityRef | null>(null)
   const [renameValue, setRenameValue] = useState('')
@@ -203,24 +159,7 @@ export function AppSidebar(): React.JSX.Element {
     <Sidebar>
       {/* database switcher (current connection's database) */}
       <SidebarHeader>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild disabled={!current}>
-            <button className="flex w-full items-center gap-2 rounded-md border border-sidebar-border bg-sidebar-accent/40 px-2 py-1.5 text-left text-sm hover:bg-sidebar-accent disabled:opacity-50">
-              <HardDrive className="size-4 shrink-0 opacity-70" />
-              <span className="flex-1 truncate">
-                {current ? databaseLabel(current) : 'No database'}
-              </span>
-              <ChevronsUpDown className="size-3.5 shrink-0 opacity-50" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
-            {/* multi-database listing/switching lands next; shows current for now */}
-            <DropdownMenuItem>
-              <Check className="size-4" />
-              {databaseLabel(current)}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <DatabaseSwitcher />
       </SidebarHeader>
 
       <SidebarContent>
@@ -330,70 +269,7 @@ export function AppSidebar(): React.JSX.Element {
 
       {/* connection switcher (searchable) + manage */}
       <SidebarFooter>
-        <Popover open={switcherOpen} onOpenChange={setSwitcherOpen}>
-          <PopoverTrigger asChild>
-            <button className="flex w-full items-center gap-2 rounded-md border border-sidebar-border bg-sidebar-accent/40 px-2 py-1.5 text-left text-sm hover:bg-sidebar-accent">
-              <Database className="size-4 shrink-0 opacity-70" />
-              <span className="flex-1 truncate">
-                {current?.name ?? 'Select a connection'}
-              </span>
-              {current?.readOnly && (
-                <Lock className="size-3 shrink-0 opacity-60" />
-              )}
-              <ChevronsUpDown className="size-3.5 shrink-0 opacity-50" />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-64 p-0" align="start" side="top">
-            <Command>
-              <CommandInput placeholder="Search connections…" />
-              <CommandList>
-                <CommandEmpty>No connections.</CommandEmpty>
-                <CommandGroup>
-                  {connections.map((c) => (
-                    <CommandItem
-                      key={c.id}
-                      value={c.name}
-                      onSelect={() => {
-                        setSwitcherOpen(false)
-                        void open(c.id)
-                      }}
-                    >
-                      <Database className="size-4 opacity-70" />
-                      <span className="flex-1 truncate">{c.name}</span>
-                      <span className="text-[10px] uppercase text-muted-foreground">
-                        {DRIVER_LABEL[c.driver]}
-                      </span>
-                      {openConnectionId === c.id && <Check className="size-4" />}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-                <CommandSeparator />
-                <CommandGroup>
-                  <CommandItem
-                    onSelect={() => {
-                      setSwitcherOpen(false)
-                      startNew()
-                    }}
-                  >
-                    <Plus className="size-4" />
-                    New connection…
-                  </CommandItem>
-                  {current && (
-                    <CommandItem
-                      onSelect={() => {
-                        setSwitcherOpen(false)
-                        select(current.id)
-                      }}
-                    >
-                      <Pencil className="size-4" />
-                      Edit “{current.name}”
-                    </CommandItem>
-                  )}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
+        <ConnectionSwitcher />
       </SidebarFooter>
 
       {/* Rename table */}

@@ -52,6 +52,7 @@ import { useConnections, editKey } from '@/store/connections'
 
 const ROWNUM_W = 48
 const DEFAULT_COL_W = 180
+const MIN_COL_W = 48
 
 // looks like an ISO timestamp → render the readable part
 const ISO_RE = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/
@@ -151,19 +152,36 @@ export function DataGrid(): React.JSX.Element | null {
 
   const selecting = useRef(false)
   const colSelecting = useRef(false)
-  const resizing = useRef<{ col: string; startX: number; startW: number } | null>(
-    null
-  )
+  const resizing = useRef<{
+    col: string
+    startX: number
+    startW: number
+    startTableW: number
+    liveW: number
+  } | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const tableRef = useRef<HTMLTableElement>(null)
+  // live <col> elements, keyed by column name — mutated directly during resize
+  const colEls = useRef<Map<string, HTMLTableColElement>>(new Map())
 
   useEffect(() => {
     const onMove = (e: MouseEvent): void => {
       const r = resizing.current
-      if (r) setColWidth(r.col, r.startW + (e.clientX - r.startX))
+      if (!r) return
+      // Resize via direct DOM writes — no React re-render per pixel (the grid
+      // has up to 500 rows; a store update each mousemove was the lag source).
+      const next = Math.max(MIN_COL_W, r.startW + (e.clientX - r.startX))
+      r.liveW = next
+      const colEl = colEls.current.get(r.col)
+      if (colEl) colEl.style.width = `${next}px`
+      if (tableRef.current)
+        tableRef.current.style.width = `${r.startTableW + (next - r.startW)}px`
     }
     const onUp = (): void => {
       selecting.current = false
       colSelecting.current = false
+      // Commit the resize to the store once on release
+      if (resizing.current) setColWidth(resizing.current.col, resizing.current.liveW)
       resizing.current = null
     }
     window.addEventListener('mousemove', onMove)
@@ -474,13 +492,21 @@ export function DataGrid(): React.JSX.Element | null {
               onKeyDown={onKeyDown}
             >
               <table
+                ref={tableRef}
                 className="border-collapse font-mono text-xs"
                 style={{ width: totalW, tableLayout: 'fixed' }}
               >
                 <colgroup>
                   <col style={{ width: ROWNUM_W }} />
                   {cols.map((c) => (
-                    <col key={c.name} style={{ width: colW(c.name) }} />
+                    <col
+                      key={c.name}
+                      ref={(el) => {
+                        if (el) colEls.current.set(c.name, el)
+                        else colEls.current.delete(c.name)
+                      }}
+                      style={{ width: colW(c.name) }}
+                    />
                   ))}
                 </colgroup>
                 <thead className="sticky top-0 z-10 bg-background">
@@ -565,10 +591,13 @@ export function DataGrid(): React.JSX.Element | null {
                         <span
                           onMouseDown={(e) => {
                             e.preventDefault()
+                            const w = colW(c.name)
                             resizing.current = {
                               col: c.name,
                               startX: e.clientX,
-                              startW: colW(c.name)
+                              startW: w,
+                              startTableW: tableRef.current?.offsetWidth ?? totalW,
+                              liveW: w
                             }
                           }}
                           className="absolute top-0 right-0 h-full w-1 cursor-col-resize hover:bg-ring"

@@ -1,71 +1,48 @@
 import { useEffect, useRef } from 'react'
 import { EditorView, basicSetup } from 'codemirror'
 import { keymap } from '@codemirror/view'
-import { EditorState, Prec } from '@codemirror/state'
-import { sql, SQLDialect } from '@codemirror/lang-sql'
-import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
-import { tags as t } from '@lezer/highlight'
+import { EditorState, Compartment, Prec } from '@codemirror/state'
+import { sql, MySQL, PostgreSQL, SQLite, type SQLDialect } from '@codemirror/lang-sql'
+import { syntaxHighlighting } from '@codemirror/language'
+import { krustHighlight, krustTheme } from '@/lib/cm-theme'
+import type { DriverType } from '../../../shared/types'
 
-// palette tuned to the app's dark theme (teal accent, JetBrains Mono)
-const highlight = HighlightStyle.define([
-  { tag: [t.keyword, t.modifier, t.operatorKeyword], color: '#2dd4bf', fontWeight: '500' },
-  { tag: [t.string, t.special(t.string)], color: '#6ee7b7' },
-  { tag: [t.number, t.bool, t.null], color: '#7dd3fc' },
-  { tag: [t.comment, t.lineComment, t.blockComment], color: '#6b7280', fontStyle: 'italic' },
-  { tag: [t.typeName, t.className], color: '#c4b5fd' },
-  { tag: [t.function(t.variableName), t.function(t.propertyName)], color: '#fbbf24' },
-  { tag: [t.variableName, t.propertyName, t.name], color: '#e5e7eb' },
-  { tag: [t.operator, t.punctuation, t.separator], color: '#9ca3af' }
-])
-
-const theme = EditorView.theme(
-  {
-    '&': { color: 'var(--foreground)', backgroundColor: 'transparent', fontSize: '12px', height: '100%' },
-    '.cm-scroller': { fontFamily: 'var(--font-mono)', lineHeight: '1.5' },
-    '.cm-content': { caretColor: 'var(--foreground)' },
-    '.cm-gutters': { backgroundColor: 'transparent', color: 'var(--muted-foreground)', border: 'none' },
-    '.cm-activeLine': { backgroundColor: 'rgba(255,255,255,0.03)' },
-    '.cm-activeLineGutter': { backgroundColor: 'transparent' },
-    '&.cm-focused': { outline: 'none' },
-    '.cm-cursor, .cm-dropCursor': { borderLeftColor: 'var(--foreground)' },
-    '.cm-selectionBackground, .cm-content ::selection': { backgroundColor: 'rgba(45,212,191,0.25)' },
-    '&.cm-focused .cm-selectionBackground': { backgroundColor: 'rgba(45,212,191,0.30)' },
-    '.cm-tooltip': {
-      backgroundColor: 'var(--popover)',
-      color: 'var(--popover-foreground)',
-      border: '1px solid var(--border)'
-    },
-    '.cm-tooltip-autocomplete ul li[aria-selected]': {
-      backgroundColor: 'var(--accent)',
-      color: 'var(--accent-foreground)'
-    }
-  },
-  { dark: true }
-)
+// Per-engine dialect → correct identifier quoting (MySQL backtick vs ANSI "..."),
+// keyword set, and string-escape rules.
+const DIALECTS: Record<DriverType, SQLDialect> = {
+  mysql: MySQL,
+  postgres: PostgreSQL,
+  sqlite: SQLite
+}
 
 interface Props {
   value: string
   onChange: (v: string) => void
   /** Ctrl/Cmd-Enter — passes the selection if any, else the whole doc */
   onRun: (sql: string) => void
-  /** table -> columns, for autocomplete */
+  /** table -> columns, for autocomplete; updates dynamically via Compartment */
   schema?: Record<string, string[]>
+  /** connection engine — picks the SQL dialect (quoting/keywords) */
+  driver?: DriverType
 }
 
-export function SqlEditor({ value, onChange, onRun, schema }: Props): React.JSX.Element {
+export function SqlEditor({ value, onChange, onRun, schema, driver }: Props): React.JSX.Element {
   const host = useRef<HTMLDivElement>(null)
   const view = useRef<EditorView | null>(null)
   const onChangeRef = useRef(onChange)
   const onRunRef = useRef(onRun)
+  const sqlCompartment = useRef(new Compartment())
   onChangeRef.current = onChange
   onRunRef.current = onRun
+
+  const dialect = (driver && DIALECTS[driver]) || MySQL
 
   useEffect(() => {
     if (!host.current) return
     const state = EditorState.create({
       doc: value,
       extensions: [
-        // highest precedence so basicSetup's keymap can't swallow Ctrl/Cmd-Enter
+        // Highest precedence so basicSetup's keymap can't swallow Ctrl/Cmd-Enter
         Prec.highest(
           keymap.of([
             {
@@ -83,9 +60,12 @@ export function SqlEditor({ value, onChange, onRun, schema }: Props): React.JSX.
           ])
         ),
         basicSetup,
-        sql({ dialect: SQLDialect.define({}), schema, upperCaseKeywords: true }),
-        syntaxHighlighting(highlight),
-        theme,
+        // Wrapped in a Compartment so schema/dialect can update without remounting
+        sqlCompartment.current.of(
+          sql({ dialect, schema, upperCaseKeywords: true })
+        ),
+        syntaxHighlighting(krustHighlight),
+        krustTheme,
         EditorView.updateListener.of((u) => {
           if (u.docChanged) onChangeRef.current(u.state.doc.toString())
         })
@@ -97,11 +77,21 @@ export function SqlEditor({ value, onChange, onRun, schema }: Props): React.JSX.
       v.destroy()
       view.current = null
     }
-    // schema baked in at mount; remount via key when it changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // keep editor in sync if value is set externally
+  // Dynamically update schema/dialect without destroying the editor
+  useEffect(() => {
+    const v = view.current
+    if (!v) return
+    v.dispatch({
+      effects: sqlCompartment.current.reconfigure(
+        sql({ dialect, schema, upperCaseKeywords: true })
+      )
+    })
+  }, [schema, dialect])
+
+  // Keep editor in sync if value is set externally
   useEffect(() => {
     const v = view.current
     if (v && value !== v.state.doc.toString()) {

@@ -25,6 +25,14 @@ import type {
  */
 export interface DbDriver {
   connect(): Promise<void>
+  /** databases/catalogs visible to this connection (mysql SHOW DATABASES,
+   *  pg pg_database). sqlite returns []. */
+  listDatabases(): Promise<string[]>
+  /** switch the active database. mysql: `USE db` (same connection); pg:
+   *  reconnects bound to the new db; sqlite: throws (single-file). */
+  useDatabase(name: string): Promise<void>
+  /** the currently-active database name, or null when none selected. */
+  currentDatabase(): string | null
   listEntities(): Promise<EntityInfo[]>
   listEnums(): Promise<EnumType[]>
   readRows(
@@ -48,7 +56,13 @@ export interface DbDriver {
   /** the CREATE statement for a table/view; pg reconstructs from catalog. */
   getCreateSql(entity: EntityRef): Promise<string>
   createTable(spec: CreateTableSpec): Promise<{ ddl: string }>
-  alterTable(entity: EntityRef, ops: SchemaOp[]): Promise<{ statements: string[] }>
+  /** apply schema ops. `dryRun` builds + returns the statements without
+   *  executing them (for the pre-commit DDL preview). */
+  alterTable(
+    entity: EntityRef,
+    ops: SchemaOp[],
+    dryRun?: boolean
+  ): Promise<{ statements: string[] }>
   /** DROP TABLE/VIEW. Destructive — guarded by read-only + typed confirm (UI). */
   dropEntity(entity: EntityRef, type: EntityType): Promise<{ statements: string[] }>
   /** ALTER/RENAME table to a new name (same schema). */

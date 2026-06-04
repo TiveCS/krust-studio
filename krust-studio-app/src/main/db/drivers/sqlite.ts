@@ -54,6 +54,21 @@ export class SqliteDriver implements DbDriver {
     })
   }
 
+  currentDatabase(): string | null {
+    // single-file DB — report the file's base name as the "database"
+    const p = this.deps.config.sqlitePath
+    return p ? p.replace(/^.*[\\/]/, '') : null
+  }
+
+  async listDatabases(): Promise<string[]> {
+    const cur = this.currentDatabase()
+    return cur ? [cur] : []
+  }
+
+  async useDatabase(): Promise<void> {
+    throw new Error('SQLite is a single-file database; cannot switch database')
+  }
+
   async listEntities(): Promise<EntityInfo[]> {
     if (!this.db) throw new Error('Not connected')
     const rows = this.db
@@ -307,7 +322,8 @@ export class SqliteDriver implements DbDriver {
 
   async alterTable(
     entity: EntityRef,
-    ops: SchemaOp[]
+    ops: SchemaOp[],
+    dryRun = false
   ): Promise<{ statements: string[] }> {
     if (!this.db) throw new Error('Not connected')
     const t = quoteIdent(entity.name)
@@ -333,8 +349,15 @@ export class SqliteDriver implements DbDriver {
         case 'addForeignKey':
         case 'dropForeignKey':
           throw new Error('SQLite cannot add or drop foreign keys via ALTER')
+        case 'moveColumn':
+          throw new Error('SQLite cannot reorder table columns via ALTER')
+        case 'addIndex':
+          return this.createIndexSql(entity, op.spec)
+        case 'dropIndex':
+          return this.dropIndexSql(op.name)
       }
     })
+    if (dryRun) return { statements }
     this.db.exec('BEGIN')
     try {
       for (const s of statements) this.db.exec(s)
@@ -374,14 +397,22 @@ export class SqliteDriver implements DbDriver {
     return { statements: [sql] }
   }
 
+  private createIndexSql(entity: EntityRef, spec: IndexSpec): string {
+    const name = spec.name?.trim() || defaultIndexName(entity.name, spec.columns)
+    const cols = spec.columns.map(quoteIdent).join(', ')
+    return `CREATE ${spec.unique ? 'UNIQUE ' : ''}INDEX ${quoteIdent(name)} ON ${quoteIdent(entity.name)} (${cols})`
+  }
+
+  private dropIndexSql(name: string): string {
+    return `DROP INDEX ${quoteIdent(name)}`
+  }
+
   async createIndex(
     entity: EntityRef,
     spec: IndexSpec
   ): Promise<{ statements: string[] }> {
     if (!this.db) throw new Error('Not connected')
-    const name = spec.name?.trim() || defaultIndexName(entity.name, spec.columns)
-    const cols = spec.columns.map(quoteIdent).join(', ')
-    const sql = `CREATE ${spec.unique ? 'UNIQUE ' : ''}INDEX ${quoteIdent(name)} ON ${quoteIdent(entity.name)} (${cols})`
+    const sql = this.createIndexSql(entity, spec)
     this.db.exec(sql)
     return { statements: [sql] }
   }
@@ -391,7 +422,7 @@ export class SqliteDriver implements DbDriver {
     name: string
   ): Promise<{ statements: string[] }> {
     if (!this.db) throw new Error('Not connected')
-    const sql = `DROP INDEX ${quoteIdent(name)}`
+    const sql = this.dropIndexSql(name)
     this.db.exec(sql)
     return { statements: [sql] }
   }

@@ -10,12 +10,15 @@ App lives in `krust-studio-app/`. Docs (this file, CONTEXT.md, ADRs) at repo roo
 ## Read first
 
 1. `CONTEXT.md` — domain glossary + core principle ("no silent mutations").
-2. `docs/adr/0001..0006` — the binding decisions. Especially:
+2. `docs/adr/0001..0010` — the binding decisions. Especially:
    - 0001 Electron over Tauri (no C++ toolchain).
-   - 0002 Captured DDL → Changesets, no squash (the headline feature; mostly
-     NOT built yet — see Gaps).
+   - 0002 Captured DDL → Changesets, no squash (the headline feature, built).
    - 0005 Mutation safety: staged → review → transactional commit.
    - 0006 SQLite via Node built-in `node:sqlite` (zero native deps).
+   - 0008 History capture (Table/Data Mutation + Data Retrieval streams).
+   - 0009 Auto-update via GitHub Releases.
+   - 0010 Optional database name + multi-database switching (mysql USE / pg
+     reconnect).
 3. User memory (auto-loaded): prefer **registry-latest deps + pnpm**; pull
    **real shadcn source** (CLI/registry), never hand-write a lookalike or use
    native HTML controls; **ASK before designing UI**.
@@ -39,9 +42,21 @@ App lives in `krust-studio-app/`. Docs (this file, CONTEXT.md, ADRs) at repo roo
     `searchRows(entity, term, limit, offset)` powers the FK Picker (cross-column
     OR-LIKE, ADR-0007). `dropEntity`/`renameTable`/`truncateTable` back the
     sidebar table ops (read-only guarded in session.ts; typed-confirm in UI).
-  - `db/drivers/{sqlite,mysql,postgres}.ts` — per-engine impls.
+    `listDatabases`/`currentDatabase`/`useDatabase` back the **Database Switcher**
+    (ADR-0010): mysql `USE` in place, pg reconnects, sqlite single-file.
+  - `db/drivers/{sqlite,mysql,postgres}.ts` — per-engine impls. Empty
+    `config.database` → mysql connects server-level (no default schema), pg
+    falls back to the `postgres` maintenance db, sqlite uses the file path.
+  - `db/mysql-coldef.ts` — column-definition splice helpers for the unified
+    MySQL `MODIFY` (ADR-0011): `extractColumnDef` (verbatim line from SHOW CREATE),
+    `spliceType`/`spliceNullable`/`spliceDefault`/`dropDefault`, `positionClause`.
+    Pure reposition uses the verbatim def untouched; edits splice only the changed
+    attribute so auto_increment/collation/comment survive. `moveColumn` SchemaOp
+    is MySQL-only (pg/sqlite throw).
   - `db/session.ts` — SessionManager: one live connection per connection-id;
-    read-only connections block all writes here (main-process enforced).
+    read-only connections block all writes here (main-process enforced). Also
+    exposes `listDatabases`/`currentDatabase`/`useDatabase`. `runScript`
+    records the **executed** SQL (auto-LIMIT inlined) to results + history.
   - `store/connections.ts` — connections.json + password encryption via
     `safeStorage` (DPAPI).
   - `store/history.ts` — Query History + Changeset store: `history.db`
@@ -51,11 +66,16 @@ App lives in `krust-studio-app/`. Docs (this file, CONTEXT.md, ADRs) at repo roo
     `assignEntries`) + `buildChangesetSql`/`markExported`. Fed by `session.ts`
     after each successful mutation (ADR 0008, ADR 0002).
   - `ipc.ts` — all `connections:*`, `session:*`, `history:*` handlers.
+  - `index.ts` — window + **auto-updater** (`electron-updater`, GitHub Releases,
+    ADR-0009): checks ~5s after show, downloads in background, sends
+    `update:available`/`update:downloaded` to the renderer; `update:install`
+    triggers `quitAndInstall`. Skipped in dev.
 - `src/preload/index.ts` — typed `window.api` (contextIsolation on).
 - `src/shared/types.ts` — types shared across main/preload/renderer.
 - `src/renderer/src/`
   - `store/connections.ts` — zustand: connections + live session + `enums`
-    (loaded on connect, pg named enums) + **tabs**
+    (loaded on connect, pg named enums) + `databases`/`currentDb` +
+    `switchDatabase` (Database Switcher) + **tabs**
     (each tab: entity, data, filters, orderBy, edits/deletes/inserts,
     colWidths, view 'data'|'structure', structure, draft).
   - `components/HistoryView.tsx` — dedicated full-area Query History + Changeset
@@ -76,10 +96,17 @@ App lives in `krust-studio-app/`. Docs (this file, CONTEXT.md, ADRs) at repo roo
     Presentational (props `columns`/`value`/`onApply`, no store coupling).
   - `components/TableTabView.tsx` — routes draft→NewTableEditor,
     else Data/Structure (bottom toggle).
-  - `components/StructureView.tsx` — Columns/Indexes/Relations sub-tabs +
-    refresh. Columns delegates to StructureEditor.
-  - `components/StructureEditor.tsx` — editable columns; diffs draft vs original
-    → SchemaOp[] → `alterTable`; per-engine limitation banner (conditional).
+  - `components/StructureView.tsx` — Columns/Indexes/Relations/DDL sub-tabs +
+    refresh. **Owns the unified staged-commit**: column draft + staged index
+    add/drop, one `ops = [...dropIndex, ...colOps, ...addIndex]`, shared footer
+    (pending count · **Commit…** · Discard) + DDL review **Sheet** (`previewAlter`
+    dry-run → confirm → `alterTable`). Index add/drop stage (green/red), never
+    fire on click.
+  - `components/StructureEditor.tsx` — controlled column editor (props: draft,
+    onDraftChange, movedNames); per-engine limitation banner + ColumnsEditor.
+    Drag-to-reorder (canReorder=mysql). No longer owns commit.
+  - `lib/columnDiff.ts` — `seed` + `diff` (draft vs original → SchemaOp[],
+    incl. minimal LIS `moveColumn` ops). Shared by StructureView.
   - `components/NewTableEditor.tsx` — new-table draft; shares `ColumnsEditor`.
   - `components/ColumnsEditor.tsx` — SHARED column row editor (name, type
     Combobox, null/pk checkbox, FK toggle+panel). Used by new-table AND
@@ -99,7 +126,32 @@ App lives in `krust-studio-app/`. Docs (this file, CONTEXT.md, ADRs) at repo roo
   - `components/ExportDialog.tsx` — result export: scope (page/selection/all
     filter) × CSV/JSON × Copy/Save. Uses `lib/export.ts` formatters,
     `sessions.exportAllRows` (paged) + `dialog.saveText` (OS save dialog).
+  - `components/QueryView.tsx` — SQL editor + per-statement results, **drag-
+    resizable** editor/results split (DOM-direct during drag, store-commit on
+    release — same perf pattern as DataGrid col-resize). SQL kept in a ref while
+    typing (no re-render per keystroke; flushed on run/unmount). Lazily loads
+    columns for tables referenced in the SQL (parse FROM/JOIN, debounced) →
+    feeds autocomplete.
+  - `components/SqlEditor.tsx` — CodeMirror 6 wrapper. Schema **and** dialect in
+    a `Compartment` (reconfigured live, no remount). Per-driver dialect
+    (`MySQL`/`PostgreSQL`/`SQLite`) → correct identifier quoting. Shares theme
+    with SqlDisplay via `lib/cm-theme.ts`.
+  - `components/SqlDisplay.tsx` — read-only CodeMirror, syntax-highlighted DDL in
+    the Structure → DDL sub-tab.
+  - `components/CommandPalette.tsx` — **Ctrl/⌘+P** table switcher (shadcn Command
+    in a Dialog, `shouldFilter=false` + own contains-filter capped at 50 for
+    speed on 500+ tables). Mounted in `App.tsx`.
+  - `components/ConnectionSwitcher.tsx` / `components/DatabaseSwitcher.tsx` —
+    sidebar footer (connection) + header (database) combobox switchers, each
+    with **self-contained** popover/search state. Extracted out of AppSidebar so
+    opening either popover doesn't re-render the 580-row schema tree
+    (state-colocation, not memoization). DatabaseSwitcher backs the multi-db
+    feature (ADR-0010).
+  - `lib/cm-theme.ts` — shared CodeMirror theme + highlight style (teal accent,
+    JetBrains Mono), used by SqlEditor + SqlDisplay.
   - `components/ui/combobox.tsx` — custom creatable Combobox (Popover+Command).
+  - `App.tsx` — `h-svh overflow-hidden` shell so the TabBar stays pinned and only
+    the grid scrolls; mounts `CommandPalette` + update toasts.
 
 ## Dev loop
 
@@ -109,17 +161,38 @@ App lives in `krust-studio-app/`. Docs (this file, CONTEXT.md, ADRs) at repo roo
 - Windows cache-lock: rapid double dev-restart fails; kill electron, wait, start
   once.
 - Test DB: `D:/Work/Krust Studio/sample.db` (sqlite, has FK). User also tests on
-  a remote Postgres.
+  a remote Postgres + a remote MySQL/MariaDB (large schema, 500+ tables).
+- **Perf pattern (recurring):** drag-resize and fast-typing paths mutate the DOM
+  directly during the interaction and commit to the store once at the end —
+  avoids re-rendering 500-row grids / the editor per mouse-move or keystroke.
+  Used in DataGrid col-resize, QueryView split, and SQL-in-a-ref typing.
+  Related: **state-colocation** — popover/search state for the connection +
+  database switchers lives in their own leaf components, so toggling them never
+  re-renders AppSidebar's big schema tree. (Tree filter-typing still re-renders
+  it; memoize `EntityGroup` if that becomes a problem.)
+- Navigating to a table/tab (`openTable`/`setActiveTab`/`openNewTable`/
+  `openQuery`) clears `selectedId`/`creatingNew` so the connection editor closes
+  — otherwise editing a connection then clicking a table left the form stuck open.
+- Auto-update is **GitHub Releases** (`electron-builder.yml` publish →
+  `TiveCS/krust-studio`). Release flow: bump `package.json` version → `pnpm
+  build:win` → upload installer + `latest.yml` to a `v<version>` GitHub Release.
+  Only fires in packaged builds, not dev.
 
 ## Built (working)
 
 Connections (CRUD, test, encrypted, SSH/SSL fields, read-only flag, reveal,
-duplicate) · connect → schema tree · multi-tab data browse · filter (AND) ·
+duplicate, **optional database**) · connect → schema tree · **multi-database
+switcher** (mysql/pg) · multi-tab data browse · filter (AND/OR groups) ·
 server-side sort · pagination · inline edit/insert/delete staged + transactional
-commit · copy/paste · FK navigation (new filtered tab) · Structure view
-(columns/indexes/relations) · editable columns (add/rename/drop; type/null on
-pg+mysql) · FK add/drop (pg+mysql) · create table · per-engine limitation
-banners.
+commit · copy/paste · FK navigation/expansion/picker · Structure view
+(columns/indexes/relations/DDL, **syntax-highlighted**) · editable columns
+(add/rename/drop; type/null on pg+mysql) · **column reorder** (drag handle;
+existing-table MySQL-only via unified verbatim MODIFY, free on new-table any
+engine — ADR-0011) · FK add/drop (pg+mysql) · create table ·
+per-engine limitation banners · **SQL editor** (schema+column autocomplete,
+engine-aware dialect/quoting, auto-LIMIT shown, cancel, resizable split) ·
+**Ctrl/⌘+P command palette** · Query History + Changesets + export · result
+export (CSV/JSON) · **auto-update** (GitHub Releases) · installer custom path.
 
 ## Gaps — prioritized TODO
 

@@ -1,8 +1,36 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { autoUpdater } from 'electron-updater'
 import icon from '../../resources/icon.png?asset'
 import { registerIpc } from './ipc'
+
+function setupAutoUpdater(win: BrowserWindow): void {
+  if (is.dev) return // skip in dev — no release server to hit
+
+  autoUpdater.autoDownload = true
+  autoUpdater.autoInstallOnAppQuit = true
+
+  autoUpdater.on('update-available', (info) => {
+    win.webContents.send('update:available', info.version)
+  })
+
+  autoUpdater.on('update-downloaded', (info) => {
+    win.webContents.send('update:downloaded', info.version)
+  })
+
+  autoUpdater.on('error', (err) => {
+    // silent — don't crash the app over update failures
+    console.error('[updater]', err.message)
+  })
+
+  ipcMain.on('update:install', () => {
+    autoUpdater.quitAndInstall()
+  })
+
+  // Check after a short delay so the window is visible first
+  setTimeout(() => void autoUpdater.checkForUpdates(), 5000)
+}
 
 function createWindow(): void {
   // Create the browser window.
@@ -22,6 +50,7 @@ function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    setupAutoUpdater(mainWindow)
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -43,7 +72,7 @@ function createWindow(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('com.krust.studio')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

@@ -242,8 +242,15 @@ export function ConnectionForm({ existing }: Props): React.JSX.Element {
               </div>
             </div>
             <div className="space-y-1">
-              <Label htmlFor="database">Database</Label>
-              <Input id="database" {...register('database')} />
+              <Label htmlFor="database">
+                Database{' '}
+                <span className="text-muted-foreground">(optional)</span>
+              </Label>
+              <Input
+                id="database"
+                placeholder="Leave empty to browse all databases"
+                {...register('database')}
+              />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
@@ -316,6 +323,21 @@ export function ConnectionForm({ existing }: Props): React.JSX.Element {
 
       <div className="border-t border-border">
         <div className="mx-auto flex w-full max-w-xl items-center gap-2 px-6 py-3">
+          <Button type="submit" disabled={isSubmitting}>
+            <Save />
+            Save
+          </Button>
+          {existing && (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => duplicate(existing.id)}
+              title="Duplicate (copies password)"
+            >
+              <Copy />
+              Duplicate
+            </Button>
+          )}
           <Button
             type="button"
             variant="outline"
@@ -324,10 +346,6 @@ export function ConnectionForm({ existing }: Props): React.JSX.Element {
           >
             {testing ? <Loader2 className="animate-spin" /> : <Plug />}
             Test
-          </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            <Save />
-            Save
           </Button>
           {existing && (
             <Button
@@ -342,25 +360,14 @@ export function ConnectionForm({ existing }: Props): React.JSX.Element {
           )}
           <div className="flex-1" />
           {existing && (
-            <>
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => duplicate(existing.id)}
-                title="Duplicate (copies password)"
-              >
-                <Copy />
-                Duplicate
-              </Button>
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={() => remove(existing.id)}
-              >
-                <Trash2 />
-                Delete
-              </Button>
-            </>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => remove(existing.id)}
+            >
+              <Trash2 />
+              Delete
+            </Button>
           )}
         </div>
       </div>
