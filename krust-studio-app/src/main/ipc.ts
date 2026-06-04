@@ -32,7 +32,8 @@ import {
   dropIndex,
   runScript,
   cancelQuery,
-  disconnectSession
+  disconnectSession,
+  reconnectSession
 } from './db/session'
 import {
   listHistory,
@@ -205,6 +206,7 @@ export function registerIpc(): void {
   ipcMain.handle('session:disconnect', (_e, id: string) =>
     disconnectSession(id)
   )
+  ipcMain.handle('session:reconnect', (_e, id: string) => reconnectSession(id))
 
   ipcMain.handle('history:list', (_e, query: HistoryQuery) => listHistory(query))
   ipcMain.handle(

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Database, ChevronsUpDown, Check, Plus, Pencil, Lock } from 'lucide-react'
+import { Database, ChevronsUpDown, Check, Plus, Pencil, Lock, Unplug, RefreshCw } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Command,
@@ -18,14 +18,42 @@ const DRIVER_LABEL: Record<string, string> = {
   sqlite: 'SQLite'
 }
 
+function StatusDot({ status }: { status: string }): React.JSX.Element | null {
+  if (status === 'idle') return null
+  const cls =
+    status === 'connected'
+      ? 'bg-teal-500'
+      : status === 'connecting'
+        ? 'bg-amber-400 animate-pulse'
+        : status === 'disconnected'
+          ? 'bg-muted-foreground/50'
+          : /* error */ 'bg-destructive'
+  return <span className={`size-1.5 shrink-0 rounded-full ${cls}`} />
+}
+
 /**
  * Searchable connection switcher (footer). Self-contained open state so toggling
  * it never re-renders the 580-row schema tree in AppSidebar.
  */
 export function ConnectionSwitcher(): React.JSX.Element {
-  const { connections, openConnectionId, open, startNew, select } = useConnections()
+  const {
+    connections,
+    openConnectionId,
+    sessionStatus,
+    open,
+    startNew,
+    select,
+    disconnect,
+    reconnect
+  } = useConnections()
   const [switcherOpen, setSwitcherOpen] = useState(false)
   const current = connections.find((c) => c.id === openConnectionId)
+
+  const canDisconnect =
+    !!openConnectionId && (sessionStatus === 'connected' || sessionStatus === 'error')
+  const canReconnect =
+    !!openConnectionId &&
+    (sessionStatus === 'disconnected' || sessionStatus === 'error')
 
   return (
     <Popover open={switcherOpen} onOpenChange={setSwitcherOpen}>
@@ -36,6 +64,7 @@ export function ConnectionSwitcher(): React.JSX.Element {
             {current?.name ?? 'Select a connection'}
           </span>
           {current?.readOnly && <Lock className="size-3 shrink-0 opacity-60" />}
+          <StatusDot status={openConnectionId ? sessionStatus : 'idle'} />
           <ChevronsUpDown className="size-3.5 shrink-0 opacity-50" />
         </button>
       </PopoverTrigger>
@@ -82,10 +111,40 @@ export function ConnectionSwitcher(): React.JSX.Element {
                   }}
                 >
                   <Pencil className="size-4" />
-                  Edit “{current.name}”
+                  Edit "{current.name}"
                 </CommandItem>
               )}
             </CommandGroup>
+            {(canDisconnect || canReconnect) && (
+              <>
+                <CommandSeparator />
+                <CommandGroup>
+                  {canReconnect && (
+                    <CommandItem
+                      onSelect={() => {
+                        setSwitcherOpen(false)
+                        void reconnect()
+                      }}
+                    >
+                      <RefreshCw className="size-4" />
+                      Reconnect
+                    </CommandItem>
+                  )}
+                  {canDisconnect && (
+                    <CommandItem
+                      onSelect={() => {
+                        setSwitcherOpen(false)
+                        void disconnect()
+                      }}
+                      className="text-muted-foreground"
+                    >
+                      <Unplug className="size-4" />
+                      Disconnect
+                    </CommandItem>
+                  )}
+                </CommandGroup>
+              </>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>

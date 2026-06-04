@@ -29,7 +29,7 @@ export type TabView = 'data' | 'structure'
 
 const PAGE_SIZE = 100
 
-type SessionStatus = 'idle' | 'connecting' | 'connected' | 'error'
+type SessionStatus = 'idle' | 'connecting' | 'connected' | 'disconnected' | 'error'
 
 export interface Tab {
   id: string
@@ -97,6 +97,10 @@ interface ConnectionsState {
   renameTable: (entity: EntityRef, newName: string) => Promise<string[]>
   truncateTable: (entity: EntityRef) => Promise<string[]>
   closeSession: () => Promise<void>
+  /** Close socket, keep tabs/workspace. Status → 'disconnected'. */
+  disconnect: () => Promise<void>
+  /** Force clean teardown + fresh connect. Reloads entities on success. */
+  reconnect: () => Promise<void>
 
   // which full-area screen is showing
   screen: 'tables' | 'history'
@@ -358,6 +362,43 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         tabs: [],
         activeTabId: null
       })
+    },
+
+    disconnect: async () => {
+      const id = get().openConnectionId
+      if (!id) return
+      try {
+        await window.api.sessions.disconnect(id)
+      } catch {
+        // socket already dead — ignore
+      }
+      set({ sessionStatus: 'disconnected', sessionError: null })
+      // tabs, entities, openConnectionId all preserved (workspace stays)
+    },
+
+    reconnect: async () => {
+      const id = get().openConnectionId
+      if (!id) return
+      set({ sessionStatus: 'connecting', sessionError: null })
+      try {
+        await window.api.sessions.reconnect(id)
+        const entities = await window.api.sessions.listEntities(id)
+        const enums = await window.api.sessions.listEnums(id)
+        set({ sessionStatus: 'connected', entities, enums })
+        Promise.all([
+          window.api.sessions.listDatabases(id),
+          window.api.sessions.currentDatabase(id)
+        ])
+          .then(([databases, currentDb]) => {
+            if (get().openConnectionId === id) set({ databases, currentDb })
+          })
+          .catch(() => {})
+      } catch (err) {
+        set({
+          sessionStatus: 'error',
+          sessionError: err instanceof Error ? err.message : String(err)
+        })
+      }
     },
 
     screen: 'tables',

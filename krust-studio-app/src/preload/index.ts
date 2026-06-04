@@ -90,6 +90,7 @@ const api: KrustApi = {
     applyChanges: (id: string, entity: EntityRef, changes: ChangeSet) =>
       ipcRenderer.invoke('session:applyChanges', id, entity, changes),
     disconnect: (id: string) => ipcRenderer.invoke('session:disconnect', id),
+    reconnect: (id: string) => ipcRenderer.invoke('session:reconnect', id),
     runScript: (id: string, sql: string, autoLimit?: number) =>
       ipcRenderer.invoke('session:runScript', id, sql, autoLimit),
     cancelQuery: (id: string) => ipcRenderer.invoke('session:cancelQuery', id)

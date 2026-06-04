@@ -445,6 +445,8 @@ export interface SessionApi {
     changes: ChangeSet
   ) => Promise<ApplyResult>
   disconnect: (id: string) => Promise<void>
+  /** Force close + reconnect fresh (manual reconnect from footer menu). */
+  reconnect: (id: string) => Promise<void>
   /** SQL editor: run a script (split into statements), capturing each */
   runScript: (
     id: string,

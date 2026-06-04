@@ -379,3 +379,9 @@ export async function disconnectSession(id: string): Promise<void> {
   await driver.close()
   sessions.delete(id)
 }
+
+/** Force close (even if already connected) then reconnect fresh. */
+export async function reconnectSession(id: string): Promise<void> {
+  await disconnectSession(id)
+  await connectSession(id)
+}
