@@ -32,6 +32,24 @@ MySQL connects with no default schema (entities empty until one is picked);
 PostgreSQL falls back to the `postgres` maintenance database for the initial
 connection. SQLite is single-file — its "database" is the file path, not a name.
 
+### Session
+The live link to a database opened from a **Connection**. Lifecycle:
+
+- **Connect / Disconnect / Reconnect** are explicit, available from the footer
+  connection menu. **Disconnect** closes the live socket and returns to the
+  landing state; the connection's open tabs are saved (see **Workspace & Tabs**)
+  and restored on reconnect or when you switch back. A status indicator shows
+  connected / connecting / disconnected.
+- **Resilient to idle drops.** Servers (and serverless DBs like Neon) close idle
+  connections. A Session **transparently auto-recovers**: on a connection-fatal
+  error it reconnects and retries the operation once, so coming back after lunch
+  and clicking a table just works — no manual step. The safety line follows the
+  no-silent-mutation principle: **reads and the transactional GUI writes**
+  (staged-edit commit, schema commit — a drop rolls them back) auto-retry; a raw
+  **SQL-editor** run reconnects but is **not** silently re-run (a bare statement
+  may have partially applied — you're told to re-run). When auto-recovery can't
+  help (bad creds, server down), the manual **Reconnect** is the fallback.
+
 ### Database Switching
 The sidebar header is a **database switcher**: it lists every database the
 connection can see (`SHOW DATABASES` on MySQL, `pg_database` on Postgres) and
@@ -128,6 +146,21 @@ opens the **related table in a new tab**, auto-filtered to the referenced record
 (`WHERE target_pk = value`); the filter is clearable to browse the full table.
 Outward direction only (FK → parent) for v1; NULL FK = no navigation.
 
+### Referenced By (Reverse FK)
+The inverse of an outbound relation: **which tables reference the current table**
+(inbound FKs / dependents). Shown as a **"Referenced by" sub-tab** in the
+Structure view (alongside Relations, which is outbound-only), with a count badge;
+each row opens the referencing table. Answers "what breaks if I drop/change
+this". Sourced per engine — MySQL/Postgres from the catalog
+(`KEY_COLUMN_USAGE` / `pg_constraint`); SQLite has no reverse index, so it scans
+each table's `pragma_foreign_key_list`.
+
+**Walkable both directions.** Clicking a referenced table in either the Relations
+(outbound) or Referenced By (inbound) sub-tab **opens that table in Structure
+view on its Relations sub-tab** — letting the user walk the FK graph through the
+schema (distinct from **FK Navigation**, which jumps to *data* filtered to a
+row).
+
 ### FK Picker
 While **editing or inserting** a row, a foreign-key cell offers a value picker so
 the user sets the FK by choosing a real parent record instead of memorizing keys.
@@ -181,10 +214,11 @@ requires explicit confirmation, since it runs arbitrary, irreversible SQL agains
 the target. Stop-on-error toggle. (CSV/JSON-into-table import deferred for v1.)
 
 ### Data Location
-Connections, query history, and changesets live in a user-configurable data
-directory (default `%AppData%/KrustStudio`, changeable in settings). The
-installer (NSIS) also lets the user pick a custom install path. No forced
-AppData/Program Files lock-in. (Portable mode deferred.)
+Connections, query history, changesets, and the persisted **Workspace** (open
+tabs per connection) live in a user-configurable data directory (default
+`%AppData%/KrustStudio`, changeable in settings). The installer (NSIS) also lets
+the user pick a custom install path. No forced AppData/Program Files lock-in.
+(Portable mode deferred.)
 
 ### Query Execution
 The editor can run the selected text, the statement at the cursor, or the whole
@@ -210,6 +244,22 @@ A VSCode-style quick switcher (**Ctrl/⌘+P**) to fuzzy-search every table/view 
 the current connection and open it in a tab. Contains-match (startsWith ranked
 first), results capped for speed on large schemas. Convenience layer over the
 schema tree, not a replacement.
+
+### Workspace & Tabs
+**Everything the user works in is a Tab** — data browsers, the SQL editor, a
+new-table draft, the **Query History** view, and the **connection editor**. There
+is no full-area "screen" that hides the tabs: opening the editor or history adds
+or focuses a tab, and closing it drops you back to your data tabs. History and
+the connection editor are **singletons per connection** (open focuses the
+existing one).
+
+A **Workspace** is a connection's set of open tabs + which one is active. It is
+**persisted** so the user lands back where they were after a restart, a
+disconnect, or switching connections — **per connection** (each connection
+remembers its own tabs). Only *where you were* is saved (entity, view, filters,
+sort, SQL text, draft, column widths), **not** the fetched rows/results or staged
+edits — content is transient and re-fetched on demand. Stored in the configurable
+data directory alongside connections/history (see **Data Location**).
 
 ### Schema Browser
 The left-sidebar navigation: a lazy-loaded, virtualized, filterable tree
@@ -275,6 +325,10 @@ columns without a full table rebuild, which Krust refuses
 ([ADR 0002](docs/adr/0002-captured-ddl-changesets-no-squash.md)), so the
 affordance is hidden there. See
 [ADR 0011](docs/adr/0011-column-reordering-and-unified-mysql-modify.md).
+
+A **column search** filters the column list by name (display-only; the staged
+draft and diff stay complete). Reorder is disabled while a filter is active —
+drag position is undefined relative to hidden rows.
 
 ### MCP Server
 **Priority: post-MVP, nice-to-have — not a main feature.** Design is captured but

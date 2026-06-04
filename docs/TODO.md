@@ -2,6 +2,56 @@
 
 Prioritized. Top group = highest value (matches CONTEXT.md + Beekeeper parity).
 
+## P0 — next update (v1.3.0): workspace & connection resilience
+
+Design resolved via `/grill-with-docs`. See
+[ADR-0012](adr/0012-tab-centric-persistent-workspace.md) (tab-centric workspace)
+and [ADR-0013](adr/0013-connection-resilience-auto-retry.md) (auto-retry), and
+CONTEXT.md **Session** + **Workspace & Tabs**.
+
+- [ ] **Connection auto-retry (the bug).** Driver `query`/op path: on a
+      connection-fatal error (`ECONNRESET`, `PROTOCOL_CONNECTION_LOST`, pg
+      "Connection terminated", `ETIMEDOUT`), drop the dead handle → reconnect →
+      retry **once**. Classify connection-fatal vs ordinary query errors per
+      engine (don't retry SQL errors). Auto-retry **reads + transactional writes**
+      (`applyChanges`, `alterTable`); `runScript` reconnects but does **not**
+      re-run (return a "reconnected — re-run" marker the SQL editor surfaces).
+      Add a liveness-aware `ensure()` (detect stale, not just null).
+- [ ] **Manual Disconnect / Reconnect.** Footer connection menu
+      (`ConnectionSwitcher`): Disconnect (close socket → landing, keep workspace),
+      Reconnect (force clean teardown + fresh connect — fix `connectSession`
+      early-return when the driver is still mapped). Status indicator
+      (connected / connecting / disconnected) per the active connection.
+- [ ] **Everything-is-a-tab.** Remove the full-area `screen` takeover. Add tab
+      types for **History** (singleton/connection) and the **connection editor**
+      (singleton/connection + one "new"). App shell = tab bar + active tab only.
+      Editor tab: Save keeps it, Connect closes + switches to that connection's
+      tabs. Sidebar History button + footer Edit/New open/focus their tabs.
+- [ ] **Persistent per-connection workspace.** `workspace.json` in the data dir
+      (main process, IPC, debounced). Persist per connection: open tabs (entity,
+      view, filters, sort, SQL, draft, colWidths), active tab + last connection.
+      **Not** rows/results/structure/staged edits. Restore lazily (re-fetch on
+      view); fail soft when a restored entity no longer exists. Tabs move from one
+      global array → per-connection structure.
+- [ ] **"Referenced by" (reverse FK) sub-tab.** New Structure sub-tab (count
+      badge) listing tables that reference the current one. Driver method
+      `listReferencingTables(entity)` → `[{table, column, refColumn, constraint,
+      onUpdate, onDelete}]`: MySQL `KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME=?`,
+      pg `pg_constraint WHERE confrelid=<oid>`, SQLite scans each table's
+      `pragma_foreign_key_list`. See CONTEXT **Referenced By (Reverse FK)**.
+- [ ] **Walkable relations.** Clicking a referenced table in the **Relations**
+      (outbound) or **Referenced by** (inbound) sub-tab opens that table in a tab
+      at **Structure view → Relations sub-tab** — so FK graphs are navigable both
+      directions via structure. Requires addressing the structure sub-tab: **lift
+      it from `StructureView` local `useState` into tab state** (`tab.view` +
+      `tab.structureSub`), which also feeds workspace persistence (open-at-subtab
+      survives restore). `openTable` gains optional `{ view, structureSub }`.
+- [ ] **Column search in the structure editor.** Filter input above the Columns
+      list (`ColumnsEditor`) — substring match on column name, display-only (the
+      underlying draft/diff stays full). **Reorder disabled while a filter is
+      active** (drag position is undefined against hidden rows); edits + add-column
+      still apply to the full set. Mirrors the sidebar's table filter.
+
 ## P1 — high value, mostly cheap
 
 - [x] **Total row count + page size control.** Done. `countRows(entity,

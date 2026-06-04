@@ -10,7 +10,7 @@ App lives in `krust-studio-app/`. Docs (this file, CONTEXT.md, ADRs) at repo roo
 ## Read first
 
 1. `CONTEXT.md` — domain glossary + core principle ("no silent mutations").
-2. `docs/adr/0001..0010` — the binding decisions. Especially:
+2. `docs/adr/0001..0013` — the binding decisions. Especially:
    - 0001 Electron over Tauri (no C++ toolchain).
    - 0002 Captured DDL → Changesets, no squash (the headline feature, built).
    - 0005 Mutation safety: staged → review → transactional commit.
@@ -19,7 +19,19 @@ App lives in `krust-studio-app/`. Docs (this file, CONTEXT.md, ADRs) at repo roo
    - 0009 Auto-update via GitHub Releases.
    - 0010 Optional database name + multi-database switching (mysql USE / pg
      reconnect).
-3. User memory (auto-loaded): prefer **registry-latest deps + pnpm**; pull
+   - 0011 Column reorder + unified verbatim MySQL `MODIFY`.
+   - 0012 Tab-centric UI + persistent per-connection workspace (**v1.3.0, not
+     built**).
+   - 0013 Connection resilience: auto-retry + manual reconnect (**v1.3.0, not
+     built**).
+3. **Next up — v1.3.0** (designed, NOT built): see `docs/TODO.md` → **P0**.
+   7 items: connection auto-retry (fixes the idle-drop "can't retry" bug),
+   manual disconnect/reconnect, everything-is-a-tab (history + connection editor
+   become tabs), persistent per-connection workspace, referenced-by (reverse FK)
+   sub-tab, walkable relations, column search in the structure editor. Suggested
+   order: retry → reconnect → tabs → workspace persist → reverse-FK/walkable →
+   column search. ADR-0012 + ADR-0013 cover the two architectural spines.
+4. User memory (auto-loaded): prefer **registry-latest deps + pnpm**; pull
    **real shadcn source** (CLI/registry), never hand-write a lookalike or use
    native HTML controls; **ASK before designing UI**.
 
