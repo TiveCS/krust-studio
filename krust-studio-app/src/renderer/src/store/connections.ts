@@ -236,36 +236,71 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     }
   }
 
-  /** Debounced (800ms) save of current connection's workspace to disk. */
+  /** Workspace key: `connectionId:dbName` (or just `connectionId` when no db). */
+  function workspaceKey(connectionId: string, currentDb: string | null): string {
+    return currentDb ? `${connectionId}:${currentDb}` : connectionId
+  }
+
+  /** Debounced (800ms) save of current connection+db workspace to disk. */
   function scheduleWorkspaceSave(): void {
     if (_saveTimer) clearTimeout(_saveTimer)
     _saveTimer = setTimeout(() => {
-      const { openConnectionId, tabs, activeTabId } = get()
+      const { openConnectionId, currentDb, tabs, activeTabId } = get()
       if (!openConnectionId) return
+      const key = workspaceKey(openConnectionId, currentDb)
       _workspace = {
         ..._workspace,
         lastConnectionId: openConnectionId,
-        connections: {
-          ..._workspace.connections,
-          [openConnectionId]: buildConnectionWorkspace(tabs, activeTabId)
-        }
+        connections: { ..._workspace.connections, [key]: buildConnectionWorkspace(tabs, activeTabId) }
       }
       void window.api.workspace.save(_workspace)
     }, 800)
   }
 
-  /** Flush the current connection's workspace immediately (used before switching). */
-  function flushWorkspace(connectionId: string, tabs: Tab[], activeTabId: string | null): void {
+  /** Flush the current connection+db workspace immediately (used before switching). */
+  function flushWorkspace(
+    connectionId: string,
+    currentDb: string | null,
+    tabs: Tab[],
+    activeTabId: string | null
+  ): void {
     if (_saveTimer) { clearTimeout(_saveTimer); _saveTimer = null }
+    const key = workspaceKey(connectionId, currentDb)
     _workspace = {
       ..._workspace,
       lastConnectionId: connectionId,
-      connections: {
-        ..._workspace.connections,
-        [connectionId]: buildConnectionWorkspace(tabs, activeTabId)
-      }
+      connections: { ..._workspace.connections, [key]: buildConnectionWorkspace(tabs, activeTabId) }
     }
     void window.api.workspace.save(_workspace)
+  }
+
+  /** Restore saved tabs for a connection+db after connecting. Fail-soft. */
+  function restoreWorkspaceTabs(
+    connectionId: string,
+    currentDb: string | null,
+    entities: EntityInfo[]
+  ): void {
+    const key = workspaceKey(connectionId, currentDb)
+    const saved = _workspace.connections[key]
+    if (!saved?.tabs.length) return
+    const entitySet = new Set(entities.map((e) => `${e.schema ?? ''}\x00${e.name}`))
+    const restoredTabs = saved.tabs
+      .filter((t) => {
+        if (t.kind === 'history') return true
+        if (t.draft != null) return true
+        if (t.sqlDraft !== undefined) return true
+        return entitySet.has(`${t.entity.schema ?? ''}\x00${t.entity.name}`)
+      })
+      .map(deserializeTab)
+    if (!restoredTabs.length) return
+    const restoredActiveId = restoredTabs.some((t) => t.id === saved.activeTabId)
+      ? saved.activeTabId
+      : restoredTabs[0].id
+    set({ tabs: restoredTabs, activeTabId: restoredActiveId })
+    const activeRestored = restoredTabs.find((t) => t.id === restoredActiveId)
+    if (activeRestored && !activeRestored.kind && !activeRestored.draft && !activeRestored.query) {
+      void fetchTab(restoredActiveId!)
+    }
   }
   // ── End workspace persistence ─────────────────────────────────────────────
 
@@ -313,7 +348,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       // Flush current connection's workspace before switching
       const prev = get()
       if (prev.openConnectionId && prev.tabs.length > 0) {
-        flushWorkspace(prev.openConnectionId, prev.tabs, prev.activeTabId)
+        flushWorkspace(prev.openConnectionId, prev.currentDb, prev.tabs, prev.activeTabId)
       }
 
       set({
@@ -331,46 +366,16 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         await window.api.sessions.connect(id)
         const entities = await window.api.sessions.listEntities(id)
         const enums = await window.api.sessions.listEnums(id)
-        set({ sessionStatus: 'connected', entities, enums })
+        // Fetch currentDatabase synchronously — fast cached call, needed for workspace key
+        let currentDb: string | null = null
+        try { currentDb = await window.api.sessions.currentDatabase(id) } catch { /* ignore */ }
+        set({ sessionStatus: 'connected', entities, enums, currentDb })
+        restoreWorkspaceTabs(id, currentDb, entities)
 
-        // Restore saved workspace for this connection (fail soft)
-        const saved = _workspace.connections[id]
-        if (saved?.tabs.length) {
-          const entitySet = new Set(
-            entities.map((e) => `${e.schema ?? ''}\x00${e.name}`)
-          )
-          const restoredTabs = saved.tabs
-            .filter((t) => {
-              // special tabs always restore
-              if (t.kind === 'history') return true
-              if (t.draft != null) return true       // new-table draft
-              if (t.sqlDraft !== undefined) return true // query tab
-              // regular table tab — only if entity still exists
-              return entitySet.has(`${t.entity.schema ?? ''}\x00${t.entity.name}`)
-            })
-            .map(deserializeTab)
-          if (restoredTabs.length > 0) {
-            const restoredActiveId = restoredTabs.some((t) => t.id === saved.activeTabId)
-              ? saved.activeTabId
-              : restoredTabs[0].id
-            set({ tabs: restoredTabs, activeTabId: restoredActiveId })
-            // auto-fetch the initially active tab (setActiveTab path not called on restore)
-            const activeRestored = restoredTabs.find((t) => t.id === restoredActiveId)
-            if (activeRestored && !activeRestored.kind && !activeRestored.draft && !activeRestored.query) {
-              void fetchTab(restoredActiveId!)
-            }
-          }
-        }
-
-        // databases load lazily/non-blocking — don't gate connect on it
-        Promise.all([
-          window.api.sessions.listDatabases(id),
-          window.api.sessions.currentDatabase(id)
-        ])
-          .then(([databases, currentDb]) => {
-            if (get().openConnectionId === id) set({ databases, currentDb })
-          })
-          .catch(() => { /* listing not supported / no perms — leave empty */ })
+        // databases list loads lazily/non-blocking
+        window.api.sessions.listDatabases(id)
+          .then((databases) => { if (get().openConnectionId === id) set({ databases }) })
+          .catch(() => { /* listing not supported / no perms */ })
       } catch (err) {
         set({
           sessionStatus: 'error',
@@ -390,12 +395,14 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     switchDatabase: async (name) => {
       const id = get().openConnectionId
       if (!id || name === get().currentDb) return
+      // Flush current db's tabs before switching
+      const { currentDb: prevDb, tabs, activeTabId } = get()
+      flushWorkspace(id, prevDb, tabs, activeTabId)
       set({ sessionStatus: 'connecting', sessionError: null })
       try {
         await window.api.sessions.useDatabase(id, name)
         const entities = await window.api.sessions.listEntities(id)
         const enums = await window.api.sessions.listEnums(id)
-        // tabs belong to the old database — close them all
         set({
           currentDb: name,
           entities,
@@ -404,6 +411,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
           tabs: [],
           activeTabId: null
         })
+        restoreWorkspaceTabs(id, name, entities)
       } catch (err) {
         set({
           sessionStatus: 'error',
@@ -497,8 +505,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       const id = get().openConnectionId
       if (!id) return
       // Flush workspace to disk before clearing tabs
-      const { tabs, activeTabId } = get()
-      flushWorkspace(id, tabs, activeTabId)
+      const { currentDb, tabs, activeTabId } = get()
+      flushWorkspace(id, currentDb, tabs, activeTabId)
       try {
         await window.api.sessions.disconnect(id)
       } catch {
@@ -516,39 +524,13 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         await window.api.sessions.reconnect(id)
         const entities = await window.api.sessions.listEntities(id)
         const enums = await window.api.sessions.listEnums(id)
-        set({ sessionStatus: 'connected', entities, enums })
+        let currentDb: string | null = null
+        try { currentDb = await window.api.sessions.currentDatabase(id) } catch { /* ignore */ }
+        set({ sessionStatus: 'connected', entities, enums, currentDb })
+        restoreWorkspaceTabs(id, currentDb, entities)
 
-        // Restore workspace tabs (same logic as open())
-        const saved = _workspace.connections[id]
-        if (saved?.tabs.length) {
-          const entitySet = new Set(entities.map((e) => `${e.schema ?? ''}\x00${e.name}`))
-          const restoredTabs = saved.tabs
-            .filter((t) => {
-              if (t.kind === 'history') return true
-              if (t.draft != null) return true
-              if (t.sqlDraft !== undefined) return true
-              return entitySet.has(`${t.entity.schema ?? ''}\x00${t.entity.name}`)
-            })
-            .map(deserializeTab)
-          if (restoredTabs.length > 0) {
-            const restoredActiveId = restoredTabs.some((t) => t.id === saved.activeTabId)
-              ? saved.activeTabId
-              : restoredTabs[0].id
-            set({ tabs: restoredTabs, activeTabId: restoredActiveId })
-            const activeRestored = restoredTabs.find((t) => t.id === restoredActiveId)
-            if (activeRestored && !activeRestored.kind && !activeRestored.draft && !activeRestored.query) {
-              void fetchTab(restoredActiveId!)
-            }
-          }
-        }
-
-        Promise.all([
-          window.api.sessions.listDatabases(id),
-          window.api.sessions.currentDatabase(id)
-        ])
-          .then(([databases, currentDb]) => {
-            if (get().openConnectionId === id) set({ databases, currentDb })
-          })
+        window.api.sessions.listDatabases(id)
+          .then((databases) => { if (get().openConnectionId === id) set({ databases }) })
           .catch(() => {})
       } catch (err) {
         set({
