@@ -20,12 +20,14 @@ function App(): React.JSX.Element {
     activeTabId,
     closeTab,
     patchEditorTabConnection,
-    load
+    load,
+    loadWorkspace
   } = useConnections()
 
   useEffect(() => {
     void load()
-  }, [load])
+    void loadWorkspace()
+  }, [load, loadWorkspace])
 
   useEffect(() => {
     const ipc = window.electron.ipcRenderer

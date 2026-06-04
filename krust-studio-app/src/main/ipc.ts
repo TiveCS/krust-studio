@@ -7,6 +7,7 @@ import {
   getStoredPassword,
   duplicateConnection
 } from './store/connections'
+import { loadWorkspace, saveWorkspace } from './store/workspace'
 import { testConnection } from './db/test-connection'
 import {
   connectSession,
@@ -57,7 +58,8 @@ import type {
   SchemaOp,
   IndexSpec,
   HistoryQuery,
-  HistoryStream
+  HistoryStream,
+  WorkspaceData
 } from '../shared/types'
 import type {
   SaveConnectionInput,
@@ -207,6 +209,9 @@ export function registerIpc(): void {
     disconnectSession(id)
   )
   ipcMain.handle('session:reconnect', (_e, id: string) => reconnectSession(id))
+
+  ipcMain.handle('workspace:load', () => loadWorkspace())
+  ipcMain.handle('workspace:save', (_e, data: WorkspaceData) => saveWorkspace(data))
 
   ipcMain.handle('history:list', (_e, query: HistoryQuery) => listHistory(query))
   ipcMain.handle(

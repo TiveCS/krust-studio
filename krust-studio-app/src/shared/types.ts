@@ -465,9 +465,44 @@ export interface DialogApi {
   ) => Promise<{ saved: boolean; path?: string }>
 }
 
+/** Serialized form of a tab — only the fields that survive a restart. */
+export interface SerializedTab {
+  id: string
+  entity: EntityRef
+  /** undefined = regular table tab */
+  kind?: 'history' | 'connection-editor'
+  connectionEditor?: { connectionId: string | null }
+  view: 'data' | 'structure'
+  filters: Filter[]
+  orderBy: Sort[]
+  colWidths: Record<string, number>
+  /** query tabs: the SQL text (presence marks this as a query tab) */
+  sqlDraft?: string
+  /** query tabs: the auto-LIMIT setting */
+  autoLimit?: number
+  /** new-table tabs: the column draft */
+  draft?: { name: string; columns: NewColumnSpec[] } | null
+}
+
+export interface ConnectionWorkspace {
+  activeTabId: string | null
+  tabs: SerializedTab[]
+}
+
+export interface WorkspaceData {
+  lastConnectionId: string | null
+  connections: Record<string, ConnectionWorkspace>
+}
+
+export interface WorkspaceApi {
+  load: () => Promise<WorkspaceData>
+  save: (data: WorkspaceData) => Promise<void>
+}
+
 export interface KrustApi {
   connections: ConnectionsApi
   sessions: SessionApi
   history: HistoryApi
   dialog: DialogApi
+  workspace: WorkspaceApi
 }

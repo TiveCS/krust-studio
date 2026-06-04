@@ -13,6 +13,9 @@ import type {
   QueryResult,
   RowsResult,
   SaveConnectionInput,
+  SerializedTab,
+  ConnectionWorkspace,
+  WorkspaceData,
   Sort,
   TableStructure
 } from '../../../shared/types'
@@ -77,6 +80,8 @@ interface ConnectionsState {
   connections: ConnectionSummary[]
   loading: boolean
   load: () => Promise<void>
+  /** Load workspace.json from disk. Call once on app startup before any open(). */
+  loadWorkspace: () => Promise<void>
   save: (input: SaveConnectionInput) => Promise<ConnectionSummary>
   remove: (id: string) => Promise<void>
   duplicate: (id: string) => Promise<ConnectionSummary>
@@ -172,6 +177,98 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     }
   }
 
+  // ── Workspace persistence ────────────────────────────────────────────────
+  let _workspace: WorkspaceData = { lastConnectionId: null, connections: {} }
+  let _saveTimer: ReturnType<typeof setTimeout> | null = null
+
+  function buildConnectionWorkspace(tabs: Tab[], activeTabId: string | null): ConnectionWorkspace {
+    return {
+      activeTabId,
+      tabs: tabs
+        .map((tab): SerializedTab | null => {
+          if (tab.kind === 'connection-editor') return null // don't persist editor tabs
+          return {
+            id: tab.id,
+            entity: tab.entity,
+            kind: tab.kind,
+            connectionEditor: tab.connectionEditor,
+            view: tab.view,
+            filters: tab.filters,
+            orderBy: tab.orderBy,
+            colWidths: tab.colWidths,
+            ...(tab.query !== null
+              ? { sqlDraft: tab.query.sql, autoLimit: tab.query.autoLimit }
+              : {}),
+            ...(tab.draft !== null ? { draft: tab.draft } : {})
+          }
+        })
+        .filter((t): t is SerializedTab => t !== null)
+    }
+  }
+
+  function deserializeTab(t: SerializedTab): Tab {
+    return {
+      id: t.id,
+      entity: t.entity,
+      kind: t.kind,
+      connectionEditor: t.connectionEditor,
+      data: null,
+      loading: false,
+      error: null,
+      pageIndex: 0,
+      total: null,
+      counting: false,
+      filters: t.filters,
+      orderBy: t.orderBy,
+      edits: {},
+      deletes: [],
+      inserts: [],
+      colWidths: t.colWidths,
+      committing: false,
+      view: t.view,
+      structure: null,
+      structureLoading: false,
+      draft: t.draft ?? null,
+      query:
+        t.sqlDraft !== undefined
+          ? { sql: t.sqlDraft, results: [], running: false, autoLimit: t.autoLimit ?? 500 }
+          : null
+    }
+  }
+
+  /** Debounced (800ms) save of current connection's workspace to disk. */
+  function scheduleWorkspaceSave(): void {
+    if (_saveTimer) clearTimeout(_saveTimer)
+    _saveTimer = setTimeout(() => {
+      const { openConnectionId, tabs, activeTabId } = get()
+      if (!openConnectionId) return
+      _workspace = {
+        ..._workspace,
+        lastConnectionId: openConnectionId,
+        connections: {
+          ..._workspace.connections,
+          [openConnectionId]: buildConnectionWorkspace(tabs, activeTabId)
+        }
+      }
+      void window.api.workspace.save(_workspace)
+    }, 800)
+  }
+
+  /** Flush the current connection's workspace immediately (used before switching). */
+  function flushWorkspace(connectionId: string, tabs: Tab[], activeTabId: string | null): void {
+    if (_saveTimer) { clearTimeout(_saveTimer); _saveTimer = null }
+    _workspace = {
+      ..._workspace,
+      lastConnectionId: connectionId,
+      connections: {
+        ..._workspace.connections,
+        [connectionId]: buildConnectionWorkspace(tabs, activeTabId)
+      }
+    }
+    void window.api.workspace.save(_workspace)
+  }
+  // ── End workspace persistence ─────────────────────────────────────────────
+
   return {
     connections: [],
     loading: false,
@@ -180,6 +277,10 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       set({ loading: true })
       const connections = await window.api.connections.list()
       set({ loading: false, connections })
+    },
+
+    loadWorkspace: async () => {
+      _workspace = await window.api.workspace.load()
     },
 
     save: async (input) => {
@@ -209,6 +310,12 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     currentDb: null,
 
     open: async (id) => {
+      // Flush current connection's workspace before switching
+      const prev = get()
+      if (prev.openConnectionId && prev.tabs.length > 0) {
+        flushWorkspace(prev.openConnectionId, prev.tabs, prev.activeTabId)
+      }
+
       set({
         openConnectionId: id,
         sessionStatus: 'connecting',
@@ -225,6 +332,31 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         const entities = await window.api.sessions.listEntities(id)
         const enums = await window.api.sessions.listEnums(id)
         set({ sessionStatus: 'connected', entities, enums })
+
+        // Restore saved workspace for this connection (fail soft)
+        const saved = _workspace.connections[id]
+        if (saved?.tabs.length) {
+          const entitySet = new Set(
+            entities.map((e) => `${e.schema ?? ''}\x00${e.name}`)
+          )
+          const restoredTabs = saved.tabs
+            .filter((t) => {
+              // special tabs always restore
+              if (t.kind === 'history') return true
+              if (t.draft != null) return true       // new-table draft
+              if (t.sqlDraft !== undefined) return true // query tab
+              // regular table tab — only if entity still exists
+              return entitySet.has(`${t.entity.schema ?? ''}\x00${t.entity.name}`)
+            })
+            .map(deserializeTab)
+          if (restoredTabs.length > 0) {
+            const restoredActiveId = restoredTabs.some((t) => t.id === saved.activeTabId)
+              ? saved.activeTabId
+              : restoredTabs[0].id
+            set({ tabs: restoredTabs, activeTabId: restoredActiveId })
+          }
+        }
+
         // databases load lazily/non-blocking — don't gate connect on it
         Promise.all([
           window.api.sessions.listDatabases(id),
@@ -401,6 +533,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       const existing = get().tabs.find((t) => t.kind === 'history')
       if (existing) {
         set({ activeTabId: existing.id })
+        scheduleWorkspaceSave()
         return
       }
       const tab: Tab = {
@@ -413,6 +546,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         structure: null, structureLoading: false, draft: null, query: null
       }
       set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
+      scheduleWorkspaceSave()
     },
 
     openConnectionEditorTab: (connectionId) => {
@@ -490,6 +624,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         query: null
       }
       set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
+      scheduleWorkspaceSave()
       await fetchTab(tab.id)
     },
 
@@ -520,6 +655,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         query: null
       }
       set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
+      scheduleWorkspaceSave()
     },
 
     openQuery: () => {
@@ -546,17 +682,18 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         query: { sql: '', results: [], running: false, autoLimit: 500 }
       }
       set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
+      scheduleWorkspaceSave()
     },
 
     setQuerySql: (sql) => {
       const { activeTabId, tabs } = get()
       const tab = tabs.find((t) => t.id === activeTabId)
-      if (tab?.query) patchTab(tab.id, { query: { ...tab.query, sql } })
+      if (tab?.query) { patchTab(tab.id, { query: { ...tab.query, sql } }); scheduleWorkspaceSave() }
     },
     setQueryAutoLimit: (n) => {
       const { activeTabId, tabs } = get()
       const tab = tabs.find((t) => t.id === activeTabId)
-      if (tab?.query) patchTab(tab.id, { query: { ...tab.query, autoLimit: n } })
+      if (tab?.query) { patchTab(tab.id, { query: { ...tab.query, autoLimit: n } }); scheduleWorkspaceSave() }
     },
     runQuery: async (sql) => {
       const { openConnectionId, activeTabId, tabs } = get()
@@ -613,10 +750,18 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         }
         return { tabs, activeTabId }
       })
+      scheduleWorkspaceSave()
     },
 
-    setActiveTab: (tabId) =>
-      set({ activeTabId: tabId }),
+    setActiveTab: (tabId) => {
+      set({ activeTabId: tabId })
+      scheduleWorkspaceSave()
+      // auto-fetch on view: if a restored tab has no data, load it now
+      const tab = get().tabs.find((t) => t.id === tabId)
+      if (tab && !tab.kind && !tab.draft && !tab.query && tab.data === null && !tab.loading) {
+        void fetchTab(tabId)
+      }
+    },
 
     gotoPage: async (index) => {
       const id = get().activeTabId
@@ -636,6 +781,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         deletes: [],
         inserts: []
       })
+      scheduleWorkspaceSave()
       await fetchTab(id)
     },
 
@@ -693,6 +839,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         deletes: [],
         inserts: []
       })
+      scheduleWorkspaceSave()
       await fetchTab(id)
     },
 
@@ -701,6 +848,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       const tab = tabs.find((t) => t.id === activeTabId)
       if (!activeTabId || !tab) return
       patchTab(activeTabId, { view })
+      scheduleWorkspaceSave()
       if (view === 'structure' && !tab.structure && openConnectionId) {
         patchTab(activeTabId, { structureLoading: true })
         try {
@@ -812,6 +960,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       patchTab(id, {
         colWidths: { ...tab.colWidths, [column]: Math.max(60, width) }
       })
+      scheduleWorkspaceSave()
     },
 
     clearChanges: () => {

@@ -13,7 +13,8 @@ import type {
   SchemaOp,
   IndexSpec,
   HistoryQuery,
-  HistoryStream
+  HistoryStream,
+  WorkspaceData
 } from '../shared/types'
 
 const api: KrustApi = {
@@ -94,6 +95,10 @@ const api: KrustApi = {
     runScript: (id: string, sql: string, autoLimit?: number) =>
       ipcRenderer.invoke('session:runScript', id, sql, autoLimit),
     cancelQuery: (id: string) => ipcRenderer.invoke('session:cancelQuery', id)
+  },
+  workspace: {
+    load: () => ipcRenderer.invoke('workspace:load'),
+    save: (data: WorkspaceData) => ipcRenderer.invoke('workspace:save', data)
   },
   dialog: {
     saveText: (defaultName: string, content: string) =>
