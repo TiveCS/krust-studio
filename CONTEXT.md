@@ -330,6 +330,47 @@ A **column search** filters the column list by name (display-only; the staged
 draft and diff stay complete). Reorder is disabled while a filter is active —
 drag position is undefined relative to hidden rows.
 
+### Query Plan
+
+**Priority: deferred — not in v1.x, design captured for future build.**
+
+Diagnostic surface that answers "will this query do a full table scan?" before
+or after running it. Accessible as **Explain** / **Analyze** buttons in the SQL
+editor toolbar; result appears in a dedicated panel below the editor alongside
+query results.
+
+**Two modes:**
+- **Explain** (default) — runs `EXPLAIN` only. Never executes the query; safe on
+  writes and large tables. Shows estimated cost/rows/scan type.
+- **Analyze** — runs `EXPLAIN ANALYZE` (or engine equivalent). **Actually
+  executes the query** — a warning is shown before use; DML would mutate data.
+  Shows real timing + actual row counts vs estimates.
+
+**Output: visual plan tree.** The raw engine output is parsed into a unified
+node tree with per-node annotations — not a raw result grid. Each node shows
+operation type, scan type, index used, estimated rows, and cost score. Engine
+parsing is per-driver:
+- **Postgres** — `EXPLAIN (FORMAT JSON)` returns structured JSON; parsed
+  directly into tree nodes.
+- **MySQL / MariaDB** — `EXPLAIN` returns a tabular result (`type`, `key`,
+  `rows`, `Extra` columns); parsed into a flat list of step nodes.
+- **SQLite** — `EXPLAIN QUERY PLAN` returns rows (`id`, `parent`, `notused`,
+  `detail`); parent/child ids form the tree.
+
+**Scan highlights** — the panel badges / highlights each node:
+- **Full-scan warning** (red) — MySQL `type=ALL`, Postgres `Seq Scan`, SQLite
+  `SCAN TABLE` with no index. The core signal the user asked for.
+- **Index used** (green/gray) — which index was chosen, or "none".
+- **Estimated row count** — shown prominently; large + no-index = problem.
+- **Cost score** — Postgres total cost; MySQL `rows × filtered`; SQLite
+  approximate step count.
+
+**Not captured in Query History.** Explain runs are diagnostic tooling, not user
+queries — logging them would pollute the Data Retrieval stream.
+
+See [ADR-0014](docs/adr/0014-query-plan-visual-tree.md) for the trade-off
+between visual tree and raw-table output.
+
 ### MCP Server
 **Priority: post-MVP, nice-to-have — not a main feature.** Design is captured but
 build it only after the core tool + Captured-DDL/Changeset workflow are solid.
