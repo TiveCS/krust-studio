@@ -496,6 +496,9 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     disconnect: async () => {
       const id = get().openConnectionId
       if (!id) return
+      // Flush workspace immediately — debounce may not have fired yet
+      const { tabs, activeTabId } = get()
+      flushWorkspace(id, tabs, activeTabId)
       try {
         await window.api.sessions.disconnect(id)
       } catch {
