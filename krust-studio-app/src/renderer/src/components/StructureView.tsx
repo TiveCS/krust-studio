@@ -197,11 +197,16 @@ export function StructureView(): React.JSX.Element | null {
 
   if (!tab) return null
 
-  // walkable relations: open the referenced/referencing table at Structure →
-  // Referenced by so the user can keep walking the FK graph (see who/what links)
-  const walkTo = (table: string, schema?: string): void => {
+  // walkable relations: open the target table at the sub-tab that keeps walking
+  // the same direction — Relations click (outbound) → land on Referenced by;
+  // Referenced-by click (inbound) → land on Relations.
+  const walkTo = (
+    table: string,
+    sub: 'relations' | 'referencedBy',
+    schema?: string
+  ): void => {
     const ref: EntityRef = { name: table, schema }
-    void openTable(ref, undefined, { view: 'structure', structureSub: 'referencedBy' })
+    void openTable(ref, undefined, { view: 'structure', structureSub: sub })
   }
 
   const connRow = connections.find((c) => c.id === openConnectionId)
@@ -524,7 +529,7 @@ export function StructureView(): React.JSX.Element | null {
                       <td className="px-3 py-1 font-mono">{r.column}</td>
                       <td className="px-3 py-1 font-mono">
                         <button
-                          onClick={() => walkTo(r.refTable, r.refSchema)}
+                          onClick={() => walkTo(r.refTable, 'referencedBy', r.refSchema)}
                           title={`Open ${r.refTable} structure`}
                           className="text-primary hover:underline"
                         >
@@ -571,7 +576,7 @@ export function StructureView(): React.JSX.Element | null {
                     <tr key={i} className="border-b border-border/30">
                       <td className="px-3 py-1 font-mono">
                         <button
-                          onClick={() => walkTo(r.table, r.schema)}
+                          onClick={() => walkTo(r.table, 'relations', r.schema)}
                           title={`Open ${r.table} structure`}
                           className="text-primary hover:underline"
                         >
