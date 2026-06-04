@@ -613,6 +613,9 @@ export const useConnections = create<ConnectionsState>((set, get) => {
             inserts: []
           })
           await fetchTab(existing.id)
+        } else if (existing.data === null && !existing.loading) {
+          // restored tab with no data yet — fetch now
+          await fetchTab(existing.id)
         }
         return
       }
