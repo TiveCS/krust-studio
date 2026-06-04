@@ -354,6 +354,11 @@ export const useConnections = create<ConnectionsState>((set, get) => {
               ? saved.activeTabId
               : restoredTabs[0].id
             set({ tabs: restoredTabs, activeTabId: restoredActiveId })
+            // auto-fetch the initially active tab (setActiveTab path not called on restore)
+            const activeRestored = restoredTabs.find((t) => t.id === restoredActiveId)
+            if (activeRestored && !activeRestored.kind && !activeRestored.draft && !activeRestored.query) {
+              void fetchTab(restoredActiveId!)
+            }
           }
         }
 
