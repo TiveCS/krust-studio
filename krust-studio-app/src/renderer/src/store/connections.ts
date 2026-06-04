@@ -496,7 +496,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     disconnect: async () => {
       const id = get().openConnectionId
       if (!id) return
-      // Flush workspace immediately — debounce may not have fired yet
+      // Flush workspace to disk before clearing tabs
       const { tabs, activeTabId } = get()
       flushWorkspace(id, tabs, activeTabId)
       try {
@@ -504,8 +504,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       } catch {
         // socket already dead — ignore
       }
-      set({ sessionStatus: 'disconnected', sessionError: null })
-      // tabs, entities, openConnectionId all preserved (workspace stays)
+      // Clear tabs → landing; openConnectionId stays so sidebar/status still show
+      set({ sessionStatus: 'disconnected', sessionError: null, tabs: [], activeTabId: null })
     },
 
     reconnect: async () => {
@@ -517,6 +517,31 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         const entities = await window.api.sessions.listEntities(id)
         const enums = await window.api.sessions.listEnums(id)
         set({ sessionStatus: 'connected', entities, enums })
+
+        // Restore workspace tabs (same logic as open())
+        const saved = _workspace.connections[id]
+        if (saved?.tabs.length) {
+          const entitySet = new Set(entities.map((e) => `${e.schema ?? ''}\x00${e.name}`))
+          const restoredTabs = saved.tabs
+            .filter((t) => {
+              if (t.kind === 'history') return true
+              if (t.draft != null) return true
+              if (t.sqlDraft !== undefined) return true
+              return entitySet.has(`${t.entity.schema ?? ''}\x00${t.entity.name}`)
+            })
+            .map(deserializeTab)
+          if (restoredTabs.length > 0) {
+            const restoredActiveId = restoredTabs.some((t) => t.id === saved.activeTabId)
+              ? saved.activeTabId
+              : restoredTabs[0].id
+            set({ tabs: restoredTabs, activeTabId: restoredActiveId })
+            const activeRestored = restoredTabs.find((t) => t.id === restoredActiveId)
+            if (activeRestored && !activeRestored.kind && !activeRestored.draft && !activeRestored.query) {
+              void fetchTab(restoredActiveId!)
+            }
+          }
+        }
+
         Promise.all([
           window.api.sessions.listDatabases(id),
           window.api.sessions.currentDatabase(id)
