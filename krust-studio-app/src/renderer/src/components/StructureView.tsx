@@ -162,6 +162,16 @@ export function StructureView(): React.JSX.Element | null {
     [idxDrops, colOps, idxAdds]
   )
 
+  // fetch the structure if it isn't loaded yet — covers a restored tab opened
+  // directly in structure view (setTabView, which normally fetches, isn't
+  // called on workspace restore)
+  useEffect(() => {
+    if (tab && !tab.draft && !st && !tab.structureLoading && openConnectionId) {
+      void refreshStructure()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTabId, st, openConnectionId])
+
   // fetch referencedBy when its sub-tab is active (incl. on restore)
   useEffect(() => {
     if (sub === 'referencedBy') void fetchReferencedBy()
