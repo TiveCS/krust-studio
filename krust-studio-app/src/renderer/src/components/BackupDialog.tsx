@@ -40,7 +40,7 @@ const MODES: { value: BackupTableMode; label: string }[] = [
 ]
 
 export function BackupDialog({ open, onOpenChange }: Props): React.JSX.Element {
-  const { openConnectionId, entities, connections } = useConnections()
+  const { openConnectionId, entities, connections, refreshEntities } = useConnections()
   const conn = connections.find((c) => c.id === openConnectionId)
   const readOnly = conn?.readOnly ?? false
   const [panel, setPanel] = useState<PanelTab>('backup')
@@ -130,6 +130,8 @@ export function BackupDialog({ open, onOpenChange }: Props): React.JSX.Element {
           { duration: 8000 }
         )
       }
+      // schema likely changed (new tables) — refresh the sidebar tree
+      await refreshEntities()
       onOpenChange(false)
       setPreview(null)
       setRestorePath(null)
