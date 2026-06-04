@@ -20,6 +20,28 @@ function quoteIdent(driver: DriverType, name: string): string {
   return '"' + name.replace(/"/g, '""') + '"'
 }
 
+/** Statements that disable FK enforcement so a dump restores regardless of table
+ *  order (child before parent) — the mysqldump / pg_dump --disable-triggers
+ *  approach. pg's `session_replication_role` needs table-owner privileges. */
+function fkGuards(driver: DriverType): { head: string; foot: string } {
+  switch (driver) {
+    case 'mysql':
+      return {
+        head: 'SET FOREIGN_KEY_CHECKS=0;\nSET UNIQUE_CHECKS=0;\n\n',
+        foot: '\nSET UNIQUE_CHECKS=1;\nSET FOREIGN_KEY_CHECKS=1;\n'
+      }
+    case 'sqlite':
+      return { head: 'PRAGMA foreign_keys=OFF;\n\n', foot: '\nPRAGMA foreign_keys=ON;\n' }
+    case 'postgres':
+      return {
+        head:
+          '-- requires table-owner privileges; ignore the error if it fails\n' +
+          'SET session_replication_role = replica;\n\n',
+        foot: '\nSET session_replication_role = origin;\n'
+      }
+  }
+}
+
 function target(driver: DriverType, entity: EntityRef): string {
   // pg supports schema-qualified names; mysql/sqlite use the bare (quoted) name
   if (driver === 'postgres' && entity.schema)
@@ -68,10 +90,12 @@ export async function runBackup(
   let tablesWritten = 0
   let rowsWritten = 0
   try {
+    const guards = fkGuards(driver)
     await write(
       `-- Krust Studio backup\n-- generated: ${new Date().toISOString()}\n` +
         `-- connection: ${config.name} (${driver})\n\n`
     )
+    await write(guards.head)
     for (const t of spec.tables) {
       if (t.mode === 'skip') continue
       const entity: EntityRef = { name: t.name, schema: t.schema }
@@ -111,6 +135,7 @@ export async function runBackup(
       }
       await write('\n')
     }
+    await write(guards.foot)
   } finally {
     await new Promise<void>((resolve, reject) => {
       ws.end((err?: Error | null) => (err ? reject(err) : resolve()))
@@ -120,6 +145,10 @@ export async function runBackup(
 }
 
 const DESTRUCTIVE = /^\s*(DROP|TRUNCATE|DELETE)\b/i
+// FK-guard / session-setting statements — failure is non-fatal during restore
+// (e.g. pg session_replication_role needs owner privileges the user may lack)
+const SOFT =
+  /^\s*(SET\s+(SESSION\s+)?(FOREIGN_KEY_CHECKS|UNIQUE_CHECKS|session_replication_role)|PRAGMA\s+foreign_keys)\b/i
 
 /** Parse a dump into classified statements without executing (restore dry-run). */
 export async function restorePreview(filePath: string): Promise<RestorePreview> {
@@ -162,6 +191,8 @@ export async function restoreRun(
       await execRestoreStatement(id, statements[i])
       ran++
     } catch (err) {
+      // FK-guard / session settings: ignore failure (e.g. no pg privilege)
+      if (SOFT.test(statements[i])) continue
       errors.push({
         index: i,
         statement: statements[i],
