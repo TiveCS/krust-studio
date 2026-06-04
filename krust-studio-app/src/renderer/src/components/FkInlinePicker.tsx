@@ -43,8 +43,8 @@ interface Props {
   /** visible width of the grid scroll container; box fills it minus the offset */
   containerWidth: number
   onPick: (value: unknown) => void
-  /** open the referenced table in a full new tab */
-  onOpenTable: () => void
+  /** open the referenced table in a full new tab, carrying the active filters */
+  onOpenTable: (filters: Filter[]) => void
   onClose: () => void
 }
 
@@ -171,7 +171,7 @@ export function FkInlinePicker({
         <Button
           size="xs"
           variant="ghost"
-          onClick={onOpenTable}
+          onClick={() => onOpenTable(filters)}
           title={`Open ${entity.name} in a new tab`}
         >
           <ExternalLink />

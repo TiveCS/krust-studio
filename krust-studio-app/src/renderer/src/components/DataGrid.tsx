@@ -825,11 +825,11 @@ export function DataGrid(): React.JSX.Element | null {
                               onPick={(val) =>
                                 setCellValue(fkTarget.r, fkTarget.c, val)
                               }
-                              onOpenTable={() =>
-                                void openTable({
-                                  name: fkTargetFk.refTable,
-                                  schema: fkTargetFk.refSchema
-                                })
+                              onOpenTable={(filters) =>
+                                void openTable(
+                                  { name: fkTargetFk.refTable, schema: fkTargetFk.refSchema },
+                                  filters.length ? filters : undefined
+                                )
                               }
                               onClose={() => setFkTarget(null)}
                             />
