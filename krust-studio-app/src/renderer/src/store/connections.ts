@@ -90,6 +90,10 @@ interface ConnectionsState {
   load: () => Promise<void>
   /** Load workspace.json from disk. Call once on app startup before any open(). */
   loadWorkspace: () => Promise<void>
+  /** the connection that was active when the app last closed (from workspace) */
+  lastConnectionId: string | null
+  /** open the last-used connection on startup, if it still exists (idempotent) */
+  autoOpenLast: () => void
   save: (input: SaveConnectionInput) => Promise<ConnectionSummary>
   remove: (id: string) => Promise<void>
   duplicate: (id: string) => Promise<ConnectionSummary>
@@ -334,8 +338,22 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       set({ loading: false, connections })
     },
 
+    lastConnectionId: null,
+
     loadWorkspace: async () => {
       _workspace = await window.api.workspace.load()
+      set({ lastConnectionId: _workspace.lastConnectionId })
+    },
+
+    autoOpenLast: () => {
+      const { lastConnectionId, connections, openConnectionId, open } = get()
+      if (
+        lastConnectionId &&
+        !openConnectionId &&
+        connections.some((c) => c.id === lastConnectionId)
+      ) {
+        void open(lastConnectionId)
+      }
     },
 
     save: async (input) => {

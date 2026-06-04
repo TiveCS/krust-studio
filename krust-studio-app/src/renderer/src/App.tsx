@@ -21,13 +21,17 @@ function App(): React.JSX.Element {
     closeTab,
     patchEditorTabConnection,
     load,
-    loadWorkspace
+    loadWorkspace,
+    autoOpenLast
   } = useConnections()
 
   useEffect(() => {
-    void load()
-    void loadWorkspace()
-  }, [load, loadWorkspace])
+    void (async () => {
+      await load()
+      await loadWorkspace()
+      autoOpenLast() // land back on the last-used connection
+    })()
+  }, [load, loadWorkspace, autoOpenLast])
 
   useEffect(() => {
     const ipc = window.electron.ipcRenderer

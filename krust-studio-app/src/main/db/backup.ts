@@ -89,9 +89,14 @@ export async function runBackup(
 
       // data (views are never dumped with data)
       if (t.mode === 'schema+data' && t.type !== 'view') {
+        // order by PK so OFFSET paging is stable (no dup/skip across batches)
+        const head = await readRows(id, entity, 1, 0)
+        const orderBy = head.primaryKey.length
+          ? head.primaryKey.map((c) => ({ column: c, dir: 'asc' as const }))
+          : undefined
         let offset = 0
         for (;;) {
-          const res = await readRows(id, entity, BATCH, offset)
+          const res = await readRows(id, entity, BATCH, offset, undefined, orderBy)
           if (res.rows.length === 0) break
           const cols = res.columns.map((c) => c.name)
           const qcols = cols.map((c) => quoteIdent(driver, c)).join(', ')

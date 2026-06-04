@@ -15,7 +15,8 @@ import {
   ChevronDown,
   Tags,
   History as HistoryIcon,
-  DatabaseBackup
+  DatabaseBackup,
+  Unplug
 } from 'lucide-react'
 import {
   Sidebar,
@@ -69,6 +70,7 @@ export function AppSidebar(): React.JSX.Element {
     dropEntity,
     renameTable,
     truncateTable,
+    reconnect,
     tabs,
     activeTabId
   } = useConnections()
@@ -193,6 +195,22 @@ export function AppSidebar(): React.JSX.Element {
             >
               <RefreshCw />
               Retry
+            </Button>
+          </div>
+        )}
+
+        {sessionStatus === 'disconnected' && (
+          <div className="m-2 space-y-2 rounded-md border border-border p-3 text-center text-xs text-muted-foreground">
+            <Unplug className="mx-auto size-5 opacity-50" />
+            <p>Disconnected. Your tabs are saved.</p>
+            <Button
+              size="xs"
+              variant="secondary"
+              className="w-full"
+              onClick={() => void reconnect()}
+            >
+              <RefreshCw />
+              Reconnect
             </Button>
           </div>
         )}
