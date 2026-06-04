@@ -206,7 +206,9 @@ export (CSV/JSON) · **auto-update** (GitHub Releases) · installer custom path 
 **everything-is-a-tab** (history + connection editor are tabs) · **persistent
 per-connection+database workspace** (tabs restored on restart/reconnect/switch) ·
 **connection resilience** (idle-drop auto-retry + manual disconnect/reconnect
-with status dot).
+with status dot) · **Backup / Restore** (streamed engine-aware `.sql` dump,
+per-table schema/data; restore with dry-run preview + destructive flagging +
+two-step confirm).
 
 ## Gaps — prioritized TODO
 

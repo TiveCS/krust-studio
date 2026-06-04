@@ -206,12 +206,16 @@ clone a database's structure with only some tables' data (exclude
 sensitive/oversized tables). Large tables stream rather than buffer.
 
 ### Restore (Import)
-Apply a backup `.sql` dump to a target connection. Supports optionally creating a
-fresh target database first (completes the "duplicate database" use case) and a
-**dry-run/preview** that parses the dump and reports what it would do — flagging
-destructive statements (`DROP`/`DELETE`) — without executing. Actual execution
-requires explicit confirmation, since it runs arbitrary, irreversible SQL against
-the target. Stop-on-error toggle. (CSV/JSON-into-table import deferred for v1.)
+Apply a backup `.sql` dump to a target connection. A **dry-run/preview** parses
+the dump (`splitStatements`) and reports what it would do — flagging destructive
+statements (`DROP`/`DELETE`/`TRUNCATE`) — without executing. Actual execution
+requires explicit (two-step) confirmation, since it runs arbitrary, irreversible
+SQL against the target. Stop-on-error toggle. Restore does **not** auto-retry on
+a connection drop (a partially-applied write must not silently re-run); only DDL
+is captured to history (bulk INSERTs would flood the audit log). Read-only
+connections block restore in the main process. (Creating a fresh target database
+first — the "duplicate database" use case — and CSV/JSON-into-table import are
+deferred.)
 
 ### Data Location
 Connections, query history, changesets, and the persisted **Workspace** (open

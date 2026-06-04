@@ -188,8 +188,17 @@ CONTEXT.md **Session** + **Workspace & Tabs** + **Referenced By (Reverse FK)**.
       500. Schema-name autocomplete. **Query cancel**: pg (`pg_cancel_backend`) +
       mysql (`KILL QUERY`); sqlite unsupported (synchronous). Every run captured
       (source=manual) → **Data Retrieval** stream now live (3rd History rail view).
-- [ ] **Backup / Restore** (self-contained SQL dump, per-table granularity;
-      restore with create-target + dry-run). CONTEXT.md "Backup"/"Restore".
+- [x] **Backup / Restore.** Done. `main/db/backup.ts`: `runBackup()` streams an
+      engine-aware self-contained `.sql` dump (schema via `getCreateSql`, data
+      paged via `readRows`, INSERTs with engine-aware literal/identifier quoting,
+      Buffer→hex, JSON objects). Per-table mode (skip/schema/schema+data) +
+      optional `DROP … IF EXISTS`; views never carry data. `restorePreview()`
+      dry-runs (parse via `splitStatements`, classify, flag DROP/DELETE/TRUNCATE);
+      `restoreRun()` executes with **no auto-retry** + stop-on-error, read-only
+      blocked, only DDL captured to history. `BackupDialog` (sidebar toolbar) —
+      Backup/Restore tabs, two-step destructive confirm. **Deferred:** restore
+      create-target DB (the "duplicate database" use case); CSV/JSON-into-table
+      import.
 - [ ] **MCP server** (post-MVP nice-to-have, ADR-0003) — read-only structured
       tools + AI Read Allowlist + audit. Explicitly low priority.
 
