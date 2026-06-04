@@ -60,7 +60,11 @@ export function FkInlinePicker({
   onClose
 }: Props): React.JSX.Element {
   const [term, setTerm] = useState('')
-  const [filters, setFilters] = useState<Filter[]>([])
+  const [filters, setFilters] = useState<Filter[]>(() =>
+    currentValue != null
+      ? [{ column: refColumn, op: 'eq' as const, value: String(currentValue) }]
+      : []
+  )
   const [orderBy, setOrderBy] = useState<Sort | null>(null)
   const [page, setPage] = useState(0)
   const [columns, setColumns] = useState<ColumnInfo[]>([])
