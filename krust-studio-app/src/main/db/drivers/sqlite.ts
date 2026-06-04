@@ -27,6 +27,7 @@ import type {
   ForeignKey,
   IndexSpec,
   RawQueryResult,
+  ReferencingTable,
   RowsResult,
   SchemaOp,
   SearchResult,
@@ -289,6 +290,56 @@ export class SqliteDriver implements DbDriver {
       }
     })
     return { columns, indexes, relations }
+  }
+
+  async listReferencingTables(entity: EntityRef): Promise<ReferencingTable[]> {
+    if (!this.db) throw new Error('Not connected')
+    // SQLite has no reverse-FK catalog — scan every table's foreign-key list
+    const tables = this.db
+      .prepare(
+        `SELECT name FROM sqlite_master
+          WHERE type = 'table' AND name NOT LIKE 'sqlite_%'`
+      )
+      .all() as Array<{ name: string }>
+    const out: ReferencingTable[] = []
+    for (const t of tables) {
+      // includes self-references (a table whose FK points at itself)
+      const fks = this.db
+        .prepare(
+          'SELECT id, "table" AS refTable, "from" AS col, "to" AS refColumn, on_update AS onUpdate, on_delete AS onDelete FROM pragma_foreign_key_list(?)'
+        )
+        .all(t.name) as Array<{
+        id: number
+        refTable: string
+        col: string
+        refColumn: string | null
+        onUpdate: string
+        onDelete: string
+      }>
+      for (const fk of fks) {
+        if (fk.refTable !== entity.name) continue
+        out.push({
+          table: t.name,
+          column: fk.col,
+          // sqlite omits "to" when the FK targets the parent's PK — resolve it
+          refColumn: fk.refColumn ?? this.primaryKeyColumn(entity.name) ?? '',
+          constraint: `fk_${t.name}_${fk.id}`,
+          onUpdate: fk.onUpdate,
+          onDelete: fk.onDelete
+        })
+      }
+    }
+    return out.sort((a, b) => a.table.localeCompare(b.table))
+  }
+
+  /** the (first) primary-key column of a table, for resolving implicit FK targets */
+  private primaryKeyColumn(table: string): string | null {
+    if (!this.db) return null
+    const info = this.db
+      .prepare('SELECT name, pk FROM pragma_table_info(?)')
+      .all(table) as Array<{ name: string; pk: number }>
+    const pk = info.filter((i) => i.pk > 0).sort((a, b) => a.pk - b.pk)
+    return pk[0]?.name ?? null
   }
 
   async getCreateSql(entity: EntityRef): Promise<string> {

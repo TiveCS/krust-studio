@@ -17,6 +17,7 @@ import {
   useDatabase,
   listEnums,
   describeTable,
+  listReferencingTables,
   getCreateSql,
   createTable,
   alterTable,
@@ -102,6 +103,10 @@ export function registerIpc(): void {
   ipcMain.handle('session:listEnums', (_e, id: string) => listEnums(id))
   ipcMain.handle('session:describeTable', (_e, id: string, entity: EntityRef) =>
     describeTable(id, entity)
+  )
+  ipcMain.handle(
+    'session:listReferencingTables',
+    (_e, id: string, entity: EntityRef) => listReferencingTables(id, entity)
   )
   ipcMain.handle('session:getCreateSql', (_e, id: string, entity: EntityRef) =>
     getCreateSql(id, entity)

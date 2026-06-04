@@ -73,7 +73,8 @@ export function ColumnsEditor({
   canAlterExisting = true,
   reorderable = false,
   original,
-  movedNames
+  movedNames,
+  nameFilter = ''
 }: {
   columns: EditorColumn[]
   onChange: (cols: EditorColumn[]) => void
@@ -94,8 +95,16 @@ export function ColumnsEditor({
   original?: StructureColumn[]
   /** current names of reordered columns (for the moved-row highlight) */
   movedNames?: Set<string>
+  /** display-only substring filter on column name; hides non-matching rows.
+   *  Reorder is disabled while a filter is active (drag position is undefined
+   *  against hidden rows). The draft/diff stay complete. */
+  nameFilter?: string
 }): React.JSX.Element {
   const origByName = new Map((original ?? []).map((o) => [o.name, o]))
+  const filtering = nameFilter.trim().length > 0
+  const filterLower = nameFilter.trim().toLowerCase()
+  // reorder is disabled while filtering (hidden rows make drag targets undefined)
+  const canDrag = reorderable && !filtering
   // grid template gains a leading grip column when reorderable (inline style:
   // Tailwind can't JIT a dynamically-built arbitrary class)
   const gridTemplate = reorderable ? `1.25rem ${COLS}` : COLS
@@ -153,6 +162,8 @@ export function ColumnsEditor({
         <span />
       </div>
       {columns.map((c, i) => {
+        // display-only name filter — hide non-matching rows (draft stays full)
+        if (filtering && !c.name.toLowerCase().includes(filterLower)) return null
         const existing = !!c._orig
         const dropped = !!c._drop
         const typeNullLocked = readOnly || dropped || (existing && !canAlterExisting)
@@ -185,7 +196,7 @@ export function ColumnsEditor({
               )}
               style={{ gridTemplateColumns: gridTemplate }}
               onDragOver={
-                reorderable && dragIndex !== null
+                canDrag && dragIndex !== null
                   ? (e) => {
                       e.preventDefault()
                       setOverIndex(i)
@@ -193,7 +204,7 @@ export function ColumnsEditor({
                   : undefined
               }
               onDrop={
-                reorderable && dragIndex !== null
+                canDrag && dragIndex !== null
                   ? (e) => {
                       e.preventDefault()
                       // drop on lower half of the row → place AFTER it (lets you
@@ -210,14 +221,19 @@ export function ColumnsEditor({
               {reorderable && (
                 <button
                   type="button"
-                  draggable={!readOnly && !dropped}
-                  onDragStart={() => setDragIndex(i)}
+                  draggable={canDrag && !readOnly && !dropped}
+                  onDragStart={() => canDrag && setDragIndex(i)}
                   onDragEnd={() => {
                     setDragIndex(null)
                     setOverIndex(null)
                   }}
-                  title="Drag to reorder"
-                  className="flex cursor-grab justify-center text-muted-foreground/50 hover:text-foreground active:cursor-grabbing"
+                  title={canDrag ? 'Drag to reorder' : 'Clear the filter to reorder'}
+                  className={cn(
+                    'flex justify-center text-muted-foreground/50',
+                    canDrag
+                      ? 'cursor-grab hover:text-foreground active:cursor-grabbing'
+                      : 'cursor-not-allowed opacity-30'
+                  )}
                 >
                   <GripVertical className="size-3.5" />
                 </button>

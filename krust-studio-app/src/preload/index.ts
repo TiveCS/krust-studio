@@ -38,6 +38,8 @@ const api: KrustApi = {
     listEnums: (id: string) => ipcRenderer.invoke('session:listEnums', id),
     describeTable: (id: string, entity: EntityRef) =>
       ipcRenderer.invoke('session:describeTable', id, entity),
+    listReferencingTables: (id: string, entity: EntityRef) =>
+      ipcRenderer.invoke('session:listReferencingTables', id, entity),
     getCreateSql: (id: string, entity: EntityRef) =>
       ipcRenderer.invoke('session:getCreateSql', id, entity),
     createTable: (id: string, spec: CreateTableSpec) =>

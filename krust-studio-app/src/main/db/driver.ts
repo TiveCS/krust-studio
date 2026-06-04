@@ -11,6 +11,7 @@ import type {
   FilterOp,
   IndexSpec,
   RawQueryResult,
+  ReferencingTable,
   RowsResult,
   SchemaOp,
   SearchResult,
@@ -53,6 +54,8 @@ export interface DbDriver {
   ): Promise<SearchResult>
   applyChanges(entity: EntityRef, changes: ChangeSet): Promise<ApplyResult>
   describeTable(entity: EntityRef): Promise<TableStructure>
+  /** tables that reference this one (inbound FKs / "Referenced by"). */
+  listReferencingTables(entity: EntityRef): Promise<ReferencingTable[]>
   /** the CREATE statement for a table/view; pg reconstructs from catalog. */
   getCreateSql(entity: EntityRef): Promise<string>
   createTable(spec: CreateTableSpec): Promise<{ ddl: string }>

@@ -10,6 +10,7 @@ import type {
   CreateTableSpec,
   IndexSpec,
   QueryResult,
+  ReferencingTable,
   RowsResult,
   SchemaOp,
   SearchResult,
@@ -177,6 +178,13 @@ export async function describeTable(
   entity: EntityRef
 ): Promise<TableStructure> {
   return withRetry(id, (d) => d.describeTable(entity))
+}
+
+export async function listReferencingTables(
+  id: string,
+  entity: EntityRef
+): Promise<ReferencingTable[]> {
+  return withRetry(id, (d) => d.listReferencingTables(entity))
 }
 
 export async function getCreateSql(

@@ -1,5 +1,7 @@
-import { Info } from 'lucide-react'
+import { useState } from 'react'
+import { Info, Search, X } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Input } from '@/components/ui/input'
 import { ColumnsEditor, type EditorColumn } from '@/components/ColumnsEditor'
 import { useConnections, type Tab } from '@/store/connections'
 import type { DriverType } from '../../../shared/types'
@@ -42,6 +44,7 @@ export function StructureEditor({
   const types = [...(driver ? TYPES[driver] : []), ...enums.map((e) => e.name)]
   const tableNames = entities.filter((e) => e.type === 'table').map((e) => e.name)
   const showBanner = driver === 'sqlite'
+  const [colFilter, setColFilter] = useState('')
 
   if (!st) return null
 
@@ -55,6 +58,24 @@ export function StructureEditor({
           </AlertDescription>
         </Alert>
       )}
+      <div className="relative mb-2">
+        <Search className="absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={colFilter}
+          onChange={(e) => setColFilter(e.target.value)}
+          placeholder="Filter columns…"
+          className="h-7 pl-7 pr-7 text-xs"
+        />
+        {colFilter && (
+          <button
+            onClick={() => setColFilter('')}
+            title="Clear filter"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          >
+            <X className="size-3.5" />
+          </button>
+        )}
+      </div>
       <ColumnsEditor
         columns={draft}
         onChange={onDraftChange}
@@ -66,6 +87,7 @@ export function StructureEditor({
         reorderable={canReorder}
         original={st.columns}
         movedNames={movedNames}
+        nameFilter={colFilter}
       />
     </div>
   )

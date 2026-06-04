@@ -41,15 +41,15 @@ import { StructureEditor } from '@/components/StructureEditor'
 import { SqlDisplay } from '@/components/SqlDisplay'
 import { type EditorColumn } from '@/components/ColumnsEditor'
 import { seed, diff } from '@/lib/columnDiff'
-import { useConnections } from '@/store/connections'
-import type { IndexSpec, SchemaOp } from '../../../shared/types'
+import { useConnections, type StructureSub as Sub } from '@/store/connections'
+import type { EntityRef, IndexSpec, SchemaOp } from '../../../shared/types'
 
-type Sub = 'columns' | 'indexes' | 'relations' | 'ddl'
-const SUBS: Sub[] = ['columns', 'indexes', 'relations', 'ddl']
+const SUBS: Sub[] = ['columns', 'indexes', 'relations', 'referencedBy', 'ddl']
 const SUB_LABEL: Record<Sub, string> = {
   columns: 'Columns',
   indexes: 'Indexes',
   relations: 'Relations',
+  referencedBy: 'Referenced by',
   ddl: 'DDL'
 }
 
@@ -99,12 +99,16 @@ export function StructureView(): React.JSX.Element | null {
     refreshStructure,
     refreshEntities,
     connections,
-    openConnectionId
+    openConnectionId,
+    setStructureSub,
+    fetchReferencedBy,
+    openTable
   } = useConnections()
   const tab = tabs.find((t) => t.id === activeTabId)
   const st = tab?.structure ?? null
+  const sub = tab?.structureSub ?? 'columns'
+  const setSub = setStructureSub
 
-  const [sub, setSub] = useState<Sub>('columns')
   const [ddl, setDdl] = useState<string | null>(null)
   const [ddlLoading, setDdlLoading] = useState(false)
 
@@ -158,6 +162,12 @@ export function StructureView(): React.JSX.Element | null {
     [idxDrops, colOps, idxAdds]
   )
 
+  // fetch referencedBy when its sub-tab is active (incl. on restore)
+  useEffect(() => {
+    if (sub === 'referencedBy') void fetchReferencedBy()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sub, activeTabId])
+
   const entityKey = tab ? `${tab.entity.schema ?? ''}.${tab.entity.name}` : ''
   useEffect(() => {
     if (sub !== 'ddl' || !openConnectionId || !tab) return
@@ -176,6 +186,13 @@ export function StructureView(): React.JSX.Element | null {
   }, [sub, openConnectionId, entityKey])
 
   if (!tab) return null
+
+  // walkable relations: open the referenced/referencing table at Structure →
+  // Relations so the user can keep walking the FK graph in either direction
+  const walkTo = (table: string, schema?: string): void => {
+    const ref: EntityRef = { name: table, schema }
+    void openTable(ref, undefined, { view: 'structure', structureSub: 'relations' })
+  }
 
   const connRow = connections.find((c) => c.id === openConnectionId)
   const readOnly = connRow?.readOnly ?? false
@@ -298,6 +315,11 @@ export function StructureView(): React.JSX.Element | null {
             {st && (s === 'indexes' || s === 'relations') && (
               <span className="ml-1 text-muted-foreground/50">
                 {s === 'indexes' ? st.indexes.length : st.relations.length}
+              </span>
+            )}
+            {s === 'referencedBy' && tab.referencedBy && (
+              <span className="ml-1 text-muted-foreground/50">
+                {tab.referencedBy.length}
               </span>
             )}
           </button>
@@ -472,7 +494,7 @@ export function StructureView(): React.JSX.Element | null {
               )}
             </div>
           </div>
-        ) : (
+        ) : sub === 'relations' ? (
           <div className="h-full overflow-auto">
             {st.relations.length === 0 ? (
               <div className="px-3 py-3 text-muted-foreground">No relations.</div>
@@ -490,8 +512,67 @@ export function StructureView(): React.JSX.Element | null {
                   {st.relations.map((r, i) => (
                     <tr key={i} className="border-b border-border/30">
                       <td className="px-3 py-1 font-mono">{r.column}</td>
-                      <td className="px-3 py-1 font-mono text-primary">
-                        {r.refTable}.{r.refColumn}
+                      <td className="px-3 py-1 font-mono">
+                        <button
+                          onClick={() => walkTo(r.refTable, r.refSchema)}
+                          title={`Open ${r.refTable} structure`}
+                          className="text-primary hover:underline"
+                        >
+                          {r.refTable}.{r.refColumn}
+                        </button>
+                      </td>
+                      <td className="px-3 py-1 text-muted-foreground">
+                        {r.onUpdate || '—'}
+                      </td>
+                      <td className="px-3 py-1 text-muted-foreground">
+                        {r.onDelete || '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        ) : (
+          /* referencedBy */
+          <div className="h-full overflow-auto">
+            {tab.referencedByLoading ? (
+              <div className="flex items-center gap-2 px-3 py-3 text-muted-foreground">
+                <Loader2 className="size-4 animate-spin" />
+                Loading…
+              </div>
+            ) : !tab.referencedBy || tab.referencedBy.length === 0 ? (
+              <div className="px-3 py-3 text-muted-foreground">
+                Nothing references this table.
+              </div>
+            ) : (
+              <table className="w-full border-collapse">
+                <thead className="sticky top-0 bg-background text-muted-foreground">
+                  <tr className="border-b border-border">
+                    {th('Referencing table')}
+                    {th('Column')}
+                    {th('→ This column')}
+                    {th('On Update')}
+                    {th('On Delete')}
+                  </tr>
+                </thead>
+                <tbody>
+                  {tab.referencedBy.map((r, i) => (
+                    <tr key={i} className="border-b border-border/30">
+                      <td className="px-3 py-1 font-mono">
+                        <button
+                          onClick={() => walkTo(r.table, r.schema)}
+                          title={`Open ${r.table} structure`}
+                          className="text-primary hover:underline"
+                        >
+                          {r.table}
+                        </button>
+                      </td>
+                      <td className="px-3 py-1 font-mono text-muted-foreground">
+                        {r.column}
+                      </td>
+                      <td className="px-3 py-1 font-mono text-muted-foreground">
+                        {r.refColumn}
                       </td>
                       <td className="px-3 py-1 text-muted-foreground">
                         {r.onUpdate || '—'}

@@ -304,6 +304,22 @@ export interface Relation {
   onDelete?: string
 }
 
+/** Inbound FK: a table that references the current table (reverse of Relation). */
+export interface ReferencingTable {
+  /** the referencing (child) table */
+  table: string
+  /** schema of the referencing table (pg) */
+  schema?: string
+  /** the FK column in the referencing table */
+  column: string
+  /** the column in THIS table that it points at */
+  refColumn: string
+  /** the FK constraint name */
+  constraint: string
+  onUpdate?: string
+  onDelete?: string
+}
+
 export interface TableStructure {
   columns: StructureColumn[]
   indexes: IndexInfo[]
@@ -372,6 +388,11 @@ export interface SessionApi {
   /** named enum types (pg); empty for mysql/sqlite */
   listEnums: (id: string) => Promise<EnumType[]>
   describeTable: (id: string, entity: EntityRef) => Promise<TableStructure>
+  /** tables that reference this one (inbound FKs / "Referenced by") */
+  listReferencingTables: (
+    id: string,
+    entity: EntityRef
+  ) => Promise<ReferencingTable[]>
   /** the CREATE statement for a table/view (read-only; pg reconstructs) */
   getCreateSql: (id: string, entity: EntityRef) => Promise<string>
   createTable: (id: string, spec: CreateTableSpec) => Promise<{ ddl: string }>
@@ -473,6 +494,8 @@ export interface SerializedTab {
   kind?: 'history' | 'connection-editor'
   connectionEditor?: { connectionId: string | null }
   view: 'data' | 'structure'
+  /** which Structure sub-tab was open (survives restore) */
+  structureSub?: 'columns' | 'indexes' | 'relations' | 'referencedBy' | 'ddl'
   filters: Filter[]
   orderBy: Sort[]
   colWidths: Record<string, number>

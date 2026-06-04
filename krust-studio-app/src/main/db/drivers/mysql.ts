@@ -39,6 +39,7 @@ import type {
   ForeignKey,
   IndexSpec,
   RawQueryResult,
+  ReferencingTable,
   RowsResult,
   SchemaOp,
   SearchResult,
@@ -378,6 +379,40 @@ export class MysqlDriver implements DbDriver {
     )) as [RowDataPacket[], FieldPacket[]]
     const engine = (engRows[0] as { engine?: string } | undefined)?.engine
     return { columns, indexes, relations, engine: engine ?? undefined }
+  }
+
+  async listReferencingTables(entity: EntityRef): Promise<ReferencingTable[]> {
+    const [rows] = (await (await this.ensure()).query(
+      `SELECT kcu.TABLE_NAME AS tbl, kcu.COLUMN_NAME AS col,
+              kcu.REFERENCED_COLUMN_NAME AS refColumn,
+              kcu.CONSTRAINT_NAME AS conname,
+              rc.UPDATE_RULE AS onUpdate, rc.DELETE_RULE AS onDelete
+         FROM information_schema.KEY_COLUMN_USAGE kcu
+         JOIN information_schema.REFERENTIAL_CONSTRAINTS rc
+           ON rc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME
+          AND rc.CONSTRAINT_SCHEMA = kcu.TABLE_SCHEMA
+        WHERE kcu.REFERENCED_TABLE_SCHEMA = DATABASE()
+          AND kcu.REFERENCED_TABLE_NAME = ?
+        ORDER BY kcu.TABLE_NAME, kcu.COLUMN_NAME`,
+      [entity.name]
+    )) as [RowDataPacket[], FieldPacket[]]
+    return (
+      rows as Array<{
+        tbl: string
+        col: string
+        refColumn: string
+        conname: string
+        onUpdate: string
+        onDelete: string
+      }>
+    ).map((r) => ({
+      table: r.tbl,
+      column: r.col,
+      refColumn: r.refColumn,
+      constraint: r.conname,
+      onUpdate: r.onUpdate,
+      onDelete: r.onDelete
+    }))
   }
 
   async getCreateSql(entity: EntityRef): Promise<string> {

@@ -26,6 +26,7 @@ import type {
   ForeignKey,
   IndexSpec,
   RawQueryResult,
+  ReferencingTable,
   RowsResult,
   SchemaOp,
   SearchResult,
@@ -449,6 +450,56 @@ export class PostgresDriver implements DbDriver {
     }
     const indexes = [...idxMap].map(([name, v]) => ({ name, ...v }))
     return { columns, indexes, relations }
+  }
+
+  async listReferencingTables(entity: EntityRef): Promise<ReferencingTable[]> {
+    const schema = entity.schema ?? 'public'
+    // pg_constraint: confrelid = the referenced (parent) table's oid;
+    // conrelid = the referencing (child) table. conkey/confkey are column
+    // attnum arrays (single-column FKs in v1 → take [1]).
+    const res = await (await this.ensure()).query(
+      `SELECT child.relname AS tbl, ns.nspname AS schema,
+              att.attname AS col, ratt.attname AS "refColumn",
+              c.conname AS conname,
+              c.confupdtype AS upd, c.confdeltype AS del
+         FROM pg_constraint c
+         JOIN pg_class parent ON parent.oid = c.confrelid
+         JOIN pg_namespace pns ON pns.oid = parent.relnamespace
+         JOIN pg_class child ON child.oid = c.conrelid
+         JOIN pg_namespace ns ON ns.oid = child.relnamespace
+         JOIN pg_attribute att ON att.attrelid = c.conrelid AND att.attnum = c.conkey[1]
+         JOIN pg_attribute ratt ON ratt.attrelid = c.confrelid AND ratt.attnum = c.confkey[1]
+        WHERE c.contype = 'f'
+          AND parent.relname = $1 AND pns.nspname = $2
+        ORDER BY child.relname, att.attname`,
+      [entity.name, schema]
+    )
+    const ACTION: Record<string, string> = {
+      a: 'NO ACTION',
+      r: 'RESTRICT',
+      c: 'CASCADE',
+      n: 'SET NULL',
+      d: 'SET DEFAULT'
+    }
+    return (
+      res.rows as Array<{
+        tbl: string
+        schema: string
+        col: string
+        refColumn: string
+        conname: string
+        upd: string
+        del: string
+      }>
+    ).map((r) => ({
+      table: r.tbl,
+      schema: r.schema,
+      column: r.col,
+      refColumn: r.refColumn,
+      constraint: r.conname,
+      onUpdate: ACTION[r.upd] ?? undefined,
+      onDelete: ACTION[r.del] ?? undefined
+    }))
   }
 
   async getCreateSql(entity: EntityRef): Promise<string> {

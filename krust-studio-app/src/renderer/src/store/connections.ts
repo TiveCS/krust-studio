@@ -11,6 +11,7 @@ import type {
   CreateTableSpec,
   NewColumnSpec,
   QueryResult,
+  ReferencingTable,
   RowsResult,
   SaveConnectionInput,
   SerializedTab,
@@ -29,6 +30,7 @@ export interface QueryState {
 }
 
 export type TabView = 'data' | 'structure'
+export type StructureSub = 'columns' | 'indexes' | 'relations' | 'referencedBy' | 'ddl'
 
 const PAGE_SIZE = 100
 
@@ -60,8 +62,14 @@ export interface Tab {
   colWidths: Record<string, number>
   committing: boolean
   view: TabView
+  /** which Structure sub-tab is active (lifted from StructureView local state
+   *  so it survives restore + powers walkable relations) */
+  structureSub: StructureSub
   structure: TableStructure | null
   structureLoading: boolean
+  /** inbound FKs ("Referenced by"); null until first fetched */
+  referencedBy: ReferencingTable[] | null
+  referencedByLoading: boolean
   /** present => this tab is an unsaved "new table" draft (no entity yet) */
   draft: { name: string; columns: NewColumnSpec[] } | null
   /** present => this tab is a SQL editor */
@@ -118,7 +126,11 @@ interface ConnectionsState {
   /** Update an editor tab's stored connectionId after saving a new connection. */
   patchEditorTabConnection: (tabId: string, connectionId: string) => void
 
-  openTable: (entity: EntityRef, initialFilters?: Filter[]) => Promise<void>
+  openTable: (
+    entity: EntityRef,
+    initialFilters?: Filter[],
+    opts?: { view?: TabView; structureSub?: StructureSub }
+  ) => Promise<void>
   openNewTable: () => void
   openQuery: () => void
   setQuerySql: (sql: string) => void
@@ -134,6 +146,10 @@ interface ConnectionsState {
   setFilters: (filters: Filter[]) => Promise<void>
   setSort: (column: string, additive?: boolean) => Promise<void>
   setTabView: (view: TabView) => Promise<void>
+  /** set the active Structure sub-tab (persisted; lazy-fetches referencedBy) */
+  setStructureSub: (sub: StructureSub) => void
+  /** fetch inbound FKs for the active tab (idempotent; caches on the tab) */
+  fetchReferencedBy: () => Promise<void>
   refreshStructure: () => Promise<void>
   createIndex: (spec: IndexSpec) => Promise<string[]>
   dropIndex: (name: string) => Promise<string[]>
@@ -193,6 +209,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
             kind: tab.kind,
             connectionEditor: tab.connectionEditor,
             view: tab.view,
+            structureSub: tab.structureSub,
             filters: tab.filters,
             orderBy: tab.orderBy,
             colWidths: tab.colWidths,
@@ -226,8 +243,11 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       colWidths: t.colWidths,
       committing: false,
       view: t.view,
+      structureSub: t.structureSub ?? 'columns',
       structure: null,
       structureLoading: false,
+      referencedBy: null,
+      referencedByLoading: false,
       draft: t.draft ?? null,
       query:
         t.sqlDraft !== undefined
@@ -558,6 +578,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         data: null, loading: false, error: null, pageIndex: 0, total: null,
         counting: false, filters: [], orderBy: [], edits: {}, deletes: [],
         inserts: [], colWidths: {}, committing: false, view: 'data',
+        structureSub: 'columns', referencedBy: null, referencedByLoading: false,
         structure: null, structureLoading: false, draft: null, query: null
       }
       set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
@@ -584,6 +605,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         data: null, loading: false, error: null, pageIndex: 0, total: null,
         counting: false, filters: [], orderBy: [], edits: {}, deletes: [],
         inserts: [], colWidths: {}, committing: false, view: 'data',
+        structureSub: 'columns', referencedBy: null, referencedByLoading: false,
         structure: null, structureLoading: false, draft: null, query: null
       }
       set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
@@ -597,12 +619,15 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       })
     },
 
-    openTable: async (entity, initialFilters) => {
+    openTable: async (entity, initialFilters, opts) => {
       const existing = get().tabs.find(
         (t) => entityKey(t.entity) === entityKey(entity)
       )
       if (existing) {
         set({ activeTabId: existing.id })
+        // navigate to a requested view/sub-tab (walkable relations)
+        if (opts?.view) patchTab(existing.id, { view: opts.view })
+        if (opts?.structureSub) patchTab(existing.id, { structureSub: opts.structureSub })
         if (initialFilters) {
           patchTab(existing.id, {
             filters: initialFilters,
@@ -617,13 +642,18 @@ export const useConnections = create<ConnectionsState>((set, get) => {
           // restored tab with no data yet — fetch now
           await fetchTab(existing.id)
         }
+        if (opts?.view === 'structure') {
+          await get().setTabView('structure') // ensures structure is fetched
+        }
+        scheduleWorkspaceSave()
         return
       }
+      const view: TabView = opts?.view ?? 'data'
       const tab: Tab = {
         id: crypto.randomUUID(),
         entity,
         data: null,
-        loading: true,
+        loading: view === 'data',
         error: null,
         pageIndex: 0,
         total: null,
@@ -635,15 +665,19 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         inserts: [],
         colWidths: {},
         committing: false,
-        view: 'data',
+        view,
+        structureSub: opts?.structureSub ?? 'columns',
         structure: null,
         structureLoading: false,
+        referencedBy: null,
+        referencedByLoading: false,
         draft: null,
         query: null
       }
       set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
       scheduleWorkspaceSave()
-      await fetchTab(tab.id)
+      if (view === 'data') await fetchTab(tab.id)
+      else await get().setTabView('structure')
     },
 
     openNewTable: () => {
@@ -664,8 +698,11 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         colWidths: {},
         committing: false,
         view: 'structure',
+        structureSub: 'columns',
         structure: null,
         structureLoading: false,
+        referencedBy: null,
+        referencedByLoading: false,
         draft: {
           name: '',
           columns: [{ name: 'id', type: '', nullable: false, pk: true }]
@@ -694,8 +731,11 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         colWidths: {},
         committing: false,
         view: 'data',
+        structureSub: 'columns',
         structure: null,
         structureLoading: false,
+        referencedBy: null,
+        referencedByLoading: false,
         draft: null,
         query: { sql: '', results: [], running: false, autoLimit: 500 }
       }
@@ -884,17 +924,49 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       }
     },
 
+    setStructureSub: (sub) => {
+      const { activeTabId } = get()
+      if (!activeTabId) return
+      patchTab(activeTabId, { structureSub: sub })
+      scheduleWorkspaceSave()
+      if (sub === 'referencedBy') void get().fetchReferencedBy()
+    },
+
+    fetchReferencedBy: async () => {
+      const { openConnectionId, activeTabId, tabs } = get()
+      const tab = tabs.find((t) => t.id === activeTabId)
+      if (!openConnectionId || !tab || tab.draft) return
+      if (tab.referencedBy !== null || tab.referencedByLoading) return // cached / in-flight
+      patchTab(tab.id, { referencedByLoading: true })
+      try {
+        const referencedBy = await window.api.sessions.listReferencingTables(
+          openConnectionId,
+          tab.entity
+        )
+        patchTab(tab.id, { referencedBy, referencedByLoading: false })
+      } catch (err) {
+        patchTab(tab.id, {
+          referencedByLoading: false,
+          error: err instanceof Error ? err.message : String(err)
+        })
+      }
+    },
+
     refreshStructure: async () => {
       const { openConnectionId, activeTabId, tabs } = get()
       const tab = tabs.find((t) => t.id === activeTabId)
       if (!activeTabId || !tab || !openConnectionId) return
-      patchTab(activeTabId, { structureLoading: true })
+      // invalidate referencedBy cache so it re-fetches on next view
+      patchTab(activeTabId, { structureLoading: true, referencedBy: null })
       try {
         const structure = await window.api.sessions.describeTable(
           openConnectionId,
           tab.entity
         )
         patchTab(activeTabId, { structure, structureLoading: false })
+        if (get().tabs.find((t) => t.id === activeTabId)?.structureSub === 'referencedBy') {
+          void get().fetchReferencedBy()
+        }
       } catch (err) {
         patchTab(activeTabId, {
           structureLoading: false,
