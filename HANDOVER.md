@@ -20,17 +20,14 @@ App lives in `krust-studio-app/`. Docs (this file, CONTEXT.md, ADRs) at repo roo
    - 0010 Optional database name + multi-database switching (mysql USE / pg
      reconnect).
    - 0011 Column reorder + unified verbatim MySQL `MODIFY`.
-   - 0012 Tab-centric UI + persistent per-connection workspace (**v1.3.0, not
-     built**).
-   - 0013 Connection resilience: auto-retry + manual reconnect (**v1.3.0, not
-     built**).
-3. **Next up — v1.3.0** (designed, NOT built): see `docs/TODO.md` → **P0**.
-   7 items: connection auto-retry (fixes the idle-drop "can't retry" bug),
-   manual disconnect/reconnect, everything-is-a-tab (history + connection editor
-   become tabs), persistent per-connection workspace, referenced-by (reverse FK)
-   sub-tab, walkable relations, column search in the structure editor. Suggested
-   order: retry → reconnect → tabs → workspace persist → reverse-FK/walkable →
-   column search. ADR-0012 + ADR-0013 cover the two architectural spines.
+   - 0012 Tab-centric UI + persistent per-connection workspace (**v1.3.0, built**).
+   - 0013 Connection resilience: auto-retry + manual reconnect (**v1.3.0, built**).
+   - 0014 Query Plan visual tree (**designed, not built** — deferred).
+3. **v1.3.0 — DONE** (all 7 P0 shipped, not yet released): connection auto-retry
+   (fixes the idle-drop "can't retry" bug), manual disconnect/reconnect,
+   everything-is-a-tab, persistent per-connection+database workspace,
+   referenced-by (reverse FK) sub-tab, walkable relations, column search in the
+   structure editor. See `docs/TODO.md` → **P0** (all checked).
 4. User memory (auto-loaded): prefer **registry-latest deps + pnpm**; pull
    **real shadcn source** (CLI/registry), never hand-write a lookalike or use
    native HTML controls; **ASK before designing UI**.
@@ -197,14 +194,19 @@ duplicate, **optional database**) · connect → schema tree · **multi-database
 switcher** (mysql/pg) · multi-tab data browse · filter (AND/OR groups) ·
 server-side sort · pagination · inline edit/insert/delete staged + transactional
 commit · copy/paste · FK navigation/expansion/picker · Structure view
-(columns/indexes/relations/DDL, **syntax-highlighted**) · editable columns
+(columns/indexes/relations/**referenced-by**/DDL, **syntax-highlighted**,
+**walkable FK graph** both directions, **column search**) · editable columns
 (add/rename/drop; type/null on pg+mysql) · **column reorder** (drag handle;
 existing-table MySQL-only via unified verbatim MODIFY, free on new-table any
 engine — ADR-0011) · FK add/drop (pg+mysql) · create table ·
 per-engine limitation banners · **SQL editor** (schema+column autocomplete,
 engine-aware dialect/quoting, auto-LIMIT shown, cancel, resizable split) ·
 **Ctrl/⌘+P command palette** · Query History + Changesets + export · result
-export (CSV/JSON) · **auto-update** (GitHub Releases) · installer custom path.
+export (CSV/JSON) · **auto-update** (GitHub Releases) · installer custom path ·
+**everything-is-a-tab** (history + connection editor are tabs) · **persistent
+per-connection+database workspace** (tabs restored on restart/reconnect/switch) ·
+**connection resilience** (idle-drop auto-retry + manual disconnect/reconnect
+with status dot).
 
 ## Gaps — prioritized TODO
 
