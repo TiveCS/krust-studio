@@ -71,6 +71,24 @@ import type {
 } from '../shared/types'
 
 export function registerIpc(): void {
+  // ── window controls (custom title bar) ──────────────────────────────────
+  ipcMain.on('window:minimize', (e) =>
+    BrowserWindow.fromWebContents(e.sender)?.minimize()
+  )
+  ipcMain.on('window:toggleMaximize', (e) => {
+    const w = BrowserWindow.fromWebContents(e.sender)
+    if (!w) return
+    if (w.isMaximized()) w.unmaximize()
+    else w.maximize()
+  })
+  ipcMain.on('window:close', (e) =>
+    BrowserWindow.fromWebContents(e.sender)?.close()
+  )
+  ipcMain.handle(
+    'window:isMaximized',
+    (e) => BrowserWindow.fromWebContents(e.sender)?.isMaximized() ?? false
+  )
+
   ipcMain.handle('connections:list', () => listConnections())
 
   ipcMain.handle('connections:save', (_e, input: SaveConnectionInput) =>

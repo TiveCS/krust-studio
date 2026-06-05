@@ -110,6 +110,17 @@ const api: KrustApi = {
     restoreRun: (id: string, path: string, stopOnError: boolean) =>
       ipcRenderer.invoke('backup:restoreRun', id, path, stopOnError)
   },
+  window: {
+    minimize: () => ipcRenderer.send('window:minimize'),
+    toggleMaximize: () => ipcRenderer.send('window:toggleMaximize'),
+    close: () => ipcRenderer.send('window:close'),
+    isMaximized: () => ipcRenderer.invoke('window:isMaximized'),
+    onMaximizedChange: (cb: (maximized: boolean) => void) => {
+      const handler = (_: unknown, v: boolean): void => cb(v)
+      ipcRenderer.on('window:maximized', handler)
+      return () => ipcRenderer.removeListener('window:maximized', handler)
+    }
+  },
   dialog: {
     saveText: (defaultName: string, content: string) =>
       ipcRenderer.invoke('dialog:saveText', defaultName, content)

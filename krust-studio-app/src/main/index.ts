@@ -39,6 +39,12 @@ function createWindow(): void {
     height: 800,
     show: false,
     autoHideMenuBar: true,
+    // custom title bar — frameless on Windows/Linux, hidden traffic-light inset
+    // on macOS (keep the native close/min/max but no title strip)
+    frame: false,
+    ...(process.platform === 'darwin'
+      ? { titleBarStyle: 'hidden', trafficLightPosition: { x: 12, y: 10 } }
+      : {}),
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -47,6 +53,12 @@ function createWindow(): void {
   })
 
   mainWindow.maximize()
+
+  // tell the renderer when maximized state changes (swap the max/restore icon)
+  const sendMaxState = (): void =>
+    mainWindow.webContents.send('window:maximized', mainWindow.isMaximized())
+  mainWindow.on('maximize', sendMaxState)
+  mainWindow.on('unmaximize', sendMaxState)
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()

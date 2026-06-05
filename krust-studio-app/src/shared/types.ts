@@ -581,6 +581,15 @@ export interface BackupApi {
   ) => Promise<RestoreRunResult>
 }
 
+export interface WindowControlApi {
+  minimize: () => void
+  toggleMaximize: () => void
+  close: () => void
+  isMaximized: () => Promise<boolean>
+  /** subscribe to maximize/unmaximize; returns an unsubscribe fn */
+  onMaximizedChange: (cb: (maximized: boolean) => void) => () => void
+}
+
 export interface KrustApi {
   connections: ConnectionsApi
   sessions: SessionApi
@@ -588,4 +597,5 @@ export interface KrustApi {
   dialog: DialogApi
   workspace: WorkspaceApi
   backup: BackupApi
+  window: WindowControlApi
 }

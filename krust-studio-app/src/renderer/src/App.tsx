@@ -5,6 +5,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/AppSidebar'
 import { ConnectionForm } from '@/components/ConnectionForm'
+import { TitleBar } from '@/components/TitleBar'
 import { TabBar } from '@/components/TabBar'
 import { TableTabView } from '@/components/TableTabView'
 import { HistoryView } from '@/components/HistoryView'
@@ -55,79 +56,56 @@ function App(): React.JSX.Element {
 
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? null
 
-  // Connection editor tab
+  let content: React.JSX.Element
   if (activeTab?.kind === 'connection-editor') {
     const connId = activeTab.connectionEditor?.connectionId ?? null
     const existing = connId ? (connections.find((c) => c.id === connId) ?? null) : null
-    return (
-      <TooltipProvider delayDuration={0}>
-        <SidebarProvider className="h-svh overflow-hidden">
-          <AppSidebar />
-          <SidebarInset className="min-w-0">
-            <TabBar />
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              <ConnectionForm
-                key={connId ?? 'new'}
-                existing={existing}
-                onSaved={(saved) => patchEditorTabConnection(activeTab.id, saved.id)}
-                onConnected={() => closeTab(activeTab.id)}
-              />
-            </div>
-          </SidebarInset>
-        </SidebarProvider>
-        <CommandPalette />
-        <Toaster position="bottom-right" />
-      </TooltipProvider>
+    content = (
+      <ConnectionForm
+        key={connId ?? 'new'}
+        existing={existing}
+        onSaved={(saved) => patchEditorTabConnection(activeTab.id, saved.id)}
+        onConnected={() => closeTab(activeTab.id)}
+      />
+    )
+  } else if (activeTab?.kind === 'history') {
+    content = <HistoryView />
+  } else if (activeTab) {
+    content = <TableTabView />
+  } else {
+    content = (
+      <div className="flex h-full items-center justify-center gap-2 text-muted-foreground">
+        {openConnectionId ? (
+          <>
+            <Table2 className="size-10 opacity-30" />
+            <p className="text-sm">Double-click a table in the sidebar</p>
+          </>
+        ) : (
+          <>
+            <Plug className="size-10 opacity-30" />
+            <p className="text-sm">Pick or create a connection to begin</p>
+          </>
+        )}
+      </div>
     )
   }
 
-  // History tab
-  if (activeTab?.kind === 'history') {
-    return (
-      <TooltipProvider delayDuration={0}>
-        <SidebarProvider className="h-svh overflow-hidden">
-          <AppSidebar />
-          <SidebarInset className="min-w-0">
-            <TabBar />
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              <HistoryView />
-            </div>
-          </SidebarInset>
-        </SidebarProvider>
-        <CommandPalette />
-        <Toaster position="bottom-right" />
-      </TooltipProvider>
-    )
-  }
-
-  // Regular table/query/new-table tabs or landing
   return (
     <TooltipProvider delayDuration={0}>
-      <SidebarProvider className="h-svh overflow-hidden">
-        <AppSidebar />
-        <SidebarInset className="min-w-0">
-          <TabBar />
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            {activeTab ? (
-              <TableTabView />
-            ) : (
-              <div className="flex h-full items-center justify-center gap-2 text-muted-foreground">
-                {openConnectionId ? (
-                  <>
-                    <Table2 className="size-10 opacity-30" />
-                    <p className="text-sm">Double-click a table in the sidebar</p>
-                  </>
-                ) : (
-                  <>
-                    <Plug className="size-10 opacity-30" />
-                    <p className="text-sm">Pick or create a connection to begin</p>
-                  </>
-                )}
+      <div className="flex h-svh flex-col overflow-hidden">
+        <TitleBar />
+        <div className="min-h-0 flex-1">
+          <SidebarProvider className="h-full min-h-0 overflow-hidden">
+            <AppSidebar />
+            <SidebarInset className="min-w-0">
+              <TabBar />
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                {content}
               </div>
-            )}
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
+            </SidebarInset>
+          </SidebarProvider>
+        </div>
+      </div>
       <CommandPalette />
       <Toaster position="bottom-right" />
     </TooltipProvider>
