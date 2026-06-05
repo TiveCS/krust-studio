@@ -4,6 +4,42 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [1.3.0] — 2026-06-05
+
+### Added
+- **Persistent per-connection workspace** — your open tabs (and the active one)
+  are saved per connection **and per database**, and restored after a restart,
+  a disconnect, or switching connections. The app **reopens your last
+  connection** on launch so you land back where you were. Only *where you were*
+  is saved (entity, view, structure sub-tab, filters, sort, SQL text, draft,
+  column widths) — not fetched rows or staged edits (ADR-0012).
+- **Everything is a tab** — the Query History view and the connection editor are
+  now tabs (singletons per connection), not full-screen takeovers. Open one and
+  your data tabs stay put alongside it.
+- **Connection resilience** — sessions transparently **auto-recover** from idle
+  drops (serverless DBs like Neon, server-side timeouts): on a connection-fatal
+  error Krust reconnects and retries the operation once, so coming back after
+  lunch and clicking a table just works. Reads and transactional GUI writes
+  retry; a raw SQL-editor run reconnects but is **not** silently re-run (you're
+  told to re-run). Manual **Disconnect / Reconnect** + a connection **status
+  dot** live in the footer connection menu (ADR-0013).
+- **Backup / Restore** — export a self-contained, engine-aware `.sql` dump with
+  **per-table** choice (skip / schema / schema + data) and optional
+  `DROP … IF EXISTS`; large tables stream. Restore parses a dump with a
+  **dry-run preview** that flags destructive statements (`DROP`/`DELETE`/
+  `TRUNCATE`) before a two-step confirm; stop-on-error toggle. No external
+  `mysqldump`/`pg_dump` needed. (Sidebar toolbar → backup icon.)
+- **"Referenced by" (reverse FK)** — a new Structure sub-tab lists the tables
+  that reference the current one (inbound FKs), with a count badge.
+- **Walkable relations** — click a table in **Relations** (outbound) or
+  **Referenced by** (inbound) to jump to its structure and keep walking the FK
+  graph in either direction.
+- **Column search in the structure editor** — filter the column list by name
+  (display-only; the staged draft stays complete). Reorder is disabled while a
+  filter is active.
+- **Custom title bar** — a themed, frameless title bar with in-app window
+  controls (minimize / maximize / close), replacing the native OS frame.
+
 ## [1.2.3] — 2026-06-04
 
 ### Fixed
@@ -93,6 +129,7 @@ broken; use this.)
   pagination, FK navigation/expansion/picker, structure editor, Captured DDL →
   Changesets, query history, CSV/JSON export.
 
+[1.3.0]: https://github.com/TiveCS/krust-studio/releases/tag/v1.3.0
 [1.2.3]: https://github.com/TiveCS/krust-studio/releases/tag/v1.2.3
 [1.2.2]: https://github.com/TiveCS/krust-studio/releases/tag/v1.2.2
 [1.2.1]: https://github.com/TiveCS/krust-studio/releases/tag/v1.2.1

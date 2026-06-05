@@ -85,8 +85,10 @@ Your connections, query history, and changesets live in a local folder
 ### Inspect
 - A **JSON view** of the selected row (Space bar) — nested JSON expands, and
   foreign keys expand the linked record **inline**, as deep as you want.
-- A **Structure** tab per table: columns, indexes, relations, and the real
-  **CREATE statement**.
+- A **Structure** tab per table: columns, indexes, relations, **"Referenced by"**
+  (which tables point *at* this one), and the real **CREATE statement**.
+- **Walk the foreign-key graph** — click a table in *Relations* (outbound) or
+  *Referenced by* (inbound) to jump to its structure and keep walking either way.
 - Follow a foreign key to open the related table, filtered to that record.
 
 ### Write SQL
@@ -121,6 +123,29 @@ Your connections, query history, and changesets live in a local folder
   (`AFTER`).
 - Create, rename, **truncate**, or **drop** tables (destructive actions require
   you to type the name to confirm).
+- On wide tables, **filter the column list** by name in the structure editor
+  (display-only; your staged edits stay complete).
+
+### Back up & restore
+- **Export a self-contained `.sql` dump** — no `mysqldump` / `pg_dump` install
+  needed. Choose **per table** whether to include schema only, schema + data, or
+  skip it; optionally add `DROP … IF EXISTS`. Large tables stream, and the dump
+  disables FK checks so it restores regardless of table order.
+- **Restore** a dump with a **dry-run preview** that flags destructive
+  statements (`DROP` / `DELETE` / `TRUNCATE`) before a two-step confirm, with a
+  stop-on-error toggle. (Read-only connections block restore.)
+
+### Stay where you left off
+- **Your tabs are remembered** — per connection *and* per database. Restart the
+  app, disconnect, or switch connections, and you land back on the same open
+  tabs (with their filters, sort, SQL text, and column widths). The app reopens
+  your last connection on launch.
+- **Everything is a tab** — data browsers, the SQL editor, Query History, and the
+  connection editor; no full-screen mode that hides your work.
+- **Resilient connections** — idle drops (serverless DBs, server timeouts)
+  auto-recover: Krust reconnects and retries once so clicking a table after a
+  break just works. Manual **Disconnect / Reconnect** and a status indicator live
+  in the footer connection menu.
 
 ### Captured changes → a script for production *(the headline feature)*
 Many teams apply schema changes to production by hand and are wary of migration
