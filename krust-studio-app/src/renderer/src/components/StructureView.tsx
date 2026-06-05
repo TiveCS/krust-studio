@@ -118,6 +118,7 @@ export function StructureView(): React.JSX.Element | null {
   )
   const [idxAdds, setIdxAdds] = useState<IndexSpec[]>([])
   const [idxDrops, setIdxDrops] = useState<Set<string>>(new Set())
+  const [colFilter, setColFilter] = useState('')
 
   // add/edit-index dialog (editIdx = index into idxAdds, or null for a new one)
   const [addOpen, setAddOpen] = useState(false)
@@ -271,6 +272,15 @@ export function StructureView(): React.JSX.Element | null {
     setIdxDrops(new Set())
   }
 
+  const addColumn = (): void => {
+    setColDraft((prev) => [
+      ...prev,
+      { name: '', type: '', nullable: true, pk: false }
+    ])
+    setColFilter('') // clear filter so the new (empty-name) row isn't hidden
+    setStructureSub('columns')
+  }
+
   const preview = async (): Promise<void> => {
     if (!openConnectionId || ops.length === 0) return
     setPreviewing(true)
@@ -392,6 +402,8 @@ export function StructureView(): React.JSX.Element | null {
             draft={colDraft}
             onDraftChange={setColDraft}
             movedNames={movedNames}
+            colFilter={colFilter}
+            onColFilterChange={setColFilter}
           />
         ) : sub === 'indexes' ? (
           <div className="flex h-full flex-col">
@@ -607,6 +619,12 @@ export function StructureView(): React.JSX.Element | null {
       {/* shared commit footer — columns + indexes commit together */}
       {st && !readOnly && (
         <div className="flex h-9 shrink-0 items-center gap-2 border-t border-border px-3 text-xs text-muted-foreground">
+          {sub === 'columns' && (
+            <Button size="xs" variant="ghost" onClick={addColumn} title="Add a column">
+              <Plus />
+              Add column
+            </Button>
+          )}
           <span>{ops.length} pending change(s)</span>
           <div className="flex-1" />
           <Button

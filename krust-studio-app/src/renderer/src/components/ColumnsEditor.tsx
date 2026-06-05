@@ -74,7 +74,8 @@ export function ColumnsEditor({
   reorderable = false,
   original,
   movedNames,
-  nameFilter = ''
+  nameFilter = '',
+  hideAddButton = false
 }: {
   columns: EditorColumn[]
   onChange: (cols: EditorColumn[]) => void
@@ -99,6 +100,9 @@ export function ColumnsEditor({
    *  Reorder is disabled while a filter is active (drag position is undefined
    *  against hidden rows). The draft/diff stay complete. */
   nameFilter?: string
+  /** hide the built-in "Add column" button (when the host renders its own,
+   *  e.g. in the structure-editor footer) */
+  hideAddButton?: boolean
 }): React.JSX.Element {
   const origByName = new Map((original ?? []).map((o) => [o.name, o]))
   const filtering = nameFilter.trim().length > 0
@@ -418,7 +422,7 @@ export function ColumnsEditor({
           </div>
         )
       })}
-      {!readOnly && (
+      {!readOnly && !hideAddButton && (
         <Button
           size="xs"
           variant="ghost"

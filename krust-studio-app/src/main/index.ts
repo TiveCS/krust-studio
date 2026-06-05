@@ -5,8 +5,11 @@ import { autoUpdater } from 'electron-updater'
 import icon from '../../resources/icon.png?asset'
 import { registerIpc } from './ipc'
 
+let updaterWired = false
+
 function setupAutoUpdater(win: BrowserWindow): void {
-  if (is.dev) return // skip in dev — no release server to hit
+  if (updaterWired) return // once per app run (ready-to-show can re-fire)
+  updaterWired = true
 
   autoUpdater.autoDownload = true
   autoUpdater.autoInstallOnAppQuit = true
@@ -14,13 +17,10 @@ function setupAutoUpdater(win: BrowserWindow): void {
   autoUpdater.on('update-available', (info) => {
     win.webContents.send('update:available', info.version)
   })
-
   autoUpdater.on('update-downloaded', (info) => {
     win.webContents.send('update:downloaded', info.version)
   })
-
   autoUpdater.on('error', (err) => {
-    // silent — don't crash the app over update failures
     console.error('[updater]', err.message)
   })
 
@@ -28,8 +28,32 @@ function setupAutoUpdater(win: BrowserWindow): void {
     autoUpdater.quitAndInstall()
   })
 
-  // Check after a short delay so the window is visible first
-  setTimeout(() => void autoUpdater.checkForUpdates(), 5000)
+  // Manual "check for updates" — invokable from the UI. Returns a status the
+  // renderer toasts. In dev there's no release feed, so report that plainly.
+  ipcMain.handle('update:check', async () => {
+    const current = app.getVersion()
+    if (is.dev) return { status: 'dev' as const, current }
+    try {
+      const r = await autoUpdater.checkForUpdates()
+      const latest = r?.updateInfo?.version
+      if (!latest) return { status: 'unknown' as const, current }
+      // a newer version → autoDownload runs; the 'update:downloaded' toast follows
+      return {
+        status: latest !== current ? ('available' as const) : ('up-to-date' as const),
+        version: latest,
+        current
+      }
+    } catch (err) {
+      return {
+        status: 'error' as const,
+        error: err instanceof Error ? err.message : String(err),
+        current
+      }
+    }
+  })
+
+  // Auto-check shortly after launch (packaged only — dev has no feed)
+  if (!is.dev) setTimeout(() => void autoUpdater.checkForUpdates(), 5000)
 }
 
 function createWindow(): void {

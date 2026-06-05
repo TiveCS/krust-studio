@@ -1,6 +1,41 @@
 import { useEffect, useState } from 'react'
-import { Minus, Square, Copy, X } from 'lucide-react'
+import { Minus, Square, Copy, X, ChevronDown, RefreshCw } from 'lucide-react'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
+
+type UpdateResult = {
+  status: 'dev' | 'up-to-date' | 'available' | 'unknown' | 'error'
+  version?: string
+  current?: string
+  error?: string
+}
+
+async function checkForUpdates(): Promise<void> {
+  toast.loading('Checking for updates…', { id: 'upd' })
+  const r = (await window.electron.ipcRenderer.invoke('update:check')) as UpdateResult
+  switch (r.status) {
+    case 'available':
+      toast.info(`Update v${r.version} found — downloading…`, { id: 'upd' })
+      break
+    case 'up-to-date':
+      toast.success(`You're up to date (v${r.current})`, { id: 'upd' })
+      break
+    case 'dev':
+      toast.info('Updates are disabled in development', { id: 'upd' })
+      break
+    case 'error':
+      toast.error(`Update check failed: ${r.error}`, { id: 'upd' })
+      break
+    default:
+      toast.message('Could not determine update status', { id: 'upd' })
+  }
+}
 
 // @electron-toolkit/preload exposes process info on window.electron
 const isMac =
@@ -17,13 +52,20 @@ export function TitleBar(): React.JSX.Element {
 
   return (
     <div className="app-drag flex h-8 shrink-0 items-center border-b border-border bg-card/40 select-none">
-      {/* left: room for macOS traffic lights, then app identity / future menu slot */}
-      <div
-        className={cn('flex items-center gap-2 px-3', isMac && 'pl-[72px]')}
-      >
-        <span className="text-xs font-medium tracking-wide text-muted-foreground">
-          Krust Studio
-        </span>
+      {/* left: room for macOS traffic lights, then app menu */}
+      <div className={cn('app-no-drag flex items-center px-1', isMac && 'pl-[72px]')}>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="flex items-center gap-1 rounded px-2 py-1 text-xs font-medium tracking-wide text-muted-foreground hover:bg-accent hover:text-foreground">
+            Krust Studio
+            <ChevronDown className="size-3 opacity-60" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem onSelect={() => void checkForUpdates()}>
+              <RefreshCw className="size-4" />
+              Check for updates
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* draggable filler */}

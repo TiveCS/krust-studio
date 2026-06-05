@@ -4,6 +4,20 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [1.3.1] — 2026-06-05
+
+### Fixed
+- **Structure editor scroll** — tables with many columns no longer overflow
+  behind the commit footer; the column list scrolls within its own area
+  (self-contained flex layout).
+
+### Changed
+- **Add column** moved to the structure-editor footer (bottom-left, next to
+  Commit/Discard) — no more scrolling to the end of the list. Adding clears any
+  active column filter so the new row is visible.
+- **Check for updates** — manual check in the title-bar app menu (Krust Studio ▾
+  → Check for updates); toasts up-to-date / downloading / error.
+
 ## [1.3.0] — 2026-06-05
 
 ### Added
@@ -129,6 +143,7 @@ broken; use this.)
   pagination, FK navigation/expansion/picker, structure editor, Captured DDL →
   Changesets, query history, CSV/JSON export.
 
+[1.3.1]: https://github.com/TiveCS/krust-studio/releases/tag/v1.3.1
 [1.3.0]: https://github.com/TiveCS/krust-studio/releases/tag/v1.3.0
 [1.2.3]: https://github.com/TiveCS/krust-studio/releases/tag/v1.2.3
 [1.2.2]: https://github.com/TiveCS/krust-studio/releases/tag/v1.2.2

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Info, Search, X } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
@@ -29,12 +28,16 @@ export function StructureEditor({
   tab,
   draft,
   onDraftChange,
-  movedNames
+  movedNames,
+  colFilter,
+  onColFilterChange
 }: {
   tab: Tab
   draft: EditorColumn[]
   onDraftChange: (cols: EditorColumn[]) => void
   movedNames: Set<string>
+  colFilter: string
+  onColFilterChange: (v: string) => void
 }): React.JSX.Element | null {
   const { connections, openConnectionId, entities, enums } = useConnections()
   const driver = connections.find((c) => c.id === openConnectionId)?.driver
@@ -44,51 +47,57 @@ export function StructureEditor({
   const types = [...(driver ? TYPES[driver] : []), ...enums.map((e) => e.name)]
   const tableNames = entities.filter((e) => e.type === 'table').map((e) => e.name)
   const showBanner = driver === 'sqlite'
-  const [colFilter, setColFilter] = useState('')
 
   if (!st) return null
 
+  // self-contained flex column so the list scrolls within its bounded area
+  // regardless of the parent (StructureView content wrapper isn't a flex box).
   return (
-    <div className="min-h-0 flex-1 overflow-auto p-3">
-      {driver && showBanner && (
-        <Alert className="mb-3">
-          <Info className="size-4" />
-          <AlertDescription className="text-xs text-muted-foreground">
-            {LIMITS[driver]}
-          </AlertDescription>
-        </Alert>
-      )}
-      <div className="relative mb-2">
-        <Search className="absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={colFilter}
-          onChange={(e) => setColFilter(e.target.value)}
-          placeholder="Filter columns…"
-          className="h-7 pl-7 pr-7 text-xs"
-        />
-        {colFilter && (
-          <button
-            onClick={() => setColFilter('')}
-            title="Clear filter"
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-          >
-            <X className="size-3.5" />
-          </button>
+    <div className="flex h-full flex-col">
+      <div className="shrink-0 p-3 pb-2">
+        {driver && showBanner && (
+          <Alert className="mb-3">
+            <Info className="size-4" />
+            <AlertDescription className="text-xs text-muted-foreground">
+              {LIMITS[driver]}
+            </AlertDescription>
+          </Alert>
         )}
+        <div className="relative">
+          <Search className="absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={colFilter}
+            onChange={(e) => onColFilterChange(e.target.value)}
+            placeholder="Filter columns…"
+            className="h-7 pl-7 pr-7 text-xs"
+          />
+          {colFilter && (
+            <button
+              onClick={() => onColFilterChange('')}
+              title="Clear filter"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="size-3.5" />
+            </button>
+          )}
+        </div>
       </div>
-      <ColumnsEditor
-        columns={draft}
-        onChange={onDraftChange}
-        types={types}
-        tables={tableNames}
-        enums={enums}
-        allowFk={canAlter}
-        canAlterExisting={canAlter}
-        reorderable={canReorder}
-        original={st.columns}
-        movedNames={movedNames}
-        nameFilter={colFilter}
-      />
+      <div className="min-h-0 flex-1 overflow-auto px-3 pb-3">
+        <ColumnsEditor
+          columns={draft}
+          onChange={onDraftChange}
+          types={types}
+          tables={tableNames}
+          enums={enums}
+          allowFk={canAlter}
+          canAlterExisting={canAlter}
+          reorderable={canReorder}
+          original={st.columns}
+          movedNames={movedNames}
+          nameFilter={colFilter}
+          hideAddButton
+        />
+      </div>
     </div>
   )
 }
