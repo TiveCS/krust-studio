@@ -1,0 +1,56 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0c1618"/>
+      <stop offset="1" stop-color="#05090a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="512" cy="512" r="430" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0d9488" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#0d9488" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="disc" x1="512" y1="300" x2="512" y2="760" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2dd4bf"/>
+      <stop offset="0.55" stop-color="#14b8a6"/>
+      <stop offset="1" stop-color="#0d9488"/>
+    </linearGradient>
+    <linearGradient id="discDark" x1="512" y1="300" x2="512" y2="760" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f766e"/>
+      <stop offset="1" stop-color="#115e59"/>
+    </linearGradient>
+  </defs>
+
+  <!-- rounded-square base -->
+  <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
+  <rect width="1024" height="1024" rx="224" fill="url(#glow)"/>
+  <rect x="6" y="6" width="1012" height="1012" rx="218" fill="none" stroke="#134e4a" stroke-opacity="0.55" stroke-width="3"/>
+
+  <!-- database "crust": three stacked layers, top-down perspective.
+       each layer = filled band; a lighter top ellipse caps the stack. -->
+  <g>
+    <!-- bottom layer -->
+    <path d="M286 600
+             a226 78 0 0 0 452 0
+             v92
+             a226 78 0 0 1 -452 0 z" fill="url(#discDark)"/>
+    <ellipse cx="512" cy="600" rx="226" ry="78" fill="url(#disc)"/>
+
+    <!-- middle layer -->
+    <path d="M286 470
+             a226 78 0 0 0 452 0
+             v92
+             a226 78 0 0 1 -452 0 z" fill="url(#discDark)"/>
+    <ellipse cx="512" cy="470" rx="226" ry="78" fill="url(#disc)"/>
+
+    <!-- top layer -->
+    <path d="M286 340
+             a226 78 0 0 0 452 0
+             v92
+             a226 78 0 0 1 -452 0 z" fill="url(#discDark)"/>
+    <ellipse cx="512" cy="340" rx="226" ry="78" fill="url(#disc)"/>
+
+    <!-- top rim highlight -->
+    <ellipse cx="512" cy="340" rx="226" ry="78" fill="none" stroke="#5eead4" stroke-width="6" stroke-opacity="0.7"/>
+    <!-- small specular -->
+    <ellipse cx="430" cy="316" rx="70" ry="20" fill="#ccfbf1" fill-opacity="0.5"/>
+  </g>
+</svg>
