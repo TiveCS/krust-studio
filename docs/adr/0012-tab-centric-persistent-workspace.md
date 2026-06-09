@@ -55,3 +55,13 @@ back meant re-opening every table, re-typing filters, re-finding where you were.
 - Staged (uncommitted) edits are intentionally **not** persisted — reopening is a
   clean slate, consistent with the no-silent-mutation stance (we never silently
   re-apply pending writes from a previous session).
+
+  **Clarification (v1.3.4):** "not persisted" is specifically about **disk**
+  (`workspace.json`) — i.e. across an app restart, disconnect, or connection/db
+  switch. Staged edits still live in **per-tab in-memory state** and therefore
+  **survive switching between open tabs** within a live session. This holds for
+  both data-grid staged edits (always was) and the **schema/structure draft**
+  (new columns, index add/drop), which moved from `StructureView` component-local
+  state into the tab object so it is no longer wiped when the tab unmounts on
+  switch. The disk-persistence exclusion is unchanged; only navigation between
+  live tabs preserves a draft.

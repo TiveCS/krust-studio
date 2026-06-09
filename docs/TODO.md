@@ -2,6 +2,49 @@
 
 Prioritized. Top group = highest value (matches CONTEXT.md + Beekeeper parity).
 
+## P0 — v1.3.4 + v1.4.0: editor/history/backup UX — PLANNED
+
+Design resolved via `/grill-with-docs` (2026-06-09). Split into a fast fix
+release (1.3.4) and a feature release (1.4.0). See CONTEXT.md **Table Editor**
+and [ADR-0012](adr/0012-tab-centric-persistent-workspace.md) clarification
+(in-memory tab-switch survival vs disk persistence).
+
+### v1.3.4 — fix (data-loss feel)
+
+- [ ] **Structure draft survives tab switch (the bug).** `colDraft` / `idxAdds` /
+      `idxDrops` / `colFilter` live in `StructureView` component-local state, and
+      `TableTabView` renders `<StructureView key={tab.id} />` → switching tabs
+      unmounts it and the draft is wiped. Move them onto the `Tab` object in
+      `store/connections.ts` (where data-grid `edits`/`deletes`/`inserts` already
+      live). Seed the draft when `structure` first loads **only if no draft
+      exists**; clear it on commit / discard / refresh — not on every remount.
+      In-memory only; **not** written to `workspace.json` (ADR 0012 disk rule
+      intact). Refresh-with-pending-edits goes through the dirty-confirm below.
+- [ ] **Dirty indicator + confirm-on-close.** Tab shows a dot when it has
+      uncommitted structure OR data changes (both now on `Tab`). `closeTab` +
+      bulk closes confirm before discarding a dirty tab.
+- [ ] **Bulk tab close.** Right-click tab menu (`ui/context-menu.tsx`): Close /
+      Close others / Close to the right / Close all. All tab types. One
+      consolidated dirty-confirm lists affected tabs before proceeding.
+
+### v1.4.0 — features
+
+- [ ] **Backup & Restore → tab + wizard.** New `Tab.kind: 'backup'`, singleton
+      per connection (like `history`). Sidebar button opens/focuses the tab
+      instead of the `BackupDialog` modal. Stepped wizard: pick Backup|Restore →
+      Backup = objects/modes → options (DROP IF EXISTS) → run+progress; Restore =
+      choose file → preview/destructive flags → confirm+run. Tab state transient
+      (not persisted, like `connection-editor`). Grid CSV/JSON `ExportDialog`
+      untouched (different concept: result set vs DB dump).
+- [ ] **History syntax highlight + readable long queries.** Rows render a
+      single-line truncated **static** highlight (`@lezer/highlight` tokens →
+      spans, no editor instance — scales to the 500-row list). Click a row to
+      expand inline into the full statement via one `SqlDisplay` (CodeMirror),
+      wrapped + highlighted, with a **Format toggle (default on)** using a
+      formatter (e.g. `sql-formatter`). Display formatting is cosmetic — Copy /
+      export keep the **verbatim** captured statement (no-silent-mutation,
+      same principle as auto-`LIMIT` recording actual SQL).
+
 ## P0 — v1.3.0: workspace & connection resilience — DONE
 
 All 7 shipped. Design resolved via `/grill-with-docs`. See

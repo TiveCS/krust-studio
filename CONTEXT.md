@@ -310,7 +310,12 @@ confirmation even on writable connections.
 The GUI surface for editing schema (create table, add/alter/drop column, reorder
 columns, indexes, constraints). Every action emits visible **Captured DDL** (see
 core principle). Column edits **and index add/drop** are **staged together** (not
-applied on click) and committed in one batch: committing opens a **confirmation
+applied on click) and committed in one batch. The staged schema draft is held in
+the **tab's in-memory state** (like the data grid's **Staged Edits**), so it
+**survives switching tabs** within a live session — but, per
+[ADR 0012](docs/adr/0012-tab-centric-persistent-workspace.md), it is **not**
+persisted to disk: a restart/disconnect starts from a clean slate. Committing
+opens a **confirmation
 showing the exact DDL** the commit will run, in one transaction (the schema-edit
 analogue of the data edit's affected-row preview) — generated server-side without
 executing or capturing it, so the user always reviews before anything runs. (On
