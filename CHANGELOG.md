@@ -4,6 +4,18 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [1.3.3] — 2026-06-09
+
+### Fixed
+- **Installer "application is running" error** — the NSIS installer now force-closes
+  any running Krust Studio instance (`taskkill /F /IM krust-studio-app.exe /T`)
+  before extracting files, so manual installs no longer stall with a "please close
+  the application" prompt.
+- **In-app update restart** — "Restart now" now destroys all windows synchronously
+  before handing off to the installer, preventing the same race on the in-app
+  update path (`quitAndInstall` could spawn NSIS before `app.quit()` fully drained
+  the process).
+
 ## [1.3.2] — 2026-06-09
 
 ### Fixed

@@ -25,7 +25,13 @@ function setupAutoUpdater(win: BrowserWindow): void {
   })
 
   ipcMain.on('update:install', () => {
-    autoUpdater.quitAndInstall()
+    // Destroy all windows synchronously so NSIS doesn't detect the app as
+    // still running when the installer starts (quitAndInstall spawns the
+    // installer before app.quit() fully drains the process).
+    for (const win of BrowserWindow.getAllWindows()) {
+      win.destroy()
+    }
+    autoUpdater.quitAndInstall(false, true)
   })
 
   // Manual "check for updates" — invokable from the UI. Returns a status the

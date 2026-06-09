@@ -21,6 +21,9 @@ nsis:
   # assisted (multi-step) installer — required for the directory picker
   oneClick: false
   allowToChangeInstallationDirectory: true
+  # custom script: close running instance before install so NSIS doesn't
+  # error with "application is running" on manual / auto updates
+  include: build/installer.nsh
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
