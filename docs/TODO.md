@@ -63,6 +63,30 @@ and [ADR-0012](adr/0012-tab-centric-persistent-workspace.md) clarification
       FK-backing index and block the bare drop with "this index backs FK <name> —
       drop the relation too?", offering to stage both (ordered FK → index). Builds
       on the v1.3.4 structure-editor work.
+- [ ] **Local table templates (column sets).** Reusable, **local-only** named
+      column sets (never on the DB until a normal Create/Commit — no-silent
+      stance). Solves repeated boilerplate (`id` + audit columns
+      `CreatedDate`/`CreatedBy`/`LastModifiedBy`/`RecordStatus`). Resolved via
+      `/grill-me`; see CONTEXT.md **Table Template**.
+      - **Scope:** columns only (`NewColumnSpec`: name/type/nullable/pk/default/fk).
+        Indexes/constraints out of scope for v1.
+      - **Engine-locked:** each template tagged with its capture engine; the
+        picker only shows templates matching the current connection's driver
+        (no cross-engine type surprises).
+      - **Storage:** one global `templates.json` in the data dir, main-process +
+        IPC, mirroring `connections.json` (NOT per-connection — reuse across
+        same-engine projects).
+      - **Author:** "Save columns as template" from an existing table's Structure
+        view and from a new-table draft; editable in the manager.
+      - **Apply (a)** new-table draft → seeds draft columns (PK kept).
+        **Apply (b)** existing table's Columns editor → "Insert template columns"
+        as staged column-adds (reuse v1.3.4 staging); strip `pk:true`, skip
+        name-collisions, toast "added N, skipped M (already exists)".
+      - **Manage:** a "Templates" dialog from the sidebar toolbar (list
+        engine-filtered, edit via `ColumnsEditor`, rename, delete).
+      - Notes: no built-in templates (audit columns are project-specific); a
+        template's per-column FK is kept on apply only if the target table
+        exists, else flagged.
 
 ## P0 — v1.3.0: workspace & connection resilience — DONE
 

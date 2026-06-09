@@ -339,6 +339,29 @@ A **column search** filters the column list by name (display-only; the staged
 draft and diff stay complete). Reorder is disabled while a filter is active —
 drag position is undefined relative to hidden rows.
 
+### Table Template
+A reusable, **local-only** named set of columns (name/type/nullable/pk/default/fk)
+used to scaffold the repetitive parts of a table — typically an `id` plus an
+audit block (`CreatedDate` / `CreatedBy` / `LastModifiedBy` / `RecordStatus`). A
+template is **never applied to the database directly**: it only pre-fills a draft
+or stages column-adds, which the user still reviews and commits through the
+normal **Table Editor** path (the no-silent-mutation stance — a template is
+scaffolding, not a migration).
+
+A template is **engine-locked**: tagged with the engine it was captured on and
+offered only on connections of that engine, so MySQL `VARCHAR(255)` never lands
+on a Postgres table. Templates are **global** (not tied to one connection),
+stored in a `templates.json` in the configurable **Data Location** alongside
+connections — reusable across every same-engine project.
+
+Authored by capturing columns from an existing table's Structure view or from a
+new-table draft, and edited in a **Templates** manager (sidebar toolbar dialog).
+Applied two ways: into a **new-table draft** (seeds its columns, primary key
+kept), or as **"Insert template columns"** into an existing table's Columns
+editor — landing as staged column-adds with the primary-key flag stripped and
+name-collisions skipped (the table already has its PK and those columns), so a
+reused audit block never produces invalid DDL.
+
 ### Query Plan
 
 **Priority: deferred — not in v1.x, design captured for future build.**
