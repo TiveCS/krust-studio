@@ -4,6 +4,28 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [1.3.4] — 2026-06-09
+
+### Fixed
+- **Structure-editor changes no longer vanish when you switch tabs.** Staged
+  schema edits (new/altered columns, index add/drop) lived in component-local
+  state and were wiped when the tab unmounted on switch. They now live on the
+  tab itself — switching away and back keeps your pending changes. Still
+  in-memory only: a restart/disconnect starts clean (no silently re-applied
+  writes).
+- **Dropping a foreign-key column no longer errors.** The generated DDL now
+  emits `DROP FOREIGN KEY` before `DROP COLUMN`, so removing an FK-backing
+  column on MySQL no longer fails with "needed in a foreign key constraint".
+  The drop chain is shown in the DDL preview before it runs.
+
+### Added
+- **Unsaved-changes indicator + close confirmation.** Tabs with uncommitted
+  structure or data edits show an amber dot, and closing one asks before
+  discarding the work.
+- **Bulk tab close.** Right-click a tab for Close / Close others / Close to the
+  right / Close all (middle-click also closes). Any close that would discard
+  unsaved work confirms first and lists the affected tabs.
+
 ## [1.3.3] — 2026-06-09
 
 ### Fixed
