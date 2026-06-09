@@ -26,6 +26,17 @@ and [ADR-0012](adr/0012-tab-centric-persistent-workspace.md) clarification
 - [ ] **Bulk tab close.** Right-click tab menu (`ui/context-menu.tsx`): Close /
       Close others / Close to the right / Close all. All tab types. One
       consolidated dirty-confirm lists affected tabs before proceeding.
+- [ ] **Dependency-aware column drop (the FK-column bug).** `columnDiff.diff()`
+      dropped-column loop emits **only** `dropColumn` — never inspects `o.fk`. So
+      dropping an FK column on MySQL fails (`Cannot drop column: needed in a
+      foreign key constraint`). Fix in `columnDiff.ts`: when a dropped column has
+      `o.fk?.constraint`, also stage `dropForeignKey` (and the backing index where
+      it isn't auto-dropped with the column). Backend ordering is already correct
+      (`mysql.ts`: `[...dropFk, ...dropIdx, ...structural]`, dropColumn ∈
+      structural), so the combined DDL runs in one transaction. Per-engine: PG
+      auto-drops the column's dependent constraint (explicit drop still clearer,
+      no-silent); SQLite uses its table-rebuild path. The DDL preview must show the
+      full generated chain.
 
 ### v1.4.0 — features
 
@@ -44,6 +55,14 @@ and [ADR-0012](adr/0012-tab-centric-persistent-workspace.md) clarification
       formatter (e.g. `sql-formatter`). Display formatting is cosmetic — Copy /
       export keep the **verbatim** captured statement (no-silent-mutation,
       same principle as auto-`LIMIT` recording actual SQL).
+- [ ] **Drop a relation where users look for it.** Only FK-drop path today is the
+      Columns FK toggle (`columnDiff` → `dropForeignKey`); the **Relations**
+      sub-tab is read-only and the **Indexes** drop on an FK-backing index throws a
+      raw MySQL error. (a) Make Relations editable enough to stage a "drop
+      relation" (reuses the `dropForeignKey` op). (b) In the Indexes tab, detect an
+      FK-backing index and block the bare drop with "this index backs FK <name> —
+      drop the relation too?", offering to stage both (ordered FK → index). Builds
+      on the v1.3.4 structure-editor work.
 
 ## P0 — v1.3.0: workspace & connection resilience — DONE
 
