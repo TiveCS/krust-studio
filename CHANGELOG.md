@@ -4,6 +4,14 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [1.3.2] — 2026-06-09
+
+### Fixed
+- **Sidebar covers title bar** — the sidebar was positioned `fixed inset-y-0`
+  (anchored to the viewport top), hiding the "Krust Studio ▾" title-bar menu
+  introduced in v1.3.1. Now starts at `top-8` so the title bar and its
+  **Check for updates** menu item are always visible.
+
 ## [1.3.1] — 2026-06-05
 
 ### Fixed
