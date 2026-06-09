@@ -53,6 +53,14 @@ jobs:
           # no signing certs in CI -> don't try to sign/notarize
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
 
+      # NOTE: on a tag, electron-builder itself publishes ALL artifacts —
+      # installers, update manifests (latest*.yml) and .blockmap files — to a
+      # DRAFT GitHub Release (see electron-builder.yml `publish.releaseType:
+      # draft`). Do NOT add a second publisher (e.g. softprops/action-gh-release)
+      # here: it races electron-builder across the parallel OS jobs and can
+      # force-publish the release before the Windows `latest.yml` lands, which
+      # breaks auto-update (the v1.3.4 incident). Review the draft and publish it
+      # manually.
       - name: Upload run artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -64,15 +72,5 @@ jobs:
             krust-studio-app/dist/*.zip
             krust-studio-app/dist/*.AppImage
             krust-studio-app/dist/*.deb
-
-      - name: Attach to release
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          fail_on_unmatched_files: false
-          files: |
-            krust-studio-app/dist/*.exe
-            krust-studio-app/dist/*.dmg
-            krust-studio-app/dist/*.zip
-            krust-studio-app/dist/*.AppImage
-            krust-studio-app/dist/*.deb
+            krust-studio-app/dist/*.yml
+            krust-studio-app/dist/*.blockmap
