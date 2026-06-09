@@ -92,6 +92,10 @@ function th(label: string): React.JSX.Element {
   return <th className="px-3 py-1.5 text-left font-medium">{label}</th>
 }
 
+// stable empty refs so an unseeded/empty tab doesn't churn renders
+const EMPTY_COLS: EditorColumn[] = []
+const EMPTY_ADDS: IndexSpec[] = []
+
 export function StructureView(): React.JSX.Element | null {
   const {
     tabs,
@@ -102,7 +106,11 @@ export function StructureView(): React.JSX.Element | null {
     openConnectionId,
     setStructureSub,
     fetchReferencedBy,
-    openTable
+    openTable,
+    setStructDraft,
+    setIdxAdds,
+    setIdxDrops,
+    setStructDirty
   } = useConnections()
   const tab = tabs.find((t) => t.id === activeTabId)
   const st = tab?.structure ?? null
@@ -113,11 +121,12 @@ export function StructureView(): React.JSX.Element | null {
   const [ddlLoading, setDdlLoading] = useState(false)
 
   // ── staged structure changes (columns + indexes, committed together) ──────
-  const [colDraft, setColDraft] = useState<EditorColumn[]>(() =>
-    st ? seed(st.columns) : []
-  )
-  const [idxAdds, setIdxAdds] = useState<IndexSpec[]>([])
-  const [idxDrops, setIdxDrops] = useState<Set<string>>(new Set())
+  // These live on the tab (store) so they survive switching tabs within a live
+  // session — but are NOT persisted to disk (ADR 0012). `structDraft === null`
+  // means "not seeded yet"; the effect below seeds it from the structure.
+  const colDraft = tab?.structDraft ?? EMPTY_COLS
+  const idxAdds = tab?.idxAdds ?? EMPTY_ADDS
+  const idxDrops = useMemo(() => new Set(tab?.idxDrops ?? []), [tab?.idxDrops])
   const [colFilter, setColFilter] = useState('')
 
   // add/edit-index dialog (editIdx = index into idxAdds, or null for a new one)
@@ -137,12 +146,13 @@ export function StructureView(): React.JSX.Element | null {
   const canAlter = driver !== 'sqlite'
   const canReorder = driver === 'mysql'
 
-  // reseed draft + clear staged whenever the structure (re)loads
+  // seed the draft from the structure the first time it loads. The store resets
+  // structDraft to null on every structure (re)load (commit / refresh), so this
+  // reseeds afterwards; switching tabs keeps the existing draft (not null).
   useEffect(() => {
-    setColDraft(st ? seed(st.columns) : [])
-    setIdxAdds([])
-    setIdxDrops(new Set())
-  }, [st])
+    if (st && tab && tab.structDraft == null) setStructDraft(seed(st.columns))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [st, tab?.structDraft])
 
   const colOps = useMemo(
     () => (st ? diff(st.columns, colDraft, canAlter, canReorder) : []),
@@ -162,6 +172,12 @@ export function StructureView(): React.JSX.Element | null {
     ],
     [idxDrops, colOps, idxAdds]
   )
+
+  // surface "has uncommitted schema changes" onto the tab (powers the dirty dot
+  // + close-confirm). setStructDirty no-ops when the value is unchanged.
+  useEffect(() => {
+    setStructDirty(ops.length > 0)
+  }, [ops, setStructDirty])
 
   // fetch the structure if it isn't loaded yet — covers a restored tab opened
   // directly in structure view (setTabView, which normally fetches, isn't
@@ -250,33 +266,29 @@ export function StructureView(): React.JSX.Element | null {
       unique: ixUnique,
       method: ixMethod || undefined
     }
-    setIdxAdds((prev) =>
+    setIdxAdds(
       editIdx === null
-        ? [...prev, spec]
-        : prev.map((s, i) => (i === editIdx ? spec : s))
+        ? [...idxAdds, spec]
+        : idxAdds.map((s, i) => (i === editIdx ? spec : s))
     )
     setAddOpen(false)
     resetIxForm()
   }
 
-  const toggleDropIndex = (name: string): void =>
-    setIdxDrops((prev) => {
-      const next = new Set(prev)
-      next.has(name) ? next.delete(name) : next.add(name)
-      return next
-    })
+  const toggleDropIndex = (name: string): void => {
+    const next = new Set(idxDrops)
+    next.has(name) ? next.delete(name) : next.add(name)
+    setIdxDrops([...next])
+  }
 
   const discard = (): void => {
-    setColDraft(st ? seed(st.columns) : [])
+    setStructDraft(st ? seed(st.columns) : [])
     setIdxAdds([])
-    setIdxDrops(new Set())
+    setIdxDrops([])
   }
 
   const addColumn = (): void => {
-    setColDraft((prev) => [
-      ...prev,
-      { name: '', type: '', nullable: true, pk: false }
-    ])
+    setStructDraft([...colDraft, { name: '', type: '', nullable: true, pk: false }])
     setColFilter('') // clear filter so the new (empty-name) row isn't hidden
     setStructureSub('columns')
   }
@@ -400,7 +412,7 @@ export function StructureView(): React.JSX.Element | null {
           <StructureEditor
             tab={tab}
             draft={colDraft}
-            onDraftChange={setColDraft}
+            onDraftChange={setStructDraft}
             movedNames={movedNames}
             colFilter={colFilter}
             onColFilterChange={setColFilter}
@@ -505,7 +517,7 @@ export function StructureView(): React.JSX.Element | null {
                             </button>
                             <button
                               onClick={() =>
-                                setIdxAdds((prev) => prev.filter((_, idx) => idx !== i))
+                                setIdxAdds(idxAdds.filter((_, idx) => idx !== i))
                               }
                               title="Remove staged index"
                               className="text-muted-foreground hover:text-destructive"

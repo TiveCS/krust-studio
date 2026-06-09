@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import type { EditorColumn } from '@/components/ColumnsEditor'
 import type {
   ConnectionSummary,
   EntityInfo,
@@ -74,6 +75,41 @@ export interface Tab {
   draft: { name: string; columns: NewColumnSpec[] } | null
   /** present => this tab is a SQL editor */
   query: QueryState | null
+  // ── staged structure (schema) edits — in-memory, survive tab switch, NOT
+  //    persisted to disk (ADR 0012). undefined until the structure first loads.
+  /** staged column draft (seeded from structure on first load); null = unseeded */
+  structDraft?: EditorColumn[] | null
+  /** staged index additions (committed with the column draft) */
+  idxAdds?: IndexSpec[]
+  /** staged index drops, by index name */
+  idxDrops?: string[]
+  /** last-computed "has uncommitted schema changes" flag (set by StructureView) */
+  structDirty?: boolean
+}
+
+/** any uncommitted data-grid edit on this tab (cell edits / deletes / inserts) */
+export function tabHasDataChanges(tab: Tab): boolean {
+  return (
+    Object.keys(tab.edits).length > 0 ||
+    tab.deletes.length > 0 ||
+    tab.inserts.some((r) => Object.keys(r).length > 0)
+  )
+}
+
+/** a not-yet-created "new table" draft with real content entered */
+function tabHasDraftContent(tab: Tab): boolean {
+  if (!tab.draft) return false
+  // default seed is a single column named "id" with no type — ignore that
+  return (
+    tab.draft.name.trim().length > 0 ||
+    tab.draft.columns.length > 1 ||
+    tab.draft.columns.some((c) => c.type.trim().length > 0)
+  )
+}
+
+/** true when closing this tab would silently discard uncommitted work */
+export function tabIsDirty(tab: Tab): boolean {
+  return tabHasDataChanges(tab) || !!tab.structDirty || tabHasDraftContent(tab)
 }
 
 export function editKey(rowIndex: number, column: string): string {
@@ -165,6 +201,15 @@ interface ConnectionsState {
   setColWidth: (column: string, width: number) => void
   clearChanges: () => void
   commitChanges: () => Promise<void>
+  // staged structure (schema) edits — live on the active tab
+  setStructDraft: (cols: EditorColumn[]) => void
+  setIdxAdds: (adds: IndexSpec[]) => void
+  setIdxDrops: (drops: string[]) => void
+  setStructDirty: (dirty: boolean) => void
+  // bulk tab close (raw — callers handle any dirty-confirm)
+  closeOtherTabs: (tabId: string) => void
+  closeTabsToRight: (tabId: string) => void
+  closeAllTabs: () => void
 }
 
 export const useConnections = create<ConnectionsState>((set, get) => {
@@ -932,7 +977,15 @@ export const useConnections = create<ConnectionsState>((set, get) => {
             openConnectionId,
             tab.entity
           )
-          patchTab(activeTabId, { structure, structureLoading: false })
+          patchTab(activeTabId, {
+            structure,
+            structureLoading: false,
+            // fresh structure → reseed draft + clear staged schema edits
+            structDraft: null,
+            idxAdds: [],
+            idxDrops: [],
+            structDirty: false
+          })
         } catch (err) {
           patchTab(activeTabId, {
             structureLoading: false,
@@ -1131,6 +1184,48 @@ export const useConnections = create<ConnectionsState>((set, get) => {
           error: err instanceof Error ? err.message : String(err)
         })
       }
+    },
+
+    setStructDraft: (cols) => {
+      const id = get().activeTabId
+      if (id) patchTab(id, { structDraft: cols })
+    },
+    setIdxAdds: (adds) => {
+      const id = get().activeTabId
+      if (id) patchTab(id, { idxAdds: adds })
+    },
+    setIdxDrops: (drops) => {
+      const id = get().activeTabId
+      if (id) patchTab(id, { idxDrops: drops })
+    },
+    setStructDirty: (dirty) => {
+      const { activeTabId, tabs } = get()
+      const tab = tabs.find((t) => t.id === activeTabId)
+      if (tab && !!tab.structDirty !== dirty) patchTab(tab.id, { structDirty: dirty })
+    },
+
+    closeOtherTabs: (tabId) => {
+      set((s) => ({
+        tabs: s.tabs.filter((t) => t.id === tabId),
+        activeTabId: tabId
+      }))
+      scheduleWorkspaceSave()
+    },
+    closeTabsToRight: (tabId) => {
+      set((s) => {
+        const idx = s.tabs.findIndex((t) => t.id === tabId)
+        if (idx < 0) return s
+        const tabs = s.tabs.slice(0, idx + 1)
+        const activeTabId = tabs.some((t) => t.id === s.activeTabId)
+          ? s.activeTabId
+          : tabId
+        return { tabs, activeTabId }
+      })
+      scheduleWorkspaceSave()
+    },
+    closeAllTabs: () => {
+      set({ tabs: [], activeTabId: null })
+      scheduleWorkspaceSave()
     }
   }
 })

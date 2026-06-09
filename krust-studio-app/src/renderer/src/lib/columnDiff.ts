@@ -107,10 +107,17 @@ export function diff(
   canReorder: boolean
 ): SchemaOp[] {
   const ops: SchemaOp[] = []
-  // dropped = original column missing from draft, OR present but staged `_drop`
+  // dropped = original column missing from draft, OR present but staged `_drop`.
+  // A dropped column that backs a foreign key must drop the FK first, or the
+  // engine refuses the column drop ("needed in a foreign key constraint" on
+  // MySQL). The backing index is removed by the engine together with the column.
   for (const o of orig) {
     const d = draft.find((x) => x._orig === o.name)
-    if (!d || d._drop) ops.push({ kind: 'dropColumn', name: o.name })
+    if (!d || d._drop) {
+      if (canAlter && o.fk?.constraint)
+        ops.push({ kind: 'dropForeignKey', constraint: o.fk.constraint })
+      ops.push({ kind: 'dropColumn', name: o.name })
+    }
   }
   // running name of the previous non-dropped row, for positioning new columns
   let prevName: string | null = null
