@@ -9,9 +9,9 @@ release (1.3.4) and a feature release (1.4.0). See CONTEXT.md **Table Editor**
 and [ADR-0012](adr/0012-tab-centric-persistent-workspace.md) clarification
 (in-memory tab-switch survival vs disk persistence).
 
-### v1.3.4 — fix (data-loss feel)
+### v1.3.4 — fix (data-loss feel) — DONE (merged 69c7791, manually verified)
 
-- [ ] **Structure draft survives tab switch (the bug).** `colDraft` / `idxAdds` /
+- [x] **Structure draft survives tab switch (the bug).** `colDraft` / `idxAdds` /
       `idxDrops` / `colFilter` live in `StructureView` component-local state, and
       `TableTabView` renders `<StructureView key={tab.id} />` → switching tabs
       unmounts it and the draft is wiped. Move them onto the `Tab` object in
@@ -20,13 +20,13 @@ and [ADR-0012](adr/0012-tab-centric-persistent-workspace.md) clarification
       exists**; clear it on commit / discard / refresh — not on every remount.
       In-memory only; **not** written to `workspace.json` (ADR 0012 disk rule
       intact). Refresh-with-pending-edits goes through the dirty-confirm below.
-- [ ] **Dirty indicator + confirm-on-close.** Tab shows a dot when it has
+- [x] **Dirty indicator + confirm-on-close.** Tab shows a dot when it has
       uncommitted structure OR data changes (both now on `Tab`). `closeTab` +
       bulk closes confirm before discarding a dirty tab.
-- [ ] **Bulk tab close.** Right-click tab menu (`ui/context-menu.tsx`): Close /
+- [x] **Bulk tab close.** Right-click tab menu (`ui/context-menu.tsx`): Close /
       Close others / Close to the right / Close all. All tab types. One
       consolidated dirty-confirm lists affected tabs before proceeding.
-- [ ] **Dependency-aware column drop (the FK-column bug).** `columnDiff.diff()`
+- [x] **Dependency-aware column drop (the FK-column bug).** `columnDiff.diff()`
       dropped-column loop emits **only** `dropColumn` — never inspects `o.fk`. So
       dropping an FK column on MySQL fails (`Cannot drop column: needed in a
       foreign key constraint`). Fix in `columnDiff.ts`: when a dropped column has
