@@ -4,6 +4,31 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [1.4.0] — 2026-06-10
+
+### Added
+- **Data grid virtualization** — large tables now render only the visible rows
+  (TanStack Virtual), so scrolling stays smooth on big result sets.
+- **Drop a relation from the Relations tab** — each foreign key has a drop
+  toggle; the generated `DROP FOREIGN KEY` is staged and committed with your
+  other schema edits. Dropping an index that backs a foreign key now warns and
+  offers to drop both (in the correct order) or just the index.
+- **Backup & Restore is a tab** — replaces the cramped modal with a full-height
+  two-panel view, opened from the sidebar.
+- **Syntax-highlighted history** — the Query History list is color-highlighted;
+  click any row to expand the full statement, with a Format toggle for long
+  one-liners. Copy always copies the verbatim captured SQL.
+- **Local table templates** — save reusable column sets (e.g. `id` + audit
+  columns) and apply them to a new table, or insert them into an existing one.
+  Templates are local-only and engine-specific; never touch the database until
+  you commit. Managed from the new sidebar Templates button.
+
+### Fixed
+- Committing a table-structure change now clears the staged edits (the pending
+  indicator and queued operations no longer linger after commit).
+- Release workflow no longer races two publishers, so update manifests
+  (`latest.yml`) always ship with a release.
+
 ## [1.3.4] — 2026-06-09
 
 ### Fixed
