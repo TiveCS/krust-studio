@@ -1082,7 +1082,16 @@ export const useConnections = create<ConnectionsState>((set, get) => {
           openConnectionId,
           tab.entity
         )
-        patchTab(activeTabId, { structure, structureLoading: false })
+        patchTab(activeTabId, {
+          structure,
+          structureLoading: false,
+          // fresh structure → reseed draft + clear staged schema edits
+          structDraft: null,
+          idxAdds: [],
+          idxDrops: [],
+          fkDrops: [],
+          structDirty: false
+        })
         if (get().tabs.find((t) => t.id === activeTabId)?.structureSub === 'referencedBy') {
           void get().fetchReferencedBy()
         }
