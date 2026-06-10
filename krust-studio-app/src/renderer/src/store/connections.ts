@@ -41,7 +41,7 @@ export interface Tab {
   id: string
   entity: EntityRef
   /** undefined / absent = regular table/query/new-table tab */
-  kind?: 'history' | 'connection-editor'
+  kind?: 'history' | 'connection-editor' | 'backup'
   /** set on connection-editor tabs: which connection to edit (null = new) */
   connectionEditor?: { connectionId: string | null }
   data: RowsResult | null
@@ -83,6 +83,8 @@ export interface Tab {
   idxAdds?: IndexSpec[]
   /** staged index drops, by index name */
   idxDrops?: string[]
+  /** staged FK constraint drops, by constraint name */
+  fkDrops?: string[]
   /** last-computed "has uncommitted schema changes" flag (set by StructureView) */
   structDirty?: boolean
 }
@@ -161,6 +163,8 @@ interface ConnectionsState {
   pageSize: number
   /** Open/focus the History tab for the current connection (singleton). */
   openHistoryTab: () => void
+  /** Open/focus the Backup & Restore tab for the current connection (singleton). */
+  openBackupTab: () => void
   /** Open/focus a connection-editor tab. `connectionId` null = new connection. */
   openConnectionEditorTab: (connectionId: string | null) => void
   /** Update an editor tab's stored connectionId after saving a new connection. */
@@ -205,6 +209,7 @@ interface ConnectionsState {
   setStructDraft: (cols: EditorColumn[]) => void
   setIdxAdds: (adds: IndexSpec[]) => void
   setIdxDrops: (drops: string[]) => void
+  setFkDrops: (drops: string[]) => void
   setStructDirty: (dirty: boolean) => void
   // bulk tab close (raw — callers handle any dirty-confirm)
   closeOtherTabs: (tabId: string) => void
@@ -251,7 +256,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       activeTabId,
       tabs: tabs
         .map((tab): SerializedTab | null => {
-          if (tab.kind === 'connection-editor') return null // don't persist editor tabs
+          if (tab.kind === 'connection-editor' || tab.kind === 'backup') return null
           return {
             id: tab.id,
             entity: tab.entity,
@@ -648,6 +653,25 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       scheduleWorkspaceSave()
     },
 
+    openBackupTab: () => {
+      const existing = get().tabs.find((t) => t.kind === 'backup')
+      if (existing) {
+        set({ activeTabId: existing.id })
+        return
+      }
+      const tab: Tab = {
+        id: crypto.randomUUID(),
+        kind: 'backup',
+        entity: { name: 'Backup & Restore' },
+        data: null, loading: false, error: null, pageIndex: 0, total: null,
+        counting: false, filters: [], orderBy: [], edits: {}, deletes: [],
+        inserts: [], colWidths: {}, committing: false, view: 'data',
+        structureSub: 'columns', referencedBy: null, referencedByLoading: false,
+        structure: null, structureLoading: false, draft: null, query: null
+      }
+      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
+    },
+
     openConnectionEditorTab: (connectionId) => {
       const existing = get().tabs.find(
         (t) => t.kind === 'connection-editor' &&
@@ -984,6 +1008,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
             structDraft: null,
             idxAdds: [],
             idxDrops: [],
+            fkDrops: [],
             structDirty: false
           })
         } catch (err) {
@@ -1197,6 +1222,10 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     setIdxDrops: (drops) => {
       const id = get().activeTabId
       if (id) patchTab(id, { idxDrops: drops })
+    },
+    setFkDrops: (drops) => {
+      const id = get().activeTabId
+      if (id) patchTab(id, { fkDrops: drops })
     },
     setStructDirty: (dirty) => {
       const { activeTabId, tabs } = get()

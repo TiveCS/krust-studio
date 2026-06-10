@@ -1,4 +1,5 @@
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { toast } from 'sonner'
 import {
   ChevronLeft,
@@ -230,6 +231,28 @@ export function DataGrid(): React.JSX.Element | null {
     setGridW(el.clientWidth)
     return () => ro.disconnect()
   }, [])
+
+  // Virtual row setup — must be before early return (React hooks order rule).
+  // _total may be 0 when tab is null; virtualizer handles that gracefully.
+  const _total = (tab?.data?.rows.length ?? 0) + (tab?.inserts.length ?? 0)
+  const isPickerVRow = (vi: number): boolean =>
+    fkTarget !== null && vi === fkTarget.r + 1
+  const virtRowToDataRow = (vi: number): number =>
+    fkTarget === null || vi <= fkTarget.r ? vi : vi - 1
+  const rowVirtualizer = useVirtualizer({
+    count: _total + (fkTarget !== null ? 1 : 0),
+    getScrollElement: () => containerRef.current,
+    estimateSize: (vi) => (isPickerVRow(vi) ? 280 : 33),
+    overscan: 8,
+  })
+
+  // Scroll fkTarget row into view when the picker opens
+  useEffect(() => {
+    if (fkTarget !== null) {
+      rowVirtualizer.scrollToIndex(fkTarget.r + 1, { align: 'auto' })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fkTarget?.r, fkTarget?.c])
 
   if (!tab) return null
 
@@ -607,248 +630,280 @@ export function DataGrid(): React.JSX.Element | null {
                   </tr>
                 </thead>
                 <tbody>
-                  {Array.from({ length: total }, (_, r) => {
-                    const ins = isInsert(r)
-                    const deleted = !ins && tab.deletes.includes(realIdx(r))
+                  {(() => {
+                    const vRows = rowVirtualizer.getVirtualItems()
+                    const totalVSize = rowVirtualizer.getTotalSize()
+                    const padTop = vRows.length > 0 ? (vRows[0]?.start ?? 0) : 0
+                    const padBottom =
+                      vRows.length > 0
+                        ? totalVSize - (vRows[vRows.length - 1]?.end ?? 0)
+                        : 0
                     return (
-                      <Fragment
-                        key={ins ? `ins-${insIdx(r)}` : `row-${realIdx(r)}`}
-                      >
-                      <tr
-                        className={cn(
-                          'border-b border-border/30',
-                          ins && 'bg-new-row',
-                          deleted && 'bg-delete-row line-through'
+                      <>
+                        {padTop > 0 && (
+                          <tr style={{ height: padTop }}>
+                            <td />
+                          </tr>
                         )}
-                      >
-                        <td
-                          onMouseDown={(e) => {
-                            if (ins) return
-                            containerRef.current?.focus()
-                            if (e.shiftKey && sel)
-                              setSel({ ...sel, fr: r, fc: cols.length - 1 })
-                            else {
-                              selecting.current = true
-                              setSel({ ar: r, ac: 0, fr: r, fc: cols.length - 1 })
-                            }
-                          }}
-                          onMouseEnter={(e) => {
-                            if (selecting.current && !ins && e.buttons === 1)
-                              setSel((s) =>
-                                s && s.fr !== r
-                                  ? { ...s, fr: r, fc: cols.length - 1 }
-                                  : s
-                              )
-                          }}
-                          onMouseMove={(e) => {
-                            if (selecting.current && !ins && e.buttons === 1)
-                              setSel((s) =>
-                                s && s.fr !== r
-                                  ? { ...s, fr: r, fc: cols.length - 1 }
-                                  : s
-                              )
-                          }}
-                          className={cn(
-                            'sticky left-0 z-10 px-1 py-1 text-center select-none',
-                            rowFullySelected(r)
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-background text-muted-foreground/40'
-                          )}
-                        >
-                          {ins ? (
-                            <button
-                              onClick={() => removeInsert(insIdx(r))}
-                              className="text-muted-foreground hover:text-destructive"
-                              title="Remove new row"
-                            >
-                              <X className="size-3" />
-                            </button>
-                          ) : (
-                            tab.pageIndex * pageSize + realIdx(r) + 1
-                          )}
-                        </td>
-                        {cols.map((col, c) => {
-                          const edited = isEditedCell(r, c)
-                          const isEditing = editing?.r === r && editing?.c === c
-                          const isFkTarget =
-                            fkTarget?.r === r && fkTarget?.c === c
+                        {vRows.map((vRow) => {
+                          // FK picker virtual row
+                          if (isPickerVRow(vRow.index)) {
+                            return (
+                              <tr key="fk-picker">
+                                <td colSpan={cols.length + 1} className="p-0">
+                                  {fkTarget && fkTargetFk && openConnectionId && (
+                                    <FkInlinePicker
+                                      key={fkTarget.c}
+                                      connId={openConnectionId}
+                                      entity={{
+                                        name: fkTargetFk.refTable,
+                                        schema: fkTargetFk.refSchema
+                                      }}
+                                      refColumn={fkTargetFk.refColumn}
+                                      currentValue={valueAt(fkTarget.r, fkTarget.c)}
+                                      offsetLeft={ROWNUM_W}
+                                      containerWidth={gridW}
+                                      onPick={(val) =>
+                                        setCellValue(fkTarget.r, fkTarget.c, val)
+                                      }
+                                      onOpenTable={(filters) =>
+                                        void openTable(
+                                          {
+                                            name: fkTargetFk.refTable,
+                                            schema: fkTargetFk.refSchema
+                                          },
+                                          filters.length ? filters : undefined
+                                        )
+                                      }
+                                      onClose={() => setFkTarget(null)}
+                                    />
+                                  )}
+                                </td>
+                              </tr>
+                            )
+                          }
+
+                          const r = virtRowToDataRow(vRow.index)
+                          const ins = isInsert(r)
+                          const deleted = !ins && tab.deletes.includes(realIdx(r))
                           return (
-                            <td
-                              key={col.name}
-                              onMouseDown={(e) => {
-                                if (e.button !== 0 || isEditing) return
-                                containerRef.current?.focus()
-                                if (e.shiftKey && sel) setSel({ ...sel, fr: r, fc: c })
-                                else {
-                                  selecting.current = true
-                                  setSel({ ar: r, ac: c, fr: r, fc: c })
-                                }
-                              }}
-                              onMouseEnter={(e) => {
-                                if (selecting.current && e.buttons === 1)
-                                  setSel((s) =>
-                                    s && (s.fr !== r || s.fc !== c)
-                                      ? { ...s, fr: r, fc: c }
-                                      : s
-                                  )
-                              }}
-                              onMouseMove={(e) => {
-                                if (selecting.current && e.buttons === 1)
-                                  setSel((s) =>
-                                    s && (s.fr !== r || s.fc !== c)
-                                      ? { ...s, fr: r, fc: c }
-                                      : s
-                                  )
-                              }}
-                              onDoubleClick={() => startEdit(r, c)}
-                              onContextMenu={() => {
-                                setCtx({ r, c })
-                                if (!inSel(r, c)) setSel({ ar: r, ac: c, fr: r, fc: c })
-                              }}
-                              style={selStyle(r, c)}
+                            <tr
+                              key={ins ? `ins-${insIdx(r)}` : `row-${realIdx(r)}`}
                               className={cn(
-                                'group/cell relative overflow-hidden px-3 py-1 whitespace-nowrap text-ellipsis select-none',
-                                edited && !ins && 'bg-edit-cell',
-                                isFkTarget &&
-                                  'outline outline-2 -outline-offset-2 outline-primary'
+                                'border-b border-border/30',
+                                ins && 'bg-new-row',
+                                deleted && 'bg-delete-row line-through'
                               )}
                             >
-                              {isEditing && enumValuesOf(col.type) ? (
-                                <Combobox
-                                  value={draft}
-                                  onChange={(val) => setCellValue(r, c, val)}
-                                  options={enumValuesOf(col.type) ?? []}
-                                  creatable
-                                  placeholder="value"
-                                  autoOpen
-                                  onOpenChange={(o) => !o && setEditing(null)}
-                                  className="h-auto rounded-none border-0 bg-transparent px-0 text-xs shadow-none focus-visible:ring-0"
-                                />
-                              ) : isEditing ? (
-                                <input
-                                  autoFocus
-                                  value={draft}
-                                  onChange={(e) => setDraft(e.target.value)}
-                                  onBlur={commitDraft}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') commitDraft()
-                                    if (e.key === 'Escape') setEditing(null)
-                                  }}
-                                  className="w-full bg-transparent outline-none"
-                                />
-                              ) : (() => {
-                                const v = valueAt(r, c)
-                                const fk = fkByCol.get(col.name)
-                                const hasVal =
-                                  v !== null && v !== undefined && v !== ''
-                                const showNav = fk && hasVal
-                                const showPick =
-                                  fk && cellEditable(r) && !!openConnectionId
-                                if (!fk || (!showNav && !showPick))
-                                  return display(v)
+                              <td
+                                onMouseDown={(e) => {
+                                  if (ins) return
+                                  containerRef.current?.focus()
+                                  if (e.shiftKey && sel)
+                                    setSel({ ...sel, fr: r, fc: cols.length - 1 })
+                                  else {
+                                    selecting.current = true
+                                    setSel({ ar: r, ac: 0, fr: r, fc: cols.length - 1 })
+                                  }
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (selecting.current && !ins && e.buttons === 1)
+                                    setSel((s) =>
+                                      s && s.fr !== r
+                                        ? { ...s, fr: r, fc: cols.length - 1 }
+                                        : s
+                                    )
+                                }}
+                                onMouseMove={(e) => {
+                                  if (selecting.current && !ins && e.buttons === 1)
+                                    setSel((s) =>
+                                      s && s.fr !== r
+                                        ? { ...s, fr: r, fc: cols.length - 1 }
+                                        : s
+                                    )
+                                }}
+                                className={cn(
+                                  'sticky left-0 z-10 px-1 py-1 text-center select-none',
+                                  rowFullySelected(r)
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'bg-background text-muted-foreground/40'
+                                )}
+                              >
+                                {ins ? (
+                                  <button
+                                    onClick={() => removeInsert(insIdx(r))}
+                                    className="text-muted-foreground hover:text-destructive"
+                                    title="Remove new row"
+                                  >
+                                    <X className="size-3" />
+                                  </button>
+                                ) : (
+                                  tab.pageIndex * pageSize + realIdx(r) + 1
+                                )}
+                              </td>
+                              {cols.map((col, c) => {
+                                const edited = isEditedCell(r, c)
+                                const isEditing = editing?.r === r && editing?.c === c
+                                const isFkTarget =
+                                  fkTarget?.r === r && fkTarget?.c === c
                                 return (
-                                  <span className="flex items-center justify-between gap-1">
-                                    <span className="truncate">{display(v)}</span>
-                                    <span className="flex shrink-0 items-center gap-0.5">
-                                      {showPick && (
-                                        <button
-                                          onMouseDown={(e) => e.stopPropagation()}
-                                          onClick={(e) => {
-                                            e.stopPropagation()
-                                            setFkTarget((t) =>
-                                              t && t.r === r && t.c === c
-                                                ? null
-                                                : { r, c }
-                                            )
-                                          }}
-                                          title={`Pick from ${fk.refTable}`}
-                                          className={cn(
-                                            'hover:text-primary',
-                                            isFkTarget
-                                              ? 'text-primary'
-                                              : 'text-muted-foreground',
-                                            ins || isFkTarget
-                                              ? 'opacity-100'
-                                              : 'opacity-0 group-hover/cell:opacity-100'
-                                          )}
-                                        >
-                                          <Search className="size-3" />
-                                        </button>
-                                      )}
-                                      {showNav && (
-                                        <button
-                                          onMouseDown={(e) => e.stopPropagation()}
-                                          onClick={(e) => {
-                                            e.stopPropagation()
-                                            void openTable(
-                                              {
-                                                name: fk.refTable,
-                                                schema: fk.refSchema
-                                              },
-                                              [
-                                                {
-                                                  column: fk.refColumn,
-                                                  op: 'eq',
-                                                  value: String(v)
-                                                }
-                                              ]
-                                            )
-                                          }}
-                                          title={`Open ${fk.refTable}`}
-                                          className="text-muted-foreground opacity-0 group-hover/cell:opacity-100 hover:text-primary"
-                                        >
-                                          <ExternalLink className="size-3" />
-                                        </button>
-                                      )}
-                                    </span>
-                                  </span>
+                                  <td
+                                    key={col.name}
+                                    onMouseDown={(e) => {
+                                      if (e.button !== 0 || isEditing) return
+                                      containerRef.current?.focus()
+                                      if (e.shiftKey && sel)
+                                        setSel({ ...sel, fr: r, fc: c })
+                                      else {
+                                        selecting.current = true
+                                        setSel({ ar: r, ac: c, fr: r, fc: c })
+                                      }
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      if (selecting.current && e.buttons === 1)
+                                        setSel((s) =>
+                                          s && (s.fr !== r || s.fc !== c)
+                                            ? { ...s, fr: r, fc: c }
+                                            : s
+                                        )
+                                    }}
+                                    onMouseMove={(e) => {
+                                      if (selecting.current && e.buttons === 1)
+                                        setSel((s) =>
+                                          s && (s.fr !== r || s.fc !== c)
+                                            ? { ...s, fr: r, fc: c }
+                                            : s
+                                        )
+                                    }}
+                                    onDoubleClick={() => startEdit(r, c)}
+                                    onContextMenu={() => {
+                                      setCtx({ r, c })
+                                      if (!inSel(r, c))
+                                        setSel({ ar: r, ac: c, fr: r, fc: c })
+                                    }}
+                                    style={selStyle(r, c)}
+                                    className={cn(
+                                      'group/cell relative overflow-hidden px-3 py-1 whitespace-nowrap text-ellipsis select-none',
+                                      edited && !ins && 'bg-edit-cell',
+                                      isFkTarget &&
+                                        'outline outline-2 -outline-offset-2 outline-primary'
+                                    )}
+                                  >
+                                    {isEditing && enumValuesOf(col.type) ? (
+                                      <Combobox
+                                        value={draft}
+                                        onChange={(val) => setCellValue(r, c, val)}
+                                        options={enumValuesOf(col.type) ?? []}
+                                        creatable
+                                        placeholder="value"
+                                        autoOpen
+                                        onOpenChange={(o) => !o && setEditing(null)}
+                                        className="h-auto rounded-none border-0 bg-transparent px-0 text-xs shadow-none focus-visible:ring-0"
+                                      />
+                                    ) : isEditing ? (
+                                      <input
+                                        autoFocus
+                                        value={draft}
+                                        onChange={(e) => setDraft(e.target.value)}
+                                        onBlur={commitDraft}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') commitDraft()
+                                          if (e.key === 'Escape') setEditing(null)
+                                        }}
+                                        className="w-full bg-transparent outline-none"
+                                      />
+                                    ) : (() => {
+                                      const v = valueAt(r, c)
+                                      const fk = fkByCol.get(col.name)
+                                      const hasVal =
+                                        v !== null && v !== undefined && v !== ''
+                                      const showNav = fk && hasVal
+                                      const showPick =
+                                        fk && cellEditable(r) && !!openConnectionId
+                                      if (!fk || (!showNav && !showPick))
+                                        return display(v)
+                                      return (
+                                        <span className="flex items-center justify-between gap-1">
+                                          <span className="truncate">{display(v)}</span>
+                                          <span className="flex shrink-0 items-center gap-0.5">
+                                            {showPick && (
+                                              <button
+                                                onMouseDown={(e) => e.stopPropagation()}
+                                                onClick={(e) => {
+                                                  e.stopPropagation()
+                                                  setFkTarget((t) =>
+                                                    t && t.r === r && t.c === c
+                                                      ? null
+                                                      : { r, c }
+                                                  )
+                                                }}
+                                                title={`Pick from ${fk.refTable}`}
+                                                className={cn(
+                                                  'hover:text-primary',
+                                                  isFkTarget
+                                                    ? 'text-primary'
+                                                    : 'text-muted-foreground',
+                                                  ins || isFkTarget
+                                                    ? 'opacity-100'
+                                                    : 'opacity-0 group-hover/cell:opacity-100'
+                                                )}
+                                              >
+                                                <Search className="size-3" />
+                                              </button>
+                                            )}
+                                            {showNav && (
+                                              <button
+                                                onMouseDown={(e) => e.stopPropagation()}
+                                                onClick={(e) => {
+                                                  e.stopPropagation()
+                                                  void openTable(
+                                                    {
+                                                      name: fk.refTable,
+                                                      schema: fk.refSchema
+                                                    },
+                                                    [
+                                                      {
+                                                        column: fk.refColumn,
+                                                        op: 'eq',
+                                                        value: String(v)
+                                                      }
+                                                    ]
+                                                  )
+                                                }}
+                                                title={`Open ${fk.refTable}`}
+                                                className="text-muted-foreground opacity-0 group-hover/cell:opacity-100 hover:text-primary"
+                                              >
+                                                <ExternalLink className="size-3" />
+                                              </button>
+                                            )}
+                                          </span>
+                                        </span>
+                                      )
+                                    })()}
+                                  </td>
                                 )
-                              })()}
-                            </td>
+                              })}
+                            </tr>
                           )
                         })}
-                      </tr>
-                      {fkTarget?.r === r && fkTargetFk && openConnectionId && (
-                        <tr>
-                          <td colSpan={cols.length + 1} className="p-0">
-                            <FkInlinePicker
-                              key={fkTarget.c}
-                              connId={openConnectionId}
-                              entity={{
-                                name: fkTargetFk.refTable,
-                                schema: fkTargetFk.refSchema
-                              }}
-                              refColumn={fkTargetFk.refColumn}
-                              currentValue={valueAt(fkTarget.r, fkTarget.c)}
-                              offsetLeft={ROWNUM_W}
-                              containerWidth={gridW}
-                              onPick={(val) =>
-                                setCellValue(fkTarget.r, fkTarget.c, val)
-                              }
-                              onOpenTable={(filters) =>
-                                void openTable(
-                                  { name: fkTargetFk.refTable, schema: fkTargetFk.refSchema },
-                                  filters.length ? filters : undefined
-                                )
-                              }
-                              onClose={() => setFkTarget(null)}
-                            />
-                          </td>
-                        </tr>
-                      )}
-                      </Fragment>
+                        {total === 0 && !tab.loading && (
+                          <tr>
+                            <td
+                              colSpan={cols.length + 1}
+                              className="px-3 py-6 text-center text-muted-foreground"
+                            >
+                              No rows.
+                            </td>
+                          </tr>
+                        )}
+                        {padBottom > 0 && (
+                          <tr style={{ height: padBottom }}>
+                            <td />
+                          </tr>
+                        )}
+                      </>
                     )
-                  })}
-                  {total === 0 && !tab.loading && (
-                    <tr>
-                      <td
-                        colSpan={cols.length + 1}
-                        className="px-3 py-6 text-center text-muted-foreground"
-                      >
-                        No rows.
-                      </td>
-                    </tr>
-                  )}
+                  })()}
                 </tbody>
               </table>
             </div>

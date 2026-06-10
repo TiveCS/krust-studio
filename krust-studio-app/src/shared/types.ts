@@ -302,6 +302,8 @@ export interface Relation {
   refSchema?: string
   onUpdate?: string
   onDelete?: string
+  /** FK constraint name; undefined on SQLite (no named FK constraints) */
+  constraint?: string
 }
 
 /** Inbound FK: a table that references the current table (reverse of Relation). */

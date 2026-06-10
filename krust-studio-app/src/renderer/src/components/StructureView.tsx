@@ -110,6 +110,7 @@ export function StructureView(): React.JSX.Element | null {
     setStructDraft,
     setIdxAdds,
     setIdxDrops,
+    setFkDrops,
     setStructDirty
   } = useConnections()
   const tab = tabs.find((t) => t.id === activeTabId)
@@ -127,7 +128,14 @@ export function StructureView(): React.JSX.Element | null {
   const colDraft = tab?.structDraft ?? EMPTY_COLS
   const idxAdds = tab?.idxAdds ?? EMPTY_ADDS
   const idxDrops = useMemo(() => new Set(tab?.idxDrops ?? []), [tab?.idxDrops])
+  const fkDrops = useMemo(() => new Set(tab?.fkDrops ?? []), [tab?.fkDrops])
   const [colFilter, setColFilter] = useState('')
+
+  // FK-backing index alert: shown when user drops an index that backs a FK
+  const [fkBackingAlert, setFkBackingAlert] = useState<{
+    indexName: string
+    constraint: string
+  } | null>(null)
 
   // add/edit-index dialog (editIdx = index into idxAdds, or null for a new one)
   const [addOpen, setAddOpen] = useState(false)
@@ -162,15 +170,16 @@ export function StructureView(): React.JSX.Element | null {
     () => new Set(colOps.filter((o) => o.kind === 'moveColumn').map((o) => o.name)),
     [colOps]
   )
-  // order: drop indexes → column changes → add indexes (safe on pg; mysql
-  // re-buckets internally regardless)
+  // order: drop FKs → drop indexes → column changes → add indexes
+  // FK drops must precede index drops (MySQL requires FK gone before its backing index)
   const ops = useMemo<SchemaOp[]>(
     () => [
+      ...[...fkDrops].map((c) => ({ kind: 'dropForeignKey', constraint: c }) as SchemaOp),
       ...[...idxDrops].map((name) => ({ kind: 'dropIndex', name }) as SchemaOp),
       ...colOps,
       ...idxAdds.map((spec) => ({ kind: 'addIndex', spec }) as SchemaOp)
     ],
-    [idxDrops, colOps, idxAdds]
+    [fkDrops, idxDrops, colOps, idxAdds]
   )
 
   // surface "has uncommitted schema changes" onto the tab (powers the dirty dot
@@ -276,15 +285,30 @@ export function StructureView(): React.JSX.Element | null {
   }
 
   const toggleDropIndex = (name: string): void => {
+    // If this index backs a FK and isn't already staged for drop, prompt to drop both
+    if (!idxDrops.has(name)) {
+      const backing = st?.relations.find((r) => r.constraint === name)
+      if (backing?.constraint) {
+        setFkBackingAlert({ indexName: name, constraint: backing.constraint })
+        return
+      }
+    }
     const next = new Set(idxDrops)
     next.has(name) ? next.delete(name) : next.add(name)
     setIdxDrops([...next])
+  }
+
+  const toggleDropRelation = (constraint: string): void => {
+    const next = new Set(fkDrops)
+    next.has(constraint) ? next.delete(constraint) : next.add(constraint)
+    setFkDrops([...next])
   }
 
   const discard = (): void => {
     setStructDraft(st ? seed(st.columns) : [])
     setIdxAdds([])
     setIdxDrops([])
+    setFkDrops([])
   }
 
   const addColumn = (): void => {
@@ -534,43 +558,82 @@ export function StructureView(): React.JSX.Element | null {
             </div>
           </div>
         ) : sub === 'relations' ? (
-          <div className="h-full overflow-auto">
-            {st.relations.length === 0 ? (
-              <div className="px-3 py-3 text-muted-foreground">No relations.</div>
-            ) : (
-              <table className="w-full border-collapse">
-                <thead className="sticky top-0 bg-background text-muted-foreground">
-                  <tr className="border-b border-border">
-                    {th('Column')}
-                    {th('References')}
-                    {th('On Update')}
-                    {th('On Delete')}
-                  </tr>
-                </thead>
-                <tbody>
-                  {st.relations.map((r, i) => (
-                    <tr key={i} className="border-b border-border/30">
-                      <td className="px-3 py-1 font-mono">{r.column}</td>
-                      <td className="px-3 py-1 font-mono">
-                        <button
-                          onClick={() => walkTo(r.refTable, 'referencedBy', r.refSchema)}
-                          title={`Open ${r.refTable} structure`}
-                          className="text-primary hover:underline"
-                        >
-                          {r.refTable}.{r.refColumn}
-                        </button>
-                      </td>
-                      <td className="px-3 py-1 text-muted-foreground">
-                        {r.onUpdate || '—'}
-                      </td>
-                      <td className="px-3 py-1 text-muted-foreground">
-                        {r.onDelete || '—'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <div className="flex h-full flex-col">
+            {!canAlter && (
+              <div className="shrink-0 border-b border-border/60 px-3 py-1.5 text-xs text-amber-500/80">
+                SQLite cannot drop foreign keys
+              </div>
             )}
+            <div className="min-h-0 flex-1 overflow-auto">
+              {st.relations.length === 0 ? (
+                <div className="px-3 py-3 text-muted-foreground">No relations.</div>
+              ) : (
+                <table className="w-full border-collapse">
+                  <thead className="sticky top-0 bg-background text-muted-foreground">
+                    <tr className="border-b border-border">
+                      {th('Column')}
+                      {th('References')}
+                      {th('On Update')}
+                      {th('On Delete')}
+                      {!readOnly && canAlter && <th className="w-8" />}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {st.relations.map((r, i) => {
+                      const dropped = r.constraint ? fkDrops.has(r.constraint) : false
+                      return (
+                        <tr
+                          key={i}
+                          className={cn(
+                            'group border-b border-border/30',
+                            dropped && 'bg-delete-row line-through'
+                          )}
+                        >
+                          <td className="px-3 py-1 font-mono">{r.column}</td>
+                          <td className="px-3 py-1 font-mono">
+                            <button
+                              onClick={() => walkTo(r.refTable, 'referencedBy', r.refSchema)}
+                              title={`Open ${r.refTable} structure`}
+                              className="text-primary hover:underline"
+                            >
+                              {r.refTable}.{r.refColumn}
+                            </button>
+                          </td>
+                          <td className="px-3 py-1 text-muted-foreground">
+                            {r.onUpdate || '—'}
+                          </td>
+                          <td className="px-3 py-1 text-muted-foreground">
+                            {r.onDelete || '—'}
+                          </td>
+                          {!readOnly && canAlter && (
+                            <td className="px-3 py-1">
+                              {r.constraint && (
+                                <button
+                                  onClick={() => toggleDropRelation(r.constraint!)}
+                                  title={dropped ? 'Undo drop' : 'Drop relation'}
+                                  className={cn(
+                                    'opacity-0 group-hover:opacity-100',
+                                    dropped
+                                      ? 'text-muted-foreground opacity-100 hover:text-foreground'
+                                      : 'text-muted-foreground hover:text-destructive'
+                                  )}
+                                >
+                                  {dropped ? (
+                                    <Undo2 className="size-3.5" />
+                                  ) : (
+                                    <Trash2 className="size-3.5" />
+                                  )}
+                                </button>
+                              )}
+                            </td>
+                          )}
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
         ) : (
           /* referencedBy */
@@ -776,6 +839,44 @@ export function StructureView(): React.JSX.Element | null {
             </Button>
             <Button onClick={stageIndex} disabled={ixCols.length === 0}>
               {editIdx === null ? 'Add' : 'Save'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* FK-backing index alert — drop the relation first or together */}
+      <Dialog
+        open={fkBackingAlert !== null}
+        onOpenChange={(o) => !o && setFkBackingAlert(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Index backs a foreign key</DialogTitle>
+            <DialogDescription>
+              Index <span className="font-mono">{fkBackingAlert?.indexName}</span> is
+              required by FK constraint{' '}
+              <span className="font-mono">{fkBackingAlert?.constraint}</span>. The
+              relation must be dropped first. Stage both?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setFkBackingAlert(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (!fkBackingAlert) return
+                const nextFk = new Set(fkDrops)
+                nextFk.add(fkBackingAlert.constraint)
+                setFkDrops([...nextFk])
+                const nextIdx = new Set(idxDrops)
+                nextIdx.add(fkBackingAlert.indexName)
+                setIdxDrops([...nextIdx])
+                setFkBackingAlert(null)
+              }}
+            >
+              Drop both
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -50,7 +50,6 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { DatabaseSwitcher } from '@/components/DatabaseSwitcher'
 import { ConnectionSwitcher } from '@/components/ConnectionSwitcher'
-import { BackupDialog } from '@/components/BackupDialog'
 import { useConnections } from '@/store/connections'
 import type { EntityRef, EntityType, EnumType } from '../../../shared/types'
 
@@ -67,6 +66,7 @@ export function AppSidebar(): React.JSX.Element {
     openTable,
     openNewTable,
     openHistoryTab,
+    openBackupTab,
     dropEntity,
     renameTable,
     truncateTable,
@@ -74,7 +74,9 @@ export function AppSidebar(): React.JSX.Element {
     tabs,
     activeTabId
   } = useConnections()
-  const historyActive = tabs.find((t) => t.id === activeTabId)?.kind === 'history'
+  const activeTabKind = tabs.find((t) => t.id === activeTabId)?.kind
+  const historyActive = activeTabKind === 'history'
+  const backupActive = activeTabKind === 'backup'
   const [filter, setFilter] = useState('')
   const [renameTarget, setRenameTarget] = useState<EntityRef | null>(null)
   const [renameValue, setRenameValue] = useState('')
@@ -85,7 +87,7 @@ export function AppSidebar(): React.JSX.Element {
   } | null>(null)
   const [confirmText, setConfirmText] = useState('')
   const [busy, setBusy] = useState(false)
-  const [backupOpen, setBackupOpen] = useState(false)
+
 
   const current = connections.find((c) => c.id === openConnectionId)
   const readOnly = current?.readOnly ?? false
@@ -249,9 +251,12 @@ export function AppSidebar(): React.JSX.Element {
                 <HistoryIcon className="size-3.5" />
               </button>
               <button
-                onClick={() => setBackupOpen(true)}
+                onClick={() => openBackupTab()}
                 title="Backup / Restore"
-                className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+                className={cn(
+                  'rounded p-1 hover:bg-accent hover:text-foreground',
+                  backupActive ? 'text-primary' : 'text-muted-foreground'
+                )}
               >
                 <DatabaseBackup className="size-3.5" />
               </button>
@@ -297,9 +302,6 @@ export function AppSidebar(): React.JSX.Element {
       <SidebarFooter>
         <ConnectionSwitcher />
       </SidebarFooter>
-
-      {/* Backup / Restore */}
-      <BackupDialog open={backupOpen} onOpenChange={setBackupOpen} />
 
       {/* Rename table */}
       <Dialog

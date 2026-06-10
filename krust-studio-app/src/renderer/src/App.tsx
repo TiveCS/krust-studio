@@ -9,6 +9,7 @@ import { TitleBar } from '@/components/TitleBar'
 import { TabBar } from '@/components/TabBar'
 import { TableTabView } from '@/components/TableTabView'
 import { HistoryView } from '@/components/HistoryView'
+import { BackupView } from '@/components/BackupView'
 import { CommandPalette } from '@/components/CommandPalette'
 import { Toaster } from '@/components/ui/sonner'
 import { useConnections } from '@/store/connections'
@@ -70,6 +71,8 @@ function App(): React.JSX.Element {
     )
   } else if (activeTab?.kind === 'history') {
     content = <HistoryView />
+  } else if (activeTab?.kind === 'backup') {
+    content = <BackupView />
   } else if (activeTab) {
     content = <TableTabView />
   } else {
