@@ -69,8 +69,14 @@ export function TemplateManager({ open, onOpenChange, initialColumns }: Props): 
     if (!editing || !driver) return
     const name = editing.name.trim()
     const cols = editing.columns.filter((c) => c.name.trim() && c.type.trim())
-    if (!name) return toast.error('Template name required')
-    if (cols.length === 0) return toast.error('At least one named, typed column required')
+    if (!name) {
+      toast.error('Template name required')
+      return
+    }
+    if (cols.length === 0) {
+      toast.error('At least one named, typed column required')
+      return
+    }
     try {
       await saveTemplate({
         id: editing.id ?? '',
