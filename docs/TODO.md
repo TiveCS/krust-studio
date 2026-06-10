@@ -40,13 +40,12 @@ and [ADR-0012](adr/0012-tab-centric-persistent-workspace.md) clarification
 
 ### v1.4.0 — features
 
-- [ ] **Backup & Restore → tab + wizard.** New `Tab.kind: 'backup'`, singleton
-      per connection (like `history`). Sidebar button opens/focuses the tab
-      instead of the `BackupDialog` modal. Stepped wizard: pick Backup|Restore →
-      Backup = objects/modes → options (DROP IF EXISTS) → run+progress; Restore =
-      choose file → preview/destructive flags → confirm+run. Tab state transient
-      (not persisted, like `connection-editor`). Grid CSV/JSON `ExportDialog`
-      untouched (different concept: result set vs DB dump).
+- [x] **Backup & Restore → tab + wizard.** `Tab.kind: 'backup'` singleton (not
+      persisted, like `connection-editor`). Sidebar `DatabaseBackup` button calls
+      `openBackupTab()` (highlights when active). `BackupView.tsx` replaces
+      `BackupDialog` modal: full-height two-panel layout (Backup/Restore); table
+      list fills available space; progress inline; after backup/restore stays open
+      (result via toast). `BackupDialog.tsx` kept but no longer wired to sidebar.
 - [ ] **History syntax highlight + readable long queries.** Rows render a
       single-line truncated **static** highlight (`@lezer/highlight` tokens →
       spans, no editor instance — scales to the 500-row list). Click a row to
@@ -55,14 +54,13 @@ and [ADR-0012](adr/0012-tab-centric-persistent-workspace.md) clarification
       formatter (e.g. `sql-formatter`). Display formatting is cosmetic — Copy /
       export keep the **verbatim** captured statement (no-silent-mutation,
       same principle as auto-`LIMIT` recording actual SQL).
-- [ ] **Drop a relation where users look for it.** Only FK-drop path today is the
-      Columns FK toggle (`columnDiff` → `dropForeignKey`); the **Relations**
-      sub-tab is read-only and the **Indexes** drop on an FK-backing index throws a
-      raw MySQL error. (a) Make Relations editable enough to stage a "drop
-      relation" (reuses the `dropForeignKey` op). (b) In the Indexes tab, detect an
-      FK-backing index and block the bare drop with "this index backs FK <name> —
-      drop the relation too?", offering to stage both (ordered FK → index). Builds
-      on the v1.3.4 structure-editor work.
+- [x] **Drop a relation where users look for it.** (a) Relations sub-tab: per-row
+      Trash/Undo toggle stages `dropForeignKey` ops; disabled on SQLite + read-only.
+      `Relation.constraint` added to `types.ts` + drivers (mysql/pg). `fkDrops`
+      on `Tab` state, reset on structure refresh. (b) Indexes tab: `toggleDropIndex`
+      detects backing-FK by `index.name === relation.constraint`; blocks bare drop
+      with a "Drop both?" dialog that stages both ops in correct order (FK → index).
+      Ops order: `fkDrops` → `idxDrops` → `colOps` → `idxAdds`.
 - [ ] **Local table templates (column sets).** Reusable, **local-only** named
       column sets (never on the DB until a normal Create/Commit — no-silent
       stance). Solves repeated boilerplate (`id` + audit columns
@@ -87,6 +85,52 @@ and [ADR-0012](adr/0012-tab-centric-persistent-workspace.md) clarification
       - Notes: no built-in templates (audit columns are project-specific); a
         template's per-column FK is kept on apply only if the target table
         exists, else flagged.
+
+## P0 — v1.5.0: shortcuts, settings & history UX — PLANNED
+
+Design resolved via `/grill-with-docs` (2026-06-10). See
+[ADR-0015](adr/0015-configurable-scoped-keybindings.md) and CONTEXT.md
+**Settings** / **Keybinding / Command** / **History Search** / **Destructive**.
+
+- [ ] **Configurable scope-aware keybindings.** Named **Command** registry, each
+      with a default binding; user overrides persisted in a global `settings.json`
+      (data dir, main-process store + IPC, mirroring `connections.json` — app-
+      global, NOT per-connection). Central keydown **dispatcher** resolves the
+      active command by context. Scope-aware (`when`-clauses): contexts `global`,
+      `table-tab`, `data-view`, `structure-view`, `query-view`; two commands
+      conflict only on shared key **and** overlapping scope. Migrate the existing
+      `Ctrl+P` listener + data-grid local keys into the registry over time.
+      Intercept colliding browser/Electron defaults (`Ctrl+N`, `F5`) on
+      `webContents` so app bindings win.
+      - **Default commands/bindings:** `Ctrl/⌘+S` `table.commit` (unified — opens
+        the DDL preview sheet in structure-view, the affected-row commit dialog in
+        data-view; no-op when nothing staged); `Ctrl/⌘+N` `table.addRow`
+        (data-view); `F5` `table.refresh` (active table tab); `Ctrl/⌘+B`
+        `table.toggleView` (data ⇄ structure); `Ctrl/⌘+Shift+F` `filter.add`
+        (expand FilterBar + append a focused empty condition row); `Ctrl/⌘+P`
+        `palette.open` (existing).
+- [ ] **Settings modal.** Large VSCode-style **modal** (not a tab, not per-
+      connection), reachable from the title bar even with no connection open.
+      Left-nav categories + search. First category: **Keybindings** — lists
+      commands, shows each binding, click-to-record rebind, scoped conflict
+      warning. Backed by the global `settings.json` store above.
+- [ ] **History entry delete.** Reuse HistoryView's existing multi-select;
+      **Delete** removes selected entries (hard delete, like the bulk Clear) behind
+      a count-confirm dialog. Deleting an entry that's in a changeset just removes
+      that row from it. New `history.deleteEntries(ids)` IPC + store action.
+- [ ] **History search.** Text filter inside the History view; filters the
+      currently-shown stream/changeset entries by statement text, **client-side**
+      (entries capped, instant — same approach as the Command Palette). Command
+      Palette stays schema-object-only.
+- [ ] **TRUNCATE → Data Mutation + Destructive tag.** (a) Reclassify TRUNCATE
+      capture from `table_mutation` to `data_mutation` ([session.ts:270]) — rule:
+      object shape = Table Mutation, row contents = Data Mutation. (b) Add a
+      cross-cutting **destructive** flag to history entries (`TRUNCATE`/`DROP`/
+      `DELETE`|`UPDATE` without `WHERE`): controls visibility (flagged wherever
+      shown) + changeset **eligibility**. Destructive entries are **not** auto-
+      attached to the active changeset, but the flag makes them changeset-eligible
+      so the user can still **Move to changeset** manually. Schema column +
+      classify at the `session.ts` capture choke point.
 
 ## P0 — v1.3.0: workspace & connection resilience — DONE
 
@@ -236,9 +280,9 @@ CONTEXT.md **Session** + **Workspace & Tabs** + **Referenced By (Reverse FK)**.
       to every editable cell) / "Fill selection NULL".
 - [x] **Type-aware cell rendering.** Done. bool (green/red), number (sky,
       tabular), JSON object (violet), ISO timestamp (amber) coloured in the grid.
-- [ ] **Virtualize grid** (TanStack Virtual). Deferred — high regression risk vs
-      the custom selection-drag / sticky header / inline-`<tr>` picker / col-resize;
-      page size capped at 500 so low payoff now. Revisit if page size grows.
+- [x] **Virtualize grid** (TanStack Virtual). `useVirtualizer` on rows; FK picker
+      treated as a bonus virtual item at `fkTarget.r + 1`; spacer rows for
+      padding; drag-select limited to visible rows (acceptable given compact row height).
 
 ## P4 — the headline feature (ADR-0002), bigger
 

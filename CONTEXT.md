@@ -71,17 +71,38 @@ deferred.
 Log of executed statements, split into three distinct streams (never mixed):
 
 - **Data Retrieval** — `SELECT` and other read-only reads.
-- **Data Mutation** — `INSERT` / `UPDATE` / `DELETE` (row-level changes).
+- **Data Mutation** — `INSERT` / `UPDATE` / `DELETE` / `TRUNCATE` (row-contents
+  changes).
 - **Table Mutation** — DDL: `ALTER` / `CREATE` / `DROP`, index/constraint
   changes (structural changes to tables). See **Captured DDL** — this is the
   most important feature.
 
+The dividing rule is **object shape vs row contents**: a statement that changes
+the existence or shape of an object is **Table Mutation**; one that changes only
+the rows inside it is **Data Mutation**. So `DROP` (removes the object) is Table
+Mutation, but `TRUNCATE` (keeps the object, empties its rows) is Data Mutation —
+filed with `DELETE`, despite being DDL syntactically. This keeps a destructive
+data-wipe out of the schema-migration **Changeset** export by default.
+
 Stored in a local SQLite file in the data directory. Each entry records:
 statement, timestamp, connection, source (`gui`/`manual`), status
-(success/error), affected-row count — not result sets. Retention differs by
-stream: **Data Retrieval** auto-trims on a rolling cap (high volume, low
-long-term value); **Data Mutation** and **Table Mutation** are never auto-purged
-(audit value), pruned only manually.
+(success/error), affected-row count — not result sets — and a **Destructive**
+flag (see below). Retention differs by stream: **Data Retrieval** auto-trims on a
+rolling cap (high volume, low long-term value); **Data Mutation** and **Table
+Mutation** are never auto-purged (audit value), pruned only manually — by the
+per-stream **Clear** or by selecting entries and deleting them (hard delete,
+confirmed).
+
+### Destructive (history tag)
+A cross-cutting flag on a history entry marking a statement that destroys data:
+`TRUNCATE`, `DROP`, and `DELETE`/`UPDATE` without a `WHERE`. Independent of
+stream — it controls **visibility** (flagged wherever the entry is shown) and
+**changeset eligibility**, not classification. A destructive entry is **not
+auto-attached** to the active changeset (so it can't silently ride into an
+exported migration), but the flag makes it **changeset-eligible**: the user can
+still manually **Move to changeset** when they genuinely want it there. (Distinct
+from the **Read-only Connection** typed-confirmation, which gates *execution*;
+this tag is about *history/export* handling.)
 
 ### Captured DDL
 The exact DDL statement Krust generates when the user edits schema through the
@@ -247,7 +268,37 @@ drag-resizable.
 A VSCode-style quick switcher (**Ctrl/⌘+P**) to fuzzy-search every table/view on
 the current connection and open it in a tab. Contains-match (startsWith ranked
 first), results capped for speed on large schemas. Convenience layer over the
-schema tree, not a replacement.
+schema tree, not a replacement. Searches **schema objects only** — past
+statements are found via the History view's own search (below), a deliberately
+separate surface.
+
+### History Search
+A text filter inside the **Query History** view for finding a past statement by
+its content. Scoped to the entries currently shown (active stream / changeset),
+filters their statement text client-side (entries are already capped, so it's
+instant). Distinct from the **Command Palette**, which only finds schema objects.
+
+### Settings
+A global, app-wide configuration surface — a large VSCode-style **modal** (not a
+tab, not per-connection) reachable from the title bar even with no connection
+open. Persisted to a `settings.json` in the data directory, alongside
+connections/history (main-process store + IPC). First home of user
+**Keybindings**; future app-level preferences live here too.
+
+### Keybinding / Command
+Krust's actions are exposed as named **Commands** (e.g. `table.commit`,
+`table.addRow`, `table.refresh`, `table.toggleView`, `filter.add`), each with a
+default **Keybinding** the user can rebind in **Settings**. Bindings are
+**scope-aware** (VSCode `when`-clause style): a command declares the context it
+fires in — `global`, `table-tab`, `data-view`, `structure-view`, `query-view` —
+so one physical key can mean different things in different contexts, and two
+commands conflict only when they share a key *and* an overlapping scope. A central
+keydown dispatcher resolves the active command from the focused tab/view. Defaults:
+**Ctrl/⌘+S** commit (review staged changes for the active tab — DDL preview in
+structure-view, affected-row dialog in data-view), **Ctrl/⌘+N** add row
+(data-view), **F5** refresh the active table tab, **Ctrl/⌘+B** toggle data ⇄
+structure, **Ctrl/⌘+Shift+F** add filter (expand the FilterBar, append a focused
+empty condition), **Ctrl/⌘+P** Command Palette.
 
 ### Workspace & Tabs
 **Everything the user works in is a Tab** — data browsers, the SQL editor, a
