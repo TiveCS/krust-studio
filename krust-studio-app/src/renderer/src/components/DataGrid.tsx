@@ -212,12 +212,13 @@ export function DataGrid(): React.JSX.Element | null {
     setEditing(null)
   }, [activeTabId])
 
-  // removing an insert row shifts row indices; the index-based FK target would
-  // re-attach to a different row. Close the picker when an insert is removed.
+  // adding OR removing an insert row shifts the insert/real-row boundary, so the
+  // index-based FK target would re-attach to a different row. Close the picker on
+  // any change to the insert count.
   const prevInsCount = useRef(0)
   useEffect(() => {
     const n = tab?.inserts.length ?? 0
-    if (n < prevInsCount.current) setFkTarget(null)
+    if (n !== prevInsCount.current) setFkTarget(null)
     prevInsCount.current = n
   }, [tab?.inserts.length])
 

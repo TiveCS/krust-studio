@@ -172,21 +172,37 @@ export function StructureView(): React.JSX.Element | null {
   )
   // order: drop FKs → drop indexes → column changes → add indexes
   // FK drops must precede index drops (MySQL requires FK gone before its backing index)
-  const ops = useMemo<SchemaOp[]>(
-    () => [
-      ...[...fkDrops].map((c) => ({ kind: 'dropForeignKey', constraint: c }) as SchemaOp),
+  const ops = useMemo<SchemaOp[]>(() => {
+    // a constraint may already be dropped by colOps (Columns FK-toggle, or a
+    // dropped FK column) — don't emit a second DROP FOREIGN KEY for it
+    const colFkDrops = new Set(
+      colOps.flatMap((o) => (o.kind === 'dropForeignKey' ? [o.constraint] : []))
+    )
+    return [
+      ...[...fkDrops]
+        .filter((c) => !colFkDrops.has(c))
+        .map((c) => ({ kind: 'dropForeignKey', constraint: c }) as SchemaOp),
       ...[...idxDrops].map((name) => ({ kind: 'dropIndex', name }) as SchemaOp),
       ...colOps,
       ...idxAdds.map((spec) => ({ kind: 'addIndex', spec }) as SchemaOp)
-    ],
-    [fkDrops, idxDrops, colOps, idxAdds]
-  )
+    ]
+  }, [fkDrops, idxDrops, colOps, idxAdds])
 
   // surface "has uncommitted schema changes" onto the tab (powers the dirty dot
   // + close-confirm). setStructDirty no-ops when the value is unchanged.
   useEffect(() => {
     setStructDirty(ops.length > 0)
   }, [ops, setStructDirty])
+
+  // first relation row per constraint — a composite FK spans multiple rows
+  // (one per column); show the drop toggle only once per constraint
+  const firstFkRow = useMemo(() => {
+    const m = new Map<string, number>()
+    st?.relations.forEach((r, i) => {
+      if (r.constraint && !m.has(r.constraint)) m.set(r.constraint, i)
+    })
+    return m
+  }, [st])
 
   // fetch the structure if it isn't loaded yet — covers a restored tab opened
   // directly in structure view (setTabView, which normally fetches, isn't
@@ -284,18 +300,34 @@ export function StructureView(): React.JSX.Element | null {
     resetIxForm()
   }
 
-  const toggleDropIndex = (name: string): void => {
-    // If this index backs a FK and isn't already staged for drop, prompt to drop both
-    if (!idxDrops.has(name)) {
-      const backing = st?.relations.find((r) => r.constraint === name)
-      if (backing?.constraint) {
-        setFkBackingAlert({ indexName: name, constraint: backing.constraint })
-        return
-      }
-    }
+  // a FK is backed by an index whose leftmost column is the FK column; MySQL also
+  // names the auto-created backing index after the constraint. Match either —
+  // false positives are harmless (the alert offers "Drop index only").
+  const findBackingFk = (indexName: string): string | undefined => {
+    const ix = st?.indexes.find((i) => i.name === indexName)
+    const firstCol = ix?.columns[0]
+    const rel = st?.relations.find(
+      (r) => !!r.constraint && (r.constraint === indexName || r.column === firstCol)
+    )
+    return rel?.constraint
+  }
+
+  const stageDropIndex = (name: string): void => {
     const next = new Set(idxDrops)
     next.has(name) ? next.delete(name) : next.add(name)
     setIdxDrops([...next])
+  }
+
+  const toggleDropIndex = (name: string): void => {
+    // If this index backs a FK and isn't already staged for drop, prompt to drop both
+    if (!idxDrops.has(name)) {
+      const constraint = findBackingFk(name)
+      if (constraint) {
+        setFkBackingAlert({ indexName: name, constraint })
+        return
+      }
+    }
+    stageDropIndex(name)
   }
 
   const toggleDropRelation = (constraint: string): void => {
@@ -607,7 +639,7 @@ export function StructureView(): React.JSX.Element | null {
                           </td>
                           {!readOnly && canAlter && (
                             <td className="px-3 py-1">
-                              {r.constraint && (
+                              {r.constraint && firstFkRow.get(r.constraint) === i && (
                                 <button
                                   onClick={() => toggleDropRelation(r.constraint!)}
                                   title={dropped ? 'Undo drop' : 'Drop relation'}
@@ -862,6 +894,18 @@ export function StructureView(): React.JSX.Element | null {
           <DialogFooter>
             <Button variant="ghost" onClick={() => setFkBackingAlert(null)}>
               Cancel
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                if (!fkBackingAlert) return
+                // escape hatch: stage only the index (covers a false-positive
+                // match, or a different index that also satisfies the FK)
+                stageDropIndex(fkBackingAlert.indexName)
+                setFkBackingAlert(null)
+              }}
+            >
+              Drop index only
             </Button>
             <Button
               variant="destructive"
