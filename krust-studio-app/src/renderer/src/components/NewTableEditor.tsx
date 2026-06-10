@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Check } from 'lucide-react'
+import { Check, Bookmark } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ColumnsEditor } from '@/components/ColumnsEditor'
+import { TemplateManager } from '@/components/TemplateManager'
 import { useConnections, type Tab } from '@/store/connections'
 import type { DriverType } from '../../../shared/types'
 
@@ -20,6 +21,7 @@ export function NewTableEditor({ tab }: { tab: Tab }): React.JSX.Element {
   const types = [...(driver ? TYPES[driver] : []), ...enums.map((e) => e.name)]
   const tables = entities.filter((e) => e.type === 'table').map((e) => e.name)
   const [busy, setBusy] = useState(false)
+  const [tmplOpen, setTmplOpen] = useState(false)
   const draft = tab.draft!
 
   const create = async (): Promise<void> => {
@@ -70,6 +72,16 @@ export function NewTableEditor({ tab }: { tab: Tab }): React.JSX.Element {
       <div className="flex h-9 shrink-0 items-center gap-2 border-t border-border px-3">
         <span className="text-xs text-muted-foreground">New table draft</span>
         <div className="flex-1" />
+        <Button
+          size="xs"
+          variant="ghost"
+          onClick={() => setTmplOpen(true)}
+          disabled={draft.columns.every((c) => !c.name.trim() || !c.type.trim())}
+          title="Save these columns as a reusable template"
+        >
+          <Bookmark />
+          Save as template
+        </Button>
         <Button size="xs" onClick={create} disabled={busy}>
           <Check />
           Create
@@ -78,6 +90,12 @@ export function NewTableEditor({ tab }: { tab: Tab }): React.JSX.Element {
           Discard
         </Button>
       </div>
+
+      <TemplateManager
+        open={tmplOpen}
+        onOpenChange={setTmplOpen}
+        initialColumns={draft.columns.filter((c) => c.name.trim() && c.type.trim())}
+      />
     </div>
   )
 }

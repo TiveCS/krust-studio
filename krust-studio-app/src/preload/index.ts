@@ -15,7 +15,8 @@ import type {
   HistoryQuery,
   HistoryStream,
   WorkspaceData,
-  BackupSpec
+  BackupSpec,
+  TableTemplate
 } from '../shared/types'
 
 const api: KrustApi = {
@@ -109,6 +110,11 @@ const api: KrustApi = {
     restorePreview: () => ipcRenderer.invoke('backup:restorePreview'),
     restoreRun: (id: string, path: string, stopOnError: boolean) =>
       ipcRenderer.invoke('backup:restoreRun', id, path, stopOnError)
+  },
+  templates: {
+    list: () => ipcRenderer.invoke('templates:list'),
+    save: (template: TableTemplate) => ipcRenderer.invoke('templates:save', template),
+    remove: (id: string) => ipcRenderer.invoke('templates:remove', id)
   },
   window: {
     minimize: () => ipcRenderer.send('window:minimize'),

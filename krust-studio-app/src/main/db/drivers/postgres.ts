@@ -403,7 +403,8 @@ export class PostgresDriver implements DbDriver {
       refTable: f.refTable,
       refColumn: f.refColumn,
       onUpdate: f.onUpdate,
-      onDelete: f.onDelete
+      onDelete: f.onDelete,
+      constraint: f.conname
     }))
     const columns = colRes.rows.map(
       (c: { name: string; type: string; nullable: boolean; dflt: string | null }) => ({

@@ -15,3 +15,7 @@ export function getDataDir(): string {
 export function connectionsFile(): string {
   return join(getDataDir(), 'connections.json')
 }
+
+export function templatesFile(): string {
+  return join(getDataDir(), 'templates.json')
+}

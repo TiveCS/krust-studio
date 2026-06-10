@@ -302,6 +302,8 @@ export interface Relation {
   refSchema?: string
   onUpdate?: string
   onDelete?: string
+  /** FK constraint name; undefined on SQLite (no named FK constraints) */
+  constraint?: string
 }
 
 /** Inbound FK: a table that references the current table (reverse of Relation). */
@@ -349,6 +351,20 @@ export interface NewColumnSpec {
 export interface CreateTableSpec {
   name: string
   columns: NewColumnSpec[]
+}
+
+/**
+ * A reusable, local-only named set of columns to scaffold new tables (or insert
+ * into existing ones). Never applied to the DB directly — only seeds a draft or
+ * stages column-adds. Engine-locked so types never cross engines.
+ */
+export interface TableTemplate {
+  id: string
+  name: string
+  engine: DriverType
+  columns: NewColumnSpec[]
+  /** epoch ms */
+  createdAt: number
 }
 
 export type SchemaOp =
@@ -590,6 +606,14 @@ export interface WindowControlApi {
   onMaximizedChange: (cb: (maximized: boolean) => void) => () => void
 }
 
+/** local table-template CRUD (templates.json in the data dir) */
+export interface TemplatesApi {
+  list: () => Promise<TableTemplate[]>
+  /** upsert by id; returns the saved template */
+  save: (template: TableTemplate) => Promise<TableTemplate>
+  remove: (id: string) => Promise<void>
+}
+
 export interface KrustApi {
   connections: ConnectionsApi
   sessions: SessionApi
@@ -597,5 +621,6 @@ export interface KrustApi {
   dialog: DialogApi
   workspace: WorkspaceApi
   backup: BackupApi
+  templates: TemplatesApi
   window: WindowControlApi
 }

@@ -9,7 +9,8 @@ import {
   Check,
   Undo2,
   X,
-  Pencil
+  Pencil,
+  TableProperties
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -37,12 +38,21 @@ import {
   SheetDescription,
   SheetFooter
 } from '@/components/ui/sheet'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import { StructureEditor } from '@/components/StructureEditor'
 import { SqlDisplay } from '@/components/SqlDisplay'
+import { TemplateManager } from '@/components/TemplateManager'
 import { type EditorColumn } from '@/components/ColumnsEditor'
 import { seed, diff } from '@/lib/columnDiff'
+import { insertTemplateColumns } from '@/lib/templates'
 import { useConnections, type StructureSub as Sub } from '@/store/connections'
-import type { EntityRef, IndexSpec, SchemaOp } from '../../../shared/types'
+import type { EntityRef, IndexSpec, NewColumnSpec, SchemaOp } from '../../../shared/types'
 
 const SUBS: Sub[] = ['columns', 'indexes', 'relations', 'referencedBy', 'ddl']
 const SUB_LABEL: Record<Sub, string> = {
@@ -110,7 +120,9 @@ export function StructureView(): React.JSX.Element | null {
     setStructDraft,
     setIdxAdds,
     setIdxDrops,
-    setStructDirty
+    setFkDrops,
+    setStructDirty,
+    templates
   } = useConnections()
   const tab = tabs.find((t) => t.id === activeTabId)
   const st = tab?.structure ?? null
@@ -127,7 +139,15 @@ export function StructureView(): React.JSX.Element | null {
   const colDraft = tab?.structDraft ?? EMPTY_COLS
   const idxAdds = tab?.idxAdds ?? EMPTY_ADDS
   const idxDrops = useMemo(() => new Set(tab?.idxDrops ?? []), [tab?.idxDrops])
+  const fkDrops = useMemo(() => new Set(tab?.fkDrops ?? []), [tab?.fkDrops])
   const [colFilter, setColFilter] = useState('')
+  const [tmplOpen, setTmplOpen] = useState(false)
+
+  // FK-backing index alert: shown when user drops an index that backs a FK
+  const [fkBackingAlert, setFkBackingAlert] = useState<{
+    indexName: string
+    constraint: string
+  } | null>(null)
 
   // add/edit-index dialog (editIdx = index into idxAdds, or null for a new one)
   const [addOpen, setAddOpen] = useState(false)
@@ -162,22 +182,39 @@ export function StructureView(): React.JSX.Element | null {
     () => new Set(colOps.filter((o) => o.kind === 'moveColumn').map((o) => o.name)),
     [colOps]
   )
-  // order: drop indexes → column changes → add indexes (safe on pg; mysql
-  // re-buckets internally regardless)
-  const ops = useMemo<SchemaOp[]>(
-    () => [
+  // order: drop FKs → drop indexes → column changes → add indexes
+  // FK drops must precede index drops (MySQL requires FK gone before its backing index)
+  const ops = useMemo<SchemaOp[]>(() => {
+    // a constraint may already be dropped by colOps (Columns FK-toggle, or a
+    // dropped FK column) — don't emit a second DROP FOREIGN KEY for it
+    const colFkDrops = new Set(
+      colOps.flatMap((o) => (o.kind === 'dropForeignKey' ? [o.constraint] : []))
+    )
+    return [
+      ...[...fkDrops]
+        .filter((c) => !colFkDrops.has(c))
+        .map((c) => ({ kind: 'dropForeignKey', constraint: c }) as SchemaOp),
       ...[...idxDrops].map((name) => ({ kind: 'dropIndex', name }) as SchemaOp),
       ...colOps,
       ...idxAdds.map((spec) => ({ kind: 'addIndex', spec }) as SchemaOp)
-    ],
-    [idxDrops, colOps, idxAdds]
-  )
+    ]
+  }, [fkDrops, idxDrops, colOps, idxAdds])
 
   // surface "has uncommitted schema changes" onto the tab (powers the dirty dot
   // + close-confirm). setStructDirty no-ops when the value is unchanged.
   useEffect(() => {
     setStructDirty(ops.length > 0)
   }, [ops, setStructDirty])
+
+  // first relation row per constraint — a composite FK spans multiple rows
+  // (one per column); show the drop toggle only once per constraint
+  const firstFkRow = useMemo(() => {
+    const m = new Map<string, number>()
+    st?.relations.forEach((r, i) => {
+      if (r.constraint && !m.has(r.constraint)) m.set(r.constraint, i)
+    })
+    return m
+  }, [st])
 
   // fetch the structure if it isn't loaded yet — covers a restored tab opened
   // directly in structure view (setTabView, which normally fetches, isn't
@@ -275,16 +312,47 @@ export function StructureView(): React.JSX.Element | null {
     resetIxForm()
   }
 
-  const toggleDropIndex = (name: string): void => {
+  // a FK is backed by an index whose leftmost column is the FK column; MySQL also
+  // names the auto-created backing index after the constraint. Match either —
+  // false positives are harmless (the alert offers "Drop index only").
+  const findBackingFk = (indexName: string): string | undefined => {
+    const ix = st?.indexes.find((i) => i.name === indexName)
+    const firstCol = ix?.columns[0]
+    const rel = st?.relations.find(
+      (r) => !!r.constraint && (r.constraint === indexName || r.column === firstCol)
+    )
+    return rel?.constraint
+  }
+
+  const stageDropIndex = (name: string): void => {
     const next = new Set(idxDrops)
     next.has(name) ? next.delete(name) : next.add(name)
     setIdxDrops([...next])
+  }
+
+  const toggleDropIndex = (name: string): void => {
+    // If this index backs a FK and isn't already staged for drop, prompt to drop both
+    if (!idxDrops.has(name)) {
+      const constraint = findBackingFk(name)
+      if (constraint) {
+        setFkBackingAlert({ indexName: name, constraint })
+        return
+      }
+    }
+    stageDropIndex(name)
+  }
+
+  const toggleDropRelation = (constraint: string): void => {
+    const next = new Set(fkDrops)
+    next.has(constraint) ? next.delete(constraint) : next.add(constraint)
+    setFkDrops([...next])
   }
 
   const discard = (): void => {
     setStructDraft(st ? seed(st.columns) : [])
     setIdxAdds([])
     setIdxDrops([])
+    setFkDrops([])
   }
 
   const addColumn = (): void => {
@@ -292,6 +360,36 @@ export function StructureView(): React.JSX.Element | null {
     setColFilter('') // clear filter so the new (empty-name) row isn't hidden
     setStructureSub('columns')
   }
+
+  // templates of the current engine (engine-locked)
+  const engineTemplates = templates.filter((t) => t.engine === driver)
+
+  // insert a template's columns as staged adds (PK/FK stripped, name collisions skipped)
+  const insertTemplate = (id: string): void => {
+    const t = templates.find((x) => x.id === id)
+    if (!t) return
+    const { next, added, skipped } = insertTemplateColumns(colDraft, t)
+    setStructDraft(next)
+    setColFilter('')
+    setStructureSub('columns')
+    if (added.length === 0)
+      toast.error(`No columns added — all ${skipped.length} already exist`)
+    else
+      toast.success(
+        `Added ${added.length} column(s)` +
+          (skipped.length ? `, skipped ${skipped.length} (already exist)` : '')
+      )
+  }
+
+  // the table's current columns, as template column specs (for "Save as template")
+  const structureAsColumns = (): NewColumnSpec[] =>
+    (st?.columns ?? []).map((c) => ({
+      name: c.name,
+      type: c.type ?? '',
+      nullable: c.nullable,
+      pk: c.pk,
+      default: c.default ?? undefined
+    }))
 
   const preview = async (): Promise<void> => {
     if (!openConnectionId || ops.length === 0) return
@@ -534,43 +632,82 @@ export function StructureView(): React.JSX.Element | null {
             </div>
           </div>
         ) : sub === 'relations' ? (
-          <div className="h-full overflow-auto">
-            {st.relations.length === 0 ? (
-              <div className="px-3 py-3 text-muted-foreground">No relations.</div>
-            ) : (
-              <table className="w-full border-collapse">
-                <thead className="sticky top-0 bg-background text-muted-foreground">
-                  <tr className="border-b border-border">
-                    {th('Column')}
-                    {th('References')}
-                    {th('On Update')}
-                    {th('On Delete')}
-                  </tr>
-                </thead>
-                <tbody>
-                  {st.relations.map((r, i) => (
-                    <tr key={i} className="border-b border-border/30">
-                      <td className="px-3 py-1 font-mono">{r.column}</td>
-                      <td className="px-3 py-1 font-mono">
-                        <button
-                          onClick={() => walkTo(r.refTable, 'referencedBy', r.refSchema)}
-                          title={`Open ${r.refTable} structure`}
-                          className="text-primary hover:underline"
-                        >
-                          {r.refTable}.{r.refColumn}
-                        </button>
-                      </td>
-                      <td className="px-3 py-1 text-muted-foreground">
-                        {r.onUpdate || '—'}
-                      </td>
-                      <td className="px-3 py-1 text-muted-foreground">
-                        {r.onDelete || '—'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <div className="flex h-full flex-col">
+            {!canAlter && (
+              <div className="shrink-0 border-b border-border/60 px-3 py-1.5 text-xs text-amber-500/80">
+                SQLite cannot drop foreign keys
+              </div>
             )}
+            <div className="min-h-0 flex-1 overflow-auto">
+              {st.relations.length === 0 ? (
+                <div className="px-3 py-3 text-muted-foreground">No relations.</div>
+              ) : (
+                <table className="w-full border-collapse">
+                  <thead className="sticky top-0 bg-background text-muted-foreground">
+                    <tr className="border-b border-border">
+                      {th('Column')}
+                      {th('References')}
+                      {th('On Update')}
+                      {th('On Delete')}
+                      {!readOnly && canAlter && <th className="w-8" />}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {st.relations.map((r, i) => {
+                      const dropped = r.constraint ? fkDrops.has(r.constraint) : false
+                      return (
+                        <tr
+                          key={i}
+                          className={cn(
+                            'group border-b border-border/30',
+                            dropped && 'bg-delete-row line-through'
+                          )}
+                        >
+                          <td className="px-3 py-1 font-mono">{r.column}</td>
+                          <td className="px-3 py-1 font-mono">
+                            <button
+                              onClick={() => walkTo(r.refTable, 'referencedBy', r.refSchema)}
+                              title={`Open ${r.refTable} structure`}
+                              className="text-primary hover:underline"
+                            >
+                              {r.refTable}.{r.refColumn}
+                            </button>
+                          </td>
+                          <td className="px-3 py-1 text-muted-foreground">
+                            {r.onUpdate || '—'}
+                          </td>
+                          <td className="px-3 py-1 text-muted-foreground">
+                            {r.onDelete || '—'}
+                          </td>
+                          {!readOnly && canAlter && (
+                            <td className="px-3 py-1">
+                              {r.constraint && firstFkRow.get(r.constraint) === i && (
+                                <button
+                                  onClick={() => toggleDropRelation(r.constraint!)}
+                                  title={dropped ? 'Undo drop' : 'Drop relation'}
+                                  className={cn(
+                                    'opacity-0 group-hover:opacity-100',
+                                    dropped
+                                      ? 'text-muted-foreground opacity-100 hover:text-foreground'
+                                      : 'text-muted-foreground hover:text-destructive'
+                                  )}
+                                >
+                                  {dropped ? (
+                                    <Undo2 className="size-3.5" />
+                                  ) : (
+                                    <Trash2 className="size-3.5" />
+                                  )}
+                                </button>
+                              )}
+                            </td>
+                          )}
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
         ) : (
           /* referencedBy */
@@ -632,10 +769,35 @@ export function StructureView(): React.JSX.Element | null {
       {st && !readOnly && (
         <div className="flex h-9 shrink-0 items-center gap-2 border-t border-border px-3 text-xs text-muted-foreground">
           {sub === 'columns' && (
-            <Button size="xs" variant="ghost" onClick={addColumn} title="Add a column">
-              <Plus />
-              Add column
-            </Button>
+            <>
+              <Button size="xs" variant="ghost" onClick={addColumn} title="Add a column">
+                <Plus />
+                Add column
+              </Button>
+              {canAlter && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="xs" variant="ghost" title="Table templates">
+                      <TableProperties />
+                      Templates
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem onSelect={() => setTmplOpen(true)}>
+                      <TableProperties />
+                      Save table as template…
+                    </DropdownMenuItem>
+                    {engineTemplates.length > 0 && <DropdownMenuSeparator />}
+                    {engineTemplates.map((t) => (
+                      <DropdownMenuItem key={t.id} onSelect={() => insertTemplate(t.id)}>
+                        <Plus />
+                        Insert “{t.name}” ({t.columns.length})
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </>
           )}
           <span>{ops.length} pending change(s)</span>
           <div className="flex-1" />
@@ -780,6 +942,63 @@ export function StructureView(): React.JSX.Element | null {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* FK-backing index alert — drop the relation first or together */}
+      <Dialog
+        open={fkBackingAlert !== null}
+        onOpenChange={(o) => !o && setFkBackingAlert(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Index backs a foreign key</DialogTitle>
+            <DialogDescription>
+              Index <span className="font-mono">{fkBackingAlert?.indexName}</span> is
+              required by FK constraint{' '}
+              <span className="font-mono">{fkBackingAlert?.constraint}</span>. The
+              relation must be dropped first. Stage both?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setFkBackingAlert(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                if (!fkBackingAlert) return
+                // escape hatch: stage only the index (covers a false-positive
+                // match, or a different index that also satisfies the FK)
+                stageDropIndex(fkBackingAlert.indexName)
+                setFkBackingAlert(null)
+              }}
+            >
+              Drop index only
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (!fkBackingAlert) return
+                const nextFk = new Set(fkDrops)
+                nextFk.add(fkBackingAlert.constraint)
+                setFkDrops([...nextFk])
+                const nextIdx = new Set(idxDrops)
+                nextIdx.add(fkBackingAlert.indexName)
+                setIdxDrops([...nextIdx])
+                setFkBackingAlert(null)
+              }}
+            >
+              Drop both
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Save the table's columns as a reusable template */}
+      <TemplateManager
+        open={tmplOpen}
+        onOpenChange={setTmplOpen}
+        initialColumns={structureAsColumns()}
+      />
 
       {/* DDL review sheet (shared with column commit) */}
       <Sheet open={previewSql !== null} onOpenChange={(o) => !o && setPreviewSql(null)}>

@@ -9,6 +9,7 @@ import {
   getConnectionConfig
 } from './store/connections'
 import { loadWorkspace, saveWorkspace } from './store/workspace'
+import { listTemplates, saveTemplate, removeTemplate } from './store/templates'
 import { runBackup, restorePreview, restoreRun } from './db/backup'
 import { testConnection } from './db/test-connection'
 import {
@@ -67,7 +68,8 @@ import type {
 } from '../shared/types'
 import type {
   SaveConnectionInput,
-  TestConnectionInput
+  TestConnectionInput,
+  TableTemplate
 } from '../shared/types'
 
 export function registerIpc(): void {
@@ -113,6 +115,11 @@ export function registerIpc(): void {
   ipcMain.handle('connections:duplicate', (_e, id: string) =>
     duplicateConnection(id)
   )
+
+  // ── local table templates ────────────────────────────────────────────────
+  ipcMain.handle('templates:list', () => listTemplates())
+  ipcMain.handle('templates:save', (_e, t: TableTemplate) => saveTemplate(t))
+  ipcMain.handle('templates:remove', (_e, id: string) => removeTemplate(id))
 
   ipcMain.handle('session:connect', (_e, id: string) => connectSession(id))
   ipcMain.handle('session:listEntities', (_e, id: string) => listEntities(id))

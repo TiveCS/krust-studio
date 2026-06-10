@@ -327,7 +327,8 @@ export class MysqlDriver implements DbDriver {
       refTable: f.refTable,
       refColumn: f.refColumn,
       onUpdate: f.onUpdate,
-      onDelete: f.onDelete
+      onDelete: f.onDelete,
+      constraint: f.conname
     }))
     const columns = (
       colRows as Array<{

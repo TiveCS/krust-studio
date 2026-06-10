@@ -19,7 +19,8 @@ import type {
   ConnectionWorkspace,
   WorkspaceData,
   Sort,
-  TableStructure
+  TableStructure,
+  TableTemplate
 } from '../../../shared/types'
 
 export interface QueryState {
@@ -41,7 +42,7 @@ export interface Tab {
   id: string
   entity: EntityRef
   /** undefined / absent = regular table/query/new-table tab */
-  kind?: 'history' | 'connection-editor'
+  kind?: 'history' | 'connection-editor' | 'backup'
   /** set on connection-editor tabs: which connection to edit (null = new) */
   connectionEditor?: { connectionId: string | null }
   data: RowsResult | null
@@ -83,6 +84,8 @@ export interface Tab {
   idxAdds?: IndexSpec[]
   /** staged index drops, by index name */
   idxDrops?: string[]
+  /** staged FK constraint drops, by constraint name */
+  fkDrops?: string[]
   /** last-computed "has uncommitted schema changes" flag (set by StructureView) */
   structDirty?: boolean
 }
@@ -124,6 +127,11 @@ interface ConnectionsState {
   connections: ConnectionSummary[]
   loading: boolean
   load: () => Promise<void>
+  // local table templates (engine-tagged, global)
+  templates: TableTemplate[]
+  loadTemplates: () => Promise<void>
+  saveTemplate: (t: TableTemplate) => Promise<TableTemplate>
+  removeTemplate: (id: string) => Promise<void>
   /** Load workspace.json from disk. Call once on app startup before any open(). */
   loadWorkspace: () => Promise<void>
   /** the connection that was active when the app last closed (from workspace) */
@@ -161,6 +169,8 @@ interface ConnectionsState {
   pageSize: number
   /** Open/focus the History tab for the current connection (singleton). */
   openHistoryTab: () => void
+  /** Open/focus the Backup & Restore tab for the current connection (singleton). */
+  openBackupTab: () => void
   /** Open/focus a connection-editor tab. `connectionId` null = new connection. */
   openConnectionEditorTab: (connectionId: string | null) => void
   /** Update an editor tab's stored connectionId after saving a new connection. */
@@ -171,7 +181,7 @@ interface ConnectionsState {
     initialFilters?: Filter[],
     opts?: { view?: TabView; structureSub?: StructureSub }
   ) => Promise<void>
-  openNewTable: () => void
+  openNewTable: (initial?: { name?: string; columns?: NewColumnSpec[] }) => void
   openQuery: () => void
   setQuerySql: (sql: string) => void
   setQueryAutoLimit: (n: number) => void
@@ -205,6 +215,7 @@ interface ConnectionsState {
   setStructDraft: (cols: EditorColumn[]) => void
   setIdxAdds: (adds: IndexSpec[]) => void
   setIdxDrops: (drops: string[]) => void
+  setFkDrops: (drops: string[]) => void
   setStructDirty: (dirty: boolean) => void
   // bulk tab close (raw — callers handle any dirty-confirm)
   closeOtherTabs: (tabId: string) => void
@@ -251,7 +262,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       activeTabId,
       tabs: tabs
         .map((tab): SerializedTab | null => {
-          if (tab.kind === 'connection-editor') return null // don't persist editor tabs
+          if (tab.kind === 'connection-editor' || tab.kind === 'backup') return null
           return {
             id: tab.id,
             entity: tab.entity,
@@ -381,6 +392,20 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       set({ loading: true })
       const connections = await window.api.connections.list()
       set({ loading: false, connections })
+    },
+
+    templates: [],
+    loadTemplates: async () => {
+      set({ templates: await window.api.templates.list() })
+    },
+    saveTemplate: async (t) => {
+      const saved = await window.api.templates.save(t)
+      set({ templates: await window.api.templates.list() })
+      return saved
+    },
+    removeTemplate: async (id) => {
+      await window.api.templates.remove(id)
+      set((s) => ({ templates: s.templates.filter((t) => t.id !== id) }))
     },
 
     lastConnectionId: null,
@@ -648,6 +673,25 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       scheduleWorkspaceSave()
     },
 
+    openBackupTab: () => {
+      const existing = get().tabs.find((t) => t.kind === 'backup')
+      if (existing) {
+        set({ activeTabId: existing.id })
+        return
+      }
+      const tab: Tab = {
+        id: crypto.randomUUID(),
+        kind: 'backup',
+        entity: { name: 'Backup & Restore' },
+        data: null, loading: false, error: null, pageIndex: 0, total: null,
+        counting: false, filters: [], orderBy: [], edits: {}, deletes: [],
+        inserts: [], colWidths: {}, committing: false, view: 'data',
+        structureSub: 'columns', referencedBy: null, referencedByLoading: false,
+        structure: null, structureLoading: false, draft: null, query: null
+      }
+      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
+    },
+
     openConnectionEditorTab: (connectionId) => {
       const existing = get().tabs.find(
         (t) => t.kind === 'connection-editor' &&
@@ -743,7 +787,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       else await get().setTabView('structure')
     },
 
-    openNewTable: () => {
+    openNewTable: (initial) => {
       const tab: Tab = {
         id: crypto.randomUUID(),
         entity: { name: 'New table' },
@@ -767,8 +811,11 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         referencedBy: null,
         referencedByLoading: false,
         draft: {
-          name: '',
-          columns: [{ name: 'id', type: '', nullable: false, pk: true }]
+          name: initial?.name ?? '',
+          columns:
+            initial?.columns && initial.columns.length > 0
+              ? initial.columns
+              : [{ name: 'id', type: '', nullable: false, pk: true }]
         },
         query: null
       }
@@ -984,6 +1031,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
             structDraft: null,
             idxAdds: [],
             idxDrops: [],
+            fkDrops: [],
             structDirty: false
           })
         } catch (err) {
@@ -1034,7 +1082,16 @@ export const useConnections = create<ConnectionsState>((set, get) => {
           openConnectionId,
           tab.entity
         )
-        patchTab(activeTabId, { structure, structureLoading: false })
+        patchTab(activeTabId, {
+          structure,
+          structureLoading: false,
+          // fresh structure → reseed draft + clear staged schema edits
+          structDraft: null,
+          idxAdds: [],
+          idxDrops: [],
+          fkDrops: [],
+          structDirty: false
+        })
         if (get().tabs.find((t) => t.id === activeTabId)?.structureSub === 'referencedBy') {
           void get().fetchReferencedBy()
         }
@@ -1197,6 +1254,10 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     setIdxDrops: (drops) => {
       const id = get().activeTabId
       if (id) patchTab(id, { idxDrops: drops })
+    },
+    setFkDrops: (drops) => {
+      const id = get().activeTabId
+      if (id) patchTab(id, { fkDrops: drops })
     },
     setStructDirty: (dirty) => {
       const { activeTabId, tabs } = get()
