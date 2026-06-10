@@ -46,14 +46,14 @@ and [ADR-0012](adr/0012-tab-centric-persistent-workspace.md) clarification
       `BackupDialog` modal: full-height two-panel layout (Backup/Restore); table
       list fills available space; progress inline; after backup/restore stays open
       (result via toast). `BackupDialog.tsx` kept but no longer wired to sidebar.
-- [ ] **History syntax highlight + readable long queries.** Rows render a
-      single-line truncated **static** highlight (`@lezer/highlight` tokens →
-      spans, no editor instance — scales to the 500-row list). Click a row to
-      expand inline into the full statement via one `SqlDisplay` (CodeMirror),
-      wrapped + highlighted, with a **Format toggle (default on)** using a
-      formatter (e.g. `sql-formatter`). Display formatting is cosmetic — Copy /
-      export keep the **verbatim** captured statement (no-silent-mutation,
-      same principle as auto-`LIMIT` recording actual SQL).
+- [x] **History syntax highlight + readable long queries.** Done (`c9e8c98`).
+      `lib/sqlHighlight.tsx` — static highlight via the lezer SQL grammar
+      (`@codemirror/lang-sql` dialect parser) + `@lezer/highlight` `tagHighlighter`,
+      no editor instance, colours from `cm-theme.ts`, dialect-aware. `HistoryView`
+      rows show a single-line truncated highlighted preview (parse bounded to 300
+      chars); a chevron expands one row at a time into the full statement via a
+      single `SqlDisplay`, with a **Format toggle (default on)** using
+      `sql-formatter`. Copy stays **verbatim**.
 - [x] **Drop a relation where users look for it.** (a) Relations sub-tab: per-row
       Trash/Undo toggle stages `dropForeignKey` ops; disabled on SQLite + read-only.
       `Relation.constraint` added to `types.ts` + drivers (mysql/pg). `fkDrops`
@@ -61,7 +61,15 @@ and [ADR-0012](adr/0012-tab-centric-persistent-workspace.md) clarification
       detects backing-FK by `index.name === relation.constraint`; blocks bare drop
       with a "Drop both?" dialog that stages both ops in correct order (FK → index).
       Ops order: `fkDrops` → `idxDrops` → `colOps` → `idxAdds`.
-- [ ] **Local table templates (column sets).** Reusable, **local-only** named
+- [x] **Local table templates (column sets).** Done (`c9e8c98`). `TableTemplate`
+      type + `TemplatesApi`; main `store/templates.ts` (`templates.json`) + IPC +
+      preload; renderer store (`templates`, load/save/remove, loaded on startup).
+      `TemplateManager` dialog (sidebar toolbar) — list engine-filtered, create/edit
+      via `ColumnsEditor`, delete, "Use in new table". Author via "Save as template"
+      (NewTableEditor draft + StructureView columns). Apply: seed a new-table draft
+      (`openNewTable({ name, columns })`) or "Insert columns" into an existing
+      column draft as staged adds (`lib/templates.ts` strips PK/FK, skips name
+      collisions, toasts a summary). Reusable, **local-only** named
       column sets (never on the DB until a normal Create/Commit — no-silent
       stance). Solves repeated boilerplate (`id` + audit columns
       `CreatedDate`/`CreatedBy`/`LastModifiedBy`/`RecordStatus`). Resolved via
