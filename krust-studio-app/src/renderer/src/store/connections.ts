@@ -19,7 +19,8 @@ import type {
   ConnectionWorkspace,
   WorkspaceData,
   Sort,
-  TableStructure
+  TableStructure,
+  TableTemplate
 } from '../../../shared/types'
 
 export interface QueryState {
@@ -126,6 +127,11 @@ interface ConnectionsState {
   connections: ConnectionSummary[]
   loading: boolean
   load: () => Promise<void>
+  // local table templates (engine-tagged, global)
+  templates: TableTemplate[]
+  loadTemplates: () => Promise<void>
+  saveTemplate: (t: TableTemplate) => Promise<TableTemplate>
+  removeTemplate: (id: string) => Promise<void>
   /** Load workspace.json from disk. Call once on app startup before any open(). */
   loadWorkspace: () => Promise<void>
   /** the connection that was active when the app last closed (from workspace) */
@@ -175,7 +181,7 @@ interface ConnectionsState {
     initialFilters?: Filter[],
     opts?: { view?: TabView; structureSub?: StructureSub }
   ) => Promise<void>
-  openNewTable: () => void
+  openNewTable: (initial?: { name?: string; columns?: NewColumnSpec[] }) => void
   openQuery: () => void
   setQuerySql: (sql: string) => void
   setQueryAutoLimit: (n: number) => void
@@ -386,6 +392,20 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       set({ loading: true })
       const connections = await window.api.connections.list()
       set({ loading: false, connections })
+    },
+
+    templates: [],
+    loadTemplates: async () => {
+      set({ templates: await window.api.templates.list() })
+    },
+    saveTemplate: async (t) => {
+      const saved = await window.api.templates.save(t)
+      set({ templates: await window.api.templates.list() })
+      return saved
+    },
+    removeTemplate: async (id) => {
+      await window.api.templates.remove(id)
+      set((s) => ({ templates: s.templates.filter((t) => t.id !== id) }))
     },
 
     lastConnectionId: null,
@@ -767,7 +787,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       else await get().setTabView('structure')
     },
 
-    openNewTable: () => {
+    openNewTable: (initial) => {
       const tab: Tab = {
         id: crypto.randomUUID(),
         entity: { name: 'New table' },
@@ -791,8 +811,11 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         referencedBy: null,
         referencedByLoading: false,
         draft: {
-          name: '',
-          columns: [{ name: 'id', type: '', nullable: false, pk: true }]
+          name: initial?.name ?? '',
+          columns:
+            initial?.columns && initial.columns.length > 0
+              ? initial.columns
+              : [{ name: 'id', type: '', nullable: false, pk: true }]
         },
         query: null
       }

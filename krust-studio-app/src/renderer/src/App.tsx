@@ -24,6 +24,7 @@ function App(): React.JSX.Element {
     patchEditorTabConnection,
     load,
     loadWorkspace,
+    loadTemplates,
     autoOpenLast
   } = useConnections()
 
@@ -31,9 +32,10 @@ function App(): React.JSX.Element {
     void (async () => {
       await load()
       await loadWorkspace()
+      void loadTemplates() // non-blocking; local templates for the create-table flow
       autoOpenLast() // land back on the last-used connection
     })()
-  }, [load, loadWorkspace, autoOpenLast])
+  }, [load, loadWorkspace, loadTemplates, autoOpenLast])
 
   useEffect(() => {
     const ipc = window.electron.ipcRenderer

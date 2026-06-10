@@ -9,7 +9,8 @@ import {
   Check,
   Undo2,
   X,
-  Pencil
+  Pencil,
+  TableProperties
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -37,12 +38,21 @@ import {
   SheetDescription,
   SheetFooter
 } from '@/components/ui/sheet'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import { StructureEditor } from '@/components/StructureEditor'
 import { SqlDisplay } from '@/components/SqlDisplay'
+import { TemplateManager } from '@/components/TemplateManager'
 import { type EditorColumn } from '@/components/ColumnsEditor'
 import { seed, diff } from '@/lib/columnDiff'
+import { insertTemplateColumns } from '@/lib/templates'
 import { useConnections, type StructureSub as Sub } from '@/store/connections'
-import type { EntityRef, IndexSpec, SchemaOp } from '../../../shared/types'
+import type { EntityRef, IndexSpec, NewColumnSpec, SchemaOp } from '../../../shared/types'
 
 const SUBS: Sub[] = ['columns', 'indexes', 'relations', 'referencedBy', 'ddl']
 const SUB_LABEL: Record<Sub, string> = {
@@ -111,7 +121,8 @@ export function StructureView(): React.JSX.Element | null {
     setIdxAdds,
     setIdxDrops,
     setFkDrops,
-    setStructDirty
+    setStructDirty,
+    templates
   } = useConnections()
   const tab = tabs.find((t) => t.id === activeTabId)
   const st = tab?.structure ?? null
@@ -130,6 +141,7 @@ export function StructureView(): React.JSX.Element | null {
   const idxDrops = useMemo(() => new Set(tab?.idxDrops ?? []), [tab?.idxDrops])
   const fkDrops = useMemo(() => new Set(tab?.fkDrops ?? []), [tab?.fkDrops])
   const [colFilter, setColFilter] = useState('')
+  const [tmplOpen, setTmplOpen] = useState(false)
 
   // FK-backing index alert: shown when user drops an index that backs a FK
   const [fkBackingAlert, setFkBackingAlert] = useState<{
@@ -348,6 +360,36 @@ export function StructureView(): React.JSX.Element | null {
     setColFilter('') // clear filter so the new (empty-name) row isn't hidden
     setStructureSub('columns')
   }
+
+  // templates of the current engine (engine-locked)
+  const engineTemplates = templates.filter((t) => t.engine === driver)
+
+  // insert a template's columns as staged adds (PK/FK stripped, name collisions skipped)
+  const insertTemplate = (id: string): void => {
+    const t = templates.find((x) => x.id === id)
+    if (!t) return
+    const { next, added, skipped } = insertTemplateColumns(colDraft, t)
+    setStructDraft(next)
+    setColFilter('')
+    setStructureSub('columns')
+    if (added.length === 0)
+      toast.error(`No columns added — all ${skipped.length} already exist`)
+    else
+      toast.success(
+        `Added ${added.length} column(s)` +
+          (skipped.length ? `, skipped ${skipped.length} (already exist)` : '')
+      )
+  }
+
+  // the table's current columns, as template column specs (for "Save as template")
+  const structureAsColumns = (): NewColumnSpec[] =>
+    (st?.columns ?? []).map((c) => ({
+      name: c.name,
+      type: c.type ?? '',
+      nullable: c.nullable,
+      pk: c.pk,
+      default: c.default ?? undefined
+    }))
 
   const preview = async (): Promise<void> => {
     if (!openConnectionId || ops.length === 0) return
@@ -727,10 +769,35 @@ export function StructureView(): React.JSX.Element | null {
       {st && !readOnly && (
         <div className="flex h-9 shrink-0 items-center gap-2 border-t border-border px-3 text-xs text-muted-foreground">
           {sub === 'columns' && (
-            <Button size="xs" variant="ghost" onClick={addColumn} title="Add a column">
-              <Plus />
-              Add column
-            </Button>
+            <>
+              <Button size="xs" variant="ghost" onClick={addColumn} title="Add a column">
+                <Plus />
+                Add column
+              </Button>
+              {canAlter && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="xs" variant="ghost" title="Table templates">
+                      <TableProperties />
+                      Templates
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem onSelect={() => setTmplOpen(true)}>
+                      <TableProperties />
+                      Save table as template…
+                    </DropdownMenuItem>
+                    {engineTemplates.length > 0 && <DropdownMenuSeparator />}
+                    {engineTemplates.map((t) => (
+                      <DropdownMenuItem key={t.id} onSelect={() => insertTemplate(t.id)}>
+                        <Plus />
+                        Insert “{t.name}” ({t.columns.length})
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </>
           )}
           <span>{ops.length} pending change(s)</span>
           <div className="flex-1" />
@@ -925,6 +992,13 @@ export function StructureView(): React.JSX.Element | null {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Save the table's columns as a reusable template */}
+      <TemplateManager
+        open={tmplOpen}
+        onOpenChange={setTmplOpen}
+        initialColumns={structureAsColumns()}
+      />
 
       {/* DDL review sheet (shared with column commit) */}
       <Sheet open={previewSql !== null} onOpenChange={(o) => !o && setPreviewSql(null)}>

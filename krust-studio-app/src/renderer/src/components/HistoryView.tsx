@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Loader2,
@@ -14,8 +14,13 @@ import {
   Inbox,
   GitBranch,
   CheckCircle2,
-  XCircle
+  XCircle,
+  ChevronRight,
+  WrapText
 } from 'lucide-react'
+import { format as formatSql } from 'sql-formatter'
+import { SqlDisplay } from '@/components/SqlDisplay'
+import { highlightSql } from '@/lib/sqlHighlight'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -52,6 +57,22 @@ function when(ts: number): string {
 const withSemi = (s: string): string =>
   s.trimEnd().endsWith(';') ? s.trimEnd() : s.trimEnd() + ';'
 
+/** collapse whitespace to a single line for the truncated list preview */
+const oneLine = (s: string): string => s.replace(/\s+/g, ' ').trim()
+
+const fmtLang = (d?: string): string =>
+  d === 'mysql' ? 'mysql' : d === 'postgres' ? 'postgresql' : d === 'sqlite' ? 'sqlite' : 'sql'
+
+/** pretty-print SQL for display; never throws (falls back to the verbatim text) */
+function tryFormat(sql: string, driver?: string): string {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return formatSql(sql, { language: fmtLang(driver) as any })
+  } catch {
+    return sql
+  }
+}
+
 export function HistoryView(): React.JSX.Element {
   const openConnectionId = useConnections((s) => s.openConnectionId)
   const connections = useConnections((s) => s.connections)
@@ -65,6 +86,11 @@ export function HistoryView(): React.JSX.Element {
   const [entries, setEntries] = useState<HistoryEntry[]>([])
   const [selected, setSelected] = useState<Set<number>>(new Set())
   const [loading, setLoading] = useState(false)
+  /** id of the row expanded to show its full, highlighted statement */
+  const [expandedId, setExpandedId] = useState<number | null>(null)
+  /** pretty-print the expanded statement (display only; copy stays verbatim) */
+  const [formatExpanded, setFormatExpanded] = useState(true)
+  const driver = conn?.driver
   const [dialog, setDialog] = useState<{
     mode: 'create' | 'rename'
     id?: number
@@ -452,61 +478,125 @@ export function HistoryView(): React.JSX.Element {
                 </tr>
               </thead>
               <tbody>
-                {entries.map((e) => (
-                  <tr
-                    key={e.id}
-                    className={cn(
-                      'group border-b border-border/30 align-top',
-                      selected.has(e.id) && 'bg-accent/40'
-                    )}
-                  >
-                    <td className="px-2 py-1.5">
-                      <Checkbox
-                        checked={selected.has(e.id)}
-                        onCheckedChange={() => toggle(e.id)}
-                      />
-                    </td>
-                    <td className="px-2 py-1.5">
-                      {e.status === 'success' ? (
-                        <CheckCircle2 className="size-3.5 text-primary" />
-                      ) : (
-                        <XCircle className="size-3.5 text-destructive" />
-                      )}
-                    </td>
-                    <td className="px-2 py-1.5 whitespace-nowrap text-muted-foreground">
-                      {when(e.ts)}
-                    </td>
-                    <td className="px-2 py-1.5 font-mono whitespace-nowrap">
-                      {e.entity ?? ''}
-                    </td>
-                    <td className="px-2 py-1.5 font-mono break-all whitespace-pre-wrap">
-                      {e.statement}
-                    </td>
-                    {isDdlView && view.kind !== 'changeset' && (
-                      <td className="px-2 py-1.5 whitespace-nowrap text-muted-foreground">
-                        {e.changesetId == null ? (
-                          <span className="text-muted-foreground/50">—</span>
-                        ) : (
-                          csName(e.changesetId)
+                {entries.map((e) => {
+                  const expanded = expandedId === e.id
+                  const colCount = 7 + (isDdlView && view.kind !== 'changeset' ? 1 : 0)
+                  return (
+                    <Fragment key={e.id}>
+                      <tr
+                        className={cn(
+                          'group border-b border-border/30 align-top',
+                          selected.has(e.id) && 'bg-accent/40'
                         )}
-                      </td>
-                    )}
-                    <td className="px-2 py-1.5 text-right tabular-nums text-muted-foreground">
-                      {e.affected ?? ''}
-                    </td>
-                    <td className="px-2 py-1.5">
-                      <button
-                        onClick={() =>
-                          void copy(withSemi(e.statement), 'Copied statement')
-                        }
-                        title="Copy statement"
-                        className="text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground"
                       >
-                        <Copy className="size-3.5" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                        <td className="px-2 py-1.5">
+                          <Checkbox
+                            checked={selected.has(e.id)}
+                            onCheckedChange={() => toggle(e.id)}
+                          />
+                        </td>
+                        <td className="px-2 py-1.5">
+                          {e.status === 'success' ? (
+                            <CheckCircle2 className="size-3.5 text-primary" />
+                          ) : (
+                            <XCircle className="size-3.5 text-destructive" />
+                          )}
+                        </td>
+                        <td className="px-2 py-1.5 whitespace-nowrap text-muted-foreground">
+                          {when(e.ts)}
+                        </td>
+                        <td className="px-2 py-1.5 font-mono whitespace-nowrap">
+                          {e.entity ?? ''}
+                        </td>
+                        <td className="max-w-0 px-2 py-1.5">
+                          {/* click to expand into the full, highlighted statement */}
+                          <button
+                            onClick={() => setExpandedId(expanded ? null : e.id)}
+                            title={expanded ? 'Collapse' : 'Expand'}
+                            className="flex w-full items-start gap-1 text-left font-mono"
+                          >
+                            <ChevronRight
+                              className={cn(
+                                'mt-0.5 size-3 shrink-0 text-muted-foreground/60 transition-transform',
+                                expanded && 'rotate-90'
+                              )}
+                            />
+                            <span className="min-w-0 flex-1 truncate">
+                              {highlightSql(oneLine(e.statement).slice(0, 300), driver)}
+                            </span>
+                          </button>
+                        </td>
+                        {isDdlView && view.kind !== 'changeset' && (
+                          <td className="px-2 py-1.5 whitespace-nowrap text-muted-foreground">
+                            {e.changesetId == null ? (
+                              <span className="text-muted-foreground/50">—</span>
+                            ) : (
+                              csName(e.changesetId)
+                            )}
+                          </td>
+                        )}
+                        <td className="px-2 py-1.5 text-right tabular-nums text-muted-foreground">
+                          {e.affected ?? ''}
+                        </td>
+                        <td className="px-2 py-1.5">
+                          <button
+                            onClick={() =>
+                              void copy(withSemi(e.statement), 'Copied statement')
+                            }
+                            title="Copy statement"
+                            className="text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground"
+                          >
+                            <Copy className="size-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                      {expanded && (
+                        <tr className="border-b border-border/30 bg-card/30">
+                          <td colSpan={colCount} className="px-2 pb-2.5 pt-1">
+                            <div className="mb-1.5 flex items-center gap-2 pl-6">
+                              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                                Statement
+                              </span>
+                              <button
+                                onClick={() => setFormatExpanded((v) => !v)}
+                                title="Toggle pretty-print (display only)"
+                                className={cn(
+                                  'flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px]',
+                                  formatExpanded
+                                    ? 'bg-accent text-foreground'
+                                    : 'text-muted-foreground hover:bg-accent/50'
+                                )}
+                              >
+                                <WrapText className="size-3" />
+                                {formatExpanded ? 'Formatted' : 'Raw'}
+                              </button>
+                              <div className="flex-1" />
+                              <button
+                                onClick={() =>
+                                  void copy(withSemi(e.statement), 'Copied statement')
+                                }
+                                title="Copy verbatim statement"
+                                className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
+                              >
+                                <Copy className="size-3" />
+                                Copy
+                              </button>
+                            </div>
+                            <div className="ml-6 overflow-auto rounded border border-border/60 bg-background p-2">
+                              <SqlDisplay
+                                value={
+                                  formatExpanded
+                                    ? tryFormat(e.statement, driver)
+                                    : e.statement
+                                }
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  )
+                })}
               </tbody>
             </table>
           )}

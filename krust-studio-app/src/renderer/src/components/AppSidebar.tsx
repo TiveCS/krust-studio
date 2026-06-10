@@ -16,6 +16,7 @@ import {
   Tags,
   History as HistoryIcon,
   DatabaseBackup,
+  TableProperties,
   Unplug
 } from 'lucide-react'
 import {
@@ -50,6 +51,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { DatabaseSwitcher } from '@/components/DatabaseSwitcher'
 import { ConnectionSwitcher } from '@/components/ConnectionSwitcher'
+import { TemplateManager } from '@/components/TemplateManager'
 import { useConnections } from '@/store/connections'
 import type { EntityRef, EntityType, EnumType } from '../../../shared/types'
 
@@ -78,6 +80,7 @@ export function AppSidebar(): React.JSX.Element {
   const historyActive = activeTabKind === 'history'
   const backupActive = activeTabKind === 'backup'
   const [filter, setFilter] = useState('')
+  const [templatesOpen, setTemplatesOpen] = useState(false)
   const [renameTarget, setRenameTarget] = useState<EntityRef | null>(null)
   const [renameValue, setRenameValue] = useState('')
   const [destructive, setDestructive] = useState<{
@@ -260,6 +263,13 @@ export function AppSidebar(): React.JSX.Element {
               >
                 <DatabaseBackup className="size-3.5" />
               </button>
+              <button
+                onClick={() => setTemplatesOpen(true)}
+                title="Table templates"
+                className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+              >
+                <TableProperties className="size-3.5" />
+              </button>
             </div>
             <EntityGroup
               label="Tables"
@@ -302,6 +312,9 @@ export function AppSidebar(): React.JSX.Element {
       <SidebarFooter>
         <ConnectionSwitcher />
       </SidebarFooter>
+
+      {/* Table templates */}
+      <TemplateManager open={templatesOpen} onOpenChange={setTemplatesOpen} />
 
       {/* Rename table */}
       <Dialog
