@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Minus, Square, Copy, X, ChevronDown, RefreshCw } from 'lucide-react'
+import { Minus, Square, Copy, X, ChevronDown, RefreshCw, Settings } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import {
@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { SettingsModal } from '@/components/SettingsModal'
 
 type UpdateResult = {
   status: 'dev' | 'up-to-date' | 'available' | 'unknown' | 'error'
@@ -44,16 +45,19 @@ const isMac =
 
 export function TitleBar(): React.JSX.Element {
   const [maximized, setMaximized] = useState(false)
+  const [appVersion, setAppVersion] = useState('')
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   useEffect(() => {
     void window.api.window.isMaximized().then(setMaximized)
+    void window.api.window.getVersion().then(setAppVersion)
     return window.api.window.onMaximizedChange(setMaximized)
   }, [])
 
   return (
     <div className="app-drag flex h-8 shrink-0 items-center border-b border-border bg-card/40 select-none">
       {/* left: room for macOS traffic lights, then app menu */}
-      <div className={cn('app-no-drag flex items-center px-1', isMac && 'pl-[72px]')}>
+      <div className={cn('app-no-drag flex items-center gap-1 px-1', isMac && 'pl-[72px]')}>
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-1 rounded px-2 py-1 text-xs font-medium tracking-wide text-muted-foreground hover:bg-accent hover:text-foreground">
             Krust Studio
@@ -66,7 +70,18 @@ export function TitleBar(): React.JSX.Element {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        {appVersion && (
+          <span className="text-[10px] text-muted-foreground/50">v{appVersion}</span>
+        )}
+        <button
+          onClick={() => setSettingsOpen(true)}
+          title="Settings"
+          className="rounded p-1 text-muted-foreground/60 hover:bg-accent hover:text-foreground"
+        >
+          <Settings className="size-3" />
+        </button>
       </div>
+      <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
 
       {/* draggable filler */}
       <div className="h-full flex-1" />

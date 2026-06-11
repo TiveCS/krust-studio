@@ -171,7 +171,7 @@ export function classifyStatement(sql: string): {
   const head = kw.slice(0, 12).toUpperCase()
   if (/^(SELECT|WITH|SHOW|EXPLAIN|PRAGMA|DESCRIBE|DESC|VALUES|TABLE)\b/.test(head))
     return { stream: 'data_retrieval', reads: true }
-  if (/^(CREATE|ALTER|DROP|TRUNCATE|RENAME|COMMENT|GRANT|REVOKE)\b/.test(head))
+  if (/^(CREATE|ALTER|DROP|RENAME|COMMENT|GRANT|REVOKE)\b/.test(head))
     return { stream: 'table_mutation', reads: false }
   return { stream: 'data_mutation', reads: false }
 }

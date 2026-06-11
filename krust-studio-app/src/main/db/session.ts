@@ -45,13 +45,26 @@ async function withRetry<T>(id: string, fn: (driver: DbDriver) => Promise<T>): P
   }
 }
 
+/**
+ * True for statements that are irreversible by nature: TRUNCATE, DROP, and
+ * DELETE/UPDATE without a WHERE clause. Used to gate changeset auto-attach.
+ */
+function isDestructiveStatement(sql: string): boolean {
+  const body = sql.replace(/^\s*(\/\*[\s\S]*?\*\/|--[^\n]*\n)*\s*/, '').trimStart()
+  const head = body.slice(0, 10).toUpperCase()
+  if (/^(TRUNCATE|DROP)\b/.test(head)) return true
+  if (/^(DELETE|UPDATE)\b/.test(head) && !/\bWHERE\b/i.test(body)) return true
+  return false
+}
+
 /** Record captured statements (best-effort; capture() swallows its own errors). */
 async function captureAll(
   connectionId: string,
   stream: HistoryStream,
   statements: string[],
   entity: string | null,
-  affected: number | null = null
+  affected: number | null = null,
+  destructive = false
 ): Promise<void> {
   for (const statement of statements) {
     await capture({
@@ -61,7 +74,8 @@ async function captureAll(
       statement,
       status: 'success',
       entity,
-      affected
+      affected,
+      destructive
     })
   }
 }
@@ -240,7 +254,7 @@ export async function dropEntity(
     throw new Error('Connection is read-only; schema changes blocked')
   if (!sessions.has(id)) await connectSession(id)
   const res = await sessions.get(id)!.dropEntity(entity, type)
-  await captureAll(id, 'table_mutation', res.statements, entity.name)
+  await captureAll(id, 'table_mutation', res.statements, entity.name, null, true)
   return res
 }
 
@@ -267,7 +281,7 @@ export async function truncateTable(
     throw new Error('Connection is read-only; writes are blocked')
   if (!sessions.has(id)) await connectSession(id)
   const res = await sessions.get(id)!.truncateTable(entity)
-  await captureAll(id, 'table_mutation', res.statements, entity.name)
+  await captureAll(id, 'data_mutation', res.statements, entity.name, null, true)
   return res
 }
 
@@ -344,7 +358,8 @@ export async function runScript(
         source: 'manual',
         statement: exec,
         status: 'success',
-        affected: r.affected ?? null
+        affected: r.affected ?? null,
+        destructive: isDestructiveStatement(stmt)
       })
     } catch (err) {
       const ms = Date.now() - t0

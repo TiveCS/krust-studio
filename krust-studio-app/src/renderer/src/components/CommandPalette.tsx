@@ -10,6 +10,7 @@ import {
   CommandItem
 } from '@/components/ui/command'
 import { useConnections } from '@/store/connections'
+import { useUi } from '@/store/ui'
 
 const MAX_RESULTS = 50
 
@@ -21,23 +22,12 @@ const MAX_RESULTS = 50
  */
 export function CommandPalette(): React.JSX.Element {
   const { entities, openConnectionId, openTable } = useConnections()
-  const [open, setOpen] = useState(false)
+  const { paletteOpen: open, setPaletteOpen } = useUi()
   const [search, setSearch] = useState('')
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent): void => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
-        e.preventDefault()
-        if (openConnectionId) setOpen((o) => !o)
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [openConnectionId])
-
-  useEffect(() => {
-    if (!openConnectionId) setOpen(false)
-  }, [openConnectionId])
+    if (!openConnectionId && open) setPaletteOpen(false)
+  }, [openConnectionId, open, setPaletteOpen])
 
   // reset search each time it opens
   useEffect(() => {
@@ -60,7 +50,7 @@ export function CommandPalette(): React.JSX.Element {
   }, [search, entities])
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setPaletteOpen}>
       <DialogHeader className="sr-only">
         <DialogTitle>Search tables</DialogTitle>
         <DialogDescription>
@@ -89,7 +79,7 @@ export function CommandPalette(): React.JSX.Element {
                   value={`${e.schema ?? ''}.${e.name}`}
                   onSelect={() => {
                     void openTable({ name: e.name, schema: e.schema })
-                    setOpen(false)
+                    setPaletteOpen(false)
                   }}
                 >
                   {e.type === 'view' ? (

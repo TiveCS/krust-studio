@@ -168,6 +168,8 @@ export interface HistoryEntry {
   error: string | null
   /** changeset this Table-Mutation entry belongs to; null = Unassigned inbox */
   changesetId: number | null
+  /** TRUNCATE / DROP / DELETE|UPDATE without WHERE — not auto-attached to changeset */
+  destructive: boolean
 }
 
 export interface HistoryQuery {
@@ -206,6 +208,7 @@ export interface CaptureInput {
   affected?: number | null
   entity?: string | null
   error?: string | null
+  destructive?: boolean
 }
 
 export interface HistoryApi {
@@ -232,6 +235,8 @@ export interface HistoryApi {
   ) => Promise<void>
   /** build the commented .sql and save it via the OS dialog; marks Exported */
   exportChangeset: (id: number) => Promise<{ saved: boolean; path?: string }>
+  /** hard-delete specific entries by id (like bulk Clear but id-targeted) */
+  deleteEntries: (ids: number[]) => Promise<void>
 }
 
 export type FilterOp =
@@ -604,6 +609,7 @@ export interface WindowControlApi {
   isMaximized: () => Promise<boolean>
   /** subscribe to maximize/unmaximize; returns an unsubscribe fn */
   onMaximizedChange: (cb: (maximized: boolean) => void) => () => void
+  getVersion: () => Promise<string>
 }
 
 /** local table-template CRUD (templates.json in the data dir) */

@@ -100,11 +100,11 @@ Design resolved via `/grill-with-docs` (2026-06-10). See
 [ADR-0015](adr/0015-configurable-scoped-keybindings.md) and CONTEXT.md
 **Settings** / **Keybinding / Command** / **History Search** / **Destructive**.
 
-- [ ] **App version label.** Surface the running app version (from
+- [x] **App version label.** Surface the running app version (from
       `app.getVersion()` via IPC) somewhere visible — e.g. the sidebar footer
       near `ConnectionSwitcher`, and/or the settings/about surface. Lets the user
       confirm which build they're on (esp. after an auto-update).
-- [ ] **Configurable scope-aware keybindings.** Named **Command** registry, each
+- [x] **Configurable scope-aware keybindings.** Named **Command** registry, each
       with a default binding; user overrides persisted in a global `settings.json`
       (data dir, main-process store + IPC, mirroring `connections.json` — app-
       global, NOT per-connection). Central keydown **dispatcher** resolves the
@@ -121,20 +121,20 @@ Design resolved via `/grill-with-docs` (2026-06-10). See
         `table.toggleView` (data ⇄ structure); `Ctrl/⌘+Shift+F` `filter.add`
         (expand FilterBar + append a focused empty condition row); `Ctrl/⌘+P`
         `palette.open` (existing).
-- [ ] **Settings modal.** Large VSCode-style **modal** (not a tab, not per-
+- [x] **Settings modal.** Large VSCode-style **modal** (not a tab, not per-
       connection), reachable from the title bar even with no connection open.
       Left-nav categories + search. First category: **Keybindings** — lists
       commands, shows each binding, click-to-record rebind, scoped conflict
       warning. Backed by the global `settings.json` store above.
-- [ ] **History entry delete.** Reuse HistoryView's existing multi-select;
+- [x] **History entry delete.** Reuse HistoryView's existing multi-select;
       **Delete** removes selected entries (hard delete, like the bulk Clear) behind
       a count-confirm dialog. Deleting an entry that's in a changeset just removes
       that row from it. New `history.deleteEntries(ids)` IPC + store action.
-- [ ] **History search.** Text filter inside the History view; filters the
+- [x] **History search.** Text filter inside the History view; filters the
       currently-shown stream/changeset entries by statement text, **client-side**
       (entries capped, instant — same approach as the Command Palette). Command
       Palette stays schema-object-only.
-- [ ] **TRUNCATE → Data Mutation + Destructive tag.** (a) Reclassify TRUNCATE
+- [x] **TRUNCATE → Data Mutation + Destructive tag.** (a) Reclassify TRUNCATE
       capture from `table_mutation` to `data_mutation` ([session.ts:270]) — rule:
       object shape = Table Mutation, row contents = Data Mutation. (b) Add a
       cross-cutting **destructive** flag to history entries (`TRUNCATE`/`DROP`/
@@ -143,6 +143,34 @@ Design resolved via `/grill-with-docs` (2026-06-10). See
       attached to the active changeset, but the flag makes them changeset-eligible
       so the user can still **Move to changeset** manually. Schema column +
       classify at the `session.ts` capture choke point.
+
+## P0 — v1.6.0: pinned columns — PLANNED
+
+Design resolved via `/grill-with-docs` (2026-06-11). See
+[ADR-0016](adr/0016-pinned-columns-freeze-and-reorder.md) and CONTEXT.md
+**Pinned Column**.
+
+- [ ] **Pinned columns (freeze panes).** Columns frozen to the left or right
+      edge of the Data Grid during horizontal scroll — like Excel freeze panes.
+      Settings-driven: two rule types in a new **Pinned Columns** section of the
+      Settings modal.
+      - **Name rules** — tag/chip input; each chip is an exact column name with
+        an L/R toggle. Applied to every table opened.
+      - **PK rule** — toggle + L/R selector. Auto-pins the primary key column(s)
+        from `RowsResult.primaryKey`.
+      - **Stored in `settings.json`** as
+        `{ pinnedColumns: Array<{ name: string; side: 'left'|'right' }>, pinPrimaryKey: { enabled: boolean; side: 'left'|'right' } }`.
+      - **Render**: `DataGrid` computes `effectivePins` (name matches + PK
+        matches, minus per-tab unpins) then reorders into three groups: left-pinned
+        (original relative order) → scrollable → right-pinned. Each pinned
+        `<th>`/`<td>` gets `position: sticky` with cumulative `left`/`right`
+        offset. Row-number gutter stays sticky-left at offset 0; left-pin offsets
+        start at `ROWNUM_W` (48 px).
+      - **Freeze shadow** — `box-shadow` on the rightmost left-pinned column's
+        right edge and the leftmost right-pinned column's left edge.
+      - **Per-tab override** — right-click column header → "Unpin" / "Re-pin"
+        suppresses or restores a settings-driven pin for the current tab session
+        only. State in `Tab.pinnedOverride` (not persisted in `SerializedTab`).
 
 ## P0 — v1.3.0: workspace & connection resilience — DONE
 

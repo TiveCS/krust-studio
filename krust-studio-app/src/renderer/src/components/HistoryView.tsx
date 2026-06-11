@@ -91,6 +91,8 @@ export function HistoryView(): React.JSX.Element {
   /** pretty-print the expanded statement (display only; copy stays verbatim) */
   const [formatExpanded, setFormatExpanded] = useState(true)
   const driver = conn?.driver
+  const [search, setSearch] = useState('')
+  const [deleteConfirm, setDeleteConfirm] = useState<number[] | null>(null)
   const [dialog, setDialog] = useState<{
     mode: 'create' | 'rename'
     id?: number
@@ -111,6 +113,7 @@ export function HistoryView(): React.JSX.Element {
   const loadEntries = useCallback(async (): Promise<void> => {
     if (!openConnectionId) return setEntries([])
     setLoading(true)
+    setSearch('')
     try {
       const q =
         view.kind === 'stream'
@@ -144,9 +147,6 @@ export function HistoryView(): React.JSX.Element {
       next.has(id) ? next.delete(id) : next.add(id)
       return next
     })
-  const allSelected = entries.length > 0 && selected.size === entries.length
-  const toggleAll = (): void =>
-    setSelected(allSelected ? new Set() : new Set(entries.map((e) => e.id)))
 
   const copy = async (text: string, label: string): Promise<void> => {
     try {
@@ -228,6 +228,28 @@ export function HistoryView(): React.JSX.Element {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err))
     }
+  }
+
+  const filtered = search
+    ? entries.filter((e) =>
+        e.statement.toLowerCase().includes(search.toLowerCase())
+      )
+    : entries
+
+  const allSelected = filtered.length > 0 && filtered.every((e) => selected.has(e.id))
+  const toggleAll = (): void =>
+    setSelected(
+      allSelected
+        ? new Set([...selected].filter((id) => !filtered.some((e) => e.id === id)))
+        : new Set([...selected, ...filtered.map((e) => e.id)])
+    )
+
+  const deleteSelected = async (): Promise<void> => {
+    const ids = [...selected]
+    await window.api.history.deleteEntries(ids)
+    toast.success(`Deleted ${ids.length} entr${ids.length === 1 ? 'y' : 'ies'}`)
+    setDeleteConfirm(null)
+    await loadEntries()
   }
 
   const railItem = (active: boolean): string =>
@@ -372,6 +394,24 @@ export function HistoryView(): React.JSX.Element {
           </span>
           {loading && <Loader2 className="size-3.5 animate-spin" />}
           <div className="flex-1" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Filter statements…"
+            className="h-6 w-48 text-xs"
+          />
+
+          {selected.size > 0 && (
+            <Button
+              size="xs"
+              variant="ghost"
+              className="whitespace-nowrap text-destructive hover:text-destructive"
+              onClick={() => setDeleteConfirm([...selected])}
+            >
+              <Trash2 />
+              Delete {selected.size}
+            </Button>
+          )}
 
           {isDdlView && selected.size > 0 && (
             <DropdownMenu>
@@ -459,6 +499,10 @@ export function HistoryView(): React.JSX.Element {
             <div className="py-10 text-center text-sm text-muted-foreground">
               No statements here yet.
             </div>
+          ) : filtered.length === 0 ? (
+            <div className="py-10 text-center text-sm text-muted-foreground">
+              No statements match "{search}".
+            </div>
           ) : (
             <table className="w-full border-collapse text-xs">
               <thead className="sticky top-0 z-10 bg-background">
@@ -478,7 +522,7 @@ export function HistoryView(): React.JSX.Element {
                 </tr>
               </thead>
               <tbody>
-                {entries.map((e) => {
+                {filtered.map((e) => {
                   const expanded = expandedId === e.id
                   const colCount = 7 + (isDdlView && view.kind !== 'changeset' ? 1 : 0)
                   return (
@@ -602,6 +646,28 @@ export function HistoryView(): React.JSX.Element {
           )}
         </div>
       </div>
+
+      <Dialog
+        open={!!deleteConfirm}
+        onOpenChange={(o) => !o && setDeleteConfirm(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete {deleteConfirm?.length ?? 0} entr{(deleteConfirm?.length ?? 0) === 1 ? 'y' : 'ies'}?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            This permanently removes the selected history entries. This cannot be undone.
+          </p>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setDeleteConfirm(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={() => void deleteSelected()}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!dialog} onOpenChange={(o) => !o && setDialog(null)}>
         <DialogContent>

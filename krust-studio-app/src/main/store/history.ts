@@ -31,7 +31,8 @@ async function getDb(): Promise<DatabaseSync> {
       affected      INTEGER,
       entity        TEXT,
       error         TEXT,
-      changeset_id  INTEGER
+      changeset_id  INTEGER,
+      destructive   INTEGER NOT NULL DEFAULT 0
     );
     CREATE INDEX IF NOT EXISTS idx_history_conn_stream_ts
       ON history_entries (connection_id, stream, ts DESC);
@@ -49,12 +50,17 @@ async function getDb(): Promise<DatabaseSync> {
       value TEXT
     );
   `)
-  // migration: add changeset_id to pre-existing history_entries tables
+  // migrations: add columns to pre-existing history_entries tables
   const cols = db
     .prepare('PRAGMA table_info(history_entries)')
     .all() as Array<{ name: string }>
   if (!cols.some((c) => c.name === 'changeset_id')) {
     db.exec('ALTER TABLE history_entries ADD COLUMN changeset_id INTEGER')
+  }
+  if (!cols.some((c) => c.name === 'destructive')) {
+    db.exec(
+      'ALTER TABLE history_entries ADD COLUMN destructive INTEGER NOT NULL DEFAULT 0'
+    )
   }
   return db
 }
@@ -72,15 +78,17 @@ function getActiveId(d: DatabaseSync, connectionId: string): number | null {
 export async function capture(input: CaptureInput): Promise<void> {
   try {
     const d = await getDb()
-    // Table-Mutation (DDL) auto-attaches to the connection's active changeset
+    const destructive = input.destructive ? 1 : 0
+    // Non-destructive Table-Mutation DDL auto-attaches to the active changeset.
+    // Destructive entries are changeset-eligible but must be moved manually.
     const changesetId =
-      input.stream === 'table_mutation'
+      input.stream === 'table_mutation' && !input.destructive
         ? getActiveId(d, input.connectionId)
         : null
     d.prepare(
       `INSERT INTO history_entries
-         (ts, connection_id, stream, source, statement, status, affected, entity, error, changeset_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+         (ts, connection_id, stream, source, statement, status, affected, entity, error, changeset_id, destructive)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).run(
       Date.now(),
       input.connectionId,
@@ -91,7 +99,8 @@ export async function capture(input: CaptureInput): Promise<void> {
       input.affected ?? null,
       input.entity ?? null,
       input.error ?? null,
-      changesetId
+      changesetId,
+      destructive
     )
   } catch (err) {
     console.error('history capture failed', err)
@@ -121,14 +130,17 @@ export async function listHistory(query: HistoryQuery): Promise<HistoryEntry[]> 
   const rows = d
     .prepare(
       `SELECT id, ts, connection_id AS connectionId, stream, source, statement,
-              status, affected, entity, error, changeset_id AS changesetId
+              status, affected, entity, error, changeset_id AS changesetId,
+              destructive
          FROM history_entries
          ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
         ORDER BY ts DESC, id DESC
         LIMIT ${limit} OFFSET ${offset}`
     )
-    .all(...(params as never[])) as unknown as HistoryEntry[]
-  return rows
+    .all(...(params as never[])) as unknown as Array<
+    Omit<HistoryEntry, 'destructive'> & { destructive: number }
+  >
+  return rows.map((r) => ({ ...r, destructive: r.destructive !== 0 }))
 }
 
 export async function clearHistory(
@@ -246,7 +258,7 @@ export async function assignEntries(
   const placeholders = entryIds.map(() => '?').join(', ')
   d.prepare(
     `UPDATE history_entries SET changeset_id = ?
-      WHERE id IN (${placeholders}) AND stream = 'table_mutation'`
+      WHERE id IN (${placeholders}) AND (stream = 'table_mutation' OR destructive = 1)`
   ).run(changesetId, ...(entryIds as never[]))
 }
 
@@ -286,6 +298,15 @@ export async function buildChangesetSql(id: number): Promise<{
     })
     .join('\n\n')
   return { name: cs.name, ticket: cs.ticket, sql: `${header}\n${body}\n` }
+}
+
+export async function deleteEntries(ids: number[]): Promise<void> {
+  if (ids.length === 0) return
+  const d = await getDb()
+  const placeholders = ids.map(() => '?').join(', ')
+  d.prepare(`DELETE FROM history_entries WHERE id IN (${placeholders})`).run(
+    ...(ids as never[])
+  )
 }
 
 export async function markExported(id: number): Promise<void> {

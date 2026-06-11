@@ -1,4 +1,4 @@
-import { ipcMain, dialog, BrowserWindow } from 'electron'
+import { ipcMain, dialog, BrowserWindow, app } from 'electron'
 import { writeFileSync } from 'fs'
 import {
   listConnections,
@@ -50,7 +50,8 @@ import {
   setActiveChangeset,
   assignEntries,
   buildChangesetSql,
-  markExported
+  markExported,
+  deleteEntries,
 } from './store/history'
 import type {
   EntityRef,
@@ -90,6 +91,7 @@ export function registerIpc(): void {
     'window:isMaximized',
     (e) => BrowserWindow.fromWebContents(e.sender)?.isMaximized() ?? false
   )
+  ipcMain.handle('window:getVersion', () => app.getVersion())
 
   ipcMain.handle('connections:list', () => listConnections())
 
@@ -315,6 +317,9 @@ export function registerIpc(): void {
     'history:assignEntries',
     (_e, entryIds: number[], changesetId: number | null) =>
       assignEntries(entryIds, changesetId)
+  )
+  ipcMain.handle('history:deleteEntries', (_e, ids: number[]) =>
+    deleteEntries(ids)
   )
   ipcMain.handle(
     'history:exportChangeset',

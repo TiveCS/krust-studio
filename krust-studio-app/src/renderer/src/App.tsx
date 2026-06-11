@@ -13,6 +13,9 @@ import { BackupView } from '@/components/BackupView'
 import { CommandPalette } from '@/components/CommandPalette'
 import { Toaster } from '@/components/ui/sonner'
 import { useConnections } from '@/store/connections'
+import { useSettings } from '@/store/settings'
+import { useUi } from '@/store/ui'
+import { COMMANDS, matchesBinding } from '@/lib/commands'
 
 function App(): React.JSX.Element {
   const {
@@ -55,6 +58,72 @@ function App(): React.JSX.Element {
       offAvailable()
       offDownloaded()
     }
+  }, [])
+
+  // Central keyboard dispatcher — reads store state at event time (no stale closures)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent): void => {
+      const target = e.target as HTMLElement
+      const inInput =
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+
+      const { keybindings } = useSettings.getState()
+      const { tabs: currentTabs, activeTabId: currentActiveId, openConnectionId: connId } =
+        useConnections.getState()
+      const activeTab = currentTabs.find((t) => t.id === currentActiveId) ?? null
+      const isTableTab = activeTab !== null && !activeTab.kind
+      const isDataView = isTableTab && activeTab.view === 'data'
+      const isStructureView = isTableTab && activeTab.view === 'structure'
+
+      for (const cmd of COMMANDS) {
+        const binding = keybindings[cmd.id] ?? cmd.defaultKey
+        if (!matchesBinding(e, binding)) continue
+
+        const { scope } = cmd
+        const scopeActive =
+          scope === 'global' ||
+          (scope === 'table-tab' && isTableTab) ||
+          (scope === 'data-view' && isDataView) ||
+          (scope === 'structure-view' && isStructureView)
+        if (!scopeActive) continue
+
+        // Don't intercept inputs for non-global shortcuts
+        if (inInput && scope !== 'global') continue
+
+        e.preventDefault()
+
+        switch (cmd.id) {
+          case 'palette.open':
+            if (connId) useUi.getState().togglePalette()
+            break
+          case 'table.commit':
+            void useConnections.getState().commitChanges()
+            break
+          case 'table.addRow':
+            useConnections.getState().addRow()
+            break
+          case 'table.refresh':
+            if (isStructureView) {
+              void useConnections.getState().refreshStructure()
+            } else {
+              void useConnections.getState().gotoPage(activeTab?.pageIndex ?? 0)
+            }
+            break
+          case 'table.toggleView':
+            void useConnections
+              .getState()
+              .setTabView(activeTab?.view === 'data' ? 'structure' : 'data')
+            break
+        }
+        break
+      }
+    }
+
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? null

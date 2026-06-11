@@ -283,7 +283,30 @@ A global, app-wide configuration surface — a large VSCode-style **modal** (not
 tab, not per-connection) reachable from the title bar even with no connection
 open. Persisted to a `settings.json` in the data directory, alongside
 connections/history (main-process store + IPC). First home of user
-**Keybindings**; future app-level preferences live here too.
+**Keybindings** and **Pin Rules**; future app-level preferences live here too.
+
+### Pinned Column
+A Data Grid column frozen to the left or right edge during horizontal scroll —
+the "freeze panes" feature. Pinned columns stay visible while scrollable columns
+pass behind them.
+
+Pinning is driven by global **Pin Rules** in **Settings** — never per-tab
+persistence. Two rule types:
+
+- **Name rules** — an exact column-name list, each entry tagged `left` or
+  `right`. Applied to every table opened; columns matching a rule are frozen to
+  the specified side.
+- **PK rule** — a toggle that auto-pins primary key column(s) (from
+  `RowsResult.primaryKey`), with a configurable `left` / `right` side.
+
+At render time the Data Grid reorders columns into three groups: left-pinned
+(original relative order) → scrollable → right-pinned. A **freeze shadow** marks
+the boundary between the pinned and scrollable zones. See
+[ADR-0016](docs/adr/0016-pinned-columns-freeze-and-reorder.md).
+
+**Per-tab override**: right-clicking a column header exposes "Unpin" / "Re-pin"
+to suppress or restore a settings-driven pin for the current tab session only
+(not persisted).
 
 ### Keybinding / Command
 Krust's actions are exposed as named **Commands** (e.g. `table.commit`,

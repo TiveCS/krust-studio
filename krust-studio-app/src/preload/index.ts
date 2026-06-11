@@ -121,6 +121,7 @@ const api: KrustApi = {
     toggleMaximize: () => ipcRenderer.send('window:toggleMaximize'),
     close: () => ipcRenderer.send('window:close'),
     isMaximized: () => ipcRenderer.invoke('window:isMaximized'),
+    getVersion: () => ipcRenderer.invoke('window:getVersion'),
     onMaximizedChange: (cb: (maximized: boolean) => void) => {
       const handler = (_: unknown, v: boolean): void => cb(v)
       ipcRenderer.on('window:maximized', handler)
@@ -148,7 +149,9 @@ const api: KrustApi = {
     assignEntries: (entryIds: number[], changesetId: number | null) =>
       ipcRenderer.invoke('history:assignEntries', entryIds, changesetId),
     exportChangeset: (id: number) =>
-      ipcRenderer.invoke('history:exportChangeset', id)
+      ipcRenderer.invoke('history:exportChangeset', id),
+    deleteEntries: (ids: number[]) =>
+      ipcRenderer.invoke('history:deleteEntries', ids)
   }
 }
 
