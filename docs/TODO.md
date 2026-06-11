@@ -100,6 +100,10 @@ Design resolved via `/grill-with-docs` (2026-06-10). See
 [ADR-0015](adr/0015-configurable-scoped-keybindings.md) and CONTEXT.md
 **Settings** / **Keybinding / Command** / **History Search** / **Destructive**.
 
+- [ ] **App version label.** Surface the running app version (from
+      `app.getVersion()` via IPC) somewhere visible — e.g. the sidebar footer
+      near `ConnectionSwitcher`, and/or the settings/about surface. Lets the user
+      confirm which build they're on (esp. after an auto-update).
 - [ ] **Configurable scope-aware keybindings.** Named **Command** registry, each
       with a default binding; user overrides persisted in a global `settings.json`
       (data dir, main-process store + IPC, mirroring `connections.json` — app-
