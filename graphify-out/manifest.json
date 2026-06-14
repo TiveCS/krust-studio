@@ -5,24 +5,24 @@
     "semantic_hash": "117ddc300e9b35125e34ff8c44c55d75"
   },
   "krust-studio-app/src/main/db/driver.ts": {
-    "mtime": 1781411824.0643363,
-    "ast_hash": "570b3f6235d7d30fbd736ea7ecf057a2",
-    "semantic_hash": "570b3f6235d7d30fbd736ea7ecf057a2"
+    "mtime": 1781436643.58428,
+    "ast_hash": "fa399c58546261d19486ef8af0589c52",
+    "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/drivers/mysql.ts": {
-    "mtime": 1781411879.0311034,
-    "ast_hash": "c9970e079687f7315d8fa87a08fd3a5e",
-    "semantic_hash": "c9970e079687f7315d8fa87a08fd3a5e"
+    "mtime": 1781428490.9861393,
+    "ast_hash": "466e3fe43371a42f14ad0648ed3ca5f2",
+    "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/drivers/postgres.ts": {
-    "mtime": 1781411845.2515116,
-    "ast_hash": "518b8dd1abd431b2d9b59a34e5e26256",
-    "semantic_hash": "518b8dd1abd431b2d9b59a34e5e26256"
+    "mtime": 1781428478.009907,
+    "ast_hash": "a84e114e2f89c3319d16a97731860197",
+    "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/drivers/sqlite.ts": {
-    "mtime": 1781411899.152933,
-    "ast_hash": "51ee6bcf11bb3c547a4ce792f6c41c0a",
-    "semantic_hash": "51ee6bcf11bb3c547a4ce792f6c41c0a"
+    "mtime": 1781428505.0676153,
+    "ast_hash": "fd31fdb6935689228320dcbce727626a",
+    "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/mysql-coldef.ts": {
     "mtime": 1780570117.1913693,
@@ -30,8 +30,8 @@
     "semantic_hash": "f606270afc4b5ea1818396e7d7a48a84"
   },
   "krust-studio-app/src/main/db/session.ts": {
-    "mtime": 1781422653.8329513,
-    "ast_hash": "a3d43dbda92a3ca82a6445d24c6eca95",
+    "mtime": 1781428532.3026812,
+    "ast_hash": "f530c121493063e47d3fe15b9fb0e11c",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/test-connection.ts": {
@@ -45,8 +45,8 @@
     "semantic_hash": "48338727219bc339ec5bb00c07b1ad5f"
   },
   "krust-studio-app/src/main/ipc.ts": {
-    "mtime": 1781422653.8339536,
-    "ast_hash": "fb168123f7e7a6e91601c4967bc553c3",
+    "mtime": 1781428544.696587,
+    "ast_hash": "e10c3b6e1b3cf0ad9c828e069488d3e1",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/store/connections.ts": {
@@ -80,8 +80,8 @@
     "semantic_hash": "1e5d2d18230bb4eb73fd3be2e6aae75f"
   },
   "krust-studio-app/src/preload/index.ts": {
-    "mtime": 1781422653.835953,
-    "ast_hash": "01b4f03f88a8e9e137fa023c070b7b5f",
+    "mtime": 1781428560.1203353,
+    "ast_hash": "fb266295596c9a6ecc084d919772743a",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/App.tsx": {
@@ -90,9 +90,9 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/AppSidebar.tsx": {
-    "mtime": 1781409421.387233,
-    "ast_hash": "05e83883d3aea987f4326a63c6712742",
-    "semantic_hash": "05e83883d3aea987f4326a63c6712742"
+    "mtime": 1781436229.9792893,
+    "ast_hash": "65a0b04aedbdb0cad61d09050ea9ece4",
+    "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/BackupDialog.tsx": {
     "mtime": 1780593028.1105196,
@@ -125,9 +125,9 @@
     "semantic_hash": "700d094b04997be32a7a0cc450ad4a8c"
   },
   "krust-studio-app/src/renderer/src/components/DataGrid.tsx": {
-    "mtime": 1781410558.3135333,
-    "ast_hash": "63daeef4a03f39e20abcc89db4d15cff",
-    "semantic_hash": "63daeef4a03f39e20abcc89db4d15cff"
+    "mtime": 1781440900.2837763,
+    "ast_hash": "2663308f5af90aabadc845c42e154184",
+    "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/DatabaseSwitcher.tsx": {
     "mtime": 1780570117.2003665,
@@ -140,14 +140,14 @@
     "semantic_hash": "a967a53a9b8ee846697ac5ccdcdbbd82"
   },
   "krust-studio-app/src/renderer/src/components/FilterBar.tsx": {
-    "mtime": 1781422653.8369553,
-    "ast_hash": "f26627a5651995f237890fdefd881219",
+    "mtime": 1781434377.0428226,
+    "ast_hash": "3bf03ce7f4695ffda62bdea3acb7817b",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/FkInlinePicker.tsx": {
-    "mtime": 1780592670.6246657,
-    "ast_hash": "f31e0f3aaab896c9a03f7f2df00f6770",
-    "semantic_hash": "f31e0f3aaab896c9a03f7f2df00f6770"
+    "mtime": 1781436119.9787924,
+    "ast_hash": "d04f6c019f30248370e7b41304795aa4",
+    "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/HistoryView.tsx": {
     "mtime": 1781409421.390239,
@@ -175,8 +175,8 @@
     "semantic_hash": "499e380934505ff8fd0e95912b819eaf"
   },
   "krust-studio-app/src/renderer/src/components/SettingsModal.tsx": {
-    "mtime": 1781422653.8379574,
-    "ast_hash": "c239848229251a53052f72fe4b49adc5",
+    "mtime": 1781438587.2986796,
+    "ast_hash": "c1fc8d3c534deac838e0e77c78b6e896",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/SqlDisplay.tsx": {
@@ -195,9 +195,9 @@
     "semantic_hash": "61d63c329365fca31577d8abca3e14a1"
   },
   "krust-studio-app/src/renderer/src/components/StructureView.tsx": {
-    "mtime": 1781409421.3912325,
-    "ast_hash": "88288b84cca39f1ad579e1b918eea35d",
-    "semantic_hash": "88288b84cca39f1ad579e1b918eea35d"
+    "mtime": 1781434484.255383,
+    "ast_hash": "e4bbe8e305bac17b58a3fccc4d73c6bf",
+    "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/TabBar.tsx": {
     "mtime": 1781414509.3503726,
@@ -205,9 +205,9 @@
     "semantic_hash": "74803ad57dee3e06927b574f295cc9c0"
   },
   "krust-studio-app/src/renderer/src/components/TableTabView.tsx": {
-    "mtime": 1780401743.1170585,
-    "ast_hash": "f4d56303cf4fd8b6457db3c425bdd9ab",
-    "semantic_hash": "f4d56303cf4fd8b6457db3c425bdd9ab"
+    "mtime": 1781434393.7487876,
+    "ast_hash": "d9f8d0429e54d04cd6dd9d7a2518c9fa",
+    "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/TemplateManager.tsx": {
     "mtime": 1781409421.3922307,
@@ -370,14 +370,14 @@
     "semantic_hash": "33e2f401ba9e135c52718d3b480407ff"
   },
   "krust-studio-app/src/renderer/src/store/connections.ts": {
-    "mtime": 1781413826.8675601,
-    "ast_hash": "fcf39222f91f8b4674c85494ee652a5b",
-    "semantic_hash": "fcf39222f91f8b4674c85494ee652a5b"
+    "mtime": 1781435346.184635,
+    "ast_hash": "ce5ea4418f9c7ed5b1bcd4bdda0dd7ad",
+    "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/store/settings.ts": {
-    "mtime": 1781410193.1047616,
-    "ast_hash": "334e6b9db85c57989e8f90f31672c136",
-    "semantic_hash": "334e6b9db85c57989e8f90f31672c136"
+    "mtime": 1781438439.6771116,
+    "ast_hash": "55e1144a91a29bd1672a24fba4184b5b",
+    "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/store/ui.ts": {
     "mtime": 1781422653.840955,
@@ -385,8 +385,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/shared/types.ts": {
-    "mtime": 1781422653.8419557,
-    "ast_hash": "25d17bbf07f4ee7f7744e5922ee13eda",
+    "mtime": 1781428571.8338387,
+    "ast_hash": "255b2d018d8c740cfec09b12be4631bd",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/index.html": {
@@ -475,8 +475,8 @@
     "semantic_hash": ""
   },
   "CONTEXT.md": {
-    "mtime": 1781426883.8241193,
-    "ast_hash": "22c97dacf5b03c20b9035563cc5b4351",
+    "mtime": 1781428012.3987803,
+    "ast_hash": "89e706265f965585df03a145c2dbc774",
     "semantic_hash": ""
   },
   "HANDOVER.md": {
@@ -490,8 +490,8 @@
     "semantic_hash": ""
   },
   "docs/TODO.md": {
-    "mtime": 1781426905.953621,
-    "ast_hash": "5ecc9e91481b7139154f18097691ab91",
+    "mtime": 1781429061.4093094,
+    "ast_hash": "b78fee99e4cdcd7cb34c89486c0435a4",
     "semantic_hash": ""
   },
   "docs/adr/0001-electron-over-tauri.md": {
@@ -702,6 +702,26 @@
   "krust-studio-app/resources/icon.png": {
     "mtime": 1780620597.596,
     "ast_hash": "193da9e725561bc31a43db2f16d38ad9",
+    "semantic_hash": ""
+  },
+  "krust-studio-app/src/renderer/src/lib/filterSql.ts": {
+    "mtime": 1781436651.234633,
+    "ast_hash": "eb0f15b60447389f2ccabcbbb1db620a",
+    "semantic_hash": ""
+  },
+  "docs/adr/0017-inline-filter-builder-with-raw-where.md": {
+    "mtime": 1781429037.1830904,
+    "ast_hash": "0950d11dfeeb960744592ec5384e28e0",
+    "semantic_hash": ""
+  },
+  "krust-studio-app/src/renderer/src/components/ViewSwitch.tsx": {
+    "mtime": 1781434411.342564,
+    "ast_hash": "61147d3e42267670aa710b8767f5c161",
+    "semantic_hash": ""
+  },
+  "krust-studio-app/src/renderer/src/lib/cellDisplay.tsx": {
+    "mtime": 1781436021.3974955,
+    "ast_hash": "4292cc9efb2ad234f1e4e679a1ac484e",
     "semantic_hash": ""
   }
 }

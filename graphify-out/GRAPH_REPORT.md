@@ -1,16 +1,16 @@
 # Graph Report - Krust Studio  (2026-06-14)
 
 ## Corpus Check
-- 132 files · ~91,938 words
+- 136 files · ~95,766 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1046 nodes · 1793 edges · 106 communities (86 shown, 20 thin omitted)
-- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 106 edges (avg confidence: 0.8)
+- 1067 nodes · 1831 edges · 104 communities (83 shown, 21 thin omitted)
+- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 108 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c26aa993`
+- Built from commit: `7f808496`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -38,7 +38,6 @@
 - [[_COMMUNITY_Column Diff|Column Diff]]
 - [[_COMMUNITY_Keybinding Commands|Keybinding Commands]]
 - [[_COMMUNITY_Popover UI|Popover UI]]
-- [[_COMMUNITY_Data Grid|Data Grid]]
 - [[_COMMUNITY_SQL Highlighting|SQL Highlighting]]
 - [[_COMMUNITY_Workspace Persistence|Workspace Persistence]]
 - [[_COMMUNITY_Command Palette & UI Store|Command Palette & UI Store]]
@@ -63,14 +62,10 @@
 - [[_COMMUNITY_Separator UI|Separator UI]]
 - [[_COMMUNITY_Skeleton UI|Skeleton UI]]
 - [[_COMMUNITY_Community 49|Community 49]]
-- [[_COMMUNITY_Community 50|Community 50]]
-- [[_COMMUNITY_Community 51|Community 51]]
-- [[_COMMUNITY_Community 52|Community 52]]
 - [[_COMMUNITY_Community 53|Community 53]]
 - [[_COMMUNITY_Community 54|Community 54]]
 - [[_COMMUNITY_Community 55|Community 55]]
 - [[_COMMUNITY_Community 56|Community 56]]
-- [[_COMMUNITY_Community 57|Community 57]]
 - [[_COMMUNITY_Community 58|Community 58]]
 - [[_COMMUNITY_Community 59|Community 59]]
 - [[_COMMUNITY_Community 60|Community 60]]
@@ -98,7 +93,6 @@
 - [[_COMMUNITY_Community 82|Community 82]]
 - [[_COMMUNITY_Community 83|Community 83]]
 - [[_COMMUNITY_Community 84|Community 84]]
-- [[_COMMUNITY_Community 85|Community 85]]
 - [[_COMMUNITY_Community 86|Community 86]]
 - [[_COMMUNITY_Community 87|Community 87]]
 - [[_COMMUNITY_Community 88|Community 88]]
@@ -111,59 +105,63 @@
 - [[_COMMUNITY_Community 95|Community 95]]
 - [[_COMMUNITY_Community 96|Community 96]]
 - [[_COMMUNITY_Community 97|Community 97]]
+- [[_COMMUNITY_Community 106|Community 106]]
+- [[_COMMUNITY_Community 107|Community 107]]
+- [[_COMMUNITY_Community 109|Community 109]]
+- [[_COMMUNITY_Community 110|Community 110]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `cn()` - 85 edges
+1. `cn()` - 86 edges
 2. `EntityRef` - 49 edges
-3. `Glossary` - 34 edges
+3. `Glossary` - 35 edges
 4. `SqliteDriver` - 31 edges
 5. `MysqlDriver` - 24 edges
-6. `Filter` - 20 edges
+6. `Filter` - 21 edges
 7. `getConnectionConfig()` - 19 edges
-8. `PostgresDriver` - 18 edges
-9. `withRetry()` - 18 edges
-10. `useConnections` - 18 edges
+8. `useConnections` - 19 edges
+9. `PostgresDriver` - 18 edges
+10. `withRetry()` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `App()` --calls--> `useConnections`  [INFERRED]
+  krust-studio-app/src/renderer/src/App.tsx → krust-studio-app/src/renderer/src/store/connections.ts
+- `BackupDialog()` --calls--> `useConnections`  [INFERRED]
+  krust-studio-app/src/renderer/src/components/BackupDialog.tsx → krust-studio-app/src/renderer/src/store/connections.ts
+- `BackupView()` --calls--> `useConnections`  [INFERRED]
+  krust-studio-app/src/renderer/src/components/BackupView.tsx → krust-studio-app/src/renderer/src/store/connections.ts
 - `ColumnsEditor()` --calls--> `cn()`  [INFERRED]
   krust-studio-app/src/renderer/src/components/ColumnsEditor.tsx → krust-studio-app/src/renderer/src/lib/utils.ts
-- `ConnectionSwitcher()` --calls--> `useConnections`  [INFERRED]
-  krust-studio-app/src/renderer/src/components/ConnectionSwitcher.tsx → krust-studio-app/src/renderer/src/store/connections.ts
 - `ExportDialog()` --calls--> `cn()`  [INFERRED]
   krust-studio-app/src/renderer/src/components/ExportDialog.tsx → krust-studio-app/src/renderer/src/lib/utils.ts
-- `FkInlinePicker()` --calls--> `cn()`  [INFERRED]
-  krust-studio-app/src/renderer/src/components/FkInlinePicker.tsx → krust-studio-app/src/renderer/src/lib/utils.ts
-- `JsonViewerPanel()` --calls--> `cn()`  [INFERRED]
-  krust-studio-app/src/renderer/src/components/JsonViewerPanel.tsx → krust-studio-app/src/renderer/src/lib/utils.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (106 total, 20 thin omitted)
+## Communities (104 total, 21 thin omitted)
 
 ### Community 0 - "DB Drivers (mysql/pg/sqlite)"
-Cohesion: 0.14
-Nodes (21): buildCreateTable(), buildDelete(), buildInsert(), buildSearch(), buildUpdate(), FK_ACTIONS, fkActionClause(), renderSql() (+13 more)
+Cohesion: 0.05
+Nodes (55): Props, buildCreateTable(), buildDelete(), buildInsert(), buildOrderBy(), buildSearch(), buildUpdate(), buildWhere() (+47 more)
 
 ### Community 1 - "Main Process & Session"
-Cohesion: 0.07
-Nodes (74): BackupProgress, fkGuards(), pgArrayBody(), quoteIdent(), restorePreview(), restoreRun(), runBackup(), sqlLiteral() (+66 more)
+Cohesion: 0.08
+Nodes (69): BackupProgress, fkGuards(), pgArrayBody(), quoteIdent(), restorePreview(), restoreRun(), runBackup(), sqlLiteral() (+61 more)
 
 ### Community 2 - "Connection Store & Form"
 Cohesion: 0.10
 Nodes (33): ConnectionForm(), DEFAULT_PORTS, emptyValues(), FormValues, Props, schema, toFormValues(), testConnection() (+25 more)
 
 ### Community 3 - "Data View Panels"
-Cohesion: 0.14
-Nodes (9): CommandPalette(), FilterBar(), Group, OPS, Row, seed(), FilterOp, UiState (+1 more)
+Cohesion: 0.12
+Nodes (15): CommandPalette(), FilterBar(), Group, OPS, Row, seed(), appendCellCondition(), filtersToWhere() (+7 more)
 
 ### Community 4 - "Sidebar Primitives"
 Cohesion: 0.13
-Nodes (27): cn(), Sidebar(), SidebarContent(), SidebarContext, SidebarContextProps, SidebarFooter(), SidebarGroup(), SidebarGroupAction() (+19 more)
+Nodes (28): FkInlinePicker(), cn(), Sidebar(), SidebarContent(), SidebarContext, SidebarContextProps, SidebarFooter(), SidebarGroup() (+20 more)
 
 ### Community 5 - "Shared Types & Preload API"
 Cohesion: 0.10
-Nodes (19): Window, BackupApi, BackupResult, ConnectionsApi, ConnectionWorkspace, DialogApi, HistoryApi, IndexInfo (+11 more)
+Nodes (20): api, Window, BackupApi, BackupResult, ConnectionsApi, DialogApi, HistoryApi, HistoryQuery (+12 more)
 
 ### Community 6 - "Context Menu UI"
 Cohesion: 0.12
@@ -174,19 +172,19 @@ Cohesion: 0.12
 Nodes (9): DropdownMenuCheckboxItem(), DropdownMenuContent(), DropdownMenuItem(), DropdownMenuLabel(), DropdownMenuRadioItem(), DropdownMenuSeparator(), DropdownMenuShortcut(), DropdownMenuSubContent() (+1 more)
 
 ### Community 8 - "App Shell & Sidebar"
-Cohesion: 0.13
-Nodes (7): AppSidebar(), BackupDialog(), BackupView(), DatabaseSwitcher(), TabBar(), App(), useConnections
+Cohesion: 0.18
+Nodes (7): ConnectionSwitcher(), DRIVER_LABEL, DatabaseSwitcher(), TableTabView(), VIEWS, ViewSwitch(), useConnections
 
 ### Community 9 - "Tabs & Query State"
-Cohesion: 0.11
-Nodes (19): Props, api, EntityInfo, EntityType, EnumType, Filter, SaveConnectionInput, Sort (+11 more)
+Cohesion: 0.18
+Nodes (11): ConnectionWorkspace, QueryResult, RowEdit, SerializedTab, QueryState, SessionStatus, StructureSub, tabHasDataChanges() (+3 more)
 
 ### Community 10 - "Backup / Restore UI"
-Cohesion: 0.24
-Nodes (8): MODES, PanelTab, Props, MODES, Panel, BackupTableMode, BackupTableSpec, RestorePreview
+Cohesion: 0.20
+Nodes (10): BackupDialog(), MODES, PanelTab, Props, BackupView(), MODES, Panel, BackupTableMode (+2 more)
 
 ### Community 11 - "Columns Editor & Templates"
-Cohesion: 0.13
+Cohesion: 0.17
 Nodes (10): ColumnsEditor(), EditorColumn, FK_ACTIONS, DEFAULT_COLS, Editing, Props, TemplateManager(), TYPES (+2 more)
 
 ### Community 12 - "Structure View"
@@ -202,12 +200,12 @@ Cohesion: 0.18
 Nodes (6): SheetContent(), SheetDescription(), SheetFooter(), SheetHeader(), SheetOverlay(), SheetTitle()
 
 ### Community 15 - "Table & Query Tab Views"
-Cohesion: 0.22
-Nodes (6): NewTableEditor(), TYPES, QueryView(), TableTabView(), VIEWS, QueryResult
+Cohesion: 0.21
+Nodes (5): DataGrid(), Sel, NewTableEditor(), TYPES, QueryView()
 
 ### Community 16 - "Pinned Columns Settings"
-Cohesion: 0.20
-Nodes (6): DEFAULT_PINS, PinPrimaryKey, PinRule, PinSettings, PinSide, SettingsState
+Cohesion: 0.13
+Nodes (9): SCOPE_LABELS, SettingsModal(), DEFAULT_PINS, PinPrimaryKey, PinRule, PinSettings, PinSide, SettingsState (+1 more)
 
 ### Community 17 - "Command Menu UI"
 Cohesion: 0.20
@@ -233,25 +231,21 @@ Nodes (4): CommandDef, CommandId, COMMANDS, KeybindingScope
 Cohesion: 0.25
 Nodes (4): PopoverContent(), PopoverDescription(), PopoverHeader(), PopoverTitle()
 
-### Community 23 - "Data Grid"
-Cohesion: 0.47
-Nodes (4): dateSpan(), dateTip(), display(), Sel
-
 ### Community 24 - "SQL Highlighting"
 Cohesion: 0.40
 Nodes (4): COLORS, dialectFor(), highlighter, highlightSql()
 
 ### Community 25 - "Workspace Persistence"
-Cohesion: 0.04
-Nodes (48): author, description, devDependencies, electron, electron-builder, @electron-toolkit/eslint-config-prettier, @electron-toolkit/eslint-config-ts, @electron-toolkit/tsconfig (+40 more)
+Cohesion: 0.08
+Nodes (26): devDependencies, electron, electron-builder, @electron-toolkit/eslint-config-prettier, @electron-toolkit/eslint-config-ts, @electron-toolkit/tsconfig, electron-vite, eslint (+18 more)
 
 ### Community 26 - "Command Palette & UI Store"
 Cohesion: 0.05
-Nodes (37): AI Access Audit, AI Read Allowlist, Backup, Captured DDL, Changeset, Command Palette, Connection, Core principle (+29 more)
+Nodes (38): AI Access Audit, AI Read Allowlist, Backup, Captured DDL, Changeset, Command Palette, Connection, Core principle (+30 more)
 
 ### Community 27 - "Settings Modal"
-Cohesion: 0.40
-Nodes (4): DataGrid(), SCOPE_LABELS, SettingsModal(), useSettings
+Cohesion: 0.13
+Nodes (15): scripts, build, build:linux, build:mac, build:unpack, build:win, dev, format (+7 more)
 
 ### Community 28 - "Query Plan Panel"
 Cohesion: 0.50
@@ -269,6 +263,10 @@ Nodes (4): Alert(), AlertDescription(), AlertTitle(), alertVariants
 Cohesion: 0.40
 Nodes (4): Card, CardContent, CardHeader, CardTitle
 
+### Community 33 - "Connection Switcher"
+Cohesion: 0.25
+Nodes (7): author, description, homepage, main, name, packageManager, version
+
 ### Community 35 - "CodeMirror Theme"
 Cohesion: 0.50
 Nodes (3): krustHighlight, krustSyntax, krustTheme
@@ -285,18 +283,6 @@ Nodes (3): SelectContent, SelectItem, SelectTrigger
 Cohesion: 0.07
 Nodes (26): [1.0.0], [1.1.0], [1.2.0] — 2026-06-03, [1.2.1] — 2026-06-04, [1.2.3] — 2026-06-04, [1.3.0] — 2026-06-05, [1.3.1] — 2026-06-05, [1.3.2] — 2026-06-09 (+18 more)
 
-### Community 50 - "Community 50"
-Cohesion: 0.12
-Nodes (7): DbDriver, defaultIndexName(), quoteIdent(), SqliteDriver, IndexSpec, ReferencingTable, SchemaOp
-
-### Community 51 - "Community 51"
-Cohesion: 0.25
-Nodes (4): buildWhere(), MysqlDriver, quoteIdent(), EntityRef
-
-### Community 52 - "Community 52"
-Cohesion: 0.21
-Nodes (5): buildOrderBy(), safePaging(), PostgresDriver, quoteIdent(), RowsResult
-
 ### Community 53 - "Community 53"
 Cohesion: 0.11
 Nodes (17): aliases, components, hooks, lib, ui, utils, iconLibrary, rsc (+9 more)
@@ -310,16 +296,12 @@ Cohesion: 0.12
 Nodes (15): Back up & restore, Browse data, Captured changes → a script for production *(the headline feature)*, Change schema — and see the SQL, Download & install, Edit safely (nothing writes until you say so), Getting started, Inspect (+7 more)
 
 ### Community 56 - "Community 56"
-Cohesion: 0.13
-Nodes (14): Known bugs / sharp edges, Krust Studio — TODO (gap backlog), P0 — v1.3.0: workspace & connection resilience — DONE, P0 — v1.3.4 + v1.4.0: editor/history/backup UX — PLANNED, P0 — v1.5.0: shortcuts, settings & history UX — PLANNED, P0 — v1.6.0: pinned columns — DONE, P1 — high value, mostly cheap, P2 — schema completeness (+6 more)
-
-### Community 57 - "Community 57"
-Cohesion: 0.29
-Nodes (8): dropDefault(), extractColumnDef(), insertBefore(), positionClause(), spliceDefault(), spliceNullable(), spliceType(), MYSQL_INDEX_METHODS
+Cohesion: 0.12
+Nodes (15): Known bugs / sharp edges, Krust Studio — TODO (gap backlog), P0 — next: inline filter builder + raw WHERE — DONE, P0 — v1.3.0: workspace & connection resilience — DONE, P0 — v1.3.4 + v1.4.0: editor/history/backup UX — PLANNED, P0 — v1.5.0: shortcuts, settings & history UX — PLANNED, P0 — v1.6.0: pinned columns — DONE, P1 — high value, mostly cheap (+7 more)
 
 ### Community 58 - "Community 58"
-Cohesion: 0.20
-Nodes (7): Data, ExportDialog(), Format, Props, Scope, FkInlinePicker(), ColumnInfo
+Cohesion: 0.12
+Nodes (16): Data, ExportDialog(), Format, Props, Scope, classify(), FkExpand(), JsonValue() (+8 more)
 
 ### Community 59 - "Community 59"
 Cohesion: 0.20
@@ -342,8 +324,8 @@ Cohesion: 0.22
 Nodes (8): ✨ Added, Backup & Restore as a tab, Drop a relation where you look for it, 🐛 Fixed, 📦 Install, Local table templates, Syntax-highlighted Query History, Virtualized data grid
 
 ### Community 64 - "Community 64"
-Cohesion: 0.36
-Nodes (6): classify(), FkExpand(), JsonValue(), JsonViewerPanel(), prim(), Props
+Cohesion: 0.47
+Nodes (5): WorkspaceData, EMPTY, loadWorkspace(), saveWorkspace(), workspacePath()
 
 ### Community 65 - "Community 65"
 Cohesion: 0.25
@@ -425,10 +407,6 @@ Nodes (5): 16. Pinned columns: settings-driven freeze with DOM reorder, Conseque
 Cohesion: 0.33
 Nodes (5): compilerOptions, composite, types, extends, include
 
-### Community 85 - "Community 85"
-Cohesion: 0.47
-Nodes (4): formatRows(), Row, toCsv(), toJson()
-
 ### Community 86 - "Community 86"
 Cohesion: 0.40
 Nodes (4): 🐛 Fixed, In-app "Restart now" race condition, 📦 Install, Installer "application is running" error
@@ -445,25 +423,33 @@ Nodes (3): 🐛 Fixed, 📦 Install, Sidebar covers title bar
 Cohesion: 0.50
 Nodes (3): 🐛 Fixed, 📦 Install, What's new
 
+### Community 106 - "Community 106"
+Cohesion: 0.29
+Nodes (6): 17. Inline filter builder with a raw-WHERE escape hatch, Consequences, Considered alternatives, Context, Decision, Status
+
+### Community 109 - "Community 109"
+Cohesion: 0.83
+Nodes (3): dateSpan(), dateTip(), display()
+
 ## Knowledge Gaps
-- **414 isolated node(s):** `$schema`, `style`, `rsc`, `tsx`, `config` (+409 more)
+- **422 isolated node(s):** `$schema`, `style`, `rsc`, `tsx`, `config` (+417 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `cn()` connect `Sidebar Primitives` to `Context Menu UI`, `Dropdown Menu UI`, `App Shell & Sidebar`, `Columns Editor & Templates`, `Dialog UI`, `Sheet UI`, `Command Menu UI`, `History View`, `Popover UI`, `Settings Modal`, `Query Plan Panel`, `Alert UI`, `Tooltip UI`, `Title Bar & Updater`, `Mobile Sidebar Hook`, `Button UI`, `Combobox UI`, `Checkbox UI`, `Input UI`, `Separator UI`, `Skeleton UI`, `Community 58`, `Community 64`?**
-  _High betweenness centrality (0.155) - this node is a cross-community bridge._
-- **Why does `EntityRef` connect `Community 51` to `DB Drivers (mysql/pg/sqlite)`, `Main Process & Session`, `Shared Types & Preload API`, `App Shell & Sidebar`, `Tabs & Query State`, `Structure View`, `Community 50`, `Community 52`, `Community 57`, `Community 58`?**
-  _High betweenness centrality (0.048) - this node is a cross-community bridge._
-- **Why does `useConnections` connect `App Shell & Sidebar` to `Connection Switcher`, `Connection Store & Form`, `Data View Panels`, `Tabs & Query State`, `Columns Editor & Templates`, `Structure View`, `Table & Query Tab Views`, `History View`, `SQL / Structure Editors`, `Settings Modal`?**
-  _High betweenness centrality (0.038) - this node is a cross-community bridge._
-- **Are the 84 inferred relationships involving `cn()` (e.g. with `AppSidebar()` and `ColumnsEditor()`) actually correct?**
-  _`cn()` has 84 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `cn()` connect `Sidebar Primitives` to `Data View Panels`, `Context Menu UI`, `Dropdown Menu UI`, `Columns Editor & Templates`, `Dialog UI`, `Sheet UI`, `Pinned Columns Settings`, `Command Menu UI`, `History View`, `Popover UI`, `Query Plan Panel`, `Alert UI`, `Tooltip UI`, `Title Bar & Updater`, `Mobile Sidebar Hook`, `Button UI`, `Combobox UI`, `Checkbox UI`, `Input UI`, `Separator UI`, `Skeleton UI`, `Community 58`, `Community 87`?**
+  _High betweenness centrality (0.151) - this node is a cross-community bridge._
+- **Why does `useConnections` connect `App Shell & Sidebar` to `Connection Store & Form`, `Data View Panels`, `Tabs & Query State`, `Backup / Restore UI`, `Community 107`, `Structure View`, `Columns Editor & Templates`, `Community 110`, `Table & Query Tab Views`, `History View`, `SQL / Structure Editors`, `Community 87`?**
+  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+- **Why does `EntityRef` connect `DB Drivers (mysql/pg/sqlite)` to `Main Process & Session`, `Shared Types & Preload API`, `Tabs & Query State`, `Structure View`, `Community 87`?**
+  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+- **Are the 85 inferred relationships involving `cn()` (e.g. with `AppSidebar()` and `ColumnsEditor()`) actually correct?**
+  _`cn()` has 85 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `$schema`, `style`, `rsc` to the rest of the system?**
-  _414 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _422 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `DB Drivers (mysql/pg/sqlite)` be split into smaller, more focused modules?**
-  _Cohesion score 0.13903743315508021 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.052116875372689324 - nodes in this community are weakly interconnected._
 - **Should `Main Process & Session` be split into smaller, more focused modules?**
-  _Cohesion score 0.07015959048479374 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07789473684210527 - nodes in this community are weakly interconnected._
