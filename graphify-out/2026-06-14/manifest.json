@@ -5,8 +5,8 @@
     "semantic_hash": "117ddc300e9b35125e34ff8c44c55d75"
   },
   "krust-studio-app/src/main/db/driver.ts": {
-    "mtime": 1781428450.6349573,
-    "ast_hash": "fd41d5cd9552c3d6cd9a3bbb0c774bcb",
+    "mtime": 1781436643.58428,
+    "ast_hash": "fa399c58546261d19486ef8af0589c52",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/drivers/mysql.ts": {
@@ -125,8 +125,8 @@
     "semantic_hash": "700d094b04997be32a7a0cc450ad4a8c"
   },
   "krust-studio-app/src/renderer/src/components/DataGrid.tsx": {
-    "mtime": 1781436039.1311436,
-    "ast_hash": "b9df822758b530c480e75475a565996e",
+    "mtime": 1781440900.2837763,
+    "ast_hash": "2663308f5af90aabadc845c42e154184",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/DatabaseSwitcher.tsx": {
@@ -175,8 +175,8 @@
     "semantic_hash": "499e380934505ff8fd0e95912b819eaf"
   },
   "krust-studio-app/src/renderer/src/components/SettingsModal.tsx": {
-    "mtime": 1781422653.8379574,
-    "ast_hash": "c239848229251a53052f72fe4b49adc5",
+    "mtime": 1781438587.2986796,
+    "ast_hash": "c1fc8d3c534deac838e0e77c78b6e896",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/SqlDisplay.tsx": {
@@ -375,9 +375,9 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/store/settings.ts": {
-    "mtime": 1781410193.1047616,
-    "ast_hash": "334e6b9db85c57989e8f90f31672c136",
-    "semantic_hash": "334e6b9db85c57989e8f90f31672c136"
+    "mtime": 1781438439.6771116,
+    "ast_hash": "55e1144a91a29bd1672a24fba4184b5b",
+    "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/store/ui.ts": {
     "mtime": 1781422653.840955,
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/lib/filterSql.ts": {
-    "mtime": 1781428592.9554698,
-    "ast_hash": "acc6c139eae3cffac13d7ce05d861925",
+    "mtime": 1781436651.234633,
+    "ast_hash": "eb0f15b60447389f2ccabcbbb1db620a",
     "semantic_hash": ""
   },
   "docs/adr/0017-inline-filter-builder-with-raw-where.md": {
