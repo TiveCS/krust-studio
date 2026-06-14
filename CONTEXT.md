@@ -154,6 +154,39 @@ directory, tied to a connection, with name/ticket metadata.
 Design value (recurring): *automate for convenience, but never force trust —
 the user must be able to inspect and override anything automatic.*
 
+### Filter (Data Grid)
+How the user narrows the rows shown in a data tab. Always-visible in the grid
+toolbar — **no hidden/collapsed panel** — with a single live condition row
+(column · operator · value) present at rest; a `+` grows additional conditions
+and AND/OR groups inline. Has **two modes**, toggled, **one active at a time**:
+
+- **Builder** — the structured per-column condition builder (operators, IN,
+  BETWEEN, IS NULL, single-level AND/OR groups). Produces a `Filter[]` compiled
+  to a **parameterized** WHERE.
+- **Raw** — a hand-written **WHERE predicate only** (not a full statement). Krust
+  still wraps it in its own `SELECT … ORDER BY … LIMIT …`, so sort, pagination,
+  **Total Row Count**, inline editing, export and FK navigation all keep working
+  exactly as in Builder mode. Full arbitrary SQL is **not** here — that is the
+  **SQL editor** (see **Query Execution**); Raw is deliberately narrower so the
+  grid stays editable (single source table, PK preserved).
+
+Switching **Builder → Raw seeds** the raw box with the SQL the builder generated
+(a one-way escape hatch); **Raw → Builder does not parse back** (no SQL parser).
+The active mode and raw text are **persisted per tab** (`SerializedTab`) and
+re-applied on workspace restore, **fail-soft** — a stale raw predicate (e.g. a
+dropped column) surfaces its error but the tab stays open.
+
+Filters **apply explicitly** — on **Apply** or **Enter** in a value/raw field —
+never live-on-keystroke (avoids query storms on large tables). A failed raw
+predicate shows the engine's error **inline** beneath the filter row while the
+**last successful rows remain visible**, so the user iterates editor-style.
+Right-click a cell → **Filter by this value** appends to whichever mode is active
+(a structured condition in Builder; an engine-quoted ` AND "col" = 'value'` to the
+text in Raw). Raw is trusted like the SQL editor (the user's own connection and
+data) with one guard: a **statement separator (`;`) is rejected** so a predicate
+can't smuggle a second statement. The same builder component is reused, in a
+self-contained ephemeral instance, by the **FK Picker**'s parent-table browser.
+
 ### JSON Viewer
 A dedicated side panel that renders the currently selected row as full JSON
 (including nested JSON columns like `profile`). Has a key filter (text / regex)

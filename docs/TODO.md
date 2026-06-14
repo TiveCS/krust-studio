@@ -2,6 +2,39 @@
 
 Prioritized. Top group = highest value (matches CONTEXT.md + Beekeeper parity).
 
+## P0 — next: inline filter builder + raw WHERE — PLANNED
+
+Design resolved via `/grill-with-docs` (2026-06-14). See
+[ADR-0017](adr/0017-inline-filter-builder-with-raw-where.md) and CONTEXT.md
+**Filter (Data Grid)**. The current `FilterBar` is collapsed behind a chevron
+(daily-driver friction) and can't express predicates outside its operator set.
+
+- [ ] **Always-visible inline filter.** Remove the expand/collapse chevron. A
+      single live condition row (column · op · value) sits in the grid toolbar at
+      rest; `+ Condition` grows rows and AND/OR groups inline (no hidden panel).
+      Keep explicit **Apply** + **Enter** (no live-on-keystroke — query storms on
+      large tables).
+- [ ] **Builder ⇄ Raw mode toggle (one active).** Add a **Raw** mode: a
+      hand-written **WHERE predicate only** (not a full statement) that Krust
+      wraps in its own `SELECT … ORDER BY … LIMIT …`, so sort/pagination/count/
+      inline-edit/export/FK-nav all keep working (grid stays editable: one source
+      table, PK preserved). Full SQL stays in the SQL editor. Builder → Raw
+      **seeds** the box with the generated SQL (one-way); Raw → Builder does
+      **not** parse back.
+- [ ] **Raw guard + errors.** Reject a statement separator (`;`) — otherwise trust
+      it like the SQL editor (user's own connection, strictly less powerful). A
+      failed predicate shows the engine error **inline** under the filter row;
+      **last good rows stay visible**. The `;` guard lives at one shared choke
+      point shared by `readRows`/`countRows`/`exportAllRows`.
+- [ ] **Filter-by-cell + persistence.** Right-click → "Filter by this value"
+      appends a structured condition in Builder, an engine-quoted
+      ` AND "col" = 'value'` to the text in Raw. Persist `filterMode` (default
+      `'builder'`) + `rawWhere` on `SerializedTab`; re-run on restore **fail-soft**
+      (stale predicate errors inline, tab stays open). No migration needed —
+      absent `filterMode` defaults to Builder.
+- [ ] **Driver work.** `countRows` and `exportAllRows` take `Filter[]` today; add
+      a raw-WHERE variant on all three drivers (mysql/pg/sqlite).
+
 ## P0 — v1.3.4 + v1.4.0: editor/history/backup UX — PLANNED
 
 Design resolved via `/grill-with-docs` (2026-06-09). Split into a fast fix
