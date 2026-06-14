@@ -144,33 +144,31 @@ Design resolved via `/grill-with-docs` (2026-06-10). See
       so the user can still **Move to changeset** manually. Schema column +
       classify at the `session.ts` capture choke point.
 
-## P0 — v1.6.0: pinned columns — PLANNED
+## P0 — v1.6.0: pinned columns — DONE
 
 Design resolved via `/grill-with-docs` (2026-06-11). See
 [ADR-0016](adr/0016-pinned-columns-freeze-and-reorder.md) and CONTEXT.md
 **Pinned Column**.
 
-- [ ] **Pinned columns (freeze panes).** Columns frozen to the left or right
-      edge of the Data Grid during horizontal scroll — like Excel freeze panes.
-      Settings-driven: two rule types in a new **Pinned Columns** section of the
-      Settings modal.
-      - **Name rules** — tag/chip input; each chip is an exact column name with
-        an L/R toggle. Applied to every table opened.
-      - **PK rule** — toggle + L/R selector. Auto-pins the primary key column(s)
-        from `RowsResult.primaryKey`.
-      - **Stored in `settings.json`** as
-        `{ pinnedColumns: Array<{ name: string; side: 'left'|'right' }>, pinPrimaryKey: { enabled: boolean; side: 'left'|'right' } }`.
-      - **Render**: `DataGrid` computes `effectivePins` (name matches + PK
-        matches, minus per-tab unpins) then reorders into three groups: left-pinned
-        (original relative order) → scrollable → right-pinned. Each pinned
-        `<th>`/`<td>` gets `position: sticky` with cumulative `left`/`right`
-        offset. Row-number gutter stays sticky-left at offset 0; left-pin offsets
-        start at `ROWNUM_W` (48 px).
-      - **Freeze shadow** — `box-shadow` on the rightmost left-pinned column's
-        right edge and the leftmost right-pinned column's left edge.
-      - **Per-tab override** — right-click column header → "Unpin" / "Re-pin"
-        suppresses or restores a settings-driven pin for the current tab session
-        only. State in `Tab.pinnedOverride` (not persisted in `SerializedTab`).
+- [x] **Pinned columns (freeze panes).** Done. Pin rules in `store/settings.ts`
+      (localStorage `krust-settings-pinned-columns`, mirroring the keybindings
+      store — the v1.5 settings ended up in localStorage, not the main-process
+      `settings.json` the ADR named; impl follows the real code). Settings modal
+      gains a **Pinned Columns** left-nav section: name-rule chip input (each chip
+      has an L/R toggle + remove) + a PK auto-pin toggle with L/R. `DataGrid`
+      computes `pinOf()` (per-tab override → name rule → PK rule), reorders columns
+      into left-pinned → scrollable → right-pinned, and applies `position: sticky`
+      with cumulative offsets (left starts past `ROWNUM_W`). Sticky cells get an
+      opaque `var(--background)` backstop + translucent row/edit tint re-layered via
+      `background-image` (the tint vars are <40% alpha). Body pins sit at `z-5`
+      (below the `z-10` thead stacking context), header pins at `z-12`. Freeze
+      shadow on the edge column. Per-tab override via header right-click menu
+      (Pin left/right · Unpin · Reset), stored in `Tab.pinnedOverride`
+      (session-only, NOT in `SerializedTab`). All column data is keyed by name, so
+      reordering the `cols` array is safe — selection/edits/export follow display
+      order (Excel-like). Spec: ADR-0016 (name rules + PK rule, three-group
+      reorder, cumulative sticky offsets, freeze shadow, ephemeral per-tab
+      override).
 
 ## P0 — v1.3.0: workspace & connection resilience — DONE
 
@@ -374,6 +372,33 @@ CONTEXT.md **Session** + **Workspace & Tabs** + **Referenced By (Reverse FK)**.
 
 ## Resolved
 
+- **Tab pinning + drag-reorder + tab context menu** — built. `Tab.pinned`
+  (persisted in `SerializedTab`); `togglePinTab` keeps pinned tabs in a left
+  block, `moveTab(fromId,toId)` drag-reorders (HTML5 DnD on each tab,
+  re-asserting pinned-left invariant). The pinned block renders inside a
+  `position: sticky left-0` wrapper (opaque `bg-card`, `z-20`, freeze shadow) so
+  pinned tabs stay reachable while the unpinned tabs scroll underneath. Pinned
+  tabs survive bulk-close
+  (`closeOthers`/`closeToRight`/`closeAll` keep `pinned`). TabBar context menu
+  gains **Pin/Unpin tab** + **New query tab** (was close-only). The `+` new-query
+  button moved out of the scrolling tab strip into a `shrink-0` slot so it stays
+  visible when many tabs overflow (the original gripe: had to scroll right to
+  reach it).
+- **Query Plan (ADR-0014)** — built. `explainQuery(sql, analyze)` on all three
+  drivers → `session.explainQuery` (diagnostic, NOT history-captured; ANALYZE of
+  a write blocked on read-only) → IPC/preload. Per-engine parse: pg
+  `EXPLAIN (FORMAT JSON[, ANALYZE, BUFFERS])` → recursive `PlanNode`; mysql
+  tabular `EXPLAIN` → flat nodes + `EXPLAIN ANALYZE` indented text → tree; sqlite
+  `EXPLAIN QUERY PLAN` → parent/child tree. `QueryPlanPanel.tsx` renders the tree
+  (full-scan red / index badges, est+actual rows, cost, ms) with a Raw toggle.
+  Explain/Analyze buttons in the QueryView toolbar; Analyze confirms first.
+- **Grid virtualizer clipped last row / stutter at page end** — `DataGrid`'s
+  `useVirtualizer` used a static `estimateSize: 33` with no `measureElement`, so
+  real row height (`px-3 py-1` + text + border ≈ 34-37px) drifted the computed
+  positions downward as you scrolled; the last row of a 100-row page was never
+  fully reachable (felt like "max ~99") and the tail juddered. Fix: attach
+  `ref={rowVirtualizer.measureElement}` + `data-index` to each rendered row (data
+  rows + the FK-picker virtual row) so heights are measured, not estimated.
 - **Staged index changes** — Add/Drop index now stage (not fire immediately) and
   commit together with column edits via one reviewed transaction. New `addIndex`/
   `dropIndex` SchemaOps handled in every driver's `alterTable`; staged state +
@@ -429,10 +454,12 @@ CONTEXT.md **Session** + **Workspace & Tabs** + **Referenced By (Reverse FK)**.
   (sqlite). Leave PK untouched for auto-increment.
 - SQLite: existing-column type/nullability + FK add/drop unsupported (native
   ALTER limit; banner shown). No table-rebuild fallback by design (ADR-0002).
-- Backup data export formats Postgres array columns (`text[]`, etc.) as JSON
-  (`'["a","b"]'`) rather than pg array literal (`'{a,b}'`) — restoring such a
-  column would fail. Niche; pg-array-literal formatting deferred. Scalars,
-  JSON/JSONB, bytea (hex), dates all dump correctly.
+- ~~Backup formats Postgres array columns as JSON, not pg array literal~~ —
+  fixed. `backup.ts` `sqlLiteral` now emits a pg array literal `'{...}'` for
+  JS-array values on the postgres driver via `pgArrayBody` (double-quoted,
+  `\`-escaped elements; NULL bare; nested dims recurse unquoted), so `text[]` /
+  `int[]` / multidim columns round-trip on restore. Scalars, JSON/JSONB, bytea
+  (hex), dates already dumped correctly.
 - Backup uses Postgres's reconstructed (approximate) CREATE TABLE for the schema
   dump — same caveat as the Structure → DDL sub-tab. mysql/sqlite use native
   SHOW CREATE / sqlite_master (exact).

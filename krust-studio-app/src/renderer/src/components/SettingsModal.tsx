@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { RotateCcw, Keyboard } from 'lucide-react'
+import { RotateCcw, Keyboard, Pin, X } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -33,8 +33,18 @@ export function SettingsModal({
   onOpenChange: (o: boolean) => void
 }): React.JSX.Element {
   const { keybindings, setKeybinding, resetKeybinding, resetAll } = useSettings()
+  const {
+    pinnedColumns,
+    pinPrimaryKey,
+    addPinnedColumn,
+    removePinnedColumn,
+    setPinnedColumnSide,
+    setPinPrimaryKey
+  } = useSettings()
   const [recording, setRecording] = useState<CommandId | null>(null)
   const [search, setSearch] = useState('')
+  const [section, setSection] = useState<'keybindings' | 'pinned'>('keybindings')
+  const [pinName, setPinName] = useState('')
 
   useEffect(() => {
     if (!recording) return
@@ -83,14 +93,35 @@ export function SettingsModal({
 
         <div className="flex min-h-0 flex-1">
           {/* left nav */}
-          <div className="w-52 shrink-0 border-r p-2">
-            <button className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-xs font-medium bg-accent text-foreground">
+          <div className="w-52 shrink-0 space-y-0.5 border-r p-2">
+            <button
+              onClick={() => setSection('keybindings')}
+              className={cn(
+                'flex w-full items-center gap-2 rounded px-2 py-1.5 text-xs font-medium',
+                section === 'keybindings'
+                  ? 'bg-accent text-foreground'
+                  : 'text-muted-foreground hover:bg-accent/40'
+              )}
+            >
               <Keyboard className="size-3.5" />
               Keybindings
+            </button>
+            <button
+              onClick={() => setSection('pinned')}
+              className={cn(
+                'flex w-full items-center gap-2 rounded px-2 py-1.5 text-xs font-medium',
+                section === 'pinned'
+                  ? 'bg-accent text-foreground'
+                  : 'text-muted-foreground hover:bg-accent/40'
+              )}
+            >
+              <Pin className="size-3.5" />
+              Pinned Columns
             </button>
           </div>
 
           {/* keybindings content */}
+          {section === 'keybindings' && (
           <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-auto p-4">
             <Input
               placeholder="Search commands…"
@@ -171,6 +202,125 @@ export function SettingsModal({
               </button>
             </div>
           </div>
+          )}
+
+          {/* pinned columns content */}
+          {section === 'pinned' && (
+            <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-auto p-4">
+              <div className="space-y-2">
+                <div className="text-xs font-medium">Pin by column name</div>
+                <p className="text-[11px] text-muted-foreground">
+                  Columns with these exact names are frozen to the left or right
+                  edge of every table's data grid while scrolling horizontally.
+                </p>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    if (!pinName.trim()) return
+                    addPinnedColumn(pinName, 'left')
+                    setPinName('')
+                  }}
+                  className="flex gap-2"
+                >
+                  <Input
+                    placeholder="Column name (e.g. id, RecordStatus)…"
+                    value={pinName}
+                    onChange={(e) => setPinName(e.target.value)}
+                    className="h-7 text-xs"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!pinName.trim()}
+                    className="shrink-0 rounded border border-border px-3 py-0.5 text-xs hover:border-primary/40 disabled:opacity-40"
+                  >
+                    Add
+                  </button>
+                </form>
+
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {pinnedColumns.length === 0 && (
+                    <span className="text-[11px] text-muted-foreground/60">
+                      No name rules yet.
+                    </span>
+                  )}
+                  {pinnedColumns.map((rule) => (
+                    <span
+                      key={rule.name}
+                      className="flex items-center gap-1 rounded border border-border bg-accent/30 py-0.5 pr-1 pl-2 text-xs"
+                    >
+                      <Pin className="size-2.5 text-primary" />
+                      <span className="font-mono">{rule.name}</span>
+                      <span className="ml-1 flex overflow-hidden rounded border border-border">
+                        {(['left', 'right'] as const).map((s) => (
+                          <button
+                            key={s}
+                            onClick={() => setPinnedColumnSide(rule.name, s)}
+                            className={cn(
+                              'px-1.5 py-px text-[10px] capitalize',
+                              rule.side === s
+                                ? 'bg-primary text-primary-foreground'
+                                : 'text-muted-foreground hover:bg-accent'
+                            )}
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </span>
+                      <button
+                        onClick={() => removePinnedColumn(rule.name)}
+                        title="Remove"
+                        className="ml-0.5 text-muted-foreground hover:text-destructive"
+                      >
+                        <X className="size-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2 border-t pt-4">
+                <label className="flex items-center gap-2 text-xs font-medium">
+                  <input
+                    type="checkbox"
+                    checked={pinPrimaryKey.enabled}
+                    onChange={(e) =>
+                      setPinPrimaryKey({
+                        ...pinPrimaryKey,
+                        enabled: e.target.checked
+                      })
+                    }
+                  />
+                  Auto-pin primary key column(s)
+                </label>
+                <p className="text-[11px] text-muted-foreground">
+                  Freezes each table's primary key column(s) automatically.
+                </p>
+                {pinPrimaryKey.enabled && (
+                  <span className="flex w-fit overflow-hidden rounded border border-border">
+                    {(['left', 'right'] as const).map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setPinPrimaryKey({ ...pinPrimaryKey, side: s })}
+                        className={cn(
+                          'px-2.5 py-0.5 text-[11px] capitalize',
+                          pinPrimaryKey.side === s
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:bg-accent'
+                        )}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </span>
+                )}
+              </div>
+
+              <p className="text-[11px] text-muted-foreground/70">
+                Tip: right-click any column header in the grid to pin, unpin, or
+                override these rules for that tab only.
+              </p>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

@@ -1,8 +1,17 @@
 import { useMemo, useRef, useState, useEffect, useCallback } from 'react'
-import { Play, Square, Loader2, CheckCircle2, XCircle, RefreshCw } from 'lucide-react'
+import {
+  Play,
+  Square,
+  Loader2,
+  CheckCircle2,
+  XCircle,
+  RefreshCw,
+  Gauge
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { SqlEditor } from '@/components/SqlEditor'
+import { QueryPlanPanel } from '@/components/QueryPlanPanel'
 import { useConnections } from '@/store/connections'
 import type { QueryResult, EntityInfo } from '../../../shared/types'
 
@@ -76,6 +85,8 @@ export function QueryView(): React.JSX.Element | null {
     setQuerySql,
     setQueryAutoLimit,
     runQuery,
+    explainQuery,
+    clearPlan,
     cancelRunningQuery
   } = useConnections()
   const tab = tabs.find((t) => t.id === activeTabId)
@@ -163,7 +174,10 @@ export function QueryView(): React.JSX.Element | null {
   // SQL lives in a ref during typing — no re-renders on keystrokes.
   // Flushed to store on run (so re-renders from results use current SQL)
   // and on unmount (so tab-switch preserves unsaved SQL).
+  // `hasSql` mirrors only the empty↔non-empty transition so Run/Explain enable
+  // as you type (store `q.sql` lags behind the ref — setState bails on no change).
   const sqlRef = useRef(q?.sql ?? '')
+  const [hasSql, setHasSql] = useState((q?.sql ?? '').trim().length > 0)
   const setQuerySqlRef = useRef(setQuerySql)
   setQuerySqlRef.current = setQuerySql
 
@@ -171,6 +185,7 @@ export function QueryView(): React.JSX.Element | null {
   const tabId = tab?.id
   useEffect(() => {
     sqlRef.current = q?.sql ?? ''
+    setHasSql((q?.sql ?? '').trim().length > 0)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabId])
 
@@ -225,6 +240,18 @@ export function QueryView(): React.JSX.Element | null {
     void runQuery(sql)
   }
 
+  const explain = (analyze: boolean): void => {
+    setQuerySql(sqlRef.current)
+    if (
+      analyze &&
+      !window.confirm(
+        'ANALYZE actually executes the statement. On a write (INSERT/UPDATE/DELETE) this will modify data. Continue?'
+      )
+    )
+      return
+    void explainQuery(analyze)
+  }
+
   return (
     <div ref={containerRef} className="flex h-full flex-col">
       {/* toolbar */}
@@ -237,8 +264,8 @@ export function QueryView(): React.JSX.Element | null {
         ) : (
           <Button
             size="xs"
-            onClick={() => run(q.sql)}
-            disabled={!openConnectionId || !q.sql.trim()}
+            onClick={() => run(sqlRef.current)}
+            disabled={!openConnectionId || !hasSql}
             title="Run (Ctrl/Cmd+Enter runs the selection)"
           >
             <Play />
@@ -246,6 +273,26 @@ export function QueryView(): React.JSX.Element | null {
           </Button>
         )}
         {q.running && <Loader2 className="size-3.5 animate-spin" />}
+        <div className="mx-1 h-4 w-px bg-border" />
+        <Button
+          size="xs"
+          variant="ghost"
+          onClick={() => explain(false)}
+          disabled={!openConnectionId || !hasSql || q.planning}
+          title="EXPLAIN — show the query plan without running the query"
+        >
+          {q.planning ? <Loader2 className="size-3.5 animate-spin" /> : <Gauge />}
+          Explain
+        </Button>
+        <Button
+          size="xs"
+          variant="ghost"
+          onClick={() => explain(true)}
+          disabled={!openConnectionId || !hasSql || q.planning}
+          title="EXPLAIN ANALYZE — runs the query and shows real timings"
+        >
+          Analyze
+        </Button>
         <span className="text-muted-foreground/60">Ctrl+Enter runs selection</span>
         <div className="flex-1" />
         <label className="flex cursor-pointer items-center gap-1.5 text-muted-foreground">
@@ -263,6 +310,7 @@ export function QueryView(): React.JSX.Element | null {
           value={q.sql}
           onChange={(v) => {
             sqlRef.current = v
+            setHasSql(v.trim().length > 0)
             loadReferencedTables(v)
           }}
           onRun={run}
@@ -281,7 +329,12 @@ export function QueryView(): React.JSX.Element | null {
         <div className="absolute inset-x-0 top-[2px] h-px bg-border group-hover:bg-primary/50" />
       </div>
 
-      {/* results pane — takes all remaining space */}
+      {/* results pane — takes all remaining space; query plan takes over when set */}
+      {q.plan ? (
+        <div className="min-h-0 flex-1">
+          <QueryPlanPanel plan={q.plan} onClose={clearPlan} />
+        </div>
+      ) : (
       <div className="min-h-0 flex-1 overflow-auto">
         {q.results.length === 0 ? (
           <div className="px-3 py-6 text-center text-xs text-muted-foreground">
@@ -318,6 +371,7 @@ export function QueryView(): React.JSX.Element | null {
           ))
         )}
       </div>
+      )}
     </div>
   )
 }

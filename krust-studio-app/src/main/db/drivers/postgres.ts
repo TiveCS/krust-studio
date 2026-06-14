@@ -25,6 +25,8 @@ import type {
   Filter,
   ForeignKey,
   IndexSpec,
+  PlanNode,
+  QueryPlan,
   RawQueryResult,
   ReferencingTable,
   RowsResult,
@@ -33,6 +35,36 @@ import type {
   Sort,
   TableStructure
 } from '../../../shared/types'
+
+/** parse one node of a Postgres `EXPLAIN (FORMAT JSON)` plan into a PlanNode. */
+function pgPlanNode(p: Record<string, unknown>): PlanNode {
+  const nodeType = String(p['Node Type'] ?? 'Node')
+  const indexName = (p['Index Name'] as string | undefined) ?? null
+  const scan: PlanNode['scan'] = /Seq Scan/i.test(nodeType)
+    ? 'full'
+    : /Index|Bitmap/i.test(nodeType)
+      ? 'index'
+      : 'other'
+  const rel = p['Relation Name'] as string | undefined
+  const alias = p['Alias'] as string | undefined
+  const detail: string[] = []
+  if (rel) detail.push(`on ${rel}${alias && alias !== rel ? ` ${alias}` : ''}`)
+  if (indexName) detail.push(`using ${indexName}`)
+  if (p['Index Cond']) detail.push(`cond ${p['Index Cond']}`)
+  if (p['Filter']) detail.push(`filter ${p['Filter']}`)
+  const kids = (p['Plans'] as Record<string, unknown>[] | undefined) ?? []
+  return {
+    operation: nodeType,
+    detail: detail.join(' · ') || undefined,
+    scan,
+    index: indexName,
+    rows: (p['Plan Rows'] as number | undefined) ?? null,
+    cost: (p['Total Cost'] as number | undefined) ?? null,
+    actualRows: (p['Actual Rows'] as number | undefined) ?? null,
+    actualMs: (p['Actual Total Time'] as number | undefined) ?? null,
+    children: kids.map(pgPlanNode)
+  }
+}
 
 function quoteIdent(name: string): string {
   return '"' + name.replace(/"/g, '""') + '"'
@@ -712,6 +744,25 @@ export class PostgresDriver implements DbDriver {
         rows: res.rows as Record<string, unknown>[]
       }
     return { affected: res.rowCount ?? 0 }
+  }
+
+  async explainQuery(sql: string, analyze: boolean): Promise<QueryPlan> {
+    const opts = analyze ? 'ANALYZE, BUFFERS, FORMAT JSON' : 'FORMAT JSON'
+    const res = await (await this.ensure()).query(`EXPLAIN (${opts}) ${sql}`)
+    const raw = (res.rows[0] as Record<string, unknown>)['QUERY PLAN']
+    const arr = (typeof raw === 'string' ? JSON.parse(raw) : raw) as Record<
+      string,
+      unknown
+    >[]
+    const top = arr[0]
+    return {
+      engine: 'postgres',
+      analyze,
+      nodes: [pgPlanNode(top['Plan'] as Record<string, unknown>)],
+      raw: JSON.stringify(arr, null, 2),
+      planningMs: (top['Planning Time'] as number | undefined) ?? null,
+      executionMs: (top['Execution Time'] as number | undefined) ?? null
+    }
   }
 
   async cancel(): Promise<void> {

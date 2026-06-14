@@ -91,10 +91,15 @@ export function SqlEditor({ value, onChange, onRun, schema, driver }: Props): Re
     })
   }, [schema, dialect])
 
-  // Keep editor in sync if value is set externally
+  // Keep editor in sync when `value` is set externally (tab switch, programmatic
+  // set). Skip while the editor is focused: the parent keeps SQL in a ref during
+  // typing and only writes it to the store on run, so `value` (= store SQL) lags
+  // the live doc. Overwriting a focused editor with that stale value wipes what
+  // the user just typed and makes the editor feel frozen / uneditable.
   useEffect(() => {
     const v = view.current
-    if (v && value !== v.state.doc.toString()) {
+    if (!v || v.hasFocus) return
+    if (value !== v.state.doc.toString()) {
       v.dispatch({ changes: { from: 0, to: v.state.doc.length, insert: value } })
     }
   }, [value])

@@ -18,7 +18,9 @@ import {
   ChevronsUpDown,
   Eye,
   Search,
-  Download
+  Download,
+  Pin,
+  PinOff
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -50,6 +52,7 @@ import {
 import { FilterBar } from '@/components/FilterBar'
 import { cn } from '@/lib/utils'
 import { useConnections, editKey } from '@/store/connections'
+import { useSettings } from '@/store/settings'
 
 const ROWNUM_W = 48
 const DEFAULT_COL_W = 180
@@ -130,10 +133,13 @@ export function DataGrid(): React.JSX.Element | null {
     setInsertCell,
     removeInsert,
     setColWidth,
+    setPinOverride,
     clearChanges,
     commitChanges
   } = useConnections()
   const dbEnums = useConnections((s) => s.enums)
+  const pinnedColumns = useSettings((s) => s.pinnedColumns)
+  const pinPrimaryKey = useSettings((s) => s.pinPrimaryKey)
   const tab = tabs.find((t) => t.id === activeTabId)
   const conn = connections.find((c) => c.id === openConnectionId)
 
@@ -150,6 +156,10 @@ export function DataGrid(): React.JSX.Element | null {
   const [fkTarget, setFkTarget] = useState<{ r: number; c: number } | null>(null)
   const [gridW, setGridW] = useState(0)
   const [exportOpen, setExportOpen] = useState(false)
+  // header right-click pin menu (ADR-0016): column name + screen position
+  const [pinMenu, setPinMenu] = useState<{ name: string; x: number; y: number } | null>(
+    null
+  )
 
   const selecting = useRef(false)
   const colSelecting = useRef(false)
@@ -257,9 +267,30 @@ export function DataGrid(): React.JSX.Element | null {
 
   if (!tab) return null
 
-  const cols = tab.data?.columns ?? []
+  const rawCols = tab.data?.columns ?? []
   const rows = tab.data?.rows ?? []
   const pk = tab.data?.primaryKey ?? []
+
+  // ── pinned columns (freeze panes, ADR-0016) ──
+  // effective pin = per-tab override, else global name rule, else PK rule.
+  const pinOverride = tab.pinnedOverride ?? {}
+  const nameRule = new Map(pinnedColumns.map((r) => [r.name.toLowerCase(), r.side]))
+  const pinOf = (name: string): 'left' | 'right' | null => {
+    const ov = pinOverride[name]
+    if (ov) return ov === 'none' ? null : ov
+    const rule = nameRule.get(name.toLowerCase())
+    if (rule) return rule
+    if (pinPrimaryKey.enabled && pk.includes(name)) return pinPrimaryKey.side
+    return null
+  }
+  const leftCols = rawCols.filter((c) => pinOf(c.name) === 'left')
+  const rightCols = rawCols.filter((c) => pinOf(c.name) === 'right')
+  // render order: left-pinned (original order) → scrollable → right-pinned
+  const cols = [
+    ...leftCols,
+    ...rawCols.filter((c) => pinOf(c.name) === null),
+    ...rightCols
+  ]
   const realCount = rows.length
   const insCount = tab.inserts.length
   const total = insCount + realCount
@@ -270,6 +301,48 @@ export function DataGrid(): React.JSX.Element | null {
   const canInsert = !conn?.readOnly
   const colW = (name: string): number => tab.colWidths[name] ?? DEFAULT_COL_W
   const totalW = ROWNUM_W + cols.reduce((s, c) => s + colW(c.name), 0)
+
+  // cumulative sticky offsets for pinned columns. Left offsets start past the
+  // row-number gutter (ROWNUM_W); right offsets accumulate from the right edge.
+  const pinInfo = new Map<
+    string,
+    { side: 'left' | 'right'; offset: number; edge: boolean }
+  >()
+  {
+    let acc = ROWNUM_W
+    leftCols.forEach((c, i) => {
+      pinInfo.set(c.name, { side: 'left', offset: acc, edge: i === leftCols.length - 1 })
+      acc += colW(c.name)
+    })
+    let racc = 0
+    for (let i = rightCols.length - 1; i >= 0; i--) {
+      const c = rightCols[i]
+      pinInfo.set(c.name, { side: 'right', offset: racc, edge: i === 0 })
+      racc += colW(c.name)
+    }
+  }
+  const freezeShadow = (side: 'left' | 'right'): string =>
+    side === 'left'
+      ? '6px 0 8px -6px rgba(0,0,0,0.55)'
+      : '-6px 0 8px -6px rgba(0,0,0,0.55)'
+  // sticky style for a pinned header cell (opaque backstop so scrolled headers
+  // slide underneath instead of bleeding through)
+  const pinHeaderStyle = (
+    name: string,
+    selected: boolean
+  ): React.CSSProperties | undefined => {
+    const p = pinInfo.get(name)
+    if (!p) return undefined
+    const s: React.CSSProperties = {
+      position: 'sticky',
+      zIndex: 12,
+      backgroundColor: selected ? 'var(--primary)' : 'var(--background)'
+    }
+    if (p.side === 'left') s.left = p.offset
+    else s.right = p.offset
+    if (p.edge) s.boxShadow = freezeShadow(p.side)
+    return s
+  }
   const fkByCol = new Map((tab.data?.foreignKeys ?? []).map((f) => [f.column, f]))
   const enumValuesOf = (type?: string): string[] | null =>
     enumValues(type, dbEnums)
@@ -372,6 +445,42 @@ export function DataGrid(): React.JSX.Element | null {
     if (c === rect.minC) s.push(`inset 1px 0 0 0 ${col}`)
     if (c === rect.maxC) s.push(`inset -1px 0 0 0 ${col}`)
     return s.length ? { boxShadow: s.join(',') } : undefined
+  }
+
+  // body cell style: merges the pinned-column sticky offset + freeze shadow +
+  // opaque backstop with the existing selection outline (ADR-0016).
+  const cellStyle = (
+    r: number,
+    c: number,
+    ins: boolean,
+    deleted: boolean,
+    edited: boolean
+  ): React.CSSProperties | undefined => {
+    const p = pinInfo.get(cols[c].name)
+    const sel = selStyle(r, c)
+    if (!p) return sel
+    const shadows: string[] = []
+    if (sel?.boxShadow) shadows.push(sel.boxShadow as string)
+    if (p.edge) shadows.push(freezeShadow(p.side))
+    const tint = edited
+      ? 'var(--edit-cell)'
+      : ins
+        ? 'var(--new-row)'
+        : deleted
+          ? 'var(--delete-row)'
+          : null
+    // below the sticky header (thead is a z-10 stacking context) but above
+    // normal scrolling body cells
+    const s: React.CSSProperties = {
+      position: 'sticky',
+      zIndex: 5,
+      backgroundColor: 'var(--background)'
+    }
+    if (p.side === 'left') s.left = p.offset
+    else s.right = p.offset
+    if (tint) s.backgroundImage = `linear-gradient(${tint},${tint})`
+    if (shadows.length) s.boxShadow = shadows.join(', ')
+    return s
   }
 
   const startEdit = (r: number, c: number): void => {
@@ -541,11 +650,18 @@ export function DataGrid(): React.JSX.Element | null {
                     {cols.map((c, ci) => (
                       <th
                         key={c.name}
+                        style={pinHeaderStyle(c.name, colFullySelected(ci))}
+                        onContextMenu={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          setPinMenu({ name: c.name, x: e.clientX, y: e.clientY })
+                        }}
                         className={cn(
                           'relative px-3 py-1.5 text-left font-medium whitespace-nowrap',
                           colFullySelected(ci)
                             ? 'bg-primary text-primary-foreground'
-                            : 'text-muted-foreground'
+                            : 'text-muted-foreground',
+                          pinInfo.has(c.name) && 'text-foreground'
                         )}
                       >
                         <div className="flex w-full items-center gap-1 pr-1">
@@ -565,6 +681,9 @@ export function DataGrid(): React.JSX.Element | null {
                               !colFullySelected(ci) && 'hover:text-foreground'
                             )}
                           >
+                            {pinInfo.has(c.name) && (
+                              <Pin className="size-2.5 shrink-0 text-primary" />
+                            )}
                             <span className="truncate">{c.name}</span>
                             {pk.includes(c.name) && (
                               <span className="text-[9px] text-amber-500/70">PK</span>
@@ -650,7 +769,11 @@ export function DataGrid(): React.JSX.Element | null {
                           // FK picker virtual row
                           if (isPickerVRow(vRow.index)) {
                             return (
-                              <tr key="fk-picker">
+                              <tr
+                                key="fk-picker"
+                                data-index={vRow.index}
+                                ref={rowVirtualizer.measureElement}
+                              >
                                 <td colSpan={cols.length + 1} className="p-0">
                                   {fkTarget && fkTargetFk && openConnectionId && (
                                     <FkInlinePicker
@@ -690,6 +813,8 @@ export function DataGrid(): React.JSX.Element | null {
                           return (
                             <tr
                               key={ins ? `ins-${insIdx(r)}` : `row-${realIdx(r)}`}
+                              data-index={vRow.index}
+                              ref={rowVirtualizer.measureElement}
                               className={cn(
                                 'border-b border-border/30',
                                 ins && 'bg-new-row',
@@ -782,7 +907,7 @@ export function DataGrid(): React.JSX.Element | null {
                                       if (!inSel(r, c))
                                         setSel({ ar: r, ac: c, fr: r, fc: c })
                                     }}
-                                    style={selStyle(r, c)}
+                                    style={cellStyle(r, c, ins, deleted, edited)}
                                     className={cn(
                                       'group/cell relative overflow-hidden px-3 py-1 whitespace-nowrap text-ellipsis select-none',
                                       edited && !ins && 'bg-edit-cell',
@@ -990,6 +1115,80 @@ export function DataGrid(): React.JSX.Element | null {
             onClose={() => setJsonOpen(false)}
           />
         )}
+        {pinMenu &&
+          (() => {
+            const cur = pinOf(pinMenu.name)
+            const hasOverride = pinMenu.name in pinOverride
+            const act = (side: 'left' | 'right' | 'none' | null): void => {
+              setPinOverride(pinMenu.name, side)
+              setPinMenu(null)
+            }
+            const Item = ({
+              icon,
+              label,
+              onClick,
+              active
+            }: {
+              icon: React.ReactNode
+              label: string
+              onClick: () => void
+              active?: boolean
+            }): React.JSX.Element => (
+              <button
+                onClick={onClick}
+                className={cn(
+                  'flex w-full items-center gap-2 rounded px-2 py-1 text-left text-xs hover:bg-accent',
+                  active && 'text-primary'
+                )}
+              >
+                {icon}
+                {label}
+              </button>
+            )
+            return (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onMouseDown={() => setPinMenu(null)}
+                  onContextMenu={(e) => {
+                    e.preventDefault()
+                    setPinMenu(null)
+                  }}
+                />
+                <div
+                  className="fixed z-50 min-w-[160px] rounded-md border border-border bg-popover p-1 font-sans text-popover-foreground shadow-md"
+                  style={{ left: pinMenu.x, top: pinMenu.y }}
+                >
+                  <Item
+                    icon={<Pin className="size-3" />}
+                    label="Pin left"
+                    active={cur === 'left'}
+                    onClick={() => act('left')}
+                  />
+                  <Item
+                    icon={<Pin className="size-3" />}
+                    label="Pin right"
+                    active={cur === 'right'}
+                    onClick={() => act('right')}
+                  />
+                  {cur && (
+                    <Item
+                      icon={<PinOff className="size-3" />}
+                      label="Unpin"
+                      onClick={() => act('none')}
+                    />
+                  )}
+                  {hasOverride && (
+                    <Item
+                      icon={<Undo2 className="size-3" />}
+                      label="Reset to default"
+                      onClick={() => act(null)}
+                    />
+                  )}
+                </div>
+              </>
+            )
+          })()}
       </div>
 
       {openConnectionId && (

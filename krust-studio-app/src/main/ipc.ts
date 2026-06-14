@@ -36,6 +36,7 @@ import {
   createIndex,
   dropIndex,
   runScript,
+  explainQuery,
   cancelQuery,
   disconnectSession,
   reconnectSession
@@ -238,6 +239,11 @@ export function registerIpc(): void {
     'session:runScript',
     (_e, id: string, sql: string, autoLimit?: number) =>
       runScript(id, sql, autoLimit)
+  )
+  ipcMain.handle(
+    'session:explainQuery',
+    (_e, id: string, sql: string, analyze: boolean) =>
+      explainQuery(id, sql, analyze)
   )
   ipcMain.handle('session:cancelQuery', (_e, id: string) => cancelQuery(id))
   ipcMain.handle('session:disconnect', (_e, id: string) =>

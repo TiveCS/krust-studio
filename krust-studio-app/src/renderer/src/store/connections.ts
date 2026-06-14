@@ -11,6 +11,7 @@ import type {
   RowEdit,
   CreateTableSpec,
   NewColumnSpec,
+  QueryPlan,
   QueryResult,
   ReferencingTable,
   RowsResult,
@@ -29,6 +30,10 @@ export interface QueryState {
   running: boolean
   /** auto-LIMIT for SELECTs; 0 = off */
   autoLimit: number
+  /** last EXPLAIN/ANALYZE plan (ADR-0014); null until run, cleared to dismiss */
+  plan: QueryPlan | null
+  /** an EXPLAIN/ANALYZE is in flight */
+  planning: boolean
 }
 
 export type TabView = 'data' | 'structure'
@@ -43,6 +48,8 @@ export interface Tab {
   entity: EntityRef
   /** undefined / absent = regular table/query/new-table tab */
   kind?: 'history' | 'connection-editor' | 'backup'
+  /** pinned tabs stay at the left edge + survive bulk-close (persisted) */
+  pinned?: boolean
   /** set on connection-editor tabs: which connection to edit (null = new) */
   connectionEditor?: { connectionId: string | null }
   data: RowsResult | null
@@ -88,6 +95,10 @@ export interface Tab {
   fkDrops?: string[]
   /** last-computed "has uncommitted schema changes" flag (set by StructureView) */
   structDirty?: boolean
+  /** per-tab pin overrides keyed by column name (ADR-0016). 'none' suppresses a
+   *  settings-driven pin; 'left'/'right' force a pin for this tab session only.
+   *  Session-only — intentionally NOT persisted in SerializedTab. */
+  pinnedOverride?: Record<string, 'left' | 'right' | 'none'>
 }
 
 /** any uncommitted data-grid edit on this tab (cell edits / deletes / inserts) */
@@ -186,6 +197,10 @@ interface ConnectionsState {
   setQuerySql: (sql: string) => void
   setQueryAutoLimit: (n: number) => void
   runQuery: (sql: string) => Promise<void>
+  /** EXPLAIN (analyze=false) / EXPLAIN ANALYZE (analyze=true) the editor SQL */
+  explainQuery: (analyze: boolean) => Promise<void>
+  /** dismiss the query plan panel */
+  clearPlan: () => void
   cancelRunningQuery: () => Promise<void>
   patchDraft: (p: Partial<{ name: string; columns: NewColumnSpec[] }>) => void
   closeTab: (tabId: string) => void
@@ -209,6 +224,9 @@ interface ConnectionsState {
   setInsertCell: (insertIndex: number, column: string, value: unknown) => void
   removeInsert: (insertIndex: number) => void
   setColWidth: (column: string, width: number) => void
+  /** set/clear a per-tab pin override on the active tab (ADR-0016). `side: null`
+   *  removes the override, falling back to the global settings rule. */
+  setPinOverride: (column: string, side: 'left' | 'right' | 'none' | null) => void
   clearChanges: () => void
   commitChanges: () => Promise<void>
   // staged structure (schema) edits — live on the active tab
@@ -221,6 +239,10 @@ interface ConnectionsState {
   closeOtherTabs: (tabId: string) => void
   closeTabsToRight: (tabId: string) => void
   closeAllTabs: () => void
+  /** toggle a tab's pinned state; pinned tabs move to the left block */
+  togglePinTab: (tabId: string) => void
+  /** drag-reorder: move `fromId` to `toId`'s slot (pinned stay left of unpinned) */
+  moveTab: (fromId: string, toId: string) => void
 }
 
 export const useConnections = create<ConnectionsState>((set, get) => {
@@ -276,7 +298,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
             ...(tab.query !== null
               ? { sqlDraft: tab.query.sql, autoLimit: tab.query.autoLimit }
               : {}),
-            ...(tab.draft !== null ? { draft: tab.draft } : {})
+            ...(tab.draft !== null ? { draft: tab.draft } : {}),
+            ...(tab.pinned ? { pinned: true } : {})
           }
         })
         .filter((t): t is SerializedTab => t !== null)
@@ -288,6 +311,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       id: t.id,
       entity: t.entity,
       kind: t.kind,
+      pinned: t.pinned,
       connectionEditor: t.connectionEditor,
       data: null,
       loading: false,
@@ -311,7 +335,14 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       draft: t.draft ?? null,
       query:
         t.sqlDraft !== undefined
-          ? { sql: t.sqlDraft, results: [], running: false, autoLimit: t.autoLimit ?? 500 }
+          ? {
+              sql: t.sqlDraft,
+              results: [],
+              running: false,
+              autoLimit: t.autoLimit ?? 500,
+              plan: null,
+              planning: false
+            }
           : null
     }
   }
@@ -847,7 +878,14 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         referencedBy: null,
         referencedByLoading: false,
         draft: null,
-        query: { sql: '', results: [], running: false, autoLimit: 500 }
+        query: {
+          sql: '',
+          results: [],
+          running: false,
+          autoLimit: 500,
+          plan: null,
+          planning: false
+        }
       }
       set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
       scheduleWorkspaceSave()
@@ -867,7 +905,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       const { openConnectionId, activeTabId, tabs } = get()
       const tab = tabs.find((t) => t.id === activeTabId)
       if (!openConnectionId || !tab?.query || !sql.trim()) return
-      patchTab(tab.id, { query: { ...tab.query, running: true } })
+      // running a normal query dismisses any open plan panel
+      patchTab(tab.id, { query: { ...tab.query, running: true, plan: null } })
       try {
         const results = await window.api.sessions.runScript(
           openConnectionId,
@@ -894,6 +933,44 @@ export const useConnections = create<ConnectionsState>((set, get) => {
             }
           })
       }
+    },
+    explainQuery: async (analyze) => {
+      const { openConnectionId, activeTabId, tabs } = get()
+      const tab = tabs.find((t) => t.id === activeTabId)
+      const sql = tab?.query?.sql ?? ''
+      if (!openConnectionId || !tab?.query || !sql.trim()) return
+      patchTab(tab.id, { query: { ...tab.query, planning: true } })
+      try {
+        const plan = await window.api.sessions.explainQuery(
+          openConnectionId,
+          sql,
+          analyze
+        )
+        const cur = get().tabs.find((t) => t.id === tab.id)
+        if (cur?.query)
+          patchTab(tab.id, { query: { ...cur.query, plan, planning: false } })
+      } catch (err) {
+        const cur = get().tabs.find((t) => t.id === tab.id)
+        if (cur?.query)
+          patchTab(tab.id, {
+            query: {
+              ...cur.query,
+              planning: false,
+              results: [
+                {
+                  statement: sql,
+                  kind: 'error',
+                  error: err instanceof Error ? err.message : String(err)
+                }
+              ]
+            }
+          })
+      }
+    },
+    clearPlan: () => {
+      const { activeTabId, tabs } = get()
+      const tab = tabs.find((t) => t.id === activeTabId)
+      if (tab?.query) patchTab(tab.id, { query: { ...tab.query, plan: null } })
     },
     cancelRunningQuery: async () => {
       const id = get().openConnectionId
@@ -1181,6 +1258,17 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       scheduleWorkspaceSave()
     },
 
+    setPinOverride: (column, side) => {
+      const id = get().activeTabId
+      const tab = get().tabs.find((t) => t.id === id)
+      if (!id || !tab) return
+      const next = { ...(tab.pinnedOverride ?? {}) }
+      if (side === null) delete next[column]
+      else next[column] = side
+      patchTab(id, { pinnedOverride: next })
+      // session-only (ADR-0016): no scheduleWorkspaceSave()
+    },
+
     clearChanges: () => {
       const id = get().activeTabId
       if (id) patchTab(id, { edits: {}, deletes: [], inserts: [] })
@@ -1266,8 +1354,9 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     },
 
     closeOtherTabs: (tabId) => {
+      // keep the target tab and any pinned tabs
       set((s) => ({
-        tabs: s.tabs.filter((t) => t.id === tabId),
+        tabs: s.tabs.filter((t) => t.id === tabId || t.pinned),
         activeTabId: tabId
       }))
       scheduleWorkspaceSave()
@@ -1276,7 +1365,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       set((s) => {
         const idx = s.tabs.findIndex((t) => t.id === tabId)
         if (idx < 0) return s
-        const tabs = s.tabs.slice(0, idx + 1)
+        // keep everything up to & including the target, plus any pinned tabs
+        const tabs = s.tabs.filter((t, j) => j <= idx || t.pinned)
         const activeTabId = tabs.some((t) => t.id === s.activeTabId)
           ? s.activeTabId
           : tabId
@@ -1285,7 +1375,46 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       scheduleWorkspaceSave()
     },
     closeAllTabs: () => {
-      set({ tabs: [], activeTabId: null })
+      // pinned tabs survive a "close all"
+      set((s) => {
+        const tabs = s.tabs.filter((t) => t.pinned)
+        const activeTabId = tabs.some((t) => t.id === s.activeTabId)
+          ? s.activeTabId
+          : (tabs[0]?.id ?? null)
+        return { tabs, activeTabId }
+      })
+      scheduleWorkspaceSave()
+    },
+    togglePinTab: (tabId) => {
+      set((s) => {
+        const toggled = s.tabs.map((t) =>
+          t.id === tabId ? { ...t, pinned: !t.pinned } : t
+        )
+        // re-assert invariant: pinned block first, then unpinned (stable)
+        const tabs = [
+          ...toggled.filter((t) => t.pinned),
+          ...toggled.filter((t) => !t.pinned)
+        ]
+        return { tabs }
+      })
+      scheduleWorkspaceSave()
+    },
+    moveTab: (fromId, toId) => {
+      if (fromId === toId) return
+      set((s) => {
+        const tabs = [...s.tabs]
+        const from = tabs.findIndex((t) => t.id === fromId)
+        const to = tabs.findIndex((t) => t.id === toId)
+        if (from < 0 || to < 0) return s
+        const [moved] = tabs.splice(from, 1)
+        tabs.splice(to, 0, moved)
+        // keep pinned tabs left of unpinned, preserving the new relative order
+        const reordered = [
+          ...tabs.filter((t) => t.pinned),
+          ...tabs.filter((t) => !t.pinned)
+        ]
+        return { tabs: reordered }
+      })
       scheduleWorkspaceSave()
     }
   }

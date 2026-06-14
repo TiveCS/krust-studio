@@ -1,6 +1,29 @@
 import { create } from 'zustand'
 
 const STORAGE_KEY = 'krust-settings-keybindings'
+const STORAGE_KEY_PINS = 'krust-settings-pinned-columns'
+
+export type PinSide = 'left' | 'right'
+/** a global name-based pin rule, applied to every table opened */
+export interface PinRule {
+  name: string
+  side: PinSide
+}
+/** auto-pin the primary key column(s) of every table */
+export interface PinPrimaryKey {
+  enabled: boolean
+  side: PinSide
+}
+
+interface PinSettings {
+  pinnedColumns: PinRule[]
+  pinPrimaryKey: PinPrimaryKey
+}
+
+const DEFAULT_PINS: PinSettings = {
+  pinnedColumns: [],
+  pinPrimaryKey: { enabled: false, side: 'left' }
+}
 
 function loadKeybindings(): Record<string, string> {
   try {
@@ -11,11 +34,37 @@ function loadKeybindings(): Record<string, string> {
   }
 }
 
+function loadPins(): PinSettings {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_PINS)
+    if (!raw) return DEFAULT_PINS
+    const parsed = JSON.parse(raw) as Partial<PinSettings>
+    return {
+      pinnedColumns: Array.isArray(parsed.pinnedColumns) ? parsed.pinnedColumns : [],
+      pinPrimaryKey: parsed.pinPrimaryKey ?? DEFAULT_PINS.pinPrimaryKey
+    }
+  } catch {
+    return DEFAULT_PINS
+  }
+}
+
 interface SettingsState {
   keybindings: Record<string, string>
   setKeybinding: (commandId: string, key: string) => void
   resetKeybinding: (commandId: string) => void
   resetAll: () => void
+
+  // ── pinned columns (freeze panes, ADR-0016) ──
+  pinnedColumns: PinRule[]
+  pinPrimaryKey: PinPrimaryKey
+  addPinnedColumn: (name: string, side: PinSide) => void
+  removePinnedColumn: (name: string) => void
+  setPinnedColumnSide: (name: string, side: PinSide) => void
+  setPinPrimaryKey: (v: PinPrimaryKey) => void
+}
+
+function savePins(s: PinSettings): void {
+  localStorage.setItem(STORAGE_KEY_PINS, JSON.stringify(s))
 }
 
 export const useSettings = create<SettingsState>((set) => ({
@@ -39,5 +88,44 @@ export const useSettings = create<SettingsState>((set) => ({
   resetAll: () => {
     localStorage.removeItem(STORAGE_KEY)
     set({ keybindings: {} })
-  }
+  },
+
+  ...loadPins(),
+
+  addPinnedColumn: (name, side) =>
+    set((s) => {
+      const trimmed = name.trim()
+      if (!trimmed) return {}
+      // replace any existing rule for the same name (case-insensitive)
+      const rest = s.pinnedColumns.filter(
+        (r) => r.name.toLowerCase() !== trimmed.toLowerCase()
+      )
+      const pinnedColumns = [...rest, { name: trimmed, side }]
+      savePins({ pinnedColumns, pinPrimaryKey: s.pinPrimaryKey })
+      return { pinnedColumns }
+    }),
+
+  removePinnedColumn: (name) =>
+    set((s) => {
+      const pinnedColumns = s.pinnedColumns.filter(
+        (r) => r.name.toLowerCase() !== name.toLowerCase()
+      )
+      savePins({ pinnedColumns, pinPrimaryKey: s.pinPrimaryKey })
+      return { pinnedColumns }
+    }),
+
+  setPinnedColumnSide: (name, side) =>
+    set((s) => {
+      const pinnedColumns = s.pinnedColumns.map((r) =>
+        r.name.toLowerCase() === name.toLowerCase() ? { ...r, side } : r
+      )
+      savePins({ pinnedColumns, pinPrimaryKey: s.pinPrimaryKey })
+      return { pinnedColumns }
+    }),
+
+  setPinPrimaryKey: (pinPrimaryKey) =>
+    set((s) => {
+      savePins({ pinnedColumns: s.pinnedColumns, pinPrimaryKey })
+      return { pinPrimaryKey }
+    })
 }))

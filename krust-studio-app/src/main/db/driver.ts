@@ -10,6 +10,7 @@ import type {
   Filter,
   FilterOp,
   IndexSpec,
+  QueryPlan,
   RawQueryResult,
   ReferencingTable,
   RowsResult,
@@ -76,6 +77,9 @@ export interface DbDriver {
   dropIndex(entity: EntityRef, name: string): Promise<{ statements: string[] }>
   /** run one arbitrary statement (SQL editor); returns rows or affected count */
   query(sql: string): Promise<RawQueryResult>
+  /** EXPLAIN / EXPLAIN ANALYZE → parsed plan tree (ADR-0014). `analyze` runs the
+   *  statement for real (engine-dependent). */
+  explainQuery(sql: string, analyze: boolean): Promise<QueryPlan>
   /** cancel the in-flight query (pg/mysql); no-op/throw on sqlite */
   cancel(): Promise<void>
   close(): Promise<void>

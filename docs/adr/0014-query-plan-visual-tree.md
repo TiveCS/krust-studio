@@ -1,7 +1,18 @@
 # ADR-0014 — Query Plan: visual tree over raw table output
 
-**Status:** Accepted (deferred implementation)
+**Status:** Accepted — **built** (2026-06-14)
 **Date:** 2026-06-04
+
+> **Built:** `driver.explainQuery(sql, analyze)` on all three engines →
+> `session.explainQuery` (not history-captured; ANALYZE of a write blocked on
+> read-only connections) → IPC/preload `sessions.explainQuery`. Per-engine
+> parsing: pg `EXPLAIN (FORMAT JSON[, ANALYZE])` → recursive `PlanNode` tree;
+> mysql tabular `EXPLAIN` → flat nodes, `EXPLAIN ANALYZE` text → indented `->`
+> tree parse; sqlite `EXPLAIN QUERY PLAN` → parent/child id tree. Rendered by
+> `QueryPlanPanel.tsx` (tree with full-scan/index badges, est/actual rows, cost,
+> timings) with a **Raw toggle** fallback. Explain/Analyze buttons in the
+> QueryView toolbar; Analyze shows a confirm (it executes). Unknown node types
+> degrade gracefully (no badge).
 
 ## Context
 

@@ -38,6 +38,8 @@ import type {
   Filter,
   ForeignKey,
   IndexSpec,
+  PlanNode,
+  QueryPlan,
   RawQueryResult,
   ReferencingTable,
   RowsResult,
@@ -52,6 +54,69 @@ function quoteIdent(name: string): string {
 }
 
 const MYSQL_INDEX_METHODS = new Set(['BTREE', 'HASH'])
+
+/** one row of tabular `EXPLAIN` → a flat PlanNode. */
+function mysqlExplainRowNode(r: Record<string, unknown>): PlanNode {
+  const type = (r.type as string | null) ?? null // ALL, index, range, ref, …
+  const key = (r.key as string | null) || null
+  const scan: PlanNode['scan'] =
+    type === 'ALL' ? 'full' : key ? 'index' : type === 'index' ? 'full' : 'other'
+  const est = r.rows != null ? Number(r.rows) : null
+  const filtered = r.filtered != null ? Number(r.filtered) : 100
+  const table = (r.table as string | null) ?? null
+  const selectType = (r.select_type as string | null) ?? 'SIMPLE'
+  const detail: string[] = []
+  if (r.Extra) detail.push(String(r.Extra))
+  if (r.possible_keys) detail.push(`possible: ${r.possible_keys}`)
+  if (r.ref) detail.push(`ref ${r.ref}`)
+  return {
+    operation: `${selectType}: ${type ?? '?'}${table ? ` ${table}` : ''}`,
+    detail: detail.join(' · ') || undefined,
+    scan,
+    index: key,
+    rows: est != null ? Math.round((est * filtered) / 100) : null,
+    cost: est,
+    children: []
+  }
+}
+
+/** Parse MySQL 8 `EXPLAIN ANALYZE` text (indented `->` tree) into PlanNodes. */
+function parseMysqlAnalyzeTree(text: string): PlanNode[] {
+  const roots: PlanNode[] = []
+  const stack: { depth: number; node: PlanNode }[] = []
+  for (const rawLine of text.split('\n')) {
+    if (!rawLine.trim()) continue
+    const arrow = rawLine.indexOf('->')
+    if (arrow < 0) continue
+    const depth = Math.floor(arrow / 4)
+    const body = rawLine.slice(arrow + 2).trim()
+    const op = body.split(/\s{2,}\(/)[0].trim()
+    const cost = body.match(/cost=([\d.]+)/)
+    const estRows = body.match(/\(cost=[\d.]+ rows=([\d.]+)\)/)
+    const actual = body.match(/actual time=[\d.]+\.\.([\d.]+) rows=([\d.]+)/)
+    const scan: PlanNode['scan'] = /Table scan/i.test(op)
+      ? 'full'
+      : /index|covering/i.test(op)
+        ? 'index'
+        : 'other'
+    const node: PlanNode = {
+      operation: op,
+      detail: undefined,
+      scan,
+      index: (op.match(/index \w+ on \w+ \((\w+)\)/i) ?? [])[1] ?? null,
+      rows: estRows ? Number(estRows[1]) : null,
+      cost: cost ? Number(cost[1]) : null,
+      actualRows: actual ? Number(actual[2]) : null,
+      actualMs: actual ? Number(actual[1]) : null,
+      children: []
+    }
+    while (stack.length && stack[stack.length - 1].depth >= depth) stack.pop()
+    if (stack.length) stack[stack.length - 1].node.children.push(node)
+    else roots.push(node)
+    stack.push({ depth, node })
+  }
+  return roots
+}
 
 export class MysqlDriver implements DbDriver {
   private conn: Connection | null = null
@@ -636,6 +701,30 @@ export class MysqlDriver implements DbDriver {
         rows: result as unknown as Record<string, unknown>[]
       }
     return { affected: (result as ResultSetHeader).affectedRows ?? 0 }
+  }
+
+  async explainQuery(sql: string, analyze: boolean): Promise<QueryPlan> {
+    const conn = await this.ensure()
+    if (analyze) {
+      const [rows] = await conn.query(`EXPLAIN ANALYZE ${sql}`)
+      const text = (rows as Record<string, unknown>[])
+        .map((r) => String(Object.values(r)[0] ?? ''))
+        .join('\n')
+      return {
+        engine: 'mysql',
+        analyze: true,
+        nodes: parseMysqlAnalyzeTree(text),
+        raw: text
+      }
+    }
+    const [rows] = await conn.query(`EXPLAIN ${sql}`)
+    const list = rows as Record<string, unknown>[]
+    return {
+      engine: 'mysql',
+      analyze: false,
+      nodes: list.map(mysqlExplainRowNode),
+      raw: JSON.stringify(list, null, 2)
+    }
   }
 
   async cancel(): Promise<void> {

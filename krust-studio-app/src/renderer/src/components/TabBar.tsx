@@ -1,7 +1,16 @@
 import { useState } from 'react'
-import { X, Table2, SquareTerminal, Plus, History, Plug } from 'lucide-react'
+import {
+  X,
+  Table2,
+  SquareTerminal,
+  Plus,
+  History,
+  Plug,
+  Pin,
+  PinOff
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useConnections, tabIsDirty } from '@/store/connections'
+import { useConnections, tabIsDirty, type Tab } from '@/store/connections'
 import {
   ContextMenu,
   ContextMenuContent,
@@ -36,10 +45,15 @@ export function TabBar(): React.JSX.Element | null {
     openQuery,
     closeOtherTabs,
     closeTabsToRight,
-    closeAllTabs
+    closeAllTabs,
+    togglePinTab,
+    moveTab
   } = useConnections()
   // a pending close that needs confirmation because it would discard edits
   const [confirm, setConfirm] = useState<{ run: () => void; names: string[] } | null>(null)
+  // drag-reorder state: id being dragged + the id currently hovered over
+  const [dragId, setDragId] = useState<string | null>(null)
+  const [overId, setOverId] = useState<string | null>(null)
 
   if (tabs.length === 0 && !openConnectionId) return null
 
@@ -55,15 +69,38 @@ export function TabBar(): React.JSX.Element | null {
   const idsOf = (pred: (id: string, i: number) => boolean): string[] =>
     tabs.filter((_, i) => pred(tabs[i].id, i)).map((t) => t.id)
 
-  return (
-    <div className="flex h-9 shrink-0 items-stretch overflow-x-auto border-b border-border bg-card/30">
-      {tabs.map((t, i) => {
-        const dirty = tabIsDirty(t)
-        const isLast = i === tabs.length - 1
-        return (
+  const pinned = tabs.filter((t) => t.pinned)
+  const unpinned = tabs.filter((t) => !t.pinned)
+
+  const renderTab = (t: Tab, i: number): React.JSX.Element => {
+    const dirty = tabIsDirty(t)
+    const isLast = i === tabs.length - 1
+    return (
           <ContextMenu key={t.id}>
             <ContextMenuTrigger asChild>
               <div
+                draggable
+                onDragStart={(e) => {
+                  setDragId(t.id)
+                  e.dataTransfer.effectAllowed = 'move'
+                }}
+                onDragOver={(e) => {
+                  if (!dragId || dragId === t.id) return
+                  e.preventDefault()
+                  e.dataTransfer.dropEffect = 'move'
+                  setOverId(t.id)
+                }}
+                onDragLeave={() => setOverId((o) => (o === t.id ? null : o))}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  if (dragId && dragId !== t.id) moveTab(dragId, t.id)
+                  setDragId(null)
+                  setOverId(null)
+                }}
+                onDragEnd={() => {
+                  setDragId(null)
+                  setOverId(null)
+                }}
                 onClick={() => setActiveTab(t.id)}
                 onAuxClick={(e) => {
                   // middle-click closes
@@ -76,10 +113,16 @@ export function TabBar(): React.JSX.Element | null {
                   'group flex cursor-pointer items-center gap-1.5 border-r border-border px-3 text-xs whitespace-nowrap',
                   activeTabId === t.id
                     ? 'bg-background text-foreground'
-                    : 'text-muted-foreground hover:bg-accent/40'
+                    : 'text-muted-foreground hover:bg-accent/40',
+                  dragId === t.id && 'opacity-40',
+                  overId === t.id && 'border-l-2 border-l-primary'
                 )}
               >
-                <TabIcon tab={t} />
+                {t.pinned ? (
+                  <Pin className="size-3 shrink-0 rotate-45 text-primary" />
+                ) : (
+                  <TabIcon tab={t} />
+                )}
                 <span className="font-mono">{t.entity.name}</span>
                 {dirty && (
                   <span
@@ -105,6 +148,24 @@ export function TabBar(): React.JSX.Element | null {
               </div>
             </ContextMenuTrigger>
             <ContextMenuContent>
+              <ContextMenuItem onSelect={() => togglePinTab(t.id)}>
+                {t.pinned ? (
+                  <>
+                    <PinOff className="size-3.5" />
+                    Unpin tab
+                  </>
+                ) : (
+                  <>
+                    <Pin className="size-3.5" />
+                    Pin tab
+                  </>
+                )}
+              </ContextMenuItem>
+              <ContextMenuItem disabled={!openConnectionId} onSelect={() => openQuery()}>
+                <SquareTerminal className="size-3.5" />
+                New query tab
+              </ContextMenuItem>
+              <ContextMenuSeparator />
               <ContextMenuItem onSelect={() => requestClose([t.id], () => closeTab(t.id))}>
                 Close
               </ContextMenuItem>
@@ -112,7 +173,7 @@ export function TabBar(): React.JSX.Element | null {
                 disabled={tabs.length <= 1}
                 onSelect={() =>
                   requestClose(
-                    idsOf((id) => id !== t.id),
+                    idsOf((id) => id !== t.id && !tabs.find((x) => x.id === id)?.pinned),
                     () => closeOtherTabs(t.id)
                   )
                 }
@@ -123,7 +184,7 @@ export function TabBar(): React.JSX.Element | null {
                 disabled={isLast}
                 onSelect={() =>
                   requestClose(
-                    idsOf((_, j) => j > i),
+                    idsOf((_, j) => j > i && !tabs[j].pinned),
                     () => closeTabsToRight(t.id)
                   )
                 }
@@ -132,19 +193,35 @@ export function TabBar(): React.JSX.Element | null {
               </ContextMenuItem>
               <ContextMenuSeparator />
               <ContextMenuItem
-                onSelect={() => requestClose(idsOf(() => true), () => closeAllTabs())}
+                onSelect={() =>
+                  requestClose(
+                    idsOf((id) => !tabs.find((x) => x.id === id)?.pinned),
+                    () => closeAllTabs()
+                  )
+                }
               >
                 Close all
               </ContextMenuItem>
             </ContextMenuContent>
           </ContextMenu>
-        )
-      })}
+    )
+  }
+
+  return (
+    <div className="flex h-9 shrink-0 items-stretch border-b border-border bg-card/30">
+      <div className="flex min-w-0 flex-1 items-stretch overflow-x-auto">
+        {pinned.length > 0 && (
+          <div className="sticky left-0 z-20 flex items-stretch bg-card shadow-[3px_0_5px_-2px_rgba(0,0,0,0.45)]">
+            {pinned.map((t) => renderTab(t, tabs.indexOf(t)))}
+          </div>
+        )}
+        {unpinned.map((t) => renderTab(t, tabs.indexOf(t)))}
+      </div>
       <button
         onClick={() => openQuery()}
         disabled={!openConnectionId}
         title="New SQL query"
-        className="flex items-center gap-1 px-3 text-xs text-muted-foreground hover:bg-accent/40 hover:text-foreground disabled:opacity-40"
+        className="flex shrink-0 items-center gap-1 border-l border-border px-3 text-xs text-muted-foreground hover:bg-accent/40 hover:text-foreground disabled:opacity-40"
       >
         <Plus className="size-3.5" />
         <SquareTerminal className="size-3.5" />

@@ -49,8 +49,27 @@ function target(driver: DriverType, entity: EntityRef): string {
   return quoteIdent(driver, entity.name)
 }
 
+/** Build a Postgres array literal body (`{...}`) from a JS array. Elements are
+ *  double-quoted with `\`-escaping (NULL stays bare, nested arrays recurse
+ *  unquoted) so the result round-trips through a pg array-typed column. */
+function pgArrayBody(arr: unknown[]): string {
+  const parts = arr.map((el) => {
+    if (el === null || el === undefined) return 'NULL'
+    if (Array.isArray(el)) return pgArrayBody(el) // nested dims stay unquoted
+    const s =
+      el instanceof Date
+        ? el.toISOString()
+        : typeof el === 'object'
+          ? JSON.stringify(el)
+          : String(el)
+    // escape backslash + double-quote for the array-literal element syntax
+    return `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`
+  })
+  return `{${parts.join(',')}}`
+}
+
 /** Engine-aware SQL literal for a backup INSERT. Handles NULL, numbers, bools,
- *  dates, Buffers (BLOB → hex), and objects (JSON columns). */
+ *  dates, Buffers (BLOB → hex), pg arrays, and objects (JSON columns). */
 function sqlLiteral(driver: DriverType, v: unknown): string {
   if (v === null || v === undefined) return 'NULL'
   if (typeof v === 'number' || typeof v === 'bigint') return String(v)
@@ -61,6 +80,10 @@ function sqlLiteral(driver: DriverType, v: unknown): string {
     const hex = v.toString('hex')
     return driver === 'postgres' ? `'\\x${hex}'` : `X'${hex}'`
   }
+  // pg array columns come back as JS arrays — emit a pg array literal `'{...}'`,
+  // not JSON, so the value restores into the array-typed column.
+  if (driver === 'postgres' && Array.isArray(v))
+    return `'${pgArrayBody(v).replace(/'/g, "''")}'`
   if (typeof v === 'object') return `'${JSON.stringify(v).replace(/'/g, "''")}'`
   return `'${String(v).replace(/'/g, "''")}'`
 }

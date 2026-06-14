@@ -22,7 +22,8 @@ App lives in `krust-studio-app/`. Docs (this file, CONTEXT.md, ADRs) at repo roo
    - 0011 Column reorder + unified verbatim MySQL `MODIFY`.
    - 0012 Tab-centric UI + persistent per-connection workspace (**v1.3.0, built**).
    - 0013 Connection resilience: auto-retry + manual reconnect (**v1.3.0, built**).
-   - 0014 Query Plan visual tree (**designed, not built** — deferred).
+   - 0014 Query Plan visual tree (**built v1.6** — `explainQuery` per engine +
+     `QueryPlanPanel`).
 3. **v1.3.0 — DONE** (all 7 P0 shipped, not yet released): connection auto-retry
    (fixes the idle-drop "can't retry" bug), manual disconnect/reconnect,
    everything-is-a-tab, persistent per-connection+database workspace,
@@ -117,6 +118,10 @@ App lives in `krust-studio-app/`. Docs (this file, CONTEXT.md, ADRs) at repo roo
     cols, sticky header + row#, range-select (drag + shift-click), copy/paste,
     inline edit, staged insert(top)/delete, NULL/EMPTY display, FK ↗ nav
     (hover), server-side sort headers, footer commit/discard + pager.
+    **Pinned columns** (ADR-0016): reorders cols into left-pinned → scrollable →
+    right-pinned and `position: sticky` with cumulative offsets; rules from
+    `store/settings.ts`, per-tab override via header right-click. Row virtualizer
+    uses `measureElement` (real row heights — fixes the clipped-last-row/stutter).
   - `components/FilterBar.tsx` — column + op + value, multiple AND-joined.
     Presentational (props `columns`/`value`/`onApply`, no store coupling).
   - `components/TableTabView.tsx` — routes draft→NewTableEditor,
@@ -232,7 +237,13 @@ per-connection+database workspace** (tabs restored on restart/reconnect/switch) 
 **connection resilience** (idle-drop auto-retry + manual disconnect/reconnect
 with status dot) · **Backup / Restore** (streamed engine-aware `.sql` dump,
 per-table schema/data; restore with dry-run preview + destructive flagging +
-two-step confirm).
+two-step confirm) · **pinned columns** (freeze panes — name rules + PK auto-pin
+in Settings, per-tab override via header right-click, ADR-0016) · **Query Plan**
+(Explain / Analyze buttons → visual plan tree with full-scan/index badges +
+Raw toggle; per-engine `explainQuery`, ADR-0014) · **tab pinning + drag-reorder**
+(`Tab.pinned` persisted, pinned tabs held left + survive bulk-close; HTML5 DnD
+`moveTab`; TabBar right-click → Pin/Unpin + New query tab; `+` button pinned
+out of the scroll strip).
 
 ## Gaps — prioritized TODO
 

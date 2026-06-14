@@ -9,6 +9,7 @@ import type {
   Filter,
   CreateTableSpec,
   IndexSpec,
+  QueryPlan,
   QueryResult,
   ReferencingTable,
   RowsResult,
@@ -389,6 +390,22 @@ export async function runScript(
     }
   }
   return results
+}
+
+/**
+ * EXPLAIN / EXPLAIN ANALYZE a statement (ADR-0014). Diagnostic — **not captured
+ * to history** (would pollute the Data Retrieval stream). ANALYZE executes the
+ * statement, so a write under ANALYZE is blocked on read-only connections.
+ */
+export async function explainQuery(
+  id: string,
+  sql: string,
+  analyze: boolean
+): Promise<QueryPlan> {
+  const config = getConnectionConfig(id)
+  if (analyze && config?.readOnly && !classifyStatement(sql).reads)
+    throw new Error('Connection is read-only; cannot ANALYZE a write statement')
+  return withRetry(id, (d) => d.explainQuery(sql, analyze))
 }
 
 /**

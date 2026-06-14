@@ -438,7 +438,8 @@ reused audit block never produces invalid DDL.
 
 ### Query Plan
 
-**Priority: deferred — not in v1.x, design captured for future build.**
+**Status: built (2026-06-14).** Explain/Analyze buttons in the SQL editor
+toolbar → `QueryPlanPanel` (visual tree + Raw toggle). See ADR-0014.
 
 Diagnostic surface that answers "will this query do a full table scan?" before
 or after running it. Accessible as **Explain** / **Analyze** buttons in the SQL

@@ -108,6 +108,40 @@ export interface SearchResult {
   rows: Record<string, unknown>[]
 }
 
+/** one node in a parsed query plan tree (ADR-0014). `scan` drives the badge:
+ *  'full' = full table scan (the thing the user is hunting for). */
+export interface PlanNode {
+  /** engine operation, e.g. "Seq Scan", "Index Scan", "ALL", "SEARCH" */
+  operation: string
+  /** human-readable line: table, index, condition, extra */
+  detail?: string
+  /** scan classification for the badge: full-scan (red) vs index vs other */
+  scan?: 'full' | 'index' | 'other'
+  /** index chosen by the planner, or null/none */
+  index?: string | null
+  /** estimated rows for this node */
+  rows?: number | null
+  /** engine cost score (pg total cost; mysql rows×filtered; sqlite n/a) */
+  cost?: number | null
+  /** ANALYZE only: actual rows produced */
+  actualRows?: number | null
+  /** ANALYZE only: actual time (ms) at this node */
+  actualMs?: number | null
+  children: PlanNode[]
+}
+
+/** a parsed EXPLAIN / EXPLAIN ANALYZE result (ADR-0014). `nodes` is a forest —
+ *  pg/sqlite produce a tree, mysql a flat list. `raw` backs the "raw" toggle. */
+export interface QueryPlan {
+  engine: DriverType
+  analyze: boolean
+  nodes: PlanNode[]
+  raw: string
+  /** pg planning/execution time (ms), when available */
+  planningMs?: number | null
+  executionMs?: number | null
+}
+
 /** one statement's outcome in the SQL editor */
 export interface QueryResult {
   statement: string
@@ -497,6 +531,9 @@ export interface SessionApi {
   ) => Promise<QueryResult[]>
   /** cancel the currently running query on a connection (pg/mysql) */
   cancelQuery: (id: string) => Promise<void>
+  /** EXPLAIN (or EXPLAIN ANALYZE when `analyze`) → parsed query plan (ADR-0014).
+   *  ANALYZE actually executes the statement. Not captured to history. */
+  explainQuery: (id: string, sql: string, analyze: boolean) => Promise<QueryPlan>
 }
 
 export interface DialogApi {
@@ -526,6 +563,8 @@ export interface SerializedTab {
   autoLimit?: number
   /** new-table tabs: the column draft */
   draft?: { name: string; columns: NewColumnSpec[] } | null
+  /** pinned tabs stay at the left edge and survive bulk-close */
+  pinned?: boolean
 }
 
 export interface ConnectionWorkspace {

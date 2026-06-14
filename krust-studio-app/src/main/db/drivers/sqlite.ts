@@ -26,6 +26,8 @@ import type {
   Filter,
   ForeignKey,
   IndexSpec,
+  PlanNode,
+  QueryPlan,
   RawQueryResult,
   ReferencingTable,
   RowsResult,
@@ -37,6 +39,27 @@ import type {
 
 function quoteIdent(name: string): string {
   return '"' + name.replace(/"/g, '""') + '"'
+}
+
+/** classify one `EXPLAIN QUERY PLAN` detail line into a PlanNode. */
+function sqlitePlanNode(detail: string): PlanNode {
+  const idx = detail.match(/USING (?:COVERING )?INDEX (\w+)/i)
+  const usesIndex = /USING (?:COVERING )?INDEX/i.test(detail)
+  const scan: PlanNode['scan'] =
+    /^SCAN\b/i.test(detail) && !usesIndex
+      ? 'full'
+      : usesIndex || /^SEARCH\b/i.test(detail)
+        ? 'index'
+        : 'other'
+  return {
+    operation: detail.split(/\s+/)[0] || 'STEP',
+    detail,
+    scan,
+    index: idx ? idx[1] : null,
+    rows: null,
+    cost: null,
+    children: []
+  }
 }
 
 export class SqliteDriver implements DbDriver {
@@ -487,6 +510,30 @@ export class SqliteDriver implements DbDriver {
     }
     const info = this.db.prepare(sql).run()
     return { affected: Number(info.changes ?? 0) }
+  }
+
+  async explainQuery(sql: string, analyze: boolean): Promise<QueryPlan> {
+    if (!this.db) throw new Error('Not connected')
+    // EXPLAIN QUERY PLAN never executes the statement, so there are no actual
+    // timings — the `analyze` flag is echoed but adds nothing on sqlite.
+    const rows = this.db
+      .prepare(`EXPLAIN QUERY PLAN ${sql}`)
+      .all() as { id: number; parent: number; detail: string }[]
+    const byId = new Map<number, PlanNode>()
+    const roots: PlanNode[] = []
+    for (const r of rows) byId.set(r.id, sqlitePlanNode(r.detail))
+    for (const r of rows) {
+      const node = byId.get(r.id)!
+      const parent = byId.get(r.parent)
+      if (parent) parent.children.push(node)
+      else roots.push(node)
+    }
+    return {
+      engine: 'sqlite',
+      analyze,
+      nodes: roots,
+      raw: rows.map((r) => `${r.id}|${r.parent}|${r.detail}`).join('\n')
+    }
   }
 
   async cancel(): Promise<void> {

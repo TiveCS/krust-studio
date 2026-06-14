@@ -98,7 +98,9 @@ const api: KrustApi = {
     reconnect: (id: string) => ipcRenderer.invoke('session:reconnect', id),
     runScript: (id: string, sql: string, autoLimit?: number) =>
       ipcRenderer.invoke('session:runScript', id, sql, autoLimit),
-    cancelQuery: (id: string) => ipcRenderer.invoke('session:cancelQuery', id)
+    cancelQuery: (id: string) => ipcRenderer.invoke('session:cancelQuery', id),
+    explainQuery: (id: string, sql: string, analyze: boolean) =>
+      ipcRenderer.invoke('session:explainQuery', id, sql, analyze)
   },
   workspace: {
     load: () => ipcRenderer.invoke('workspace:load'),
