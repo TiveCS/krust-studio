@@ -53,6 +53,8 @@ import {
   buildChangesetSql,
   markExported,
   deleteEntries,
+  getAutoAttachDestructive,
+  setAutoAttachDestructive,
 } from './store/history'
 import type {
   EntityRef,
@@ -326,6 +328,13 @@ export function registerIpc(): void {
   )
   ipcMain.handle('history:deleteEntries', (_e, ids: number[]) =>
     deleteEntries(ids)
+  )
+  ipcMain.handle('history:getAutoAttachDestructive', () =>
+    getAutoAttachDestructive()
+  )
+  ipcMain.handle(
+    'history:setAutoAttachDestructive',
+    (_e, on: boolean) => setAutoAttachDestructive(on)
   )
   ipcMain.handle(
     'history:exportChangeset',

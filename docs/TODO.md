@@ -372,6 +372,32 @@ CONTEXT.md **Session** + **Workspace & Tabs** + **Referenced By (Reverse FK)**.
 
 ## Resolved
 
+- **`filter.add` command + keybinding collision fix** — built. The v1.5.0
+  keybindings item listed `filter.add` (Ctrl/⌘+Shift+F) but it was never added to
+  the command registry; now wired end-to-end. The `filter.add` command bumps a
+  nonce in `store/ui.ts` (`requestAddFilter`); `FilterBar` watches it, expands the
+  builder, appends an empty condition to the last group, and focuses its column
+  picker (`data-filter-col` + `requestAnimationFrame`). Also: `table.toggleView`
+  moved off **Ctrl/⌘+B** (collided with the shadcn sidebar's built-in toggle) onto
+  **Ctrl/⌘+G**; the sidebar toggle is now a real command (`sidebar.toggle`,
+  default Ctrl/⌘+B, global) — `ui/sidebar.tsx` reads its key from the keybindings
+  store via `matchesBinding` instead of the hard-coded `"b"`, so it is rebindable
+  and listed in Settings → Keybindings like every other command.
+- **Configurable auto-attach for destructive DDL** — built. New global setting
+  (Settings → History, default **on**) stored in `history.db` `meta`
+  (`auto_attach_destructive`). When on, destructive **Table Mutation** DDL
+  (`DROP TABLE`/`DROP VIEW`) auto-attaches to the active changeset like other DDL
+  (so a forgotten drop isn't left out of an export — and execution-time ordering
+  means a late manual add still slots correctly); when off, it lands in Unassigned
+  for manual move (the original behaviour). `capture()` condition is now
+  `table_mutation && (!destructive || autoAttach)`. Exposed via
+  `history.get/setAutoAttachDestructive` IPC + preload + `HistoryApi`.
+- **`DROP INDEX` no longer flagged destructive** — `isDestructiveStatement`
+  (`session.ts`) treated every `DROP` as destructive, so a hand-typed `DROP INDEX`
+  in the SQL editor got the destructive tag (skipped auto-attach) while the GUI
+  drop-index path did not — same action, opposite flag. Added a `^DROP\s+INDEX`
+  guard that returns false before the bare `DROP` rule. `DROP TABLE`/`VIEW`,
+  `TRUNCATE`, and WHERE-less `DELETE`/`UPDATE` stay destructive.
 - **Tab pinning + drag-reorder + tab context menu** — built. `Tab.pinned`
   (persisted in `SerializedTab`); `togglePinTab` keeps pinned tabs in a left
   block, `moveTab(fromId,toId)` drag-reorders (HTML5 DnD on each tab,

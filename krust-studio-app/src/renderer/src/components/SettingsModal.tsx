@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { RotateCcw, Keyboard, Pin, X } from 'lucide-react'
+import { RotateCcw, Keyboard, Pin, X, History } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -43,8 +43,21 @@ export function SettingsModal({
   } = useSettings()
   const [recording, setRecording] = useState<CommandId | null>(null)
   const [search, setSearch] = useState('')
-  const [section, setSection] = useState<'keybindings' | 'pinned'>('keybindings')
+  const [section, setSection] = useState<'keybindings' | 'pinned' | 'history'>(
+    'keybindings'
+  )
   const [pinName, setPinName] = useState('')
+  // History settings live in history.db meta (main process), not localStorage.
+  const [autoAttachDestructive, setAutoAttachDestructive] = useState<
+    boolean | null
+  >(null)
+
+  useEffect(() => {
+    if (!open) return
+    void window.api.history
+      .getAutoAttachDestructive()
+      .then(setAutoAttachDestructive)
+  }, [open])
 
   useEffect(() => {
     if (!recording) return
@@ -117,6 +130,18 @@ export function SettingsModal({
             >
               <Pin className="size-3.5" />
               Pinned Columns
+            </button>
+            <button
+              onClick={() => setSection('history')}
+              className={cn(
+                'flex w-full items-center gap-2 rounded px-2 py-1.5 text-xs font-medium',
+                section === 'history'
+                  ? 'bg-accent text-foreground'
+                  : 'text-muted-foreground hover:bg-accent/40'
+              )}
+            >
+              <History className="size-3.5" />
+              History
             </button>
           </div>
 
@@ -319,6 +344,37 @@ export function SettingsModal({
                 Tip: right-click any column header in the grid to pin, unpin, or
                 override these rules for that tab only.
               </p>
+            </div>
+          )}
+
+          {/* history content */}
+          {section === 'history' && (
+            <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-auto p-4">
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-xs font-medium">
+                  <input
+                    type="checkbox"
+                    checked={autoAttachDestructive ?? true}
+                    disabled={autoAttachDestructive === null}
+                    onChange={(e) => {
+                      const on = e.target.checked
+                      setAutoAttachDestructive(on)
+                      void window.api.history.setAutoAttachDestructive(on)
+                    }}
+                  />
+                  Auto-attach destructive DDL to the active changeset
+                </label>
+                <p className="text-[11px] text-muted-foreground">
+                  When on (default), destructive schema statements
+                  (<span className="font-mono">DROP TABLE</span> /{' '}
+                  <span className="font-mono">DROP VIEW</span>) attach to the
+                  active changeset like other DDL, so you do not forget to
+                  include them. When off, they go to the Unassigned inbox and must be
+                  moved in manually. Either way they stay in execution order on
+                  export. <span className="font-mono">TRUNCATE</span> and row
+                  deletes are never auto-attached.
+                </p>
+              </div>
             </div>
           )}
         </div>

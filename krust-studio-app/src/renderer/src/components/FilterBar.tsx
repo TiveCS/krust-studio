@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Plus, X, Filter as FilterIcon, ChevronDown, ChevronUp } from 'lucide-react'
+import { useUi } from '@/store/ui'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -147,6 +148,31 @@ export function FilterBar({
     setExpanded(true)
   }
 
+  // filter.add command (Ctrl+Shift+F): expand the builder + append a focused
+  // empty condition to the last group (or seed the first group).
+  const builderRef = useRef<HTMLDivElement>(null)
+  const addNonce = useUi((s) => s.filterAddNonce)
+  const seenNonce = useRef(addNonce)
+  useEffect(() => {
+    if (addNonce === seenNonce.current) return
+    seenNonce.current = addNonce
+    setExpanded(true)
+    setGroups((gs) =>
+      gs.length === 0
+        ? [{ conj: 'and', rows: [newRow()] }]
+        : gs.map((g, i) =>
+            i === gs.length - 1 ? { ...g, rows: [...g.rows, newRow()] } : g
+          )
+    )
+    requestAnimationFrame(() => {
+      const cols = builderRef.current?.querySelectorAll<HTMLElement>(
+        '[data-filter-col]'
+      )
+      cols?.[cols.length - 1]?.focus()
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addNonce])
+
   const count = groups.reduce((n, g) => n + g.rows.filter((r) => r.column).length, 0)
 
   return (
@@ -170,7 +196,10 @@ export function FilterBar({
 
       {/* builder */}
       {expanded && (
-        <div className="space-y-2 border-t border-border/60 bg-muted/10 p-2">
+        <div
+          ref={builderRef}
+          className="space-y-2 border-t border-border/60 bg-muted/10 p-2"
+        >
           {groups.map((g, gi) => (
             <div key={gi} className="flex items-start gap-1.5">
               {gi > 0 ? (
@@ -192,7 +221,7 @@ export function FilterBar({
                       <span className="w-9 text-[10px] text-muted-foreground/60">where</span>
                     )}
                     <Select value={r.column} onValueChange={(v) => setRow(gi, ri, { column: v })}>
-                      <SelectTrigger className="h-7 w-32 text-xs">
+                      <SelectTrigger data-filter-col className="h-7 w-32 text-xs">
                         <SelectValue placeholder="column" />
                       </SelectTrigger>
                       <SelectContent>

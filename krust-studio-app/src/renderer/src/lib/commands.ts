@@ -4,6 +4,8 @@ export type CommandId =
   | 'table.addRow'
   | 'table.refresh'
   | 'table.toggleView'
+  | 'filter.add'
+  | 'sidebar.toggle'
 
 export type KeybindingScope = 'global' | 'table-tab' | 'data-view' | 'structure-view'
 
@@ -27,7 +29,7 @@ export const COMMANDS: CommandDef[] = [
     id: 'table.toggleView',
     label: 'Toggle Data / Structure',
     description: 'Switch between data and structure views',
-    defaultKey: 'ctrl+b',
+    defaultKey: 'ctrl+g',
     scope: 'table-tab'
   },
   {
@@ -50,6 +52,20 @@ export const COMMANDS: CommandDef[] = [
     description: 'Insert a new row in the current table',
     defaultKey: 'ctrl+n',
     scope: 'data-view'
+  },
+  {
+    id: 'filter.add',
+    label: 'Add Filter',
+    description: 'Expand the filter bar and add a condition',
+    defaultKey: 'ctrl+shift+f',
+    scope: 'data-view'
+  },
+  {
+    id: 'sidebar.toggle',
+    label: 'Toggle Sidebar',
+    description: 'Collapse or expand the table sidebar',
+    defaultKey: 'ctrl+b',
+    scope: 'global'
   }
 ]
 

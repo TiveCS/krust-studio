@@ -53,6 +53,9 @@ async function withRetry<T>(id: string, fn: (driver: DbDriver) => Promise<T>): P
 function isDestructiveStatement(sql: string): boolean {
   const body = sql.replace(/^\s*(\/\*[\s\S]*?\*\/|--[^\n]*\n)*\s*/, '').trimStart()
   const head = body.slice(0, 10).toUpperCase()
+  // DROP INDEX is not data loss (matches the GUI dropIndex path, which never
+  // flags it destructive) — exclude before the bare DROP rule below.
+  if (/^DROP\s+INDEX\b/i.test(body)) return false
   if (/^(TRUNCATE|DROP)\b/.test(head)) return true
   if (/^(DELETE|UPDATE)\b/.test(head) && !/\bWHERE\b/i.test(body)) return true
   return false

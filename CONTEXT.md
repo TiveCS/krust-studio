@@ -95,14 +95,29 @@ confirmed).
 
 ### Destructive (history tag)
 A cross-cutting flag on a history entry marking a statement that destroys data:
-`TRUNCATE`, `DROP`, and `DELETE`/`UPDATE` without a `WHERE`. Independent of
-stream — it controls **visibility** (flagged wherever the entry is shown) and
-**changeset eligibility**, not classification. A destructive entry is **not
-auto-attached** to the active changeset (so it can't silently ride into an
-exported migration), but the flag makes it **changeset-eligible**: the user can
-still manually **Move to changeset** when they genuinely want it there. (Distinct
-from the **Read-only Connection** typed-confirmation, which gates *execution*;
-this tag is about *history/export* handling.)
+`TRUNCATE`, `DROP`, and `DELETE`/`UPDATE` without a `WHERE`. **`DROP INDEX` is
+excluded** — dropping an index is not data loss, so it is never flagged
+destructive (this matches the GUI drop-index path, which also treats it as
+ordinary DDL). Independent of stream — the flag controls **visibility** (flagged
+wherever the entry is shown) and **changeset eligibility**, not classification.
+
+By default a destructive entry is **changeset-eligible** but its auto-attach
+behaviour depends on the **Auto-attach destructive DDL** setting (Settings →
+History, default **on**):
+
+- **On** (default): destructive **Table Mutation** DDL (`DROP TABLE`/`DROP VIEW`)
+  auto-attaches to the active changeset like any other DDL — so a forgotten drop
+  isn't left out of an exported migration. Because the export orders by execution
+  time, a manually-added drop also slots into its correct chronological place.
+- **Off**: destructive entries are **not** auto-attached (they land in the
+  Unassigned inbox) and must be **Moved to changeset** manually — the original
+  no-silent-ride behaviour.
+
+`TRUNCATE` and row deletes are **never** auto-attached either way (they are Data
+Mutation, and only Table Mutation auto-attaches). The toggle lives globally in
+the history store (`history.db` `meta`), not per-connection. (Distinct from the
+**Read-only Connection** typed-confirmation, which gates *execution*; this tag is
+about *history/export* handling.)
 
 ### Captured DDL
 The exact DDL statement Krust generates when the user edits schema through the
@@ -310,18 +325,23 @@ to suppress or restore a settings-driven pin for the current tab session only
 
 ### Keybinding / Command
 Krust's actions are exposed as named **Commands** (e.g. `table.commit`,
-`table.addRow`, `table.refresh`, `table.toggleView`, `filter.add`), each with a
-default **Keybinding** the user can rebind in **Settings**. Bindings are
-**scope-aware** (VSCode `when`-clause style): a command declares the context it
-fires in — `global`, `table-tab`, `data-view`, `structure-view`, `query-view` —
-so one physical key can mean different things in different contexts, and two
-commands conflict only when they share a key *and* an overlapping scope. A central
-keydown dispatcher resolves the active command from the focused tab/view. Defaults:
-**Ctrl/⌘+S** commit (review staged changes for the active tab — DDL preview in
-structure-view, affected-row dialog in data-view), **Ctrl/⌘+N** add row
-(data-view), **F5** refresh the active table tab, **Ctrl/⌘+B** toggle data ⇄
-structure, **Ctrl/⌘+Shift+F** add filter (expand the FilterBar, append a focused
-empty condition), **Ctrl/⌘+P** Command Palette.
+`table.addRow`, `table.refresh`, `table.toggleView`, `filter.add`,
+`sidebar.toggle`), each with a default **Keybinding** the user can rebind in
+**Settings**. Bindings are **scope-aware** (VSCode `when`-clause style): a command
+declares the context it fires in — `global`, `table-tab`, `data-view`,
+`structure-view`, `query-view` — so one physical key can mean different things in
+different contexts, and two commands conflict only when they share a key *and* an
+overlapping scope. A central keydown dispatcher resolves the active command from
+the focused tab/view. Defaults: **Ctrl/⌘+S** commit (review staged changes for the
+active tab — DDL preview in structure-view, affected-row dialog in data-view),
+**Ctrl/⌘+N** add row (data-view), **F5** refresh the active table tab,
+**Ctrl/⌘+G** toggle data ⇄ structure, **Ctrl/⌘+Shift+F** add filter (expand the
+FilterBar, append a focused empty condition), **Ctrl/⌘+P** Command Palette,
+**Ctrl/⌘+B** toggle the sidebar. The sidebar toggle (`sidebar.toggle`) is routed
+through the same registry — the shadcn sidebar primitive reads its key from the
+keybindings store rather than hard-coding it — so it is rebindable like any other
+command. `table.toggleView` moved off `Ctrl/⌘+B` (which the shadcn sidebar
+already owned) onto `Ctrl/⌘+G` to remove the collision.
 
 ### Workspace & Tabs
 **Everything the user works in is a Tab** — data browsers, the SQL editor, a

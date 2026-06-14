@@ -153,7 +153,11 @@ const api: KrustApi = {
     exportChangeset: (id: number) =>
       ipcRenderer.invoke('history:exportChangeset', id),
     deleteEntries: (ids: number[]) =>
-      ipcRenderer.invoke('history:deleteEntries', ids)
+      ipcRenderer.invoke('history:deleteEntries', ids),
+    getAutoAttachDestructive: () =>
+      ipcRenderer.invoke('history:getAutoAttachDestructive'),
+    setAutoAttachDestructive: (on: boolean) =>
+      ipcRenderer.invoke('history:setAutoAttachDestructive', on)
   }
 }
 

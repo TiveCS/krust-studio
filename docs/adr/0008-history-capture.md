@@ -62,3 +62,8 @@ Three forks mattered:
   store: `changesets` table + `changeset_id` on entries, active changeset per
   connection persisted in a `meta` kv table, auto-attach at capture time. Now
   built.
+
+## Amendments
+
+- **2026-06-14** — Auto-attach of destructive DDL is now a global setting (Settings → History, default **on**), stored in the `meta` kv table as `auto_attach_destructive`. Capture decision is `table_mutation && (!destructive || autoAttach)`: with it on, destructive Table-Mutation DDL (`DROP TABLE`/`DROP VIEW`) auto-attaches to the active changeset so a forgotten drop is not omitted from an exported migration (execution-time ordering means a late manual add still slots correctly); with it off, destructive entries land in Unassigned for manual move (the original no-silent-ride behaviour). `TRUNCATE`/row-deletes never auto-attach either way (Data Mutation). Exposed via `history.get/setAutoAttachDestructive` IPC.
+- **2026-06-14** — `DROP INDEX` is excluded from the **Destructive** flag (`isDestructiveStatement` returns false before the bare `DROP` rule). Dropping an index is not data loss; this aligns the hand-typed SQL-editor path with the GUI drop-index path, which never flagged it.

@@ -271,6 +271,9 @@ export interface HistoryApi {
   exportChangeset: (id: number) => Promise<{ saved: boolean; path?: string }>
   /** hard-delete specific entries by id (like bulk Clear but id-targeted) */
   deleteEntries: (ids: number[]) => Promise<void>
+  /** global toggle: auto-attach destructive DDL (DROP) to the active changeset */
+  getAutoAttachDestructive: () => Promise<boolean>
+  setAutoAttachDestructive: (on: boolean) => Promise<void>
 }
 
 export type FilterOp =

@@ -116,6 +116,13 @@ function App(): React.JSX.Element {
               .getState()
               .setTabView(activeTab?.view === 'data' ? 'structure' : 'data')
             break
+          case 'filter.add':
+            useUi.getState().requestAddFilter()
+            break
+          case 'sidebar.toggle':
+            // handled by SidebarProvider's own listener; preventDefault here so
+            // the binding is still claimed/listed in the command registry
+            break
         }
         break
       }

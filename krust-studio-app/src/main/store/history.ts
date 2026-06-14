@@ -74,17 +74,43 @@ function getActiveId(d: DatabaseSync, connectionId: string): number | null {
   return row ? Number(row.value) : null
 }
 
+// Global toggle: when ON (default), destructive table-mutation DDL (DROP TABLE/
+// VIEW) also auto-attaches to the active changeset instead of going to the
+// Unassigned inbox. Stored once in `meta`, NOT per-connection.
+const AUTO_ATTACH_DESTRUCTIVE_KEY = 'auto_attach_destructive'
+
+function getAutoAttachDestructiveSync(d: DatabaseSync): boolean {
+  const row = d
+    .prepare('SELECT value FROM meta WHERE key = ?')
+    .get(AUTO_ATTACH_DESTRUCTIVE_KEY) as { value: string } | undefined
+  return row ? row.value === '1' : true // default ON when unset
+}
+
+export async function getAutoAttachDestructive(): Promise<boolean> {
+  const d = await getDb()
+  return getAutoAttachDestructiveSync(d)
+}
+
+export async function setAutoAttachDestructive(on: boolean): Promise<void> {
+  const d = await getDb()
+  d.prepare(
+    'INSERT INTO meta (key, value) VALUES (?, ?) ' +
+      'ON CONFLICT(key) DO UPDATE SET value = excluded.value'
+  ).run(AUTO_ATTACH_DESTRUCTIVE_KEY, on ? '1' : '0')
+}
+
 /** Record one captured statement. Best-effort: never let logging break a mutation. */
 export async function capture(input: CaptureInput): Promise<void> {
   try {
     const d = await getDb()
     const destructive = input.destructive ? 1 : 0
-    // Non-destructive Table-Mutation DDL auto-attaches to the active changeset.
-    // Destructive entries are changeset-eligible but must be moved manually.
-    const changesetId =
-      input.stream === 'table_mutation' && !input.destructive
-        ? getActiveId(d, input.connectionId)
-        : null
+    // Table-Mutation DDL auto-attaches to the active changeset. Non-destructive
+    // always; destructive (DROP TABLE/VIEW) only when the global toggle is on
+    // (default). When off, destructive entries land in Unassigned for manual move.
+    const autoAttach =
+      input.stream === 'table_mutation' &&
+      (!input.destructive || getAutoAttachDestructiveSync(d))
+    const changesetId = autoAttach ? getActiveId(d, input.connectionId) : null
     d.prepare(
       `INSERT INTO history_entries
          (ts, connection_id, stream, source, statement, status, affected, entity, error, changeset_id, destructive)

@@ -70,3 +70,8 @@ Three forks mattered:
 - Because bindings are data (registry + overrides), the Settings UI can render
   the list, detect conflicts, and record new chords generically — no per-command
   UI code.
+
+## Amendments
+
+- **2026-06-14** — `table.toggleView` moved from `Ctrl/⌘+B` to `Ctrl/⌘+G`. `Ctrl+B` collided with the shadcn sidebar primitive's built-in collapse shortcut (a hard-coded `window` listener). Rather than leave the sidebar toggle outside the registry, it became a first-class command `sidebar.toggle` (default `Ctrl/⌘+B`, `global` scope); `ui/sidebar.tsx` now reads its key from the keybindings store via `matchesBinding` instead of the literal `"b"`, so it is rebindable and conflict-checked like every other command.
+- **2026-06-14** — `filter.add` (`Ctrl/⌘+Shift+F`, `data-view`) was specified in this ADR but never actually added to the command registry; now wired. It signals `FilterBar` through a `store/ui.ts` nonce (`requestAddFilter`) to expand the builder, append an empty condition, and focus the column picker.
