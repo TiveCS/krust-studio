@@ -1,5 +1,6 @@
 # agent / editor local state
 .claude/
+.codegraph/
 
 # node / build (app has its own too)
 node_modules/

@@ -4,6 +4,60 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [1.6.0] — 2026-06-14
+
+### Added
+- **Inline filter builder + raw WHERE** (ADR-0017) — the data-grid filter is
+  always visible with two modes: a structured **Builder** and a hand-written
+  **Raw WHERE** predicate that Krust still wraps in its own
+  `SELECT … ORDER BY … LIMIT …`, so sort, pagination, count, inline editing,
+  export and FK navigation keep working. Builder → Raw seeds the box with the
+  generated SQL; a `;` guard blocks smuggling a second statement. Mode + raw text
+  persist per tab. Filter chrome is now a compact icon cluster (no header row).
+- **Pinned columns (freeze panes)** (ADR-0016) — name-rule + primary-key pin
+  rules in Settings, plus a per-tab header right-click Pin left/right · Unpin.
+- **Query plan** (ADR-0014) — `EXPLAIN` / `EXPLAIN ANALYZE` rendered as a visual
+  tree (full-scan/index badges, est+actual rows, cost, ms) in the SQL editor.
+- **Tab pinning + drag-reorder** — pin tabs to a sticky left block, drag to
+  reorder, tab right-click menu (pin/unpin, new query tab, bulk close).
+- **Postgres schema selector** — sidebar dropdown filters tables/views/enums by
+  schema (shown when a connection exposes more than one).
+- **Configurable grid virtualization** — Settings → Data Grid threshold; small
+  pages render plainly, big pages virtualize.
+
+### Changed
+- **Foreign-key values are colour-coded** (indigo) in the grid and the FK picker,
+  regardless of underlying type.
+- **Data / Structure switch** moved into each view's footer (bottom-left).
+- Destructive DDL auto-attach to the active changeset is now configurable
+  (Settings → History).
+
+### Fixed
+- Empty filter values no longer emit `col = ''` (fixes a Postgres `22P02` crash
+  on integer columns and makes clearing a value fall back to all rows).
+- FK picker: value highlighting, sticky-header background, and picking the
+  already-selected value no longer stages a redundant edit.
+- Drag-select performance — selection is painted via a DOM overlay during the
+  drag with mouse handling delegated to one listener, and a virtualizer cache
+  fix stops rows collapsing after the FK picker closes.
+- Switching a relation-opened tab to the Data view now fetches its rows.
+- Keybinding collisions fixed (`table.toggleView` off `Ctrl/⌘+B`; sidebar toggle
+  is now a real rebindable command); `DROP INDEX` no longer flagged destructive.
+
+## [1.5.0] — 2026-06-10
+
+### Added
+- **App version label** — the running version is shown in the sidebar footer.
+- **Configurable, scope-aware keybindings** — a named command registry with
+  default bindings and user overrides, resolved by active context.
+- **Settings modal** — VSCode-style modal (Keybindings first), reachable from
+  the title bar without an open connection.
+- **History entry delete** and **client-side History search**.
+
+### Changed
+- **TRUNCATE** captured as a Data Mutation; a cross-cutting **destructive** flag
+  (`TRUNCATE`/`DROP`/WHERE-less `DELETE`·`UPDATE`) controls changeset eligibility.
+
 ## [1.4.0] — 2026-06-10
 
 ### Added
