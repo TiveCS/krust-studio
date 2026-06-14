@@ -4,7 +4,7 @@ Date: 2026-06-14
 
 ## Status
 
-Accepted (not yet implemented — design resolved via `/grill-with-docs`)
+Accepted — implemented (design resolved via `/grill-with-docs`)
 
 ## Context
 

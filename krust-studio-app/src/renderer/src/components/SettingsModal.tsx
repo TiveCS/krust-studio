@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { RotateCcw, Keyboard, Pin, X, History } from 'lucide-react'
+import { RotateCcw, Keyboard, Pin, X, History, Table2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -39,11 +39,13 @@ export function SettingsModal({
     addPinnedColumn,
     removePinnedColumn,
     setPinnedColumnSide,
-    setPinPrimaryKey
+    setPinPrimaryKey,
+    virtualizeThreshold,
+    setVirtualizeThreshold
   } = useSettings()
   const [recording, setRecording] = useState<CommandId | null>(null)
   const [search, setSearch] = useState('')
-  const [section, setSection] = useState<'keybindings' | 'pinned' | 'history'>(
+  const [section, setSection] = useState<'keybindings' | 'pinned' | 'history' | 'grid'>(
     'keybindings'
   )
   const [pinName, setPinName] = useState('')
@@ -143,7 +145,47 @@ export function SettingsModal({
               <History className="size-3.5" />
               History
             </button>
+            <button
+              onClick={() => setSection('grid')}
+              className={cn(
+                'flex w-full items-center gap-2 rounded px-2 py-1.5 text-xs font-medium',
+                section === 'grid'
+                  ? 'bg-accent text-foreground'
+                  : 'text-muted-foreground hover:bg-accent/40'
+              )}
+            >
+              <Table2 className="size-3.5" />
+              Data Grid
+            </button>
           </div>
+
+          {/* grid content */}
+          {section === 'grid' && (
+            <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto p-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium">Virtualization threshold</label>
+                <p className="text-[11px] text-muted-foreground">
+                  Pages with more rows than this render virtualized (only visible rows
+                  in the DOM) for speed; smaller pages render every row directly. Lower
+                  it if you hit rendering glitches; raise it to virtualize less.
+                </p>
+                <div className="flex items-center gap-2 pt-1">
+                  <Input
+                    type="number"
+                    min={0}
+                    value={virtualizeThreshold}
+                    onChange={(e) => setVirtualizeThreshold(Number(e.target.value))}
+                    className="h-7 w-28 text-xs"
+                  />
+                  <span className="text-[11px] text-muted-foreground">rows</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground/70">
+                  Default 150: small pages render plainly, big pages virtualize.
+                  0 = always virtualize. Page size caps the rows fetched.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* keybindings content */}
           {section === 'keybindings' && (

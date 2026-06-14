@@ -496,19 +496,23 @@ export interface SessionApi {
     limit: number,
     offset: number,
     filters?: Filter[],
-    orderBy?: Sort[]
+    orderBy?: Sort[],
+    /** Raw-WHERE escape hatch (ADR-0017); when set, replaces `filters`. */
+    rawWhere?: string
   ) => Promise<RowsResult>
   countRows: (
     id: string,
     entity: EntityRef,
-    filters?: Filter[]
+    filters?: Filter[],
+    rawWhere?: string
   ) => Promise<number>
   /** fetch ALL rows matching the filters (paged internally, capped) for export */
   exportAllRows: (
     id: string,
     entity: EntityRef,
     filters?: Filter[],
-    orderBy?: Sort[]
+    orderBy?: Sort[],
+    rawWhere?: string
   ) => Promise<SearchResult>
   /** FK Picker: cross-column substring search over a (parent) table */
   searchRows: (
@@ -558,6 +562,10 @@ export interface SerializedTab {
   /** which Structure sub-tab was open (survives restore) */
   structureSub?: 'columns' | 'indexes' | 'relations' | 'referencedBy' | 'ddl'
   filters: Filter[]
+  /** active filter mode (ADR-0017); absent defaults to 'builder' (no migration) */
+  filterMode?: 'builder' | 'raw'
+  /** hand-written WHERE predicate for Raw mode; restored + re-run fail-soft */
+  rawWhere?: string
   orderBy: Sort[]
   colWidths: Record<string, number>
   /** query tabs: the SQL text (presence marks this as a query tab) */

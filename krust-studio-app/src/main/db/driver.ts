@@ -42,10 +42,11 @@ export interface DbDriver {
     limit: number,
     offset: number,
     filters?: Filter[],
-    orderBy?: Sort[]
+    orderBy?: Sort[],
+    rawWhere?: string
   ): Promise<RowsResult>
   /** Total rows matching the filters (ignores paging). For the row counter. */
-  countRows(entity: EntityRef, filters?: Filter[]): Promise<number>
+  countRows(entity: EntityRef, filters?: Filter[], rawWhere?: string): Promise<number>
   /** FK Picker: cross-column substring search over a (parent) table. */
   searchRows(
     entity: EntityRef,
@@ -391,6 +392,8 @@ export function buildWhere(
       continue
     }
     if (f.op === 'between') {
+      // incomplete range → skip (else pg rejects '' for typed columns)
+      if (f.value === '' || (f.value2 ?? '') === '') continue
       const lo = placeholder(params.length)
       params.push(f.value)
       const hi = placeholder(params.length)
@@ -398,6 +401,10 @@ export function buildWhere(
       push(`${col} BETWEEN ${lo} AND ${hi}`, f.conj)
       continue
     }
+    // value-based op with an empty value → treat as incomplete, omit it (so
+    // clearing a value falls back to "all rows" instead of `col = ''`, which
+    // pg rejects for integer/typed columns)
+    if (f.value === '') continue
     push(`${col} ${SQL_OP[f.op]} ${placeholder(params.length)}`, f.conj)
     params.push(f.value)
   }
@@ -420,6 +427,33 @@ export function buildWhere(
     })
     .join('')
   return { clause: ' WHERE ' + clause, params }
+}
+
+/**
+ * Resolve the WHERE clause for a data read, picking between the structured
+ * Builder (`filters` → parameterized) and the **Raw** escape hatch (a
+ * hand-written predicate, inlined verbatim) — exactly one is active (ADR-0017).
+ *
+ * This is the single shared choke point for the raw-WHERE guard used by
+ * readRows / countRows / exportAllRows: a non-empty raw predicate is rejected if
+ * it contains a statement separator (`;`) so it can't smuggle a second statement
+ * (e.g. via Postgres' simple-query protocol). The raw predicate is otherwise
+ * trusted like the SQL editor — the user's own SQL on their own connection,
+ * strictly narrower than the editor — so it is NOT parsed or parameterized.
+ */
+export function buildWhereClause(
+  filters: Filter[] | undefined,
+  rawWhere: string | undefined,
+  quote: (s: string) => string,
+  placeholder: (i: number) => string
+): { clause: string; params: unknown[] } {
+  const raw = rawWhere?.trim()
+  if (raw) {
+    if (raw.includes(';'))
+      throw new Error('Raw filter cannot contain a statement separator (;)')
+    return { clause: ' WHERE ' + raw, params: [] }
+  }
+  return buildWhere(filters, quote, placeholder)
 }
 
 /**

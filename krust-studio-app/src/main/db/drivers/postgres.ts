@@ -3,7 +3,7 @@ import {
   type DbDriver,
   type DriverDeps,
   safePaging,
-  buildWhere,
+  buildWhereClause,
   buildSearch,
   buildOrderBy,
   buildUpdate,
@@ -188,13 +188,14 @@ export class PostgresDriver implements DbDriver {
     limit: number,
     offset: number,
     filters?: Filter[],
-    orderBy?: Sort[]
+    orderBy?: Sort[],
+    rawWhere?: string
   ): Promise<RowsResult> {
     const { limit: l, offset: o } = safePaging(limit, offset)
     const target = entity.schema
       ? `${quoteIdent(entity.schema)}.${quoteIdent(entity.name)}`
       : quoteIdent(entity.name)
-    const where = buildWhere(filters, quoteIdent, (i) => `$${i + 1}`)
+    const where = buildWhereClause(filters, rawWhere, quoteIdent, (i) => `$${i + 1}`)
     const order = buildOrderBy(orderBy, quoteIdent)
     const res = await (await this.ensure()).query(
       `SELECT * FROM ${target}${where.clause}${order} LIMIT ${l} OFFSET ${o}`,
@@ -264,11 +265,11 @@ export class PostgresDriver implements DbDriver {
     }
   }
 
-  async countRows(entity: EntityRef, filters?: Filter[]): Promise<number> {
+  async countRows(entity: EntityRef, filters?: Filter[], rawWhere?: string): Promise<number> {
     const target = entity.schema
       ? `${quoteIdent(entity.schema)}.${quoteIdent(entity.name)}`
       : quoteIdent(entity.name)
-    const where = buildWhere(filters, quoteIdent, (i) => `$${i + 1}`)
+    const where = buildWhereClause(filters, rawWhere, quoteIdent, (i) => `$${i + 1}`)
     const res = await (await this.ensure()).query(
       `SELECT count(*) AS c FROM ${target}${where.clause}`,
       where.params

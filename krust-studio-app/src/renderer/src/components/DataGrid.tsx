@@ -50,6 +50,9 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import { FilterBar } from '@/components/FilterBar'
+import { ViewSwitch } from '@/components/ViewSwitch'
+import { appendCellCondition } from '@/lib/filterSql'
+import { display } from '@/lib/cellDisplay'
 import { cn } from '@/lib/utils'
 import { useConnections, editKey } from '@/store/connections'
 import { useSettings } from '@/store/settings'
@@ -57,48 +60,6 @@ import { useSettings } from '@/store/settings'
 const ROWNUM_W = 48
 const DEFAULT_COL_W = 180
 const MIN_COL_W = 48
-
-// looks like an ISO timestamp → render the readable part
-const ISO_RE = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/
-
-/** tooltip: local + UTC, readable, for hovering a timestamp cell */
-function dateTip(d: Date): string {
-  return `Local: ${d.toLocaleString()}\nUTC:   ${d.toUTCString()}`
-}
-
-function dateSpan(text: string, d: Date): React.ReactNode {
-  return (
-    <span title={dateTip(d)} className="text-amber-300/90">
-      {text}
-    </span>
-  )
-}
-
-function display(v: unknown): React.ReactNode {
-  if (v === null || v === undefined)
-    return <span className="italic text-muted-foreground/50">NULL</span>
-  if (v === '')
-    return <span className="italic text-muted-foreground/50">EMPTY</span>
-  if (v instanceof Date) return dateSpan(v.toISOString(), v)
-  if (typeof v === 'boolean')
-    return (
-      <span className={v ? 'text-emerald-400' : 'text-rose-400'}>
-        {String(v)}
-      </span>
-    )
-  if (typeof v === 'object')
-    return <span className="text-violet-300">{JSON.stringify(v)}</span>
-  if (typeof v === 'number')
-    return <span className="text-sky-300 tabular-nums">{String(v)}</span>
-  const s = String(v)
-  if (ISO_RE.test(s)) {
-    const d = new Date(s)
-    return isNaN(d.getTime())
-      ? <span className="text-amber-300/90">{s}</span>
-      : dateSpan(s, d)
-  }
-  return s
-}
 
 function toText(v: unknown): string {
   if (v === null || v === undefined) return ''
@@ -125,6 +86,9 @@ export function DataGrid(): React.JSX.Element | null {
     setPageSize,
     countRows,
     setFilters,
+    setFilterMode,
+    setRawWhere,
+    applyRawWhere,
     setSort,
     openTable,
     setCellEdit,
@@ -162,6 +126,11 @@ export function DataGrid(): React.JSX.Element | null {
   )
 
   const selecting = useRef(false)
+  // drag-select paints a DOM overlay rectangle during the drag (no React
+  // re-render per cell-crossing); the selection state is committed once on mouseup
+  const overlayRef = useRef<HTMLDivElement>(null)
+  const dragAnchorEl = useRef<HTMLElement | null>(null)
+  const dragFocus = useRef<{ r: number; c: number } | null>(null)
   const colSelecting = useRef(false)
   const resizing = useRef<{
     col: string
@@ -174,6 +143,34 @@ export function DataGrid(): React.JSX.Element | null {
   const tableRef = useRef<HTMLTableElement>(null)
   // live <col> elements, keyed by column name — mutated directly during resize
   const colEls = useRef<Map<string, HTMLTableColElement>>(new Map())
+
+  // paint the live selection rectangle as a DOM overlay (anchor + focus are
+  // diagonal corners, so the union of their client rects is the full rectangle)
+  const paintOverlay = (focusEl: HTMLElement | null): void => {
+    const ov = overlayRef.current
+    const anchor = dragAnchorEl.current
+    const wrap = ov?.parentElement
+    if (!ov || !anchor || !focusEl || !wrap) return
+    const w = wrap.getBoundingClientRect()
+    const a = anchor.getBoundingClientRect()
+    const f = focusEl.getBoundingClientRect()
+    ov.style.left = `${Math.min(a.left, f.left) - w.left}px`
+    ov.style.top = `${Math.min(a.top, f.top) - w.top}px`
+    ov.style.width = `${Math.max(a.right, f.right) - Math.min(a.left, f.left)}px`
+    ov.style.height = `${Math.max(a.bottom, f.bottom) - Math.min(a.top, f.top)}px`
+    ov.style.display = 'block'
+  }
+  // begin a drag: remember the anchor element + cell, show the single-cell anchor
+  const startDrag = (el: HTMLElement, r: number, c: number): void => {
+    selecting.current = true
+    dragAnchorEl.current = el
+    dragFocus.current = { r, c }
+  }
+  // extend the drag to a focus cell — pure DOM, no React state change
+  const dragExtend = (el: HTMLElement, r: number, c: number): void => {
+    dragFocus.current = { r, c }
+    paintOverlay(el)
+  }
 
   useEffect(() => {
     const onMove = (e: MouseEvent): void => {
@@ -189,8 +186,17 @@ export function DataGrid(): React.JSX.Element | null {
         tableRef.current.style.width = `${r.startTableW + (next - r.startW)}px`
     }
     const onUp = (): void => {
+      const wasDragging = selecting.current
       selecting.current = false
       colSelecting.current = false
+      // commit the drag's final cell to state once (the overlay painted it live)
+      if (wasDragging) {
+        if (overlayRef.current) overlayRef.current.style.display = 'none'
+        const f = dragFocus.current
+        dragFocus.current = null
+        dragAnchorEl.current = null
+        if (f) setSel((s) => (s && (s.fr !== f.r || s.fc !== f.c) ? { ...s, fr: f.r, fc: f.c } : s))
+      }
       // Commit the resize to the store once on release
       if (resizing.current) setColWidth(resizing.current.col, resizing.current.liveW)
       resizing.current = null
@@ -246,19 +252,30 @@ export function DataGrid(): React.JSX.Element | null {
   // Virtual row setup — must be before early return (React hooks order rule).
   // _total may be 0 when tab is null; virtualizer handles that gracefully.
   const _total = (tab?.data?.rows.length ?? 0) + (tab?.inserts.length ?? 0)
+  const vCount = _total + (fkTarget !== null ? 1 : 0)
+  // user-configurable: virtualize only when a page exceeds this many rows;
+  // below it, render every row in the DOM (no virtualizer edge-cases)
+  const virtualizeThreshold = useSettings((s) => s.virtualizeThreshold)
+  const virtualize = vCount > virtualizeThreshold
   const isPickerVRow = (vi: number): boolean =>
     fkTarget !== null && vi === fkTarget.r + 1
   const virtRowToDataRow = (vi: number): number =>
     fkTarget === null || vi <= fkTarget.r ? vi : vi - 1
   const rowVirtualizer = useVirtualizer({
-    count: _total + (fkTarget !== null ? 1 : 0),
+    count: vCount,
     getScrollElement: () => containerRef.current,
     estimateSize: (vi) => (isPickerVRow(vi) ? 280 : 33),
+    // key measurements by DATA-row index (picker gets its own key) so inserting/
+    // removing the tall picker row doesn't corrupt the index-keyed size cache
+    // (was: rows beyond the picker collapsed until a tab-switch remount)
+    getItemKey: (vi) => (isPickerVRow(vi) ? 'fk-picker' : virtRowToDataRow(vi)),
     overscan: 8,
   })
 
-  // Scroll fkTarget row into view when the picker opens
+  // Scroll fkTarget row into view when the picker opens; remeasure on open/close
+  // so the row-height cache reflects the (dis)appearing picker row immediately.
   useEffect(() => {
+    rowVirtualizer.measure()
     if (fkTarget !== null) {
       rowVirtualizer.scrollToIndex(fkTarget.r + 1, { align: 'auto' })
     }
@@ -606,6 +623,61 @@ export function DataGrid(): React.JSX.Element | null {
     }
   }
 
+  // ── Cell mouse interaction via event delegation ──
+  // One listener set on <tbody> instead of 5 closures per cell, so cell vnodes
+  // stay cheap and a selection change re-renders the grid fast.
+  const cellHit = (e: React.MouseEvent): { td: HTMLElement; r: number; c: number } | null => {
+    const td = (e.target as HTMLElement).closest<HTMLElement>('td[data-r]')
+    if (!td) return null
+    return { td, r: Number(td.dataset.r), c: td.dataset.c != null ? Number(td.dataset.c) : -1 }
+  }
+  const onBodyMouseDown = (e: React.MouseEvent): void => {
+    if (e.button !== 0) return
+    // let interactive children (FK buttons, edit input/combobox) handle their own
+    if ((e.target as HTMLElement).closest('button, input, [role="combobox"]')) return
+    const hit = cellHit(e)
+    if (!hit) return
+    const { td, r, c } = hit
+    if (c < 0) {
+      // row-number gutter → select the whole row
+      if (isInsert(r)) return
+      containerRef.current?.focus()
+      if (e.shiftKey && sel) setSel({ ...sel, fr: r, fc: cols.length - 1 })
+      else {
+        startDrag(td.closest('tr')!, r, cols.length - 1)
+        setSel({ ar: r, ac: 0, fr: r, fc: cols.length - 1 })
+      }
+      return
+    }
+    if (editing?.r === r && editing?.c === c) return
+    containerRef.current?.focus()
+    if (e.shiftKey && sel) setSel({ ...sel, fr: r, fc: c })
+    else {
+      startDrag(td, r, c)
+      setSel({ ar: r, ac: c, fr: r, fc: c })
+    }
+  }
+  const onBodyMouseOver = (e: React.MouseEvent): void => {
+    if (!selecting.current || e.buttons !== 1) return
+    const hit = cellHit(e)
+    if (!hit) return
+    const { td, r, c } = hit
+    if (dragFocus.current && dragFocus.current.r === r && dragFocus.current.c === c) return
+    if (c < 0) {
+      if (!isInsert(r)) dragExtend(td.closest('tr')!, r, cols.length - 1)
+    } else dragExtend(td, r, c)
+  }
+  const onBodyDoubleClick = (e: React.MouseEvent): void => {
+    const hit = cellHit(e)
+    if (hit && hit.c >= 0) startEdit(hit.r, hit.c)
+  }
+  const onBodyContextMenu = (e: React.MouseEvent): void => {
+    const hit = cellHit(e)
+    if (!hit || hit.c < 0) return
+    setCtx({ r: hit.r, c: hit.c })
+    if (!inSel(hit.r, hit.c)) setSel({ ar: hit.r, ac: hit.c, fr: hit.r, fc: hit.c })
+  }
+
   return (
     <div className="flex h-full flex-col">
       <FilterBar
@@ -613,6 +685,12 @@ export function DataGrid(): React.JSX.Element | null {
         columns={cols}
         value={tab.filters}
         onApply={(f) => void setFilters(f)}
+        mode={tab.filterMode}
+        rawWhere={tab.rawWhere}
+        filterError={tab.filterError}
+        onSetMode={(m) => void setFilterMode(m)}
+        onSetRawWhere={setRawWhere}
+        onApplyRaw={(t) => void applyRawWhere(t)}
       />
 
       <div className="flex min-h-0 flex-1">
@@ -624,6 +702,12 @@ export function DataGrid(): React.JSX.Element | null {
               tabIndex={0}
               onKeyDown={onKeyDown}
             >
+              <div className="relative" style={{ width: totalW }}>
+              {/* live drag-selection rectangle (DOM-painted; no React re-render) */}
+              <div
+                ref={overlayRef}
+                className="pointer-events-none absolute z-30 hidden border-[1.5px] border-primary bg-primary/10"
+              />
               <table
                 ref={tableRef}
                 className="border-collapse font-mono text-xs"
@@ -749,15 +833,25 @@ export function DataGrid(): React.JSX.Element | null {
                     ))}
                   </tr>
                 </thead>
-                <tbody>
+                <tbody
+                  onMouseDown={onBodyMouseDown}
+                  onMouseOver={onBodyMouseOver}
+                  onDoubleClick={onBodyDoubleClick}
+                  onContextMenu={onBodyContextMenu}
+                >
                   {(() => {
-                    const vRows = rowVirtualizer.getVirtualItems()
-                    const totalVSize = rowVirtualizer.getTotalSize()
-                    const padTop = vRows.length > 0 ? (vRows[0]?.start ?? 0) : 0
+                    const vRows = virtualize ? rowVirtualizer.getVirtualItems() : []
+                    const totalVSize = virtualize ? rowVirtualizer.getTotalSize() : 0
+                    const padTop = virtualize && vRows.length ? (vRows[0]?.start ?? 0) : 0
                     const padBottom =
-                      vRows.length > 0
+                      virtualize && vRows.length
                         ? totalVSize - (vRows[vRows.length - 1]?.end ?? 0)
                         : 0
+                    // virtualized → only the windowed indices; else every row
+                    const indices = virtualize
+                      ? vRows.map((v) => v.index)
+                      : Array.from({ length: vCount }, (_, i) => i)
+                    const measureRef = virtualize ? rowVirtualizer.measureElement : undefined
                     return (
                       <>
                         {padTop > 0 && (
@@ -765,15 +859,11 @@ export function DataGrid(): React.JSX.Element | null {
                             <td />
                           </tr>
                         )}
-                        {vRows.map((vRow) => {
+                        {indices.map((index) => {
                           // FK picker virtual row
-                          if (isPickerVRow(vRow.index)) {
+                          if (isPickerVRow(index)) {
                             return (
-                              <tr
-                                key="fk-picker"
-                                data-index={vRow.index}
-                                ref={rowVirtualizer.measureElement}
-                              >
+                              <tr key="fk-picker" data-index={index} ref={measureRef}>
                                 <td colSpan={cols.length + 1} className="p-0">
                                   {fkTarget && fkTargetFk && openConnectionId && (
                                     <FkInlinePicker
@@ -807,14 +897,14 @@ export function DataGrid(): React.JSX.Element | null {
                             )
                           }
 
-                          const r = virtRowToDataRow(vRow.index)
+                          const r = virtRowToDataRow(index)
                           const ins = isInsert(r)
                           const deleted = !ins && tab.deletes.includes(realIdx(r))
                           return (
                             <tr
                               key={ins ? `ins-${insIdx(r)}` : `row-${realIdx(r)}`}
-                              data-index={vRow.index}
-                              ref={rowVirtualizer.measureElement}
+                              data-index={index}
+                              ref={measureRef}
                               className={cn(
                                 'border-b border-border/30',
                                 ins && 'bg-new-row',
@@ -822,32 +912,7 @@ export function DataGrid(): React.JSX.Element | null {
                               )}
                             >
                               <td
-                                onMouseDown={(e) => {
-                                  if (ins) return
-                                  containerRef.current?.focus()
-                                  if (e.shiftKey && sel)
-                                    setSel({ ...sel, fr: r, fc: cols.length - 1 })
-                                  else {
-                                    selecting.current = true
-                                    setSel({ ar: r, ac: 0, fr: r, fc: cols.length - 1 })
-                                  }
-                                }}
-                                onMouseEnter={(e) => {
-                                  if (selecting.current && !ins && e.buttons === 1)
-                                    setSel((s) =>
-                                      s && s.fr !== r
-                                        ? { ...s, fr: r, fc: cols.length - 1 }
-                                        : s
-                                    )
-                                }}
-                                onMouseMove={(e) => {
-                                  if (selecting.current && !ins && e.buttons === 1)
-                                    setSel((s) =>
-                                      s && s.fr !== r
-                                        ? { ...s, fr: r, fc: cols.length - 1 }
-                                        : s
-                                    )
-                                }}
+                                data-r={r}
                                 className={cn(
                                   'sticky left-0 z-10 px-1 py-1 text-center select-none',
                                   rowFullySelected(r)
@@ -875,38 +940,8 @@ export function DataGrid(): React.JSX.Element | null {
                                 return (
                                   <td
                                     key={col.name}
-                                    onMouseDown={(e) => {
-                                      if (e.button !== 0 || isEditing) return
-                                      containerRef.current?.focus()
-                                      if (e.shiftKey && sel)
-                                        setSel({ ...sel, fr: r, fc: c })
-                                      else {
-                                        selecting.current = true
-                                        setSel({ ar: r, ac: c, fr: r, fc: c })
-                                      }
-                                    }}
-                                    onMouseEnter={(e) => {
-                                      if (selecting.current && e.buttons === 1)
-                                        setSel((s) =>
-                                          s && (s.fr !== r || s.fc !== c)
-                                            ? { ...s, fr: r, fc: c }
-                                            : s
-                                        )
-                                    }}
-                                    onMouseMove={(e) => {
-                                      if (selecting.current && e.buttons === 1)
-                                        setSel((s) =>
-                                          s && (s.fr !== r || s.fc !== c)
-                                            ? { ...s, fr: r, fc: c }
-                                            : s
-                                        )
-                                    }}
-                                    onDoubleClick={() => startEdit(r, c)}
-                                    onContextMenu={() => {
-                                      setCtx({ r, c })
-                                      if (!inSel(r, c))
-                                        setSel({ ar: r, ac: c, fr: r, fc: c })
-                                    }}
+                                    data-r={r}
+                                    data-c={c}
                                     style={cellStyle(r, c, ins, deleted, edited)}
                                     className={cn(
                                       'group/cell relative overflow-hidden px-3 py-1 whitespace-nowrap text-ellipsis select-none',
@@ -947,10 +982,10 @@ export function DataGrid(): React.JSX.Element | null {
                                       const showPick =
                                         fk && cellEditable(r) && !!openConnectionId
                                       if (!fk || (!showNav && !showPick))
-                                        return display(v)
+                                        return display(v, !!fk)
                                       return (
                                         <span className="flex items-center justify-between gap-1">
-                                          <span className="truncate">{display(v)}</span>
+                                          <span className="truncate">{display(v, true)}</span>
                                           <span className="flex shrink-0 items-center gap-0.5">
                                             {showPick && (
                                               <button
@@ -1032,6 +1067,7 @@ export function DataGrid(): React.JSX.Element | null {
                   })()}
                 </tbody>
               </table>
+              </div>
             </div>
           </ContextMenuTrigger>
           <ContextMenuContent>
@@ -1074,6 +1110,13 @@ export function DataGrid(): React.JSX.Element | null {
                 if (!ctx) return
                 const name = cols[ctx.c].name
                 const v = valueAt(ctx.r, ctx.c)
+                if (tab.filterMode === 'raw') {
+                  // Raw mode: append an engine-quoted ` AND col = value` and apply
+                  void applyRawWhere(
+                    appendCellCondition(tab.rawWhere, name, v, conn?.driver ?? 'postgres')
+                  )
+                  return
+                }
                 const f =
                   v === null || v === undefined
                     ? { column: name, op: 'isnull' as const, value: '' }
@@ -1203,13 +1246,15 @@ export function DataGrid(): React.JSX.Element | null {
               openConnectionId,
               tab.entity,
               tab.filters,
-              tab.orderBy.length ? tab.orderBy : undefined
+              tab.orderBy.length ? tab.orderBy : undefined,
+              tab.filterMode === 'raw' ? tab.rawWhere : undefined
             )
           }
         />
       )}
 
       <div className="flex h-9 shrink-0 items-center gap-2 border-t border-border px-3 text-xs text-muted-foreground">
+        <ViewSwitch view="data" />
         {canInsert && (
           <Button size="xs" variant="ghost" onClick={addRow}>
             <Plus />

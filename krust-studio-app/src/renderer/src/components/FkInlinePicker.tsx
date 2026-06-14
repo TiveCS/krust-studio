@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { FilterBar } from '@/components/FilterBar'
+import { display } from '@/lib/cellDisplay'
 import { cn } from '@/lib/utils'
 import type {
   ColumnInfo,
@@ -71,6 +72,9 @@ export function FkInlinePicker({
   const [page, setPage] = useState(0)
   const [columns, setColumns] = useState<ColumnInfo[]>([])
   const [rows, setRows] = useState<Record<string, unknown>[]>([])
+  // FK columns of the browsed parent table (for indigo value colouring); empty
+  // in search mode (searchRows carries no FK metadata)
+  const [fkCols, setFkCols] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
   const reqId = useRef(0)
 
@@ -97,6 +101,7 @@ export function FkInlinePicker({
         if (my !== reqId.current) return
         setColumns(res.columns)
         setRows(res.rows)
+        setFkCols(new Set())
       } else {
         const res = await window.api.sessions.readRows(
           connId,
@@ -109,6 +114,7 @@ export function FkInlinePicker({
         if (my !== reqId.current) return
         setColumns(res.columns)
         setRows(res.rows)
+        setFkCols(new Set((res.foreignKeys ?? []).map((f) => f.column)))
       }
     } finally {
       if (my === reqId.current) setLoading(false)
@@ -205,15 +211,15 @@ export function FkInlinePicker({
           </div>
         ) : (
           <table className="min-w-full border-collapse font-mono text-[11px]">
-            <thead className="sticky top-0 z-10 bg-popover">
+            <thead className="sticky top-0 z-10">
               <tr className="border-b border-border">
-                <th className="w-6" />
+                <th className="w-6 bg-popover" />
                 {columns.map((c) => (
                   <th
                     key={c.name}
                     onClick={() => toggleSort(c.name)}
                     className={cn(
-                      'px-2.5 py-1.5 text-left font-medium whitespace-nowrap text-muted-foreground',
+                      'bg-popover px-2.5 py-1.5 text-left font-medium whitespace-nowrap text-muted-foreground shadow-[inset_0_-1px_0_var(--border)]',
                       !searching && 'cursor-pointer hover:text-foreground'
                     )}
                   >
@@ -243,7 +249,9 @@ export function FkInlinePicker({
                 return (
                   <tr
                     key={i}
-                    onClick={() => onPick(row[refColumn])}
+                    // picking the already-selected value is a no-op (don't stage a
+                    // redundant edit) — just close
+                    onClick={() => (sel ? onClose() : onPick(row[refColumn]))}
                     className={cn(
                       'cursor-pointer border-b border-border/30 hover:bg-accent',
                       sel && 'bg-primary/15'
@@ -255,13 +263,10 @@ export function FkInlinePicker({
                     {columns.map((c) => (
                       <td
                         key={c.name}
-                        className={cn(
-                          'max-w-[14rem] truncate px-2.5 py-1.5 whitespace-nowrap',
-                          sel && 'font-medium text-foreground'
-                        )}
+                        className="max-w-[14rem] truncate px-2.5 py-1.5 whitespace-nowrap"
                         title={cell(row[c.name])}
                       >
-                        {cell(row[c.name])}
+                        {display(row[c.name], fkCols.has(c.name))}
                       </td>
                     ))}
                   </tr>

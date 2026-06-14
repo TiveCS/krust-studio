@@ -166,13 +166,14 @@ export function registerIpc(): void {
       limit: number,
       offset: number,
       filters?: Filter[],
-      orderBy?: Sort[]
-    ) => readRows(id, entity, limit, offset, filters, orderBy)
+      orderBy?: Sort[],
+      rawWhere?: string
+    ) => readRows(id, entity, limit, offset, filters, orderBy, rawWhere)
   )
   ipcMain.handle(
     'session:countRows',
-    (_e, id: string, entity: EntityRef, filters?: Filter[]) =>
-      countRows(id, entity, filters)
+    (_e, id: string, entity: EntityRef, filters?: Filter[], rawWhere?: string) =>
+      countRows(id, entity, filters, rawWhere)
   )
   ipcMain.handle(
     'session:searchRows',
@@ -187,8 +188,8 @@ export function registerIpc(): void {
   )
   ipcMain.handle(
     'session:exportAllRows',
-    (_e, id: string, entity: EntityRef, filters?: Filter[], orderBy?: Sort[]) =>
-      exportAllRows(id, entity, filters, orderBy)
+    (_e, id: string, entity: EntityRef, filters?: Filter[], orderBy?: Sort[], rawWhere?: string) =>
+      exportAllRows(id, entity, filters, orderBy, rawWhere)
   )
   ipcMain.handle(
     'dialog:saveText',

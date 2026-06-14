@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { EditorColumn } from '@/components/ColumnsEditor'
+import { filtersToWhere } from '@/lib/filterSql'
 import type {
   ConnectionSummary,
   EntityInfo,
@@ -60,6 +61,12 @@ export interface Tab {
   total: number | null
   counting: boolean
   filters: Filter[]
+  /** active filter mode (ADR-0017); 'builder' = structured, 'raw' = hand-written WHERE */
+  filterMode: 'builder' | 'raw'
+  /** Raw-mode WHERE predicate text (applied explicitly; persisted per tab) */
+  rawWhere: string
+  /** last raw-filter read error — shown inline; last good rows stay visible */
+  filterError: string | null
   orderBy: Sort[]
   /** staged cell edits, keyed by `${rowIndex}|${column}`; value may be null */
   edits: Record<string, unknown>
@@ -209,6 +216,12 @@ interface ConnectionsState {
   setPageSize: (size: number) => Promise<void>
   countRows: () => Promise<void>
   setFilters: (filters: Filter[]) => Promise<void>
+  /** switch Builder ⇄ Raw filter mode (ADR-0017); Builder→Raw seeds the raw box */
+  setFilterMode: (mode: 'builder' | 'raw') => Promise<void>
+  /** store raw-WHERE text without running it (live typing) */
+  setRawWhere: (text: string) => void
+  /** apply (run) a raw-WHERE predicate explicitly (Apply / Enter / filter-by-cell) */
+  applyRawWhere: (text: string) => Promise<void>
   setSort: (column: string, additive?: boolean) => Promise<void>
   setTabView: (view: TabView) => Promise<void>
   /** set the active Structure sub-tab (persisted; lazy-fetches referencedBy) */
@@ -256,7 +269,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     const { openConnectionId, tabs, pageSize } = get()
     const tab = tabs.find((t) => t.id === tabId)
     if (!openConnectionId || !tab) return
-    patchTab(tabId, { loading: true, error: null })
+    const raw = tab.filterMode === 'raw' ? tab.rawWhere : undefined
+    patchTab(tabId, { loading: true, error: null, filterError: null })
     try {
       const data = await window.api.sessions.readRows(
         openConnectionId,
@@ -264,14 +278,16 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         pageSize,
         tab.pageIndex * pageSize,
         tab.filters,
-        tab.orderBy.length ? tab.orderBy : undefined
+        tab.orderBy.length ? tab.orderBy : undefined,
+        raw
       )
-      patchTab(tabId, { data, loading: false })
+      patchTab(tabId, { data, loading: false, filterError: null })
     } catch (err) {
-      patchTab(tabId, {
-        loading: false,
-        error: err instanceof Error ? err.message : String(err)
-      })
+      const msg = err instanceof Error ? err.message : String(err)
+      // Raw predicate failure: surface inline + keep the last good rows visible
+      // (non-destructive, editor-style); a Builder error goes to the toast.
+      if (tab.filterMode === 'raw') patchTab(tabId, { loading: false, filterError: msg })
+      else patchTab(tabId, { loading: false, error: msg })
     }
   }
 
@@ -293,6 +309,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
             view: tab.view,
             structureSub: tab.structureSub,
             filters: tab.filters,
+            ...(tab.filterMode === 'raw' ? { filterMode: 'raw' as const } : {}),
+            ...(tab.rawWhere ? { rawWhere: tab.rawWhere } : {}),
             orderBy: tab.orderBy,
             colWidths: tab.colWidths,
             ...(tab.query !== null
@@ -320,6 +338,9 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       total: null,
       counting: false,
       filters: t.filters,
+      filterMode: t.filterMode ?? 'builder',
+      rawWhere: t.rawWhere ?? '',
+      filterError: null,
       orderBy: t.orderBy,
       edits: {},
       deletes: [],
@@ -695,7 +716,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         kind: 'history',
         entity: { name: 'History' },
         data: null, loading: false, error: null, pageIndex: 0, total: null,
-        counting: false, filters: [], orderBy: [], edits: {}, deletes: [],
+        counting: false, filters: [], filterMode: 'builder', rawWhere: '',
+        filterError: null, orderBy: [], edits: {}, deletes: [],
         inserts: [], colWidths: {}, committing: false, view: 'data',
         structureSub: 'columns', referencedBy: null, referencedByLoading: false,
         structure: null, structureLoading: false, draft: null, query: null
@@ -715,7 +737,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         kind: 'backup',
         entity: { name: 'Backup & Restore' },
         data: null, loading: false, error: null, pageIndex: 0, total: null,
-        counting: false, filters: [], orderBy: [], edits: {}, deletes: [],
+        counting: false, filters: [], filterMode: 'builder', rawWhere: '',
+        filterError: null, orderBy: [], edits: {}, deletes: [],
         inserts: [], colWidths: {}, committing: false, view: 'data',
         structureSub: 'columns', referencedBy: null, referencedByLoading: false,
         structure: null, structureLoading: false, draft: null, query: null
@@ -741,7 +764,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         connectionEditor: { connectionId },
         entity: { name: conn?.name ?? (connectionId ? 'Connection' : 'New connection') },
         data: null, loading: false, error: null, pageIndex: 0, total: null,
-        counting: false, filters: [], orderBy: [], edits: {}, deletes: [],
+        counting: false, filters: [], filterMode: 'builder', rawWhere: '',
+        filterError: null, orderBy: [], edits: {}, deletes: [],
         inserts: [], colWidths: {}, committing: false, view: 'data',
         structureSub: 'columns', referencedBy: null, referencedByLoading: false,
         structure: null, structureLoading: false, draft: null, query: null
@@ -797,6 +821,9 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         total: null,
         counting: false,
         filters: initialFilters ?? [],
+        filterMode: 'builder',
+        rawWhere: '',
+        filterError: null,
         orderBy: [],
         edits: {},
         deletes: [],
@@ -829,6 +856,9 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         total: null,
         counting: false,
         filters: [],
+        filterMode: 'builder',
+        rawWhere: '',
+        filterError: null,
         orderBy: [],
         edits: {},
         deletes: [],
@@ -865,6 +895,9 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         total: null,
         counting: false,
         filters: [],
+        filterMode: 'builder',
+        rawWhere: '',
+        filterError: null,
         orderBy: [],
         edits: {},
         deletes: [],
@@ -1030,6 +1063,54 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       await fetchTab(id)
     },
 
+    setFilterMode: async (mode) => {
+      const { activeTabId, tabs, openConnectionId, connections } = get()
+      const tab = tabs.find((t) => t.id === activeTabId)
+      if (!activeTabId || !tab || tab.filterMode === mode) return
+      let rawWhere = tab.rawWhere
+      // Builder → Raw: one-way seed the raw box with the SQL the builder produced
+      if (mode === 'raw' && !rawWhere.trim()) {
+        const dialect =
+          connections.find((c) => c.id === openConnectionId)?.driver ?? 'postgres'
+        rawWhere = filtersToWhere(tab.filters, dialect)
+      }
+      patchTab(activeTabId, {
+        filterMode: mode,
+        rawWhere,
+        filterError: null,
+        pageIndex: 0,
+        total: null,
+        edits: {},
+        deletes: [],
+        inserts: []
+      })
+      scheduleWorkspaceSave()
+      await fetchTab(activeTabId)
+    },
+
+    setRawWhere: (text) => {
+      const id = get().activeTabId
+      if (!id) return
+      patchTab(id, { rawWhere: text })
+      scheduleWorkspaceSave()
+    },
+
+    applyRawWhere: async (text) => {
+      const id = get().activeTabId
+      if (!id) return
+      patchTab(id, {
+        rawWhere: text,
+        filterMode: 'raw',
+        pageIndex: 0,
+        total: null,
+        edits: {},
+        deletes: [],
+        inserts: []
+      })
+      scheduleWorkspaceSave()
+      await fetchTab(id)
+    },
+
     setPageSize: async (size) => {
       const id = get().activeTabId
       if (!id) return
@@ -1047,14 +1128,14 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         const total = await window.api.sessions.countRows(
           openConnectionId,
           tab.entity,
-          tab.filters
+          tab.filters,
+          tab.filterMode === 'raw' ? tab.rawWhere : undefined
         )
         patchTab(tab.id, { total, counting: false })
       } catch (err) {
-        patchTab(tab.id, {
-          counting: false,
-          error: err instanceof Error ? err.message : String(err)
-        })
+        const msg = err instanceof Error ? err.message : String(err)
+        if (tab.filterMode === 'raw') patchTab(tab.id, { counting: false, filterError: msg })
+        else patchTab(tab.id, { counting: false, error: msg })
       }
     },
 
@@ -1094,6 +1175,19 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       if (!activeTabId || !tab) return
       patchTab(activeTabId, { view })
       scheduleWorkspaceSave()
+      // switching to data on a tab whose rows were never fetched (e.g. opened
+      // straight into structure via walkable relations) → load them now
+      if (
+        view === 'data' &&
+        tab.data === null &&
+        !tab.loading &&
+        !tab.draft &&
+        !tab.query &&
+        !tab.kind &&
+        openConnectionId
+      ) {
+        await fetchTab(activeTabId)
+      }
       if (view === 'structure' && !tab.structure && openConnectionId) {
         patchTab(activeTabId, { structureLoading: true })
         try {

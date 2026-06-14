@@ -134,17 +134,19 @@ export async function readRows(
   limit: number,
   offset: number,
   filters?: Filter[],
-  orderBy?: Sort[]
+  orderBy?: Sort[],
+  rawWhere?: string
 ): Promise<RowsResult> {
-  return withRetry(id, (d) => d.readRows(entity, limit, offset, filters, orderBy))
+  return withRetry(id, (d) => d.readRows(entity, limit, offset, filters, orderBy, rawWhere))
 }
 
 export async function countRows(
   id: string,
   entity: EntityRef,
-  filters?: Filter[]
+  filters?: Filter[],
+  rawWhere?: string
 ): Promise<number> {
-  return withRetry(id, (d) => d.countRows(entity, filters))
+  return withRetry(id, (d) => d.countRows(entity, filters, rawWhere))
 }
 
 export async function searchRows(
@@ -161,7 +163,8 @@ export async function exportAllRows(
   id: string,
   entity: EntityRef,
   filters?: Filter[],
-  orderBy?: Sort[]
+  orderBy?: Sort[],
+  rawWhere?: string
 ): Promise<SearchResult> {
   const PAGE = 1000
   const MAX = 500_000
@@ -169,7 +172,7 @@ export async function exportAllRows(
   let columns: SearchResult['columns'] = []
   const rows: Record<string, unknown>[] = []
   for (;;) {
-    const res = await withRetry(id, (d) => d.readRows(entity, PAGE, offset, filters, orderBy))
+    const res = await withRetry(id, (d) => d.readRows(entity, PAGE, offset, filters, orderBy, rawWhere))
     if (offset === 0) columns = res.columns
     rows.push(...res.rows)
     if (res.rows.length < PAGE || rows.length >= MAX) break

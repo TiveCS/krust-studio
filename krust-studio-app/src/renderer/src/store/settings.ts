@@ -2,6 +2,22 @@ import { create } from 'zustand'
 
 const STORAGE_KEY = 'krust-settings-keybindings'
 const STORAGE_KEY_PINS = 'krust-settings-pinned-columns'
+const STORAGE_KEY_GRID = 'krust-settings-grid'
+
+/** rows on a page above which the data grid switches to virtualized rendering.
+ *  Small pages (≤ this) render plainly — fast in a prod build and free of
+ *  virtualizer edge-cases; big pages (e.g. 500/pg) virtualize. 0 = always. */
+const DEFAULT_VIRTUALIZE_THRESHOLD = 150
+
+function loadVirtualizeThreshold(): number {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_GRID)
+    const n = raw ? (JSON.parse(raw) as { virtualizeThreshold?: number }).virtualizeThreshold : null
+    return typeof n === 'number' && n >= 0 ? n : DEFAULT_VIRTUALIZE_THRESHOLD
+  } catch {
+    return DEFAULT_VIRTUALIZE_THRESHOLD
+  }
+}
 
 export type PinSide = 'left' | 'right'
 /** a global name-based pin rule, applied to every table opened */
@@ -61,6 +77,11 @@ interface SettingsState {
   removePinnedColumn: (name: string) => void
   setPinnedColumnSide: (name: string, side: PinSide) => void
   setPinPrimaryKey: (v: PinPrimaryKey) => void
+
+  // ── grid ──
+  /** rows/page above which the grid virtualizes; below, all rows render in DOM */
+  virtualizeThreshold: number
+  setVirtualizeThreshold: (n: number) => void
 }
 
 function savePins(s: PinSettings): void {
@@ -127,5 +148,13 @@ export const useSettings = create<SettingsState>((set) => ({
     set((s) => {
       savePins({ pinnedColumns: s.pinnedColumns, pinPrimaryKey })
       return { pinPrimaryKey }
+    }),
+
+  virtualizeThreshold: loadVirtualizeThreshold(),
+  setVirtualizeThreshold: (n) =>
+    set(() => {
+      const virtualizeThreshold = Math.max(0, Math.floor(n) || 0)
+      localStorage.setItem(STORAGE_KEY_GRID, JSON.stringify({ virtualizeThreshold }))
+      return { virtualizeThreshold }
     })
 }))

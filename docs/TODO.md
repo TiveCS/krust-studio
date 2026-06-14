@@ -2,38 +2,43 @@
 
 Prioritized. Top group = highest value (matches CONTEXT.md + Beekeeper parity).
 
-## P0 — next: inline filter builder + raw WHERE — PLANNED
+## P0 — next: inline filter builder + raw WHERE — DONE
 
 Design resolved via `/grill-with-docs` (2026-06-14). See
 [ADR-0017](adr/0017-inline-filter-builder-with-raw-where.md) and CONTEXT.md
 **Filter (Data Grid)**. The current `FilterBar` is collapsed behind a chevron
 (daily-driver friction) and can't express predicates outside its operator set.
 
-- [ ] **Always-visible inline filter.** Remove the expand/collapse chevron. A
-      single live condition row (column · op · value) sits in the grid toolbar at
-      rest; `+ Condition` grows rows and AND/OR groups inline (no hidden panel).
-      Keep explicit **Apply** + **Enter** (no live-on-keystroke — query storms on
-      large tables).
-- [ ] **Builder ⇄ Raw mode toggle (one active).** Add a **Raw** mode: a
-      hand-written **WHERE predicate only** (not a full statement) that Krust
-      wraps in its own `SELECT … ORDER BY … LIMIT …`, so sort/pagination/count/
-      inline-edit/export/FK-nav all keep working (grid stays editable: one source
-      table, PK preserved). Full SQL stays in the SQL editor. Builder → Raw
-      **seeds** the box with the generated SQL (one-way); Raw → Builder does
-      **not** parse back.
-- [ ] **Raw guard + errors.** Reject a statement separator (`;`) — otherwise trust
-      it like the SQL editor (user's own connection, strictly less powerful). A
-      failed predicate shows the engine error **inline** under the filter row;
-      **last good rows stay visible**. The `;` guard lives at one shared choke
-      point shared by `readRows`/`countRows`/`exportAllRows`.
-- [ ] **Filter-by-cell + persistence.** Right-click → "Filter by this value"
-      appends a structured condition in Builder, an engine-quoted
-      ` AND "col" = 'value'` to the text in Raw. Persist `filterMode` (default
-      `'builder'`) + `rawWhere` on `SerializedTab`; re-run on restore **fail-soft**
-      (stale predicate errors inline, tab stays open). No migration needed —
-      absent `filterMode` defaults to Builder.
-- [ ] **Driver work.** `countRows` and `exportAllRows` take `Filter[]` today; add
-      a raw-WHERE variant on all three drivers (mysql/pg/sqlite).
+- [x] **Always-visible inline filter.** Done. Removed the expand/collapse chevron;
+      `FilterBar` renders the builder always, with one empty condition row at rest
+      (`removeRow` keeps a row so the bar is never blank). `+ Condition` / `+ Group`
+      grow inline; explicit **Apply** + **Enter** (no live-on-keystroke). External
+      changes re-seed via a `lastEmitted` JSON guard so an Apply/filter-by-cell
+      doesn't clobber a fresh in-progress edit.
+- [x] **Builder ⇄ Raw mode toggle (one active).** Done. Segmented Builder/Raw
+      toggle in the toolbar (shown only when the host wires `onSetMode` — the FK
+      Picker's ephemeral `FilterBar` stays builder-only). Raw is a WHERE predicate
+      that the drivers wrap in their own `SELECT … ORDER BY … LIMIT …`
+      (sort/pagination/count/inline-edit/export/FK-nav unaffected). `setFilterMode`
+      seeds Builder → Raw via `filtersToWhere()` (`lib/filterSql.ts`, dialect-aware
+      inlined predicate); Raw → Builder does **not** parse back (builder keeps its
+      own last `Filter[]`).
+- [x] **Raw guard + errors.** Done. `buildWhereClause(filters, rawWhere, …)` in
+      `driver.ts` is the single shared choke point used by readRows/countRows
+      (exportAllRows reuses readRows): a non-empty raw predicate is rejected if it
+      contains `;`, otherwise inlined verbatim (no parse/parameterize). A failed
+      raw read routes to `Tab.filterError` (shown inline under the filter row, **not**
+      toasted) while the last good rows stay visible (`fetchTab` doesn't clear
+      `data` on raw error).
+- [x] **Filter-by-cell + persistence.** Done. Right-click → "Filter by this value"
+      appends a structured condition in Builder; in Raw it appends an engine-quoted
+      ` AND col = value` via `appendCellCondition()` and applies. `SerializedTab`
+      gains `filterMode` + `rawWhere` (persisted only when raw / non-empty); restore
+      re-runs fail-soft through `fetchTab`. No migration — absent `filterMode`
+      defaults to Builder.
+- [x] **Driver work.** Done. `readRows`/`countRows` take an optional `rawWhere` on
+      all three drivers (mysql/pg/sqlite) via the shared `buildWhereClause`; threaded
+      through `session.ts` → `ipc.ts` → preload → `SessionApi`.
 
 ## P0 — v1.3.4 + v1.4.0: editor/history/backup UX — PLANNED
 
@@ -404,6 +409,42 @@ CONTEXT.md **Session** + **Workspace & Tabs** + **Referenced By (Reverse FK)**.
       tools + AI Read Allowlist + audit. Explicitly low priority.
 
 ## Resolved
+
+- **Inline-filter chrome + Data/Structure switch relocation** — built (post
+  ADR-0017 polish). `FilterBar` dropped its header row (filter icon + condition
+  counter + segmented Builder/Raw toggle); controls are now an icon-only cluster
+  leading the condition row — `[mode toggle][clear][group][add][apply]` (Builder)
+  / `[mode][clear][apply]` + textarea (Raw), all with `title` tooltips. Conditions
+  flow horizontally (wrap), multi-group wrapped in a translucent sky bracket;
+  compact controls (`h-6`, 11px; wider value input). The Data/Structure switch
+  moved out of its own strip into each view's footer (shared `ViewSwitch`,
+  bottom-left): `DataGrid` footer + an always-present `StructureView` footer;
+  `TableTabView` strip removed.
+- **Empty filter value → no-op (pg integer crash fix)** — a Builder condition
+  with an empty value emitted `col = ''`, which pg rejects for integer columns
+  (`22P02`) and meant clearing a value still filtered. `buildWhere` +
+  `filtersToWhere` now omit value-requiring conditions whose value is empty
+  (and `between` with a missing bound). Fixes the crash + Open-full + re-picking
+  another FK.
+- **Postgres schema selector** — sidebar gains a schema dropdown (shown only when
+  >1 schema), filtering Tables/Views/Enums client-side by `e.schema`. Hidden on
+  mysql/sqlite.
+- **FK value colour** — FK cell values render `text-indigo-400` regardless of
+  underlying type, in both the main grid and the FK picker mini-table. Shared
+  renderer extracted to `lib/cellDisplay.tsx` (`display(v, fk)`).
+- **FK picker mini-table fixes** — value syntax-highlighting via the shared
+  `display`; sticky header `bg` moved onto `th` (was bleeding through); picking
+  the already-selected value is a no-op (no redundant staged edit).
+- **Data-grid drag-select perf** — drag now paints a single DOM overlay rectangle
+  (anchor + focus = diagonal corners; no React re-render per cell-crossing),
+  committing the final selection once on mouseup. Cell mouse interaction moved to
+  **event delegation** on `<tbody>` (one listener set; cells carry `data-r`/`data-c`)
+  so a selection change re-renders far cheaper. Also fixed a virtualizer cache
+  corruption (`getItemKey`) that collapsed rows after the FK picker closed.
+- **Configurable grid virtualization** — `store/settings.ts` `virtualizeThreshold`
+  (default 150; persisted) + Settings → **Data Grid** section. Pages with more
+  rows than the threshold virtualize; smaller pages render plainly (fast in prod,
+  no virtualizer edge-cases). `0` = always virtualize.
 
 - **`filter.add` command + keybinding collision fix** — built. The v1.5.0
   keybindings item listed `filter.add` (Ctrl/⌘+Shift+F) but it was never added to

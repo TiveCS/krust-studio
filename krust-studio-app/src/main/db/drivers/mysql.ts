@@ -8,7 +8,7 @@ import {
   type DbDriver,
   type DriverDeps,
   safePaging,
-  buildWhere,
+  buildWhereClause,
   buildSearch,
   buildOrderBy,
   buildUpdate,
@@ -206,10 +206,11 @@ export class MysqlDriver implements DbDriver {
     limit: number,
     offset: number,
     filters?: Filter[],
-    orderBy?: Sort[]
+    orderBy?: Sort[],
+    rawWhere?: string
   ): Promise<RowsResult> {
     const { limit: l, offset: o } = safePaging(limit, offset)
-    const where = buildWhere(filters, quoteIdent, () => '?')
+    const where = buildWhereClause(filters, rawWhere, quoteIdent, () => '?')
     const order = buildOrderBy(orderBy, quoteIdent)
     const [rows, fields] = (await (await this.ensure()).query(
       `SELECT * FROM ${quoteIdent(entity.name)}${where.clause}${order} LIMIT ${l} OFFSET ${o}`,
@@ -294,8 +295,8 @@ export class MysqlDriver implements DbDriver {
     }
   }
 
-  async countRows(entity: EntityRef, filters?: Filter[]): Promise<number> {
-    const where = buildWhere(filters, quoteIdent, () => '?')
+  async countRows(entity: EntityRef, filters?: Filter[], rawWhere?: string): Promise<number> {
+    const where = buildWhereClause(filters, rawWhere, quoteIdent, () => '?')
     const [rows] = (await (await this.ensure()).query(
       `SELECT count(*) AS c FROM ${quoteIdent(entity.name)}${where.clause}`,
       where.params

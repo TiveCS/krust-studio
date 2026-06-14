@@ -46,6 +46,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { StructureEditor } from '@/components/StructureEditor'
+import { ViewSwitch } from '@/components/ViewSwitch'
 import { SqlDisplay } from '@/components/SqlDisplay'
 import { TemplateManager } from '@/components/TemplateManager'
 import { type EditorColumn } from '@/components/ColumnsEditor'
@@ -765,10 +766,12 @@ export function StructureView(): React.JSX.Element | null {
         )}
       </div>
 
-      {/* shared commit footer — columns + indexes commit together */}
-      {st && !readOnly && (
-        <div className="flex h-9 shrink-0 items-center gap-2 border-t border-border px-3 text-xs text-muted-foreground">
-          {sub === 'columns' && (
+      {/* footer: Data/Structure switch (always) + commit controls (when editable) */}
+      <div className="flex h-9 shrink-0 items-center gap-2 border-t border-border px-3 text-xs text-muted-foreground">
+        <ViewSwitch view="structure" />
+        {st && !readOnly && (
+          <>
+            {sub === 'columns' && (
             <>
               <Button size="xs" variant="ghost" onClick={addColumn} title="Add a column">
                 <Plus />
@@ -810,17 +813,18 @@ export function StructureView(): React.JSX.Element | null {
             {previewing ? <Loader2 className="animate-spin" /> : <Check />}
             Commit…
           </Button>
-          <Button
-            size="xs"
-            variant="ghost"
-            onClick={discard}
-            disabled={busy || ops.length === 0}
-          >
-            <Undo2 />
-            Discard
-          </Button>
-        </div>
-      )}
+            <Button
+              size="xs"
+              variant="ghost"
+              onClick={discard}
+              disabled={busy || ops.length === 0}
+            >
+              <Undo2 />
+              Discard
+            </Button>
+          </>
+        )}
+      </div>
 
       {/* Add-index dialog — stages the index (committed with the rest) */}
       <Dialog

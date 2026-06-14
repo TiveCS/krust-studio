@@ -66,7 +66,8 @@ const api: KrustApi = {
       limit: number,
       offset: number,
       filters?: Filter[],
-      orderBy?: Sort[]
+      orderBy?: Sort[],
+      rawWhere?: string
     ) =>
       ipcRenderer.invoke(
         'session:readRows',
@@ -75,16 +76,18 @@ const api: KrustApi = {
         limit,
         offset,
         filters,
-        orderBy
+        orderBy,
+        rawWhere
       ),
-    countRows: (id: string, entity: EntityRef, filters?: Filter[]) =>
-      ipcRenderer.invoke('session:countRows', id, entity, filters),
+    countRows: (id: string, entity: EntityRef, filters?: Filter[], rawWhere?: string) =>
+      ipcRenderer.invoke('session:countRows', id, entity, filters, rawWhere),
     exportAllRows: (
       id: string,
       entity: EntityRef,
       filters?: Filter[],
-      orderBy?: Sort[]
-    ) => ipcRenderer.invoke('session:exportAllRows', id, entity, filters, orderBy),
+      orderBy?: Sort[],
+      rawWhere?: string
+    ) => ipcRenderer.invoke('session:exportAllRows', id, entity, filters, orderBy, rawWhere),
     searchRows: (
       id: string,
       entity: EntityRef,

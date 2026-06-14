@@ -48,6 +48,13 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { DatabaseSwitcher } from '@/components/DatabaseSwitcher'
 import { ConnectionSwitcher } from '@/components/ConnectionSwitcher'
@@ -80,6 +87,7 @@ export function AppSidebar(): React.JSX.Element {
   const historyActive = activeTabKind === 'history'
   const backupActive = activeTabKind === 'backup'
   const [filter, setFilter] = useState('')
+  const [schemaFilter, setSchemaFilter] = useState('all')
   const [templatesOpen, setTemplatesOpen] = useState(false)
   const [renameTarget, setRenameTarget] = useState<EntityRef | null>(null)
   const [renameValue, setRenameValue] = useState('')
@@ -147,15 +155,23 @@ export function AppSidebar(): React.JSX.Element {
   }
   const activeName = tabs.find((t) => t.id === activeTabId)?.entity.name
 
+  // distinct schemas across entities (pg lists multiple; mysql/sqlite have none)
+  const schemas = useMemo(
+    () => [...new Set(entities.map((e) => e.schema).filter((s): s is string => !!s))].sort(),
+    [entities]
+  )
+
   const grouped = useMemo(() => {
     const q = filter.trim().toLowerCase()
     const match = (n: string): boolean => !q || n.toLowerCase().includes(q)
+    const matchSchema = (s?: string): boolean =>
+      schemaFilter === 'all' || (s ?? '') === schemaFilter
     return {
-      tables: entities.filter((e) => e.type === 'table' && match(e.name)),
-      views: entities.filter((e) => e.type === 'view' && match(e.name)),
-      enums: enums.filter((e) => match(e.name))
+      tables: entities.filter((e) => e.type === 'table' && match(e.name) && matchSchema(e.schema)),
+      views: entities.filter((e) => e.type === 'view' && match(e.name) && matchSchema(e.schema)),
+      enums: enums.filter((e) => match(e.name) && matchSchema(e.schema))
     }
-  }, [entities, enums, filter])
+  }, [entities, enums, filter, schemaFilter])
 
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const toggleSection = (k: string): void =>
@@ -271,6 +287,25 @@ export function AppSidebar(): React.JSX.Element {
                 <TableProperties className="size-3.5" />
               </button>
             </div>
+            {schemas.length > 1 && (
+              <div className="px-2 pt-1.5">
+                <Select value={schemaFilter} onValueChange={setSchemaFilter}>
+                  <SelectTrigger className="h-7 w-full text-xs" title="Filter by schema">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all" className="text-xs">
+                      All schemas
+                    </SelectItem>
+                    {schemas.map((s) => (
+                      <SelectItem key={s} value={s} className="text-xs">
+                        {s}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <EntityGroup
               label="Tables"
               type="table"

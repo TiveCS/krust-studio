@@ -4,7 +4,7 @@ import {
   type DbDriver,
   type DriverDeps,
   safePaging,
-  buildWhere,
+  buildWhereClause,
   buildSearch,
   buildOrderBy,
   buildUpdate,
@@ -117,11 +117,12 @@ export class SqliteDriver implements DbDriver {
     limit: number,
     offset: number,
     filters?: Filter[],
-    orderBy?: Sort[]
+    orderBy?: Sort[],
+    rawWhere?: string
   ): Promise<RowsResult> {
     if (!this.db) throw new Error('Not connected')
     const { limit: l, offset: o } = safePaging(limit, offset)
-    const where = buildWhere(filters, quoteIdent, () => '?')
+    const where = buildWhereClause(filters, rawWhere, quoteIdent, () => '?')
     const order = buildOrderBy(orderBy, quoteIdent)
     const rows = this.db
       .prepare(
@@ -164,9 +165,9 @@ export class SqliteDriver implements DbDriver {
     return { columns, rows, primaryKey: pk.map((p) => p.name), foreignKeys }
   }
 
-  async countRows(entity: EntityRef, filters?: Filter[]): Promise<number> {
+  async countRows(entity: EntityRef, filters?: Filter[], rawWhere?: string): Promise<number> {
     if (!this.db) throw new Error('Not connected')
-    const where = buildWhere(filters, quoteIdent, () => '?')
+    const where = buildWhereClause(filters, rawWhere, quoteIdent, () => '?')
     const row = this.db
       .prepare(`SELECT count(*) AS c FROM ${quoteIdent(entity.name)}${where.clause}`)
       .get(...(where.params as never[])) as { c: number | bigint }
