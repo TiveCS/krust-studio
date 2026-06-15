@@ -90,6 +90,1316 @@
   },
   "nodes": [
     {
+      "label": "CHANGELOG.md",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "changelog",
+      "community": 9,
+      "norm_label": "changelog.md"
+    },
+    {
+      "label": "Changelog",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "changelog_changelog",
+      "community": 9,
+      "norm_label": "changelog"
+    },
+    {
+      "label": "[1.6.0] \u2014 2026-06-14",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "changelog_1_6_0_2026_06_14",
+      "community": 9,
+      "norm_label": "[1.6.0] \u2014 2026-06-14"
+    },
+    {
+      "label": "Added",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "changelog_added",
+      "community": 9,
+      "norm_label": "added"
+    },
+    {
+      "label": "Changed",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L28",
+      "_origin": "ast",
+      "id": "changelog_changed",
+      "community": 9,
+      "norm_label": "changed"
+    },
+    {
+      "label": "Fixed",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "changelog_fixed",
+      "community": 9,
+      "norm_label": "fixed"
+    },
+    {
+      "label": "[1.5.0] \u2014 2026-06-10",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "changelog_1_5_0_2026_06_10",
+      "community": 9,
+      "norm_label": "[1.5.0] \u2014 2026-06-10"
+    },
+    {
+      "label": "Added",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L49",
+      "_origin": "ast",
+      "id": "changelog_added_49",
+      "community": 9,
+      "norm_label": "added"
+    },
+    {
+      "label": "Changed",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L57",
+      "_origin": "ast",
+      "id": "changelog_changed_57",
+      "community": 9,
+      "norm_label": "changed"
+    },
+    {
+      "label": "[1.4.0] \u2014 2026-06-10",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L61",
+      "_origin": "ast",
+      "id": "changelog_1_4_0_2026_06_10",
+      "community": 9,
+      "norm_label": "[1.4.0] \u2014 2026-06-10"
+    },
+    {
+      "label": "Added",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L63",
+      "_origin": "ast",
+      "id": "changelog_added_63",
+      "community": 9,
+      "norm_label": "added"
+    },
+    {
+      "label": "Fixed",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L80",
+      "_origin": "ast",
+      "id": "changelog_fixed_80",
+      "community": 9,
+      "norm_label": "fixed"
+    },
+    {
+      "label": "[1.3.4] \u2014 2026-06-09",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L86",
+      "_origin": "ast",
+      "id": "changelog_1_3_4_2026_06_09",
+      "community": 9,
+      "norm_label": "[1.3.4] \u2014 2026-06-09"
+    },
+    {
+      "label": "Fixed",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L88",
+      "_origin": "ast",
+      "id": "changelog_fixed_88",
+      "community": 9,
+      "norm_label": "fixed"
+    },
+    {
+      "label": "Added",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L100",
+      "_origin": "ast",
+      "id": "changelog_added_100",
+      "community": 9,
+      "norm_label": "added"
+    },
+    {
+      "label": "[1.3.3] \u2014 2026-06-09",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L108",
+      "_origin": "ast",
+      "id": "changelog_1_3_3_2026_06_09",
+      "community": 9,
+      "norm_label": "[1.3.3] \u2014 2026-06-09"
+    },
+    {
+      "label": "Fixed",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L110",
+      "_origin": "ast",
+      "id": "changelog_fixed_110",
+      "community": 9,
+      "norm_label": "fixed"
+    },
+    {
+      "label": "[1.3.2] \u2014 2026-06-09",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L120",
+      "_origin": "ast",
+      "id": "changelog_1_3_2_2026_06_09",
+      "community": 9,
+      "norm_label": "[1.3.2] \u2014 2026-06-09"
+    },
+    {
+      "label": "Fixed",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L122",
+      "_origin": "ast",
+      "id": "changelog_fixed_122",
+      "community": 9,
+      "norm_label": "fixed"
+    },
+    {
+      "label": "[1.3.1] \u2014 2026-06-05",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L128",
+      "_origin": "ast",
+      "id": "changelog_1_3_1_2026_06_05",
+      "community": 9,
+      "norm_label": "[1.3.1] \u2014 2026-06-05"
+    },
+    {
+      "label": "Fixed",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L130",
+      "_origin": "ast",
+      "id": "changelog_fixed_130",
+      "community": 9,
+      "norm_label": "fixed"
+    },
+    {
+      "label": "Changed",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L135",
+      "_origin": "ast",
+      "id": "changelog_changed_135",
+      "community": 9,
+      "norm_label": "changed"
+    },
+    {
+      "label": "[1.3.0] \u2014 2026-06-05",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L142",
+      "_origin": "ast",
+      "id": "changelog_1_3_0_2026_06_05",
+      "community": 9,
+      "norm_label": "[1.3.0] \u2014 2026-06-05"
+    },
+    {
+      "label": "Added",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L144",
+      "_origin": "ast",
+      "id": "changelog_added_144",
+      "community": 9,
+      "norm_label": "added"
+    },
+    {
+      "label": "[1.2.3] \u2014 2026-06-04",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L178",
+      "_origin": "ast",
+      "id": "changelog_1_2_3_2026_06_04",
+      "community": 9,
+      "norm_label": "[1.2.3] \u2014 2026-06-04"
+    },
+    {
+      "label": "Fixed",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L180",
+      "_origin": "ast",
+      "id": "changelog_fixed_180",
+      "community": 9,
+      "norm_label": "fixed"
+    },
+    {
+      "label": "[1.2.1] \u2014 2026-06-04",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L193",
+      "_origin": "ast",
+      "id": "changelog_1_2_1_2026_06_04",
+      "community": 9,
+      "norm_label": "[1.2.1] \u2014 2026-06-04"
+    },
+    {
+      "label": "Fixed",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L195",
+      "_origin": "ast",
+      "id": "changelog_fixed_195",
+      "community": 9,
+      "norm_label": "fixed"
+    },
+    {
+      "label": "[1.2.0] \u2014 2026-06-03",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L204",
+      "_origin": "ast",
+      "id": "changelog_1_2_0_2026_06_03",
+      "community": 9,
+      "norm_label": "[1.2.0] \u2014 2026-06-03"
+    },
+    {
+      "label": "Added",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L206",
+      "_origin": "ast",
+      "id": "changelog_added_206",
+      "community": 9,
+      "norm_label": "added"
+    },
+    {
+      "label": "Changed",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L235",
+      "_origin": "ast",
+      "id": "changelog_changed_235",
+      "community": 9,
+      "norm_label": "changed"
+    },
+    {
+      "label": "Fixed",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L241",
+      "_origin": "ast",
+      "id": "changelog_fixed_241",
+      "community": 9,
+      "norm_label": "fixed"
+    },
+    {
+      "label": "[1.1.0]",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L255",
+      "_origin": "ast",
+      "id": "changelog_1_1_0",
+      "community": 9,
+      "norm_label": "[1.1.0]"
+    },
+    {
+      "label": "[1.0.0]",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L260",
+      "_origin": "ast",
+      "id": "changelog_1_0_0",
+      "community": 9,
+      "norm_label": "[1.0.0]"
+    },
+    {
+      "label": "blurb.md",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/blurb.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "v1_6_0_blurb",
+      "community": 109,
+      "norm_label": "blurb.md"
+    },
+    {
+      "label": "full.md",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "v1_6_0_full",
+      "community": 29,
+      "norm_label": "full.md"
+    },
+    {
+      "label": "\u2728 Added",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "v1_6_0_full_added",
+      "community": 29,
+      "norm_label": "\u2728 added"
+    },
+    {
+      "label": "Inline filter builder + raw WHERE (ADR-0017)",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "v1_6_0_full_inline_filter_builder_raw_where_adr_0017",
+      "community": 29,
+      "norm_label": "inline filter builder + raw where (adr-0017)"
+    },
+    {
+      "label": "Pinned columns / freeze panes (ADR-0016)",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "v1_6_0_full_pinned_columns_freeze_panes_adr_0016",
+      "community": 29,
+      "norm_label": "pinned columns / freeze panes (adr-0016)"
+    },
+    {
+      "label": "Query plan (ADR-0014)",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "v1_6_0_full_query_plan_adr_0014",
+      "community": 29,
+      "norm_label": "query plan (adr-0014)"
+    },
+    {
+      "label": "Pinnable, reorderable tabs",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "v1_6_0_full_pinnable_reorderable_tabs",
+      "community": 29,
+      "norm_label": "pinnable, reorderable tabs"
+    },
+    {
+      "label": "Postgres schema selector",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "v1_6_0_full_postgres_schema_selector",
+      "community": 29,
+      "norm_label": "postgres schema selector"
+    },
+    {
+      "label": "Configurable grid virtualization",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "v1_6_0_full_configurable_grid_virtualization",
+      "community": 29,
+      "norm_label": "configurable grid virtualization"
+    },
+    {
+      "label": "\ud83d\udd27 Changed",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "v1_6_0_full_changed",
+      "community": 29,
+      "norm_label": "\ud83d\udd27 changed"
+    },
+    {
+      "label": "\ud83d\udc1b Fixed",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L28",
+      "_origin": "ast",
+      "id": "v1_6_0_full_fixed",
+      "community": 29,
+      "norm_label": "\ud83d\udc1b fixed"
+    },
+    {
+      "label": "\ud83d\udce6 Install",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "v1_6_0_full_install",
+      "community": 29,
+      "norm_label": "\ud83d\udce6 install"
+    },
+    {
+      "label": "short.md",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/short.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "v1_6_0_short",
+      "community": 62,
+      "norm_label": "short.md"
+    },
+    {
+      "label": "What's new",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/short.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "v1_6_0_short_what_s_new",
+      "community": 62,
+      "norm_label": "what's new"
+    },
+    {
+      "label": "\ud83d\udc1b Fixed",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/short.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "v1_6_0_short_fixed",
+      "community": 62,
+      "norm_label": "\ud83d\udc1b fixed"
+    },
+    {
+      "label": "\ud83d\udce6 Install",
+      "file_type": "document",
+      "source_file": "docs/release/v1.6.0/short.md",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "v1_6_0_short_install",
+      "community": 62,
+      "norm_label": "\ud83d\udce6 install"
+    },
+    {
+      "label": "package.json",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "krust_studio_app_package",
+      "community": 41,
+      "norm_label": "package.json"
+    },
+    {
+      "label": "name",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_name",
+      "community": 41,
+      "norm_label": "name"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_version",
+      "community": 41,
+      "norm_label": "version"
+    },
+    {
+      "label": "description",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_description",
+      "community": 41,
+      "norm_label": "description"
+    },
+    {
+      "label": "packageManager",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_packagemanager",
+      "community": 41,
+      "norm_label": "packagemanager"
+    },
+    {
+      "label": "main",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_main",
+      "community": 41,
+      "norm_label": "main"
+    },
+    {
+      "label": "author",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_author",
+      "community": 41,
+      "norm_label": "author"
+    },
+    {
+      "label": "homepage",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_homepage",
+      "community": 41,
+      "norm_label": "homepage"
+    },
+    {
+      "label": "scripts",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts",
+      "community": 22,
+      "norm_label": "scripts"
+    },
+    {
+      "label": "format",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts_format",
+      "community": 22,
+      "norm_label": "format"
+    },
+    {
+      "label": "lint",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts_lint",
+      "community": 22,
+      "norm_label": "lint"
+    },
+    {
+      "label": "typecheck:node",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts_typecheck_node",
+      "community": 22,
+      "norm_label": "typecheck:node"
+    },
+    {
+      "label": "typecheck:web",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts_typecheck_web",
+      "community": 22,
+      "norm_label": "typecheck:web"
+    },
+    {
+      "label": "typecheck",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts_typecheck",
+      "community": 22,
+      "norm_label": "typecheck"
+    },
+    {
+      "label": "start",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts_start",
+      "community": 22,
+      "norm_label": "start"
+    },
+    {
+      "label": "dev",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts_dev",
+      "community": 22,
+      "norm_label": "dev"
+    },
+    {
+      "label": "build",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts_build",
+      "community": 22,
+      "norm_label": "build"
+    },
+    {
+      "label": "postinstall",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts_postinstall",
+      "community": 22,
+      "norm_label": "postinstall"
+    },
+    {
+      "label": "build:unpack",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts_build_unpack",
+      "community": 22,
+      "norm_label": "build:unpack"
+    },
+    {
+      "label": "icon",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts_icon",
+      "community": 22,
+      "norm_label": "icon"
+    },
+    {
+      "label": "build:win",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts_build_win",
+      "community": 22,
+      "norm_label": "build:win"
+    },
+    {
+      "label": "build:mac",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts_build_mac",
+      "community": 22,
+      "norm_label": "build:mac"
+    },
+    {
+      "label": "build:linux",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_scripts_build_linux",
+      "community": 22,
+      "norm_label": "build:linux"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies",
+      "community": 6,
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "@codemirror/autocomplete",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_codemirror_autocomplete",
+      "community": 6,
+      "norm_label": "@codemirror/autocomplete"
+    },
+    {
+      "label": "@codemirror/commands",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_codemirror_commands",
+      "community": 6,
+      "norm_label": "@codemirror/commands"
+    },
+    {
+      "label": "@codemirror/lang-sql",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L28",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_codemirror_lang_sql",
+      "community": 6,
+      "norm_label": "@codemirror/lang-sql"
+    },
+    {
+      "label": "@codemirror/language",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_codemirror_language",
+      "community": 6,
+      "norm_label": "@codemirror/language"
+    },
+    {
+      "label": "@codemirror/state",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_codemirror_state",
+      "community": 6,
+      "norm_label": "@codemirror/state"
+    },
+    {
+      "label": "@codemirror/view",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_codemirror_view",
+      "community": 6,
+      "norm_label": "@codemirror/view"
+    },
+    {
+      "label": "@electron-toolkit/preload",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_electron_toolkit_preload",
+      "community": 6,
+      "norm_label": "@electron-toolkit/preload"
+    },
+    {
+      "label": "@electron-toolkit/utils",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_electron_toolkit_utils",
+      "community": 6,
+      "norm_label": "@electron-toolkit/utils"
+    },
+    {
+      "label": "@hookform/resolvers",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_hookform_resolvers",
+      "community": 6,
+      "norm_label": "@hookform/resolvers"
+    },
+    {
+      "label": "@lezer/highlight",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_lezer_highlight",
+      "community": 6,
+      "norm_label": "@lezer/highlight"
+    },
+    {
+      "label": "@radix-ui/react-label",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_radix_ui_react_label",
+      "community": 6,
+      "norm_label": "@radix-ui/react-label"
+    },
+    {
+      "label": "@radix-ui/react-select",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L37",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_radix_ui_react_select",
+      "community": 6,
+      "norm_label": "@radix-ui/react-select"
+    },
+    {
+      "label": "@radix-ui/react-slot",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L38",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_radix_ui_react_slot",
+      "community": 6,
+      "norm_label": "@radix-ui/react-slot"
+    },
+    {
+      "label": "@tanstack/react-table",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L39",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_tanstack_react_table",
+      "community": 6,
+      "norm_label": "@tanstack/react-table"
+    },
+    {
+      "label": "@tanstack/react-virtual",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L40",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_tanstack_react_virtual",
+      "community": 6,
+      "norm_label": "@tanstack/react-virtual"
+    },
+    {
+      "label": "class-variance-authority",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L41",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_class_variance_authority",
+      "community": 6,
+      "norm_label": "class-variance-authority"
+    },
+    {
+      "label": "clsx",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L42",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_clsx",
+      "community": 6,
+      "norm_label": "clsx"
+    },
+    {
+      "label": "cmdk",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L43",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_cmdk",
+      "community": 6,
+      "norm_label": "cmdk"
+    },
+    {
+      "label": "codemirror",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_codemirror",
+      "community": 6,
+      "norm_label": "codemirror"
+    },
+    {
+      "label": "electron-updater",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L45",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_electron_updater",
+      "community": 6,
+      "norm_label": "electron-updater"
+    },
+    {
+      "label": "lucide-react",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L46",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_lucide_react",
+      "community": 6,
+      "norm_label": "lucide-react"
+    },
+    {
+      "label": "mysql2",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_mysql2",
+      "community": 6,
+      "norm_label": "mysql2"
+    },
+    {
+      "label": "next-themes",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L48",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_next_themes",
+      "community": 6,
+      "norm_label": "next-themes"
+    },
+    {
+      "label": "pg",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L49",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_pg",
+      "community": 6,
+      "norm_label": "pg"
+    },
+    {
+      "label": "radix-ui",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L50",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_radix_ui",
+      "community": 6,
+      "norm_label": "radix-ui"
+    },
+    {
+      "label": "react-hook-form",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L51",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_react_hook_form",
+      "community": 6,
+      "norm_label": "react-hook-form"
+    },
+    {
+      "label": "sonner",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L52",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_sonner",
+      "community": 6,
+      "norm_label": "sonner"
+    },
+    {
+      "label": "sql-formatter",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L53",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_sql_formatter",
+      "community": 6,
+      "norm_label": "sql-formatter"
+    },
+    {
+      "label": "tailwind-merge",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L54",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_tailwind_merge",
+      "community": 6,
+      "norm_label": "tailwind-merge"
+    },
+    {
+      "label": "zod",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L55",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_zod",
+      "community": 6,
+      "norm_label": "zod"
+    },
+    {
+      "label": "zustand",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L56",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_zustand",
+      "community": 6,
+      "norm_label": "zustand"
+    },
+    {
+      "label": "devDependencies",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L58",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies",
+      "community": 2,
+      "norm_label": "devdependencies"
+    },
+    {
+      "label": "@electron-toolkit/eslint-config-prettier",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L59",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_electron_toolkit_eslint_config_prettier",
+      "community": 2,
+      "norm_label": "@electron-toolkit/eslint-config-prettier"
+    },
+    {
+      "label": "@electron-toolkit/eslint-config-ts",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L60",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_electron_toolkit_eslint_config_ts",
+      "community": 2,
+      "norm_label": "@electron-toolkit/eslint-config-ts"
+    },
+    {
+      "label": "@electron-toolkit/tsconfig",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L61",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_electron_toolkit_tsconfig",
+      "community": 2,
+      "norm_label": "@electron-toolkit/tsconfig"
+    },
+    {
+      "label": "@tailwindcss/vite",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L62",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_tailwindcss_vite",
+      "community": 2,
+      "norm_label": "@tailwindcss/vite"
+    },
+    {
+      "label": "@types/node",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L63",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_types_node",
+      "community": 2,
+      "norm_label": "@types/node"
+    },
+    {
+      "label": "@types/pg",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L64",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_types_pg",
+      "community": 2,
+      "norm_label": "@types/pg"
+    },
+    {
+      "label": "@types/react",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L65",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_types_react",
+      "community": 2,
+      "norm_label": "@types/react"
+    },
+    {
+      "label": "@types/react-dom",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L66",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_types_react_dom",
+      "community": 2,
+      "norm_label": "@types/react-dom"
+    },
+    {
+      "label": "@vitejs/plugin-react",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L67",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_vitejs_plugin_react",
+      "community": 2,
+      "norm_label": "@vitejs/plugin-react"
+    },
+    {
+      "label": "electron",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L68",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_electron",
+      "community": 2,
+      "norm_label": "electron"
+    },
+    {
+      "label": "electron-builder",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L69",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_electron_builder",
+      "community": 2,
+      "norm_label": "electron-builder"
+    },
+    {
+      "label": "electron-vite",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L70",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_electron_vite",
+      "community": 2,
+      "norm_label": "electron-vite"
+    },
+    {
+      "label": "eslint",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L71",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_eslint",
+      "community": 2,
+      "norm_label": "eslint"
+    },
+    {
+      "label": "eslint-plugin-react",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L72",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_eslint_plugin_react",
+      "community": 2,
+      "norm_label": "eslint-plugin-react"
+    },
+    {
+      "label": "eslint-plugin-react-hooks",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L73",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_eslint_plugin_react_hooks",
+      "community": 2,
+      "norm_label": "eslint-plugin-react-hooks"
+    },
+    {
+      "label": "eslint-plugin-react-refresh",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L74",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_eslint_plugin_react_refresh",
+      "community": 2,
+      "norm_label": "eslint-plugin-react-refresh"
+    },
+    {
+      "label": "icon-gen",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L75",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_icon_gen",
+      "community": 2,
+      "norm_label": "icon-gen"
+    },
+    {
+      "label": "prettier",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L76",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_prettier",
+      "community": 2,
+      "norm_label": "prettier"
+    },
+    {
+      "label": "react",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L77",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_react",
+      "community": 2,
+      "norm_label": "react"
+    },
+    {
+      "label": "react-dom",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L78",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_react_dom",
+      "community": 2,
+      "norm_label": "react-dom"
+    },
+    {
+      "label": "sharp",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L79",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_sharp",
+      "community": 2,
+      "norm_label": "sharp"
+    },
+    {
+      "label": "tailwindcss",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L80",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_tailwindcss",
+      "community": 2,
+      "norm_label": "tailwindcss"
+    },
+    {
+      "label": "tw-animate-css",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L81",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_tw_animate_css",
+      "community": 2,
+      "norm_label": "tw-animate-css"
+    },
+    {
+      "label": "typescript",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L82",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_typescript",
+      "community": 2,
+      "norm_label": "typescript"
+    },
+    {
+      "label": "vite",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L83",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_devdependencies_vite",
+      "community": 2,
+      "norm_label": "vite"
+    },
+    {
       "label": "components.json",
       "file_type": "code",
       "source_file": "krust-studio-app/components.json",
@@ -330,816 +1640,6 @@
       "id": "krust_studio_app_gen_icon_src"
     },
     {
-      "label": "package.json",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 41,
-      "norm_label": "package.json",
-      "id": "krust_studio_app_package"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L2",
-      "_origin": "ast",
-      "community": 41,
-      "norm_label": "name",
-      "id": "krust_studio_app_package_name"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L3",
-      "_origin": "ast",
-      "community": 41,
-      "norm_label": "version",
-      "id": "krust_studio_app_package_version"
-    },
-    {
-      "label": "description",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L4",
-      "_origin": "ast",
-      "community": 41,
-      "norm_label": "description",
-      "id": "krust_studio_app_package_description"
-    },
-    {
-      "label": "packageManager",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L5",
-      "_origin": "ast",
-      "community": 41,
-      "norm_label": "packagemanager",
-      "id": "krust_studio_app_package_packagemanager"
-    },
-    {
-      "label": "main",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L6",
-      "_origin": "ast",
-      "community": 41,
-      "norm_label": "main",
-      "id": "krust_studio_app_package_main"
-    },
-    {
-      "label": "author",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L7",
-      "_origin": "ast",
-      "community": 41,
-      "norm_label": "author",
-      "id": "krust_studio_app_package_author"
-    },
-    {
-      "label": "homepage",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L8",
-      "_origin": "ast",
-      "community": 41,
-      "norm_label": "homepage",
-      "id": "krust_studio_app_package_homepage"
-    },
-    {
-      "label": "scripts",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L9",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "scripts",
-      "id": "krust_studio_app_package_scripts"
-    },
-    {
-      "label": "format",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L10",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "format",
-      "id": "krust_studio_app_package_scripts_format"
-    },
-    {
-      "label": "lint",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L11",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "lint",
-      "id": "krust_studio_app_package_scripts_lint"
-    },
-    {
-      "label": "typecheck:node",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L12",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "typecheck:node",
-      "id": "krust_studio_app_package_scripts_typecheck_node"
-    },
-    {
-      "label": "typecheck:web",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L13",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "typecheck:web",
-      "id": "krust_studio_app_package_scripts_typecheck_web"
-    },
-    {
-      "label": "typecheck",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L14",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "typecheck",
-      "id": "krust_studio_app_package_scripts_typecheck"
-    },
-    {
-      "label": "start",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L15",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "start",
-      "id": "krust_studio_app_package_scripts_start"
-    },
-    {
-      "label": "dev",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L16",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "dev",
-      "id": "krust_studio_app_package_scripts_dev"
-    },
-    {
-      "label": "build",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L17",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "build",
-      "id": "krust_studio_app_package_scripts_build"
-    },
-    {
-      "label": "postinstall",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L18",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "postinstall",
-      "id": "krust_studio_app_package_scripts_postinstall"
-    },
-    {
-      "label": "build:unpack",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L19",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "build:unpack",
-      "id": "krust_studio_app_package_scripts_build_unpack"
-    },
-    {
-      "label": "icon",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L20",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "icon",
-      "id": "krust_studio_app_package_scripts_icon"
-    },
-    {
-      "label": "build:win",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L21",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "build:win",
-      "id": "krust_studio_app_package_scripts_build_win"
-    },
-    {
-      "label": "build:mac",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L22",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "build:mac",
-      "id": "krust_studio_app_package_scripts_build_mac"
-    },
-    {
-      "label": "build:linux",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L23",
-      "_origin": "ast",
-      "community": 22,
-      "norm_label": "build:linux",
-      "id": "krust_studio_app_package_scripts_build_linux"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L25",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "dependencies",
-      "id": "krust_studio_app_package_dependencies"
-    },
-    {
-      "label": "@codemirror/autocomplete",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L26",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@codemirror/autocomplete",
-      "id": "krust_studio_app_package_dependencies_codemirror_autocomplete"
-    },
-    {
-      "label": "@codemirror/commands",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L27",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@codemirror/commands",
-      "id": "krust_studio_app_package_dependencies_codemirror_commands"
-    },
-    {
-      "label": "@codemirror/lang-sql",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L28",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@codemirror/lang-sql",
-      "id": "krust_studio_app_package_dependencies_codemirror_lang_sql"
-    },
-    {
-      "label": "@codemirror/language",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L29",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@codemirror/language",
-      "id": "krust_studio_app_package_dependencies_codemirror_language"
-    },
-    {
-      "label": "@codemirror/state",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L30",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@codemirror/state",
-      "id": "krust_studio_app_package_dependencies_codemirror_state"
-    },
-    {
-      "label": "@codemirror/view",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L31",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@codemirror/view",
-      "id": "krust_studio_app_package_dependencies_codemirror_view"
-    },
-    {
-      "label": "@electron-toolkit/preload",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L32",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@electron-toolkit/preload",
-      "id": "krust_studio_app_package_dependencies_electron_toolkit_preload"
-    },
-    {
-      "label": "@electron-toolkit/utils",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L33",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@electron-toolkit/utils",
-      "id": "krust_studio_app_package_dependencies_electron_toolkit_utils"
-    },
-    {
-      "label": "@hookform/resolvers",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L34",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@hookform/resolvers",
-      "id": "krust_studio_app_package_dependencies_hookform_resolvers"
-    },
-    {
-      "label": "@lezer/highlight",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L35",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@lezer/highlight",
-      "id": "krust_studio_app_package_dependencies_lezer_highlight"
-    },
-    {
-      "label": "@radix-ui/react-label",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L36",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@radix-ui/react-label",
-      "id": "krust_studio_app_package_dependencies_radix_ui_react_label"
-    },
-    {
-      "label": "@radix-ui/react-select",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L37",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@radix-ui/react-select",
-      "id": "krust_studio_app_package_dependencies_radix_ui_react_select"
-    },
-    {
-      "label": "@radix-ui/react-slot",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L38",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@radix-ui/react-slot",
-      "id": "krust_studio_app_package_dependencies_radix_ui_react_slot"
-    },
-    {
-      "label": "@tanstack/react-table",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L39",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@tanstack/react-table",
-      "id": "krust_studio_app_package_dependencies_tanstack_react_table"
-    },
-    {
-      "label": "@tanstack/react-virtual",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L40",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "@tanstack/react-virtual",
-      "id": "krust_studio_app_package_dependencies_tanstack_react_virtual"
-    },
-    {
-      "label": "class-variance-authority",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L41",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "class-variance-authority",
-      "id": "krust_studio_app_package_dependencies_class_variance_authority"
-    },
-    {
-      "label": "clsx",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L42",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "clsx",
-      "id": "krust_studio_app_package_dependencies_clsx"
-    },
-    {
-      "label": "cmdk",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L43",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "cmdk",
-      "id": "krust_studio_app_package_dependencies_cmdk"
-    },
-    {
-      "label": "codemirror",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L44",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "codemirror",
-      "id": "krust_studio_app_package_dependencies_codemirror"
-    },
-    {
-      "label": "electron-updater",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L45",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "electron-updater",
-      "id": "krust_studio_app_package_dependencies_electron_updater"
-    },
-    {
-      "label": "lucide-react",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L46",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "lucide-react",
-      "id": "krust_studio_app_package_dependencies_lucide_react"
-    },
-    {
-      "label": "mysql2",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L47",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "mysql2",
-      "id": "krust_studio_app_package_dependencies_mysql2"
-    },
-    {
-      "label": "next-themes",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L48",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "next-themes",
-      "id": "krust_studio_app_package_dependencies_next_themes"
-    },
-    {
-      "label": "pg",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L49",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "pg",
-      "id": "krust_studio_app_package_dependencies_pg"
-    },
-    {
-      "label": "radix-ui",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L50",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "radix-ui",
-      "id": "krust_studio_app_package_dependencies_radix_ui"
-    },
-    {
-      "label": "react-hook-form",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L51",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "react-hook-form",
-      "id": "krust_studio_app_package_dependencies_react_hook_form"
-    },
-    {
-      "label": "sonner",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L52",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "sonner",
-      "id": "krust_studio_app_package_dependencies_sonner"
-    },
-    {
-      "label": "sql-formatter",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L53",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "sql-formatter",
-      "id": "krust_studio_app_package_dependencies_sql_formatter"
-    },
-    {
-      "label": "tailwind-merge",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L54",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "tailwind-merge",
-      "id": "krust_studio_app_package_dependencies_tailwind_merge"
-    },
-    {
-      "label": "zod",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L55",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "zod",
-      "id": "krust_studio_app_package_dependencies_zod"
-    },
-    {
-      "label": "zustand",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L56",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "zustand",
-      "id": "krust_studio_app_package_dependencies_zustand"
-    },
-    {
-      "label": "devDependencies",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L58",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "devdependencies",
-      "id": "krust_studio_app_package_devdependencies"
-    },
-    {
-      "label": "@electron-toolkit/eslint-config-prettier",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L59",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "@electron-toolkit/eslint-config-prettier",
-      "id": "krust_studio_app_package_devdependencies_electron_toolkit_eslint_config_prettier"
-    },
-    {
-      "label": "@electron-toolkit/eslint-config-ts",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L60",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "@electron-toolkit/eslint-config-ts",
-      "id": "krust_studio_app_package_devdependencies_electron_toolkit_eslint_config_ts"
-    },
-    {
-      "label": "@electron-toolkit/tsconfig",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L61",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "@electron-toolkit/tsconfig",
-      "id": "krust_studio_app_package_devdependencies_electron_toolkit_tsconfig"
-    },
-    {
-      "label": "@tailwindcss/vite",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L62",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "@tailwindcss/vite",
-      "id": "krust_studio_app_package_devdependencies_tailwindcss_vite"
-    },
-    {
-      "label": "@types/node",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L63",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "@types/node",
-      "id": "krust_studio_app_package_devdependencies_types_node"
-    },
-    {
-      "label": "@types/pg",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L64",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "@types/pg",
-      "id": "krust_studio_app_package_devdependencies_types_pg"
-    },
-    {
-      "label": "@types/react",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L65",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "@types/react",
-      "id": "krust_studio_app_package_devdependencies_types_react"
-    },
-    {
-      "label": "@types/react-dom",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L66",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "@types/react-dom",
-      "id": "krust_studio_app_package_devdependencies_types_react_dom"
-    },
-    {
-      "label": "@vitejs/plugin-react",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L67",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "@vitejs/plugin-react",
-      "id": "krust_studio_app_package_devdependencies_vitejs_plugin_react"
-    },
-    {
-      "label": "electron",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L68",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "electron",
-      "id": "krust_studio_app_package_devdependencies_electron"
-    },
-    {
-      "label": "electron-builder",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L69",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "electron-builder",
-      "id": "krust_studio_app_package_devdependencies_electron_builder"
-    },
-    {
-      "label": "electron-vite",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L70",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "electron-vite",
-      "id": "krust_studio_app_package_devdependencies_electron_vite"
-    },
-    {
-      "label": "eslint",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L71",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "eslint",
-      "id": "krust_studio_app_package_devdependencies_eslint"
-    },
-    {
-      "label": "eslint-plugin-react",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L72",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "eslint-plugin-react",
-      "id": "krust_studio_app_package_devdependencies_eslint_plugin_react"
-    },
-    {
-      "label": "eslint-plugin-react-hooks",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L73",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "eslint-plugin-react-hooks",
-      "id": "krust_studio_app_package_devdependencies_eslint_plugin_react_hooks"
-    },
-    {
-      "label": "eslint-plugin-react-refresh",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L74",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "eslint-plugin-react-refresh",
-      "id": "krust_studio_app_package_devdependencies_eslint_plugin_react_refresh"
-    },
-    {
-      "label": "icon-gen",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L75",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "icon-gen",
-      "id": "krust_studio_app_package_devdependencies_icon_gen"
-    },
-    {
-      "label": "prettier",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L76",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "prettier",
-      "id": "krust_studio_app_package_devdependencies_prettier"
-    },
-    {
-      "label": "react",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L77",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "react",
-      "id": "krust_studio_app_package_devdependencies_react"
-    },
-    {
-      "label": "react-dom",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L78",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "react-dom",
-      "id": "krust_studio_app_package_devdependencies_react_dom"
-    },
-    {
-      "label": "sharp",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L79",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "sharp",
-      "id": "krust_studio_app_package_devdependencies_sharp"
-    },
-    {
-      "label": "tailwindcss",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L80",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "tailwindcss",
-      "id": "krust_studio_app_package_devdependencies_tailwindcss"
-    },
-    {
-      "label": "tw-animate-css",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L81",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "tw-animate-css",
-      "id": "krust_studio_app_package_devdependencies_tw_animate_css"
-    },
-    {
-      "label": "typescript",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L82",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "typescript",
-      "id": "krust_studio_app_package_devdependencies_typescript"
-    },
-    {
-      "label": "vite",
-      "file_type": "code",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L83",
-      "_origin": "ast",
-      "community": 2,
-      "norm_label": "vite",
-      "id": "krust_studio_app_package_devdependencies_vite"
-    },
-    {
       "label": "backup.ts",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/backup.ts",
@@ -1255,7 +1755,7 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L28",
       "_origin": "ast",
-      "community": 8,
+      "community": 23,
       "norm_label": "dbdriver",
       "id": "db_driver_dbdriver"
     },
@@ -1285,7 +1785,7 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L185",
       "_origin": "ast",
-      "community": 5,
+      "community": 8,
       "norm_label": "defaultindexname()",
       "id": "db_driver_defaultindexname"
     },
@@ -1295,7 +1795,7 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L190",
       "_origin": "ast",
-      "community": 5,
+      "community": 27,
       "norm_label": "buildcreatetable()",
       "id": "db_driver_buildcreatetable"
     },
@@ -1315,7 +1815,7 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L245",
       "_origin": "ast",
-      "community": 5,
+      "community": 23,
       "norm_label": "fkactionclause()",
       "id": "db_driver_fkactionclause"
     },
@@ -1435,7 +1935,7 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L519",
       "_origin": "ast",
-      "community": 76,
+      "community": 27,
       "norm_label": "driverdeps",
       "id": "db_driver_driverdeps"
     },
@@ -1515,7 +2015,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/mysql.ts",
       "source_location": "L127",
       "_origin": "ast",
-      "community": 76,
+      "community": 27,
       "norm_label": ".constructor()",
       "id": "drivers_mysql_mysqldriver_constructor"
     },
@@ -1585,7 +2085,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/mysql.ts",
       "source_location": "L200",
       "_origin": "ast",
-      "community": 13,
+      "community": 23,
       "norm_label": ".listenums()",
       "id": "drivers_mysql_mysqldriver_listenums"
     },
@@ -1665,7 +2165,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/mysql.ts",
       "source_location": "L500",
       "_origin": "ast",
-      "community": 13,
+      "community": 27,
       "norm_label": ".createtable()",
       "id": "drivers_mysql_mysqldriver_createtable"
     },
@@ -1745,7 +2245,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/postgres.ts",
       "source_location": "L69",
       "_origin": "ast",
-      "community": 23,
+      "community": 5,
       "norm_label": "quoteident()",
       "id": "drivers_postgres_quoteident"
     },
@@ -1775,7 +2275,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/postgres.ts",
       "source_location": "L89",
       "_origin": "ast",
-      "community": 76,
+      "community": 27,
       "norm_label": ".constructor()",
       "id": "drivers_postgres_postgresdriver_constructor"
     },
@@ -1865,7 +2365,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/postgres.ts",
       "source_location": "L268",
       "_origin": "ast",
-      "community": 23,
+      "community": 17,
       "norm_label": ".countrows()",
       "id": "drivers_postgres_postgresdriver_countrows"
     },
@@ -1875,7 +2375,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/postgres.ts",
       "source_location": "L281",
       "_origin": "ast",
-      "community": 23,
+      "community": 5,
       "norm_label": ".searchrows()",
       "id": "drivers_postgres_postgresdriver_searchrows"
     },
@@ -1935,7 +2435,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 5,
+      "community": 17,
       "norm_label": "sqlite.ts",
       "id": "drivers_sqlite"
     },
@@ -1955,7 +2455,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L45",
       "_origin": "ast",
-      "community": 5,
+      "community": 11,
       "norm_label": "sqliteplannode()",
       "id": "drivers_sqlite_sqliteplannode"
     },
@@ -1975,7 +2475,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L68",
       "_origin": "ast",
-      "community": 76,
+      "community": 27,
       "norm_label": ".constructor()",
       "id": "drivers_sqlite_sqlitedriver_constructor"
     },
@@ -2025,7 +2525,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L96",
       "_origin": "ast",
-      "community": 5,
+      "community": 23,
       "norm_label": ".listentities()",
       "id": "drivers_sqlite_sqlitedriver_listentities"
     },
@@ -2035,7 +2535,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L111",
       "_origin": "ast",
-      "community": 8,
+      "community": 23,
       "norm_label": ".listenums()",
       "id": "drivers_sqlite_sqlitedriver_listenums"
     },
@@ -2065,7 +2565,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L177",
       "_origin": "ast",
-      "community": 8,
+      "community": 5,
       "norm_label": ".searchrows()",
       "id": "drivers_sqlite_sqlitedriver_searchrows"
     },
@@ -2085,7 +2585,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L252",
       "_origin": "ast",
-      "community": 8,
+      "community": 13,
       "norm_label": ".describetable()",
       "id": "drivers_sqlite_sqlitedriver_describetable"
     },
@@ -2125,7 +2625,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L388",
       "_origin": "ast",
-      "community": 5,
+      "community": 27,
       "norm_label": ".createtable()",
       "id": "drivers_sqlite_sqlitedriver_createtable"
     },
@@ -2225,7 +2725,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L516",
       "_origin": "ast",
-      "community": 5,
+      "community": 11,
       "norm_label": ".explainquery()",
       "id": "drivers_sqlite_sqlitedriver_explainquery"
     },
@@ -2675,7 +3175,7 @@
       "source_file": "krust-studio-app/src/main/db/test-connection.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 60,
+      "community": 26,
       "norm_label": "test-connection.ts",
       "id": "db_test_connection"
     },
@@ -2685,7 +3185,7 @@
       "source_file": "krust-studio-app/src/main/db/test-connection.ts",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 60,
+      "community": 26,
       "norm_label": "testmysql()",
       "id": "db_test_connection_testmysql"
     },
@@ -2695,7 +3195,7 @@
       "source_file": "krust-studio-app/src/main/db/test-connection.ts",
       "source_location": "L32",
       "_origin": "ast",
-      "community": 60,
+      "community": 26,
       "norm_label": "testpostgres()",
       "id": "db_test_connection_testpostgres"
     },
@@ -2705,7 +3205,7 @@
       "source_file": "krust-studio-app/src/main/db/test-connection.ts",
       "source_location": "L57",
       "_origin": "ast",
-      "community": 60,
+      "community": 26,
       "norm_label": "testsqlite()",
       "id": "db_test_connection_testsqlite"
     },
@@ -2715,7 +3215,7 @@
       "source_file": "krust-studio-app/src/main/db/test-connection.ts",
       "source_location": "L77",
       "_origin": "ast",
-      "community": 60,
+      "community": 26,
       "norm_label": "testconnection()",
       "id": "db_test_connection_testconnection"
     },
@@ -3295,7 +3795,7 @@
       "source_file": "krust-studio-app/src/renderer/src/App.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 108,
       "norm_label": "app.tsx",
       "id": "src_app"
     },
@@ -3305,7 +3805,7 @@
       "source_file": "krust-studio-app/src/renderer/src/App.tsx",
       "source_location": "L20",
       "_origin": "ast",
-      "community": 1,
+      "community": 108,
       "norm_label": "app()",
       "id": "src_app_app"
     },
@@ -3445,7 +3945,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ColumnsEditor.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 28,
+      "community": 35,
       "norm_label": "columnseditor.tsx",
       "id": "components_columnseditor"
     },
@@ -3455,7 +3955,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ColumnsEditor.tsx",
       "source_location": "L31",
       "_origin": "ast",
-      "community": 28,
+      "community": 35,
       "norm_label": "editorcolumn",
       "id": "components_columnseditor_editorcolumn"
     },
@@ -3465,7 +3965,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ColumnsEditor.tsx",
       "source_location": "L40",
       "_origin": "ast",
-      "community": 28,
+      "community": 35,
       "norm_label": "rowchanged()",
       "id": "components_columnseditor_rowchanged"
     },
@@ -3475,7 +3975,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ColumnsEditor.tsx",
       "source_location": "L61",
       "_origin": "ast",
-      "community": 28,
+      "community": 35,
       "norm_label": "fk_actions",
       "id": "components_columnseditor_fk_actions"
     },
@@ -3485,7 +3985,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ColumnsEditor.tsx",
       "source_location": "L65",
       "_origin": "ast",
-      "community": 28,
+      "community": 35,
       "norm_label": "columnseditor()",
       "id": "components_columnseditor_columnseditor"
     },
@@ -3495,7 +3995,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/CommandPalette.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 3,
+      "community": 40,
       "norm_label": "commandpalette.tsx",
       "id": "components_commandpalette"
     },
@@ -3505,7 +4005,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/CommandPalette.tsx",
       "source_location": "L23",
       "_origin": "ast",
-      "community": 3,
+      "community": 40,
       "norm_label": "commandpalette()",
       "id": "components_commandpalette_commandpalette"
     },
@@ -3605,7 +4105,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ConnectionSwitcher.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 60,
       "norm_label": "connectionswitcher.tsx",
       "id": "components_connectionswitcher"
     },
@@ -3615,7 +4115,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ConnectionSwitcher.tsx",
       "source_location": "L15",
       "_origin": "ast",
-      "community": 1,
+      "community": 60,
       "norm_label": "driver_label",
       "id": "components_connectionswitcher_driver_label"
     },
@@ -3625,7 +4125,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ConnectionSwitcher.tsx",
       "source_location": "L21",
       "_origin": "ast",
-      "community": 1,
+      "community": 60,
       "norm_label": "statusdot()",
       "id": "components_connectionswitcher_statusdot"
     },
@@ -3635,7 +4135,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ConnectionSwitcher.tsx",
       "source_location": "L38",
       "_origin": "ast",
-      "community": 1,
+      "community": 60,
       "norm_label": "connectionswitcher()",
       "id": "components_connectionswitcher_connectionswitcher"
     },
@@ -3685,7 +4185,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/DatabaseSwitcher.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 28,
       "norm_label": "databaseswitcher.tsx",
       "id": "components_databaseswitcher"
     },
@@ -3695,7 +4195,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/DatabaseSwitcher.tsx",
       "source_location": "L18",
       "_origin": "ast",
-      "community": 1,
+      "community": 28,
       "norm_label": "databaseswitcher()",
       "id": "components_databaseswitcher_databaseswitcher"
     },
@@ -3705,7 +4205,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ExportDialog.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "exportdialog.tsx",
       "id": "components_exportdialog"
     },
@@ -3715,7 +4215,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ExportDialog.tsx",
       "source_location": "L15",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "data",
       "id": "components_exportdialog_data"
     },
@@ -3725,7 +4225,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ExportDialog.tsx",
       "source_location": "L16",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "scope",
       "id": "components_exportdialog_scope"
     },
@@ -3735,7 +4235,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ExportDialog.tsx",
       "source_location": "L17",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "format",
       "id": "components_exportdialog_format"
     },
@@ -3745,7 +4245,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ExportDialog.tsx",
       "source_location": "L19",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "props",
       "id": "components_exportdialog_props"
     },
@@ -3755,7 +4255,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ExportDialog.tsx",
       "source_location": "L28",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "exportdialog()",
       "id": "components_exportdialog_exportdialog"
     },
@@ -3765,7 +4265,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/FilterBar.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 3,
+      "community": 40,
       "norm_label": "filterbar.tsx",
       "id": "components_filterbar"
     },
@@ -3775,7 +4275,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/FilterBar.tsx",
       "source_location": "L15",
       "_origin": "ast",
-      "community": 3,
+      "community": 40,
       "norm_label": "ops",
       "id": "components_filterbar_ops"
     },
@@ -3785,7 +4285,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/FilterBar.tsx",
       "source_location": "L30",
       "_origin": "ast",
-      "community": 3,
+      "community": 40,
       "norm_label": "opneedsvalue()",
       "id": "components_filterbar_opneedsvalue"
     },
@@ -3795,7 +4295,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/FilterBar.tsx",
       "source_location": "L34",
       "_origin": "ast",
-      "community": 3,
+      "community": 40,
       "norm_label": "row",
       "id": "components_filterbar_row"
     },
@@ -3805,7 +4305,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/FilterBar.tsx",
       "source_location": "L35",
       "_origin": "ast",
-      "community": 3,
+      "community": 40,
       "norm_label": "group",
       "id": "components_filterbar_group"
     },
@@ -3815,7 +4315,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/FilterBar.tsx",
       "source_location": "L38",
       "_origin": "ast",
-      "community": 3,
+      "community": 40,
       "norm_label": "seed()",
       "id": "components_filterbar_seed"
     },
@@ -3825,7 +4325,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/FilterBar.tsx",
       "source_location": "L59",
       "_origin": "ast",
-      "community": 3,
+      "community": 40,
       "norm_label": "flatten()",
       "id": "components_filterbar_flatten"
     },
@@ -3835,7 +4335,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/FilterBar.tsx",
       "source_location": "L78",
       "_origin": "ast",
-      "community": 3,
+      "community": 40,
       "norm_label": "andor()",
       "id": "components_filterbar_andor"
     },
@@ -3845,7 +4345,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/FilterBar.tsx",
       "source_location": "L96",
       "_origin": "ast",
-      "community": 3,
+      "community": 40,
       "norm_label": "filterbar()",
       "id": "components_filterbar_filterbar"
     },
@@ -3885,7 +4385,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/FkInlinePicker.tsx",
       "source_location": "L52",
       "_origin": "ast",
-      "community": 17,
+      "community": 7,
       "norm_label": "fkinlinepicker()",
       "id": "components_fkinlinepicker_fkinlinepicker"
     },
@@ -3895,7 +4395,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 39,
       "norm_label": "historyview.tsx",
       "id": "components_historyview"
     },
@@ -3905,7 +4405,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L49",
       "_origin": "ast",
-      "community": 1,
+      "community": 39,
       "norm_label": "view",
       "id": "components_historyview_view"
     },
@@ -3915,7 +4415,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L54",
       "_origin": "ast",
-      "community": 1,
+      "community": 39,
       "norm_label": "when()",
       "id": "components_historyview_when"
     },
@@ -3925,7 +4425,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L57",
       "_origin": "ast",
-      "community": 1,
+      "community": 39,
       "norm_label": "withsemi()",
       "id": "components_historyview_withsemi"
     },
@@ -3935,7 +4435,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L61",
       "_origin": "ast",
-      "community": 1,
+      "community": 39,
       "norm_label": "oneline()",
       "id": "components_historyview_oneline"
     },
@@ -3945,7 +4445,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L63",
       "_origin": "ast",
-      "community": 1,
+      "community": 39,
       "norm_label": "fmtlang()",
       "id": "components_historyview_fmtlang"
     },
@@ -3955,7 +4455,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L67",
       "_origin": "ast",
-      "community": 1,
+      "community": 39,
       "norm_label": "tryformat()",
       "id": "components_historyview_tryformat"
     },
@@ -3965,7 +4465,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L76",
       "_origin": "ast",
-      "community": 1,
+      "community": 39,
       "norm_label": "historyview()",
       "id": "components_historyview_historyview"
     },
@@ -4315,7 +4815,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/StructureView.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 15,
       "norm_label": "structureview.tsx",
       "id": "components_structureview"
     },
@@ -4325,7 +4825,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/StructureView.tsx",
       "source_location": "L58",
       "_origin": "ast",
-      "community": 1,
+      "community": 15,
       "norm_label": "subs",
       "id": "components_structureview_subs"
     },
@@ -4335,7 +4835,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/StructureView.tsx",
       "source_location": "L59",
       "_origin": "ast",
-      "community": 1,
+      "community": 15,
       "norm_label": "sub_label",
       "id": "components_structureview_sub_label"
     },
@@ -4345,7 +4845,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/StructureView.tsx",
       "source_location": "L70",
       "_origin": "ast",
-      "community": 1,
+      "community": 15,
       "norm_label": "index_methods",
       "id": "components_structureview_index_methods"
     },
@@ -4355,7 +4855,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/StructureView.tsx",
       "source_location": "L76",
       "_origin": "ast",
-      "community": 1,
+      "community": 15,
       "norm_label": "mysql_hash_engines",
       "id": "components_structureview_mysql_hash_engines"
     },
@@ -4365,7 +4865,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/StructureView.tsx",
       "source_location": "L79",
       "_origin": "ast",
-      "community": 1,
+      "community": 15,
       "norm_label": "methoddisabledreason()",
       "id": "components_structureview_methoddisabledreason"
     },
@@ -4375,7 +4875,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/StructureView.tsx",
       "source_location": "L92",
       "_origin": "ast",
-      "community": 1,
+      "community": 15,
       "norm_label": "method_desc",
       "id": "components_structureview_method_desc"
     },
@@ -4385,7 +4885,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/StructureView.tsx",
       "source_location": "L102",
       "_origin": "ast",
-      "community": 1,
+      "community": 15,
       "norm_label": "th()",
       "id": "components_structureview_th"
     },
@@ -4395,7 +4895,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/StructureView.tsx",
       "source_location": "L107",
       "_origin": "ast",
-      "community": 1,
+      "community": 15,
       "norm_label": "empty_cols",
       "id": "components_structureview_empty_cols"
     },
@@ -4405,7 +4905,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/StructureView.tsx",
       "source_location": "L108",
       "_origin": "ast",
-      "community": 1,
+      "community": 15,
       "norm_label": "empty_adds",
       "id": "components_structureview_empty_adds"
     },
@@ -4415,7 +4915,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/StructureView.tsx",
       "source_location": "L110",
       "_origin": "ast",
-      "community": 1,
+      "community": 15,
       "norm_label": "structureview()",
       "id": "components_structureview_structureview"
     },
@@ -4425,7 +4925,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/TabBar.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 76,
       "norm_label": "tabbar.tsx",
       "id": "components_tabbar"
     },
@@ -4435,7 +4935,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/TabBar.tsx",
       "source_location": "L31",
       "_origin": "ast",
-      "community": 1,
+      "community": 76,
       "norm_label": "tabicon()",
       "id": "components_tabbar_tabicon"
     },
@@ -4445,7 +4945,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/TabBar.tsx",
       "source_location": "L38",
       "_origin": "ast",
-      "community": 1,
+      "community": 76,
       "norm_label": "tabbar()",
       "id": "components_tabbar_tabbar"
     },
@@ -4465,7 +4965,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/TableTabView.tsx",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 1,
+      "community": 28,
       "norm_label": "tabletabview()",
       "id": "components_tabletabview_tabletabview"
     },
@@ -4475,7 +4975,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/TemplateManager.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 29,
+      "community": 3,
       "norm_label": "templatemanager.tsx",
       "id": "components_templatemanager"
     },
@@ -4485,7 +4985,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/TemplateManager.tsx",
       "source_location": "L18",
       "_origin": "ast",
-      "community": 29,
+      "community": 3,
       "norm_label": "types",
       "id": "components_templatemanager_types"
     },
@@ -4495,7 +4995,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/TemplateManager.tsx",
       "source_location": "L24",
       "_origin": "ast",
-      "community": 29,
+      "community": 3,
       "norm_label": "props",
       "id": "components_templatemanager_props"
     },
@@ -4505,7 +5005,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/TemplateManager.tsx",
       "source_location": "L31",
       "_origin": "ast",
-      "community": 29,
+      "community": 3,
       "norm_label": "editing",
       "id": "components_templatemanager_editing"
     },
@@ -4515,7 +5015,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/TemplateManager.tsx",
       "source_location": "L33",
       "_origin": "ast",
-      "community": 29,
+      "community": 3,
       "norm_label": "default_cols",
       "id": "components_templatemanager_default_cols"
     },
@@ -4525,7 +5025,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/TemplateManager.tsx",
       "source_location": "L35",
       "_origin": "ast",
-      "community": 29,
+      "community": 3,
       "norm_label": "templatemanager()",
       "id": "components_templatemanager_templatemanager"
     },
@@ -4575,7 +5075,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ViewSwitch.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 28,
       "norm_label": "viewswitch.tsx",
       "id": "components_viewswitch"
     },
@@ -4585,7 +5085,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ViewSwitch.tsx",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 1,
+      "community": 28,
       "norm_label": "views",
       "id": "components_viewswitch_views"
     },
@@ -4595,7 +5095,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ViewSwitch.tsx",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 1,
+      "community": 28,
       "norm_label": "viewswitch()",
       "id": "components_viewswitch_viewswitch"
     },
@@ -6305,7 +6805,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/export.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 62,
+      "community": 40,
       "norm_label": "export.ts",
       "id": "lib_export"
     },
@@ -6315,7 +6815,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/export.ts",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 62,
+      "community": 40,
       "norm_label": "row",
       "id": "lib_export_row"
     },
@@ -6325,7 +6825,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/export.ts",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 62,
+      "community": 40,
       "norm_label": "scalar()",
       "id": "lib_export_scalar"
     },
@@ -6335,7 +6835,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/export.ts",
       "source_location": "L13",
       "_origin": "ast",
-      "community": 62,
+      "community": 40,
       "norm_label": "tocsv()",
       "id": "lib_export_tocsv"
     },
@@ -6345,7 +6845,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/export.ts",
       "source_location": "L24",
       "_origin": "ast",
-      "community": 62,
+      "community": 40,
       "norm_label": "tojson()",
       "id": "lib_export_tojson"
     },
@@ -6355,7 +6855,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/export.ts",
       "source_location": "L33",
       "_origin": "ast",
-      "community": 62,
+      "community": 40,
       "norm_label": "formatrows()",
       "id": "lib_export_formatrows"
     },
@@ -6495,7 +6995,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/templates.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 29,
+      "community": 11,
       "norm_label": "templates.ts",
       "id": "lib_templates"
     },
@@ -6505,7 +7005,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/templates.ts",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 29,
+      "community": 11,
       "norm_label": "templatetodraftcolumns()",
       "id": "lib_templates_templatetodraftcolumns"
     },
@@ -6515,7 +7015,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/templates.ts",
       "source_location": "L15",
       "_origin": "ast",
-      "community": 29,
+      "community": 11,
       "norm_label": "inserttemplatecolumns()",
       "id": "lib_templates_inserttemplatecolumns"
     },
@@ -6545,7 +7045,7 @@
       "source_file": "krust-studio-app/src/renderer/src/main.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 108,
       "norm_label": "main.tsx",
       "id": "src_main"
     },
@@ -6555,7 +7055,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "connections.ts",
       "id": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections"
     },
@@ -6565,7 +7065,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L28",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "querystate",
       "id": "store_connections_querystate"
     },
@@ -6575,7 +7075,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L40",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "tabview",
       "id": "store_connections_tabview"
     },
@@ -6585,7 +7085,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L41",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "structuresub",
       "id": "store_connections_structuresub"
     },
@@ -6595,7 +7095,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L45",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "sessionstatus",
       "id": "store_connections_sessionstatus"
     },
@@ -6615,7 +7115,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L112",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "tabhasdatachanges()",
       "id": "store_connections_tabhasdatachanges"
     },
@@ -6625,7 +7125,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L121",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "tabhasdraftcontent()",
       "id": "store_connections_tabhasdraftcontent"
     },
@@ -6635,7 +7135,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L132",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "tabisdirty()",
       "id": "store_connections_tabisdirty"
     },
@@ -6645,7 +7145,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L136",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "editkey()",
       "id": "store_connections_editkey"
     },
@@ -6655,7 +7155,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L140",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "entitykey()",
       "id": "store_connections_entitykey"
     },
@@ -6665,7 +7165,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L144",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "connectionsstate",
       "id": "store_connections_connectionsstate"
     },
@@ -6675,7 +7175,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L261",
       "_origin": "ast",
-      "community": 1,
+      "community": 28,
       "norm_label": "useconnections",
       "id": "store_connections_useconnections"
     },
@@ -6805,7 +7305,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/ui.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 3,
+      "community": 40,
       "norm_label": "ui.ts",
       "id": "store_ui"
     },
@@ -6815,7 +7315,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/ui.ts",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 3,
+      "community": 40,
       "norm_label": "uistate",
       "id": "store_ui_uistate"
     },
@@ -6825,7 +7325,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/ui.ts",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 3,
+      "community": 40,
       "norm_label": "useui",
       "id": "store_ui_useui"
     },
@@ -6865,7 +7365,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L20",
       "_origin": "ast",
-      "community": 26,
+      "community": 11,
       "norm_label": "connectionsummary",
       "id": "shared_types_connectionsummary"
     },
@@ -6875,7 +7375,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L25",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "saveconnectioninput",
       "id": "shared_types_saveconnectioninput"
     },
@@ -6895,7 +7395,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L36",
       "_origin": "ast",
-      "community": 60,
+      "community": 26,
       "norm_label": "testconnectionresult",
       "id": "shared_types_testconnectionresult"
     },
@@ -6915,7 +7415,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L57",
       "_origin": "ast",
-      "community": 28,
+      "community": 11,
       "norm_label": "entitytype",
       "id": "shared_types_entitytype"
     },
@@ -6925,7 +7425,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L60",
       "_origin": "ast",
-      "community": 28,
+      "community": 23,
       "norm_label": "enumtype",
       "id": "shared_types_enumtype"
     },
@@ -6935,7 +7435,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L66",
       "_origin": "ast",
-      "community": 5,
+      "community": 23,
       "norm_label": "entityinfo",
       "id": "shared_types_entityinfo"
     },
@@ -6945,7 +7445,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L74",
       "_origin": "ast",
-      "community": 8,
+      "community": 13,
       "norm_label": "entityref",
       "id": "shared_types_entityref"
     },
@@ -6955,7 +7455,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L79",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "columninfo",
       "id": "shared_types_columninfo"
     },
@@ -6965,7 +7465,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L85",
       "_origin": "ast",
-      "community": 5,
+      "community": 11,
       "norm_label": "foreignkey",
       "id": "shared_types_foreignkey"
     },
@@ -6995,7 +7495,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L106",
       "_origin": "ast",
-      "community": 39,
+      "community": 5,
       "norm_label": "searchresult",
       "id": "shared_types_searchresult"
     },
@@ -7005,7 +7505,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L113",
       "_origin": "ast",
-      "community": 5,
+      "community": 11,
       "norm_label": "plannode",
       "id": "shared_types_plannode"
     },
@@ -7015,7 +7515,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L135",
       "_origin": "ast",
-      "community": 5,
+      "community": 11,
       "norm_label": "queryplan",
       "id": "shared_types_queryplan"
     },
@@ -7025,7 +7525,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L146",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "queryresult",
       "id": "shared_types_queryresult"
     },
@@ -7045,7 +7545,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L165",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "rowedit",
       "id": "shared_types_rowedit"
     },
@@ -7085,7 +7585,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L188",
       "_origin": "ast",
-      "community": 1,
+      "community": 39,
       "norm_label": "historyentry",
       "id": "shared_types_historyentry"
     },
@@ -7095,7 +7595,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L209",
       "_origin": "ast",
-      "community": 0,
+      "community": 11,
       "norm_label": "historyquery",
       "id": "shared_types_historyquery"
     },
@@ -7125,7 +7625,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L279",
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": "filterop",
       "id": "shared_types_filterop"
     },
@@ -7165,7 +7665,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L331",
       "_origin": "ast",
-      "community": 15,
+      "community": 8,
       "norm_label": "indexspec",
       "id": "shared_types_indexspec"
     },
@@ -7185,7 +7685,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L352",
       "_origin": "ast",
-      "community": 8,
+      "community": 23,
       "norm_label": "referencingtable",
       "id": "shared_types_referencingtable"
     },
@@ -7195,7 +7695,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L367",
       "_origin": "ast",
-      "community": 8,
+      "community": 13,
       "norm_label": "tablestructure",
       "id": "shared_types_tablestructure"
     },
@@ -7205,7 +7705,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L375",
       "_origin": "ast",
-      "community": 29,
+      "community": 11,
       "norm_label": "newcolumnspec",
       "id": "shared_types_newcolumnspec"
     },
@@ -7215,7 +7715,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L393",
       "_origin": "ast",
-      "community": 11,
+      "community": 27,
       "norm_label": "createtablespec",
       "id": "shared_types_createtablespec"
     },
@@ -7225,7 +7725,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L403",
       "_origin": "ast",
-      "community": 29,
+      "community": 11,
       "norm_label": "tabletemplate",
       "id": "shared_types_tabletemplate"
     },
@@ -7235,7 +7735,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L412",
       "_origin": "ast",
-      "community": 5,
+      "community": 11,
       "norm_label": "schemaop",
       "id": "shared_types_schemaop"
     },
@@ -7265,7 +7765,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L555",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "serializedtab",
       "id": "shared_types_serializedtab"
     },
@@ -7275,7 +7775,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L581",
       "_origin": "ast",
-      "community": 15,
+      "community": 11,
       "norm_label": "connectionworkspace",
       "id": "shared_types_connectionworkspace"
     },
@@ -7335,7 +7835,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L612",
       "_origin": "ast",
-      "community": 11,
+      "community": 0,
       "norm_label": "backupresult",
       "id": "shared_types_backupresult"
     },
@@ -7345,7 +7845,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L620",
       "_origin": "ast",
-      "community": 11,
+      "community": 0,
       "norm_label": "restorestatement",
       "id": "shared_types_restorestatement"
     },
@@ -7365,7 +7865,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L635",
       "_origin": "ast",
-      "community": 11,
+      "community": 0,
       "norm_label": "restorerunresult",
       "id": "shared_types_restorerunresult"
     },
@@ -7598,166 +8098,6 @@
       "community": 33,
       "norm_label": "@/*",
       "id": "krust_studio_app_tsconfig_web_paths"
-    },
-    {
-      "label": "CHANGELOG.md",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "changelog.md",
-      "id": "changelog"
-    },
-    {
-      "label": "Changelog",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "changelog",
-      "id": "changelog_changelog"
-    },
-    {
-      "label": "[1.4.0] \u2014 2026-06-10",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L7",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "[1.4.0] \u2014 2026-06-10",
-      "id": "changelog_1_4_0_2026_06_10"
-    },
-    {
-      "label": "Added",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L9",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "added",
-      "id": "changelog_added"
-    },
-    {
-      "label": "Fixed",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L26",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "fixed",
-      "id": "changelog_fixed"
-    },
-    {
-      "label": "[1.3.4] \u2014 2026-06-09",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L32",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "[1.3.4] \u2014 2026-06-09",
-      "id": "changelog_1_3_4_2026_06_09"
-    },
-    {
-      "label": "[1.3.3] \u2014 2026-06-09",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L54",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "[1.3.3] \u2014 2026-06-09",
-      "id": "changelog_1_3_3_2026_06_09"
-    },
-    {
-      "label": "[1.3.2] \u2014 2026-06-09",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L66",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "[1.3.2] \u2014 2026-06-09",
-      "id": "changelog_1_3_2_2026_06_09"
-    },
-    {
-      "label": "[1.3.1] \u2014 2026-06-05",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L74",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "[1.3.1] \u2014 2026-06-05",
-      "id": "changelog_1_3_1_2026_06_05"
-    },
-    {
-      "label": "Changed",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L81",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "changed",
-      "id": "changelog_changed"
-    },
-    {
-      "label": "[1.3.0] \u2014 2026-06-05",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L88",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "[1.3.0] \u2014 2026-06-05",
-      "id": "changelog_1_3_0_2026_06_05"
-    },
-    {
-      "label": "[1.2.3] \u2014 2026-06-04",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L124",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "[1.2.3] \u2014 2026-06-04",
-      "id": "changelog_1_2_3_2026_06_04"
-    },
-    {
-      "label": "[1.2.1] \u2014 2026-06-04",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L139",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "[1.2.1] \u2014 2026-06-04",
-      "id": "changelog_1_2_1_2026_06_04"
-    },
-    {
-      "label": "[1.2.0] \u2014 2026-06-03",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L150",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "[1.2.0] \u2014 2026-06-03",
-      "id": "changelog_1_2_0_2026_06_03"
-    },
-    {
-      "label": "[1.1.0]",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L201",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "[1.1.0]",
-      "id": "changelog_1_1_0"
-    },
-    {
-      "label": "[1.0.0]",
-      "file_type": "document",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L206",
-      "_origin": "ast",
-      "community": 9,
-      "norm_label": "[1.0.0]",
-      "id": "changelog_1_0_0"
     },
     {
       "label": "CLAUDE.md",
@@ -10535,9 +10875,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "store_connections",
-      "community": 15,
-      "norm_label": "connections.ts"
+      "community": 11,
+      "norm_label": "connections.ts",
+      "id": "store_connections"
     },
     {
       "label": "Release Workflow (CI)",
@@ -10548,9 +10888,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "release_release",
       "community": 9,
-      "norm_label": "release workflow (ci)"
+      "norm_label": "release workflow (ci)",
+      "id": "release_release"
     },
     {
       "label": "electron-builder draft publish",
@@ -10561,9 +10901,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "release_electron_builder_publish",
       "community": 9,
-      "norm_label": "electron-builder draft publish"
+      "norm_label": "electron-builder draft publish",
+      "id": "release_electron_builder_publish"
     },
     {
       "label": "Krust Studio Context (Domain Glossary)",
@@ -10574,9 +10914,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "context_context",
       "community": 16,
-      "norm_label": "krust studio context (domain glossary)"
+      "norm_label": "krust studio context (domain glossary)",
+      "id": "context_context"
     },
     {
       "label": "No Silent Mutations (core principle)",
@@ -10587,9 +10927,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "context_no_silent_mutations",
       "community": 24,
-      "norm_label": "no silent mutations (core principle)"
+      "norm_label": "no silent mutations (core principle)",
+      "id": "context_no_silent_mutations"
     },
     {
       "label": "Automate for Convenience, Never Force Trust",
@@ -10600,9 +10940,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "context_automate_for_convenience",
       "community": 24,
-      "norm_label": "automate for convenience, never force trust"
+      "norm_label": "automate for convenience, never force trust",
+      "id": "context_automate_for_convenience"
     },
     {
       "label": "Destructive (history tag)",
@@ -10613,9 +10953,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "context_destructive",
       "community": 12,
-      "norm_label": "destructive (history tag)"
+      "norm_label": "destructive (history tag)",
+      "id": "context_destructive"
     },
     {
       "label": "Filter (Data Grid)",
@@ -10626,9 +10966,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "context_filter",
       "community": 24,
-      "norm_label": "filter (data grid)"
+      "norm_label": "filter (data grid)",
+      "id": "context_filter"
     },
     {
       "label": "Referenced By (Reverse FK)",
@@ -10639,9 +10979,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "context_referenced_by",
       "community": 12,
-      "norm_label": "referenced by (reverse fk)"
+      "norm_label": "referenced by (reverse fk)",
+      "id": "context_referenced_by"
     },
     {
       "label": "Restore (Import)",
@@ -10652,9 +10992,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "context_restore",
       "community": 12,
-      "norm_label": "restore (import)"
+      "norm_label": "restore (import)",
+      "id": "context_restore"
     },
     {
       "label": "Krust Studio Handover",
@@ -10665,9 +11005,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "handover_handover",
       "community": 16,
-      "norm_label": "krust studio handover"
+      "norm_label": "krust studio handover",
+      "id": "handover_handover"
     },
     {
       "label": "Krust Studio README",
@@ -10678,9 +11018,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_readme",
       "community": 24,
-      "norm_label": "krust studio readme"
+      "norm_label": "krust studio readme",
+      "id": "readme_readme"
     },
     {
       "label": "TODO (Gap Backlog)",
@@ -10691,9 +11031,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "todo_todo",
       "community": 16,
-      "norm_label": "todo (gap backlog)"
+      "norm_label": "todo (gap backlog)",
+      "id": "todo_todo"
     },
     {
       "label": "ADR-0002 Captured DDL Changesets, No Squash",
@@ -10704,9 +11044,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "adr_0002_captured_ddl_changesets",
       "community": 24,
-      "norm_label": "adr-0002 captured ddl changesets, no squash"
+      "norm_label": "adr-0002 captured ddl changesets, no squash",
+      "id": "adr_0002_captured_ddl_changesets"
     },
     {
       "label": "ADR-0003 In-app MCP Read-only Structured Tools",
@@ -10717,9 +11057,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "adr_0003_mcp_read_only_tools",
       "community": 72,
-      "norm_label": "adr-0003 in-app mcp read-only structured tools"
+      "norm_label": "adr-0003 in-app mcp read-only structured tools",
+      "id": "adr_0003_mcp_read_only_tools"
     },
     {
       "label": "ADR-0010 Optional Database & Switching",
@@ -10730,9 +11070,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "adr_0010_optional_database_switching",
       "community": 73,
-      "norm_label": "adr-0010 optional database & switching"
+      "norm_label": "adr-0010 optional database & switching",
+      "id": "adr_0010_optional_database_switching"
     },
     {
       "label": "ADR-0011 Column Reordering & Unified MySQL MODIFY",
@@ -10743,9 +11083,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "adr_0011_column_reordering_mysql_modify",
       "community": 24,
-      "norm_label": "adr-0011 column reordering & unified mysql modify"
+      "norm_label": "adr-0011 column reordering & unified mysql modify",
+      "id": "adr_0011_column_reordering_mysql_modify"
     },
     {
       "label": "ADR-0012 Tab-centric Persistent Workspace",
@@ -10756,9 +11096,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "adr_0012_tab_centric_workspace",
       "community": 16,
-      "norm_label": "adr-0012 tab-centric persistent workspace"
+      "norm_label": "adr-0012 tab-centric persistent workspace",
+      "id": "adr_0012_tab_centric_workspace"
     },
     {
       "label": "ADR-0013 Connection Resilience Auto-retry",
@@ -10769,9 +11109,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "adr_0013_connection_resilience",
       "community": 16,
-      "norm_label": "adr-0013 connection resilience auto-retry"
+      "norm_label": "adr-0013 connection resilience auto-retry",
+      "id": "adr_0013_connection_resilience"
     },
     {
       "label": "ADR-0016: Pinned Columns Freeze and Reorder",
@@ -10782,9 +11122,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "0016_pinned_columns_freeze_and_reorder",
       "community": 44,
-      "norm_label": "adr-0016: pinned columns freeze and reorder"
+      "norm_label": "adr-0016: pinned columns freeze and reorder",
+      "id": "0016_pinned_columns_freeze_and_reorder"
     },
     {
       "label": "DOM Reorder + Sticky Pinning",
@@ -10795,9 +11135,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "0016_dom_reorder_sticky",
       "community": 44,
-      "norm_label": "dom reorder + sticky pinning"
+      "norm_label": "dom reorder + sticky pinning",
+      "id": "0016_dom_reorder_sticky"
     },
     {
       "label": "effectivePins Computation",
@@ -10808,9 +11148,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "0016_effective_pins",
       "community": 44,
-      "norm_label": "effectivepins computation"
+      "norm_label": "effectivepins computation",
+      "id": "0016_effective_pins"
     },
     {
       "label": "Freeze Shadow Boundary Marker",
@@ -10821,9 +11161,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "0016_freeze_shadow",
       "community": 44,
-      "norm_label": "freeze shadow boundary marker"
+      "norm_label": "freeze shadow boundary marker",
+      "id": "0016_freeze_shadow"
     },
     {
       "label": "Per-Tab Pin Override (Tab.pinnedOverride)",
@@ -10834,9 +11174,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "0016_per_tab_pin_override",
       "community": 44,
-      "norm_label": "per-tab pin override (tab.pinnedoverride)"
+      "norm_label": "per-tab pin override (tab.pinnedoverride)",
+      "id": "0016_per_tab_pin_override"
     },
     {
       "label": "ADR-0017: Inline Filter Builder with Raw-WHERE Escape Hatch",
@@ -10847,9 +11187,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "0017_inline_filter_builder_with_raw_where",
       "community": 49,
-      "norm_label": "adr-0017: inline filter builder with raw-where escape hatch"
+      "norm_label": "adr-0017: inline filter builder with raw-where escape hatch",
+      "id": "0017_inline_filter_builder_with_raw_where"
     },
     {
       "label": "Raw-WHERE Predicate Mode",
@@ -10860,9 +11200,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "0017_raw_where_mode",
       "community": 49,
-      "norm_label": "raw-where predicate mode"
+      "norm_label": "raw-where predicate mode",
+      "id": "0017_raw_where_mode"
     },
     {
       "label": "Structured Builder Filter Mode",
@@ -10873,9 +11213,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "0017_builder_mode",
       "community": 49,
-      "norm_label": "structured builder filter mode"
+      "norm_label": "structured builder filter mode",
+      "id": "0017_builder_mode"
     },
     {
       "label": "Statement Separator (;) Guard",
@@ -10886,9 +11226,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "0017_statement_separator_guard",
       "community": 49,
-      "norm_label": "statement separator (;) guard"
+      "norm_label": "statement separator (;) guard",
+      "id": "0017_statement_separator_guard"
     },
     {
       "label": "One-Way Builder-to-Raw Seed",
@@ -10899,9 +11239,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "0017_one_way_seed",
       "community": 49,
-      "norm_label": "one-way builder-to-raw seed"
+      "norm_label": "one-way builder-to-raw seed",
+      "id": "0017_one_way_seed"
     },
     {
       "label": "FilterBar Component",
@@ -10912,9 +11252,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "0017_filterbar",
       "community": 49,
-      "norm_label": "filterbar component"
+      "norm_label": "filterbar component",
+      "id": "0017_filterbar"
     },
     {
       "label": "SerializedTab filterMode + rawWhere",
@@ -10925,9 +11265,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "0017_serializedtab_filter_fields",
       "community": 44,
-      "norm_label": "serializedtab filtermode + rawwhere"
+      "norm_label": "serializedtab filtermode + rawwhere",
+      "id": "0017_serializedtab_filter_fields"
     },
     {
       "label": "Krust Studio v1.2.3 Release Notes",
@@ -10938,9 +11278,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_2_3_release_notes",
       "community": 4,
-      "norm_label": "krust studio v1.2.3 release notes"
+      "norm_label": "krust studio v1.2.3 release notes",
+      "id": "v1_2_3_release_notes"
     },
     {
       "label": "Staged Reviewable Schema Edits",
@@ -10951,9 +11291,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_2_3_staged_schema_edits",
       "community": 4,
-      "norm_label": "staged reviewable schema edits"
+      "norm_label": "staged reviewable schema edits",
+      "id": "v1_2_3_staged_schema_edits"
     },
     {
       "label": "Auto-Update via GitHub Releases",
@@ -10964,9 +11304,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_2_3_auto_update",
       "community": 4,
-      "norm_label": "auto-update via github releases"
+      "norm_label": "auto-update via github releases",
+      "id": "v1_2_3_auto_update"
     },
     {
       "label": "Ctrl/Cmd+P Command Palette",
@@ -10977,9 +11317,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_2_3_command_palette",
       "community": 4,
-      "norm_label": "ctrl/cmd+p command palette"
+      "norm_label": "ctrl/cmd+p command palette",
+      "id": "v1_2_3_command_palette"
     },
     {
       "label": "MySQL Column Reorder (AFTER)",
@@ -10990,9 +11330,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_2_3_column_reorder",
       "community": 4,
-      "norm_label": "mysql column reorder (after)"
+      "norm_label": "mysql column reorder (after)",
+      "id": "v1_2_3_column_reorder"
     },
     {
       "label": "Persistent Per-Connection Workspace",
@@ -11003,9 +11343,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_3_0_persistent_workspace",
       "community": 32,
-      "norm_label": "persistent per-connection workspace"
+      "norm_label": "persistent per-connection workspace",
+      "id": "v1_3_0_persistent_workspace"
     },
     {
       "label": "Connection Resilience (Idle-Drop Auto-Retry)",
@@ -11016,9 +11356,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_3_0_connection_resilience",
       "community": 32,
-      "norm_label": "connection resilience (idle-drop auto-retry)"
+      "norm_label": "connection resilience (idle-drop auto-retry)",
+      "id": "v1_3_0_connection_resilience"
     },
     {
       "label": "Backup & Restore (.sql dump)",
@@ -11029,9 +11369,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_3_0_backup_restore",
       "community": 32,
-      "norm_label": "backup & restore (.sql dump)"
+      "norm_label": "backup & restore (.sql dump)",
+      "id": "v1_3_0_backup_restore"
     },
     {
       "label": "Reverse Foreign Keys + Walkable FK Graph",
@@ -11042,9 +11382,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_3_0_reverse_fk",
       "community": 42,
-      "norm_label": "reverse foreign keys + walkable fk graph"
+      "norm_label": "reverse foreign keys + walkable fk graph",
+      "id": "v1_3_0_reverse_fk"
     },
     {
       "label": "Custom Frameless Title Bar",
@@ -11055,9 +11395,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_3_0_custom_title_bar",
       "community": 4,
-      "norm_label": "custom frameless title bar"
+      "norm_label": "custom frameless title bar",
+      "id": "v1_3_0_custom_title_bar"
     },
     {
       "label": "Everything-Is-A-Tab Layout",
@@ -11068,9 +11408,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_3_0_everything_is_a_tab",
       "community": 32,
-      "norm_label": "everything-is-a-tab layout"
+      "norm_label": "everything-is-a-tab layout",
+      "id": "v1_3_0_everything_is_a_tab"
     },
     {
       "label": "Manual Check for Updates Menu",
@@ -11081,9 +11421,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_3_1_manual_update_check",
       "community": 4,
-      "norm_label": "manual check for updates menu"
+      "norm_label": "manual check for updates menu",
+      "id": "v1_3_1_manual_update_check"
     },
     {
       "label": "Sidebar Covering Title Bar Fix",
@@ -11094,9 +11434,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_3_2_sidebar_title_bar_fix",
       "community": 4,
-      "norm_label": "sidebar covering title bar fix"
+      "norm_label": "sidebar covering title bar fix",
+      "id": "v1_3_2_sidebar_title_bar_fix"
     },
     {
       "label": "Installer Application-Is-Running Fix (NSIS taskkill)",
@@ -11107,9 +11447,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_3_3_installer_running_fix",
       "community": 4,
-      "norm_label": "installer application-is-running fix (nsis taskkill)"
+      "norm_label": "installer application-is-running fix (nsis taskkill)",
+      "id": "v1_3_3_installer_running_fix"
     },
     {
       "label": "Restart-Now quitAndInstall Race Fix",
@@ -11120,9 +11460,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_3_3_restart_race_fix",
       "community": 4,
-      "norm_label": "restart-now quitandinstall race fix"
+      "norm_label": "restart-now quitandinstall race fix",
+      "id": "v1_3_3_restart_race_fix"
     },
     {
       "label": "Staged Schema Edits Persisted on Tab",
@@ -11133,9 +11473,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_3_4_staged_edits_on_tab",
       "community": 4,
-      "norm_label": "staged schema edits persisted on tab"
+      "norm_label": "staged schema edits persisted on tab",
+      "id": "v1_3_4_staged_edits_on_tab"
     },
     {
       "label": "Drop FK-Backed Column (DROP FOREIGN KEY first)",
@@ -11146,9 +11486,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_3_4_fk_column_drop",
       "community": 42,
-      "norm_label": "drop fk-backed column (drop foreign key first)"
+      "norm_label": "drop fk-backed column (drop foreign key first)",
+      "id": "v1_3_4_fk_column_drop"
     },
     {
       "label": "Unsaved-Changes Indicator + Close Confirmation",
@@ -11159,9 +11499,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_3_4_unsaved_changes_indicator",
       "community": 4,
-      "norm_label": "unsaved-changes indicator + close confirmation"
+      "norm_label": "unsaved-changes indicator + close confirmation",
+      "id": "v1_3_4_unsaved_changes_indicator"
     },
     {
       "label": "Bulk Tab Close",
@@ -11172,9 +11512,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_3_4_bulk_tab_close",
       "community": 4,
-      "norm_label": "bulk tab close"
+      "norm_label": "bulk tab close",
+      "id": "v1_3_4_bulk_tab_close"
     },
     {
       "label": "Virtualized Data Grid (TanStack Virtual)",
@@ -11185,9 +11525,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_4_0_virtualized_grid",
       "community": 44,
-      "norm_label": "virtualized data grid (tanstack virtual)"
+      "norm_label": "virtualized data grid (tanstack virtual)",
+      "id": "v1_4_0_virtualized_grid"
     },
     {
       "label": "Drop Relation Toggle in Relations Sub-Tab",
@@ -11198,9 +11538,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_4_0_relation_drop_toggle",
       "community": 42,
-      "norm_label": "drop relation toggle in relations sub-tab"
+      "norm_label": "drop relation toggle in relations sub-tab",
+      "id": "v1_4_0_relation_drop_toggle"
     },
     {
       "label": "Backup & Restore as a Tab",
@@ -11211,9 +11551,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_4_0_backup_restore_tab",
       "community": 38,
-      "norm_label": "backup & restore as a tab"
+      "norm_label": "backup & restore as a tab",
+      "id": "v1_4_0_backup_restore_tab"
     },
     {
       "label": "Syntax-Highlighted Query History",
@@ -11224,9 +11564,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_4_0_syntax_highlighted_history",
       "community": 38,
-      "norm_label": "syntax-highlighted query history"
+      "norm_label": "syntax-highlighted query history",
+      "id": "v1_4_0_syntax_highlighted_history"
     },
     {
       "label": "Local Table Templates",
@@ -11237,9 +11577,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "v1_4_0_table_templates",
       "community": 38,
-      "norm_label": "local table templates"
+      "norm_label": "local table templates",
+      "id": "v1_4_0_table_templates"
     },
     {
       "label": "Prettier Config (.prettierrc.yaml)",
@@ -11250,9 +11590,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "prettierrc_config",
       "community": 101,
-      "norm_label": "prettier config (.prettierrc.yaml)"
+      "norm_label": "prettier config (.prettierrc.yaml)",
+      "id": "prettierrc_config"
     },
     {
       "label": "Electron + electron-vite + React 19 Stack",
@@ -11263,9 +11603,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "krust_studio_app_readme_electron_stack",
       "community": 2,
-      "norm_label": "electron + electron-vite + react 19 stack"
+      "norm_label": "electron + electron-vite + react 19 stack",
+      "id": "krust_studio_app_readme_electron_stack"
     },
     {
       "label": "GitHub Releases Auto-Update",
@@ -11276,9 +11616,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "krust_studio_app_readme_auto_update",
       "community": 2,
-      "norm_label": "github releases auto-update"
+      "norm_label": "github releases auto-update",
+      "id": "krust_studio_app_readme_auto_update"
     },
     {
       "label": "NSIS Windows Installer (directory picker)",
@@ -11289,9 +11629,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "krust_studio_app_readme_nsis_installer",
       "community": 2,
-      "norm_label": "nsis windows installer (directory picker)"
+      "norm_label": "nsis windows installer (directory picker)",
+      "id": "krust_studio_app_readme_nsis_installer"
     },
     {
       "label": "Release Workflow (version bump, build, GitHub Release)",
@@ -11302,9 +11642,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "krust_studio_app_readme_release_workflow",
       "community": 2,
-      "norm_label": "release workflow (version bump, build, github release)"
+      "norm_label": "release workflow (version bump, build, github release)",
+      "id": "krust_studio_app_readme_release_workflow"
     },
     {
       "label": "dev-app-update.yml",
@@ -11315,9 +11655,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "dev_app_update",
       "community": 2,
-      "norm_label": "dev-app-update.yml"
+      "norm_label": "dev-app-update.yml",
+      "id": "dev_app_update"
     },
     {
       "label": "electron-builder.yml",
@@ -11328,9 +11668,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "electron_builder",
       "community": 2,
-      "norm_label": "electron-builder.yml"
+      "norm_label": "electron-builder.yml",
+      "id": "electron_builder"
     },
     {
       "label": "GitHub Publish (draft release)",
@@ -11341,9 +11681,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "electron_builder_github_publish",
       "community": 2,
-      "norm_label": "github publish (draft release)"
+      "norm_label": "github publish (draft release)",
+      "id": "electron_builder_github_publish"
     },
     {
       "label": "NSIS Assisted Installer Config",
@@ -11354,9 +11694,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "electron_builder_nsis_config",
       "community": 2,
-      "norm_label": "nsis assisted installer config"
+      "norm_label": "nsis assisted installer config",
+      "id": "electron_builder_nsis_config"
     },
     {
       "label": "Multi-platform Build Targets (win/mac/linux)",
@@ -11367,9 +11707,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "electron_builder_targets",
       "community": 2,
-      "norm_label": "multi-platform build targets (win/mac/linux)"
+      "norm_label": "multi-platform build targets (win/mac/linux)",
+      "id": "electron_builder_targets"
     },
     {
       "label": "pnpm-workspace.yaml",
@@ -11380,9 +11720,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "pnpm_workspace",
       "community": 100,
-      "norm_label": "pnpm-workspace.yaml"
+      "norm_label": "pnpm-workspace.yaml",
+      "id": "pnpm_workspace"
     },
     {
       "label": "shadcn CLI",
@@ -11393,9 +11733,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "llm_shadcn_cli",
       "community": 10,
-      "norm_label": "shadcn cli"
+      "norm_label": "shadcn cli",
+      "id": "llm_shadcn_cli"
     },
     {
       "label": "shadcn Registry System",
@@ -11406,9 +11746,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "llm_shadcn_registry",
       "community": 10,
-      "norm_label": "shadcn registry system"
+      "norm_label": "shadcn registry system",
+      "id": "llm_shadcn_registry"
     },
     {
       "label": "Radix UI Primitives",
@@ -11419,9 +11759,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "llm_radix_ui",
       "community": 10,
-      "norm_label": "radix ui primitives"
+      "norm_label": "radix ui primitives",
+      "id": "llm_radix_ui"
     },
     {
       "label": "Tailwind CSS v4",
@@ -11432,211 +11772,661 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "llm_tailwind_v4",
       "community": 10,
-      "norm_label": "tailwind css v4"
+      "norm_label": "tailwind css v4",
+      "id": "llm_tailwind_v4"
     }
   ],
   "links": [
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
-      "source_location": "L14",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L1",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "krust_studio_app_components",
-      "target": "krust_studio_app_components_aliases"
+      "source": "changelog",
+      "target": "changelog_changelog"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CHANGELOG.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "changelog_changelog",
+      "target": "adr_0009_auto_update_github_releases"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CHANGELOG.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "changelog_changelog",
+      "target": "adr_0010_optional_database_switching"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CHANGELOG.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "changelog_changelog",
+      "target": "adr_0011_column_reordering_mysql_modify"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CHANGELOG.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "changelog_changelog",
+      "target": "adr_0012_tab_centric_workspace"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CHANGELOG.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "changelog_changelog",
+      "target": "adr_0013_connection_resilience"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
-      "source_location": "L13",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L206",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "krust_studio_app_components",
-      "target": "krust_studio_app_components_iconlibrary"
+      "source": "changelog_changelog",
+      "target": "changelog_1_0_0"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
-      "source_location": "L4",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L201",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "krust_studio_app_components",
-      "target": "krust_studio_app_components_rsc"
+      "source": "changelog_changelog",
+      "target": "changelog_1_1_0"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
-      "source_location": "L2",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L150",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "krust_studio_app_components",
-      "target": "krust_studio_app_components_schema"
+      "source": "changelog_changelog",
+      "target": "changelog_1_2_0_2026_06_03"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
-      "source_location": "L3",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L139",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "krust_studio_app_components",
-      "target": "krust_studio_app_components_style"
+      "source": "changelog_changelog",
+      "target": "changelog_1_2_1_2026_06_04"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
-      "source_location": "L6",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L124",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "krust_studio_app_components",
-      "target": "krust_studio_app_components_tailwind"
+      "source": "changelog_changelog",
+      "target": "changelog_1_2_3_2026_06_04"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
-      "source_location": "L5",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L88",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "krust_studio_app_components",
-      "target": "krust_studio_app_components_tsx"
+      "source": "changelog_changelog",
+      "target": "changelog_1_3_0_2026_06_05"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
-      "source_location": "L9",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L74",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "krust_studio_app_components_tailwind",
-      "target": "krust_studio_app_components_tailwind_basecolor"
+      "source": "changelog_changelog",
+      "target": "changelog_1_3_1_2026_06_05"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L66",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_changelog",
+      "target": "changelog_1_3_2_2026_06_09"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L54",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_changelog",
+      "target": "changelog_1_3_3_2026_06_09"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L32",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_changelog",
+      "target": "changelog_1_3_4_2026_06_09"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
       "source_location": "L7",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "krust_studio_app_components_tailwind",
-      "target": "krust_studio_app_components_tailwind_config"
+      "source": "changelog_changelog",
+      "target": "changelog_1_4_0_2026_06_10"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L47",
+      "weight": 1.0,
+      "source": "changelog_changelog",
+      "target": "changelog_1_5_0_2026_06_10",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "changelog_changelog",
+      "target": "changelog_1_6_0_2026_06_14",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "changelog_1_6_0_2026_06_14",
+      "target": "changelog_added",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "changelog_1_6_0_2026_06_14",
+      "target": "changelog_changed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "changelog_1_6_0_2026_06_14",
+      "target": "changelog_fixed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L152",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_1_2_0_2026_06_03",
+      "target": "changelog_added"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L90",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_1_3_0_2026_06_05",
+      "target": "changelog_added"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L46",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_1_3_4_2026_06_09",
+      "target": "changelog_added"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_1_4_0_2026_06_10",
+      "target": "changelog_added"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L181",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_1_2_0_2026_06_03",
+      "target": "changelog_changed"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L81",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_1_3_1_2026_06_05",
+      "target": "changelog_changed"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L187",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_1_2_0_2026_06_03",
+      "target": "changelog_fixed"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L141",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_1_2_1_2026_06_04",
+      "target": "changelog_fixed"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L126",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_1_2_3_2026_06_04",
+      "target": "changelog_fixed"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L76",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_1_3_1_2026_06_05",
+      "target": "changelog_fixed"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L68",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_1_3_2_2026_06_09",
+      "target": "changelog_fixed"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L56",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_1_3_3_2026_06_09",
+      "target": "changelog_fixed"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L34",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_1_3_4_2026_06_09",
+      "target": "changelog_fixed"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L26",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_1_4_0_2026_06_10",
+      "target": "changelog_fixed"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "changelog_1_5_0_2026_06_10",
+      "target": "changelog_added_49",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "changelog_1_5_0_2026_06_10",
+      "target": "changelog_changed_57",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "changelog_1_4_0_2026_06_10",
+      "target": "changelog_added_63",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L80",
+      "weight": 1.0,
+      "source": "changelog_1_4_0_2026_06_10",
+      "target": "changelog_fixed_80",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L100",
+      "weight": 1.0,
+      "source": "changelog_1_3_4_2026_06_09",
+      "target": "changelog_added_100",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L88",
+      "weight": 1.0,
+      "source": "changelog_1_3_4_2026_06_09",
+      "target": "changelog_fixed_88",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L110",
+      "weight": 1.0,
+      "source": "changelog_1_3_3_2026_06_09",
+      "target": "changelog_fixed_110",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L122",
+      "weight": 1.0,
+      "source": "changelog_1_3_2_2026_06_09",
+      "target": "changelog_fixed_122",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L135",
+      "weight": 1.0,
+      "source": "changelog_1_3_1_2026_06_05",
+      "target": "changelog_changed_135",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L130",
+      "weight": 1.0,
+      "source": "changelog_1_3_1_2026_06_05",
+      "target": "changelog_fixed_130",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L144",
+      "weight": 1.0,
+      "source": "changelog_1_3_0_2026_06_05",
+      "target": "changelog_added_144",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L180",
+      "weight": 1.0,
+      "source": "changelog_1_2_3_2026_06_04",
+      "target": "changelog_fixed_180",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L195",
+      "weight": 1.0,
+      "source": "changelog_1_2_1_2026_06_04",
+      "target": "changelog_fixed_195",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L206",
+      "weight": 1.0,
+      "source": "changelog_1_2_0_2026_06_03",
+      "target": "changelog_added_206",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L235",
+      "weight": 1.0,
+      "source": "changelog_1_2_0_2026_06_03",
+      "target": "changelog_changed_235",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L241",
+      "weight": 1.0,
+      "source": "changelog_1_2_0_2026_06_03",
+      "target": "changelog_fixed_241",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "v1_6_0_full",
+      "target": "v1_6_0_full_added",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "v1_6_0_full",
+      "target": "v1_6_0_full_changed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "v1_6_0_full",
+      "target": "v1_6_0_full_fixed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "v1_6_0_full",
+      "target": "v1_6_0_full_install",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "v1_6_0_full_added",
+      "target": "v1_6_0_full_configurable_grid_virtualization",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "v1_6_0_full_added",
+      "target": "v1_6_0_full_inline_filter_builder_raw_where_adr_0017",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "v1_6_0_full_added",
+      "target": "v1_6_0_full_pinnable_reorderable_tabs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.6.0/full.md",
       "source_location": "L8",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "krust_studio_app_components_tailwind",
-      "target": "krust_studio_app_components_tailwind_css"
+      "source": "v1_6_0_full_added",
+      "target": "v1_6_0_full_pinned_columns_freeze_panes_adr_0016",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
-      "source_location": "L10",
+      "source_file": "docs/release/v1.6.0/full.md",
+      "source_location": "L17",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "krust_studio_app_components_tailwind",
-      "target": "krust_studio_app_components_tailwind_cssvariables"
+      "source": "v1_6_0_full_added",
+      "target": "v1_6_0_full_postgres_schema_selector",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
+      "source_file": "docs/release/v1.6.0/full.md",
       "source_location": "L11",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "krust_studio_app_components_tailwind",
-      "target": "krust_studio_app_components_tailwind_prefix"
+      "source": "v1_6_0_full_added",
+      "target": "v1_6_0_full_query_plan_adr_0014",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
-      "source_location": "L15",
+      "source_file": "docs/release/v1.6.0/short.md",
+      "source_location": "L12",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "krust_studio_app_components_aliases",
-      "target": "krust_studio_app_components_aliases_components"
+      "source": "v1_6_0_short",
+      "target": "v1_6_0_short_fixed",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
-      "source_location": "L19",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "krust_studio_app_components_aliases",
-      "target": "krust_studio_app_components_aliases_hooks"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
+      "source_file": "docs/release/v1.6.0/short.md",
       "source_location": "L18",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "krust_studio_app_components_aliases",
-      "target": "krust_studio_app_components_aliases_lib"
+      "source": "v1_6_0_short",
+      "target": "v1_6_0_short_install",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
-      "source_location": "L17",
+      "source_file": "docs/release/v1.6.0/short.md",
+      "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "krust_studio_app_components_aliases",
-      "target": "krust_studio_app_components_aliases_ui"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/components.json",
-      "source_location": "L16",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "krust_studio_app_components_aliases",
-      "target": "krust_studio_app_components_aliases_utils"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/gen-icon.mjs",
-      "source_location": "L11",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "krust_studio_app_gen_icon",
-      "target": "krust_studio_app_gen_icon_png1024"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/gen-icon.mjs",
-      "source_location": "L17",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "krust_studio_app_gen_icon",
-      "target": "krust_studio_app_gen_icon_src"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/gen-icon.mjs",
-      "source_location": "L16",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "krust_studio_app_gen_icon",
-      "target": "krust_studio_app_gen_icon_tmp"
+      "source": "v1_6_0_short",
+      "target": "v1_6_0_short_what_s_new",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -12445,9 +13235,209 @@
       "source_location": "L69",
       "weight": 1.0,
       "context": "import",
+      "confidence_score": 1.0,
       "source": "krust_studio_app_package_devdependencies_electron_builder",
-      "target": "electron_builder",
-      "confidence_score": 1.0
+      "target": "electron_builder"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components",
+      "target": "krust_studio_app_components_aliases"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components",
+      "target": "krust_studio_app_components_iconlibrary"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components",
+      "target": "krust_studio_app_components_rsc"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components",
+      "target": "krust_studio_app_components_schema"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components",
+      "target": "krust_studio_app_components_style"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components",
+      "target": "krust_studio_app_components_tailwind"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components",
+      "target": "krust_studio_app_components_tsx"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components_tailwind",
+      "target": "krust_studio_app_components_tailwind_basecolor"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components_tailwind",
+      "target": "krust_studio_app_components_tailwind_config"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components_tailwind",
+      "target": "krust_studio_app_components_tailwind_css"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components_tailwind",
+      "target": "krust_studio_app_components_tailwind_cssvariables"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components_tailwind",
+      "target": "krust_studio_app_components_tailwind_prefix"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components_aliases",
+      "target": "krust_studio_app_components_aliases_components"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components_aliases",
+      "target": "krust_studio_app_components_aliases_hooks"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components_aliases",
+      "target": "krust_studio_app_components_aliases_lib"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components_aliases",
+      "target": "krust_studio_app_components_aliases_ui"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/components.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_components_aliases",
+      "target": "krust_studio_app_components_aliases_utils"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/gen-icon.mjs",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_gen_icon",
+      "target": "krust_studio_app_gen_icon_png1024"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/gen-icon.mjs",
+      "source_location": "L17",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_gen_icon",
+      "target": "krust_studio_app_gen_icon_src"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/gen-icon.mjs",
+      "source_location": "L16",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_gen_icon",
+      "target": "krust_studio_app_gen_icon_tmp"
     },
     {
       "relation": "contains",
@@ -26818,9 +27808,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "store_connections_querystate",
-      "confidence_score": 1.0
+      "target": "store_connections_querystate"
     },
     {
       "relation": "references",
@@ -26850,9 +27840,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L40",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "store_connections_tabview",
-      "confidence_score": 1.0
+      "target": "store_connections_tabview"
     },
     {
       "relation": "contains",
@@ -26860,9 +27850,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "store_connections_structuresub",
-      "confidence_score": 1.0
+      "target": "store_connections_structuresub"
     },
     {
       "relation": "contains",
@@ -26870,9 +27860,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L45",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "store_connections_sessionstatus",
-      "confidence_score": 1.0
+      "target": "store_connections_sessionstatus"
     },
     {
       "relation": "contains",
@@ -26880,9 +27870,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "store_connections_tab",
-      "confidence_score": 1.0
+      "target": "store_connections_tab"
     },
     {
       "relation": "references",
@@ -26978,9 +27968,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L112",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "store_connections_tabhasdatachanges",
-      "confidence_score": 1.0
+      "target": "store_connections_tabhasdatachanges"
     },
     {
       "relation": "calls",
@@ -26999,9 +27989,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L121",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "store_connections_tabhasdraftcontent",
-      "confidence_score": 1.0
+      "target": "store_connections_tabhasdraftcontent"
     },
     {
       "relation": "calls",
@@ -27020,9 +28010,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L132",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "store_connections_tabisdirty",
-      "confidence_score": 1.0
+      "target": "store_connections_tabisdirty"
     },
     {
       "relation": "contains",
@@ -27030,9 +28020,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L136",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "store_connections_editkey",
-      "confidence_score": 1.0
+      "target": "store_connections_editkey"
     },
     {
       "relation": "contains",
@@ -27040,9 +28030,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L140",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "store_connections_entitykey",
-      "confidence_score": 1.0
+      "target": "store_connections_entitykey"
     },
     {
       "relation": "contains",
@@ -27050,9 +28040,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L144",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "store_connections_connectionsstate",
-      "confidence_score": 1.0
+      "target": "store_connections_connectionsstate"
     },
     {
       "relation": "references",
@@ -27181,9 +28171,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L261",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "store_connections_useconnections",
-      "confidence_score": 1.0
+      "target": "store_connections_useconnections"
     },
     {
       "relation": "contains",
@@ -27892,9 +28882,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types",
-      "confidence_score": 1.0
+      "target": "shared_types"
     },
     {
       "relation": "inherits",
@@ -27914,9 +28904,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_connectionsummary",
-      "confidence_score": 1.0
+      "target": "shared_types_connectionsummary"
     },
     {
       "relation": "imports",
@@ -27925,9 +28915,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_saveconnectioninput",
-      "confidence_score": 1.0
+      "target": "shared_types_saveconnectioninput"
     },
     {
       "relation": "imports",
@@ -27936,9 +28926,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_entitytype",
-      "confidence_score": 1.0
+      "target": "shared_types_entitytype"
     },
     {
       "relation": "imports",
@@ -27947,9 +28937,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_enumtype",
-      "confidence_score": 1.0
+      "target": "shared_types_enumtype"
     },
     {
       "relation": "imports",
@@ -27958,9 +28948,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_entityinfo",
-      "confidence_score": 1.0
+      "target": "shared_types_entityinfo"
     },
     {
       "relation": "imports",
@@ -27969,9 +28959,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_entityref",
-      "confidence_score": 1.0
+      "target": "shared_types_entityref"
     },
     {
       "relation": "imports",
@@ -27980,9 +28970,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_sort",
-      "confidence_score": 1.0
+      "target": "shared_types_sort"
     },
     {
       "relation": "imports",
@@ -27991,9 +28981,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_rowsresult",
-      "confidence_score": 1.0
+      "target": "shared_types_rowsresult"
     },
     {
       "relation": "imports",
@@ -28002,9 +28992,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_queryplan",
-      "confidence_score": 1.0
+      "target": "shared_types_queryplan"
     },
     {
       "relation": "imports",
@@ -28013,9 +29003,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_queryresult",
-      "confidence_score": 1.0
+      "target": "shared_types_queryresult"
     },
     {
       "relation": "imports",
@@ -28024,9 +29014,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_rowedit",
-      "confidence_score": 1.0
+      "target": "shared_types_rowedit"
     },
     {
       "relation": "imports",
@@ -28035,9 +29025,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_filter",
-      "confidence_score": 1.0
+      "target": "shared_types_filter"
     },
     {
       "relation": "imports",
@@ -28046,9 +29036,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_indexspec",
-      "confidence_score": 1.0
+      "target": "shared_types_indexspec"
     },
     {
       "relation": "imports",
@@ -28057,9 +29047,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_referencingtable",
-      "confidence_score": 1.0
+      "target": "shared_types_referencingtable"
     },
     {
       "relation": "imports",
@@ -28068,9 +29058,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_tablestructure",
-      "confidence_score": 1.0
+      "target": "shared_types_tablestructure"
     },
     {
       "relation": "imports",
@@ -28079,9 +29069,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_newcolumnspec",
-      "confidence_score": 1.0
+      "target": "shared_types_newcolumnspec"
     },
     {
       "relation": "imports",
@@ -28090,9 +29080,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_createtablespec",
-      "confidence_score": 1.0
+      "target": "shared_types_createtablespec"
     },
     {
       "relation": "imports",
@@ -28101,9 +29091,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_tabletemplate",
-      "confidence_score": 1.0
+      "target": "shared_types_tabletemplate"
     },
     {
       "relation": "imports",
@@ -28112,9 +29102,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_serializedtab",
-      "confidence_score": 1.0
+      "target": "shared_types_serializedtab"
     },
     {
       "relation": "imports",
@@ -28123,9 +29113,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_connectionworkspace",
-      "confidence_score": 1.0
+      "target": "shared_types_connectionworkspace"
     },
     {
       "relation": "imports",
@@ -28134,9 +29124,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_connections",
-      "target": "shared_types_workspacedata",
-      "confidence_score": 1.0
+      "target": "shared_types_workspacedata"
     },
     {
       "relation": "contains",
@@ -28297,316 +29287,6 @@
       "confidence_score": 1.0,
       "source": "krust_studio_app_tsconfig_web_compileroptions_paths",
       "target": "krust_studio_app_tsconfig_web_paths_renderer"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L1",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog",
-      "target": "changelog_changelog"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "CHANGELOG.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "changelog_changelog",
-      "target": "adr_0009_auto_update_github_releases"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "CHANGELOG.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "changelog_changelog",
-      "target": "adr_0010_optional_database_switching"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "CHANGELOG.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "changelog_changelog",
-      "target": "adr_0011_column_reordering_mysql_modify"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "CHANGELOG.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "changelog_changelog",
-      "target": "adr_0012_tab_centric_workspace"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "CHANGELOG.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "changelog_changelog",
-      "target": "adr_0013_connection_resilience"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L206",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_changelog",
-      "target": "changelog_1_0_0"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L201",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_changelog",
-      "target": "changelog_1_1_0"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L150",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_changelog",
-      "target": "changelog_1_2_0_2026_06_03"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L139",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_changelog",
-      "target": "changelog_1_2_1_2026_06_04"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L124",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_changelog",
-      "target": "changelog_1_2_3_2026_06_04"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L88",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_changelog",
-      "target": "changelog_1_3_0_2026_06_05"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L74",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_changelog",
-      "target": "changelog_1_3_1_2026_06_05"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L66",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_changelog",
-      "target": "changelog_1_3_2_2026_06_09"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L54",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_changelog",
-      "target": "changelog_1_3_3_2026_06_09"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L32",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_changelog",
-      "target": "changelog_1_3_4_2026_06_09"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_changelog",
-      "target": "changelog_1_4_0_2026_06_10"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L9",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_1_4_0_2026_06_10",
-      "target": "changelog_added"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L26",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_1_4_0_2026_06_10",
-      "target": "changelog_fixed"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L152",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_1_2_0_2026_06_03",
-      "target": "changelog_added"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L90",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_1_3_0_2026_06_05",
-      "target": "changelog_added"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L46",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_1_3_4_2026_06_09",
-      "target": "changelog_added"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L187",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_1_2_0_2026_06_03",
-      "target": "changelog_fixed"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L141",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_1_2_1_2026_06_04",
-      "target": "changelog_fixed"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L126",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_1_2_3_2026_06_04",
-      "target": "changelog_fixed"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L76",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_1_3_1_2026_06_05",
-      "target": "changelog_fixed"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L68",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_1_3_2_2026_06_09",
-      "target": "changelog_fixed"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L56",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_1_3_3_2026_06_09",
-      "target": "changelog_fixed"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L34",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_1_3_4_2026_06_09",
-      "target": "changelog_fixed"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L81",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_1_3_1_2026_06_05",
-      "target": "changelog_changed"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CHANGELOG.md",
-      "source_location": "L181",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_1_2_0_2026_06_03",
-      "target": "changelog_changed"
     },
     {
       "relation": "contains",
@@ -32624,5 +33304,5 @@
       "source_file": "docs/adr/0017-inline-filter-builder-with-raw-where.md"
     }
   ],
-  "built_at_commit": "0ac2f799688f6cf2129b16cabf3bcedfce791ced"
+  "built_at_commit": "2da3edd1cbb282061397be1abc3bc2e37817b5bd"
 }
