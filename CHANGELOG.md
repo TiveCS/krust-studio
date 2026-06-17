@@ -4,6 +4,15 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [1.6.1] — 2026-06-17
+
+### Fixed
+- **Unsaved SQL no longer vanishes on tab switch** (ADR-0018) — query text typed
+  or pasted into the editor but not yet run survived switching tabs only by luck;
+  the draft is now flushed to the right tab on blur, idly while typing, and on
+  tab switch (explicit tab id, never the active tab). Unsaved SQL also survives an
+  app quit/restart via a `beforeunload` workspace flush.
+
 ## [1.6.0] — 2026-06-14
 
 ### Added

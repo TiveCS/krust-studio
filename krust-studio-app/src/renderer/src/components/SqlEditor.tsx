@@ -18,6 +18,8 @@ const DIALECTS: Record<DriverType, SQLDialect> = {
 interface Props {
   value: string
   onChange: (v: string) => void
+  /** fired when the editor loses focus — used to flush the SQL draft (ADR-0018) */
+  onBlur?: () => void
   /** Ctrl/Cmd-Enter — passes the selection if any, else the whole doc */
   onRun: (sql: string) => void
   /** table -> columns, for autocomplete; updates dynamically via Compartment */
@@ -26,13 +28,15 @@ interface Props {
   driver?: DriverType
 }
 
-export function SqlEditor({ value, onChange, onRun, schema, driver }: Props): React.JSX.Element {
+export function SqlEditor({ value, onChange, onBlur, onRun, schema, driver }: Props): React.JSX.Element {
   const host = useRef<HTMLDivElement>(null)
   const view = useRef<EditorView | null>(null)
   const onChangeRef = useRef(onChange)
+  const onBlurRef = useRef(onBlur)
   const onRunRef = useRef(onRun)
   const sqlCompartment = useRef(new Compartment())
   onChangeRef.current = onChange
+  onBlurRef.current = onBlur
   onRunRef.current = onRun
 
   const dialect = (driver && DIALECTS[driver]) || MySQL
@@ -68,6 +72,12 @@ export function SqlEditor({ value, onChange, onRun, schema, driver }: Props): Re
         krustTheme,
         EditorView.updateListener.of((u) => {
           if (u.docChanged) onChangeRef.current(u.state.doc.toString())
+        }),
+        EditorView.domEventHandlers({
+          blur: () => {
+            onBlurRef.current?.()
+            return false
+          }
         })
       ]
     })

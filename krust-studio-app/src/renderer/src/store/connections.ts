@@ -201,8 +201,15 @@ interface ConnectionsState {
   ) => Promise<void>
   openNewTable: (initial?: { name?: string; columns?: NewColumnSpec[] }) => void
   openQuery: () => void
-  setQuerySql: (sql: string) => void
+  /** write editor SQL to a specific tab's query state. Takes an explicit tabId
+   *  (not activeTabId) because deferred flushes (blur/debounce/unmount) can fire
+   *  after the active tab has already moved — ADR-0018. */
+  setQuerySql: (tabId: string, sql: string) => void
   setQueryAutoLimit: (n: number) => void
+  /** flush the current workspace to disk immediately (clears the save debounce).
+   *  Used by the app `beforeunload` handler so an abrupt quit doesn't drop the
+   *  last <800ms of edits — ADR-0018. */
+  flushWorkspaceNow: () => void
   runQuery: (sql: string) => Promise<void>
   /** EXPLAIN (analyze=false) / EXPLAIN ANALYZE (analyze=true) the editor SQL */
   explainQuery: (analyze: boolean) => Promise<void>
@@ -924,10 +931,14 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       scheduleWorkspaceSave()
     },
 
-    setQuerySql: (sql) => {
-      const { activeTabId, tabs } = get()
-      const tab = tabs.find((t) => t.id === activeTabId)
-      if (tab?.query) { patchTab(tab.id, { query: { ...tab.query, sql } }); scheduleWorkspaceSave() }
+    setQuerySql: (tabId, sql) => {
+      const tab = get().tabs.find((t) => t.id === tabId)
+      if (tab?.query) { patchTab(tabId, { query: { ...tab.query, sql } }); scheduleWorkspaceSave() }
+    },
+    flushWorkspaceNow: () => {
+      const { openConnectionId, currentDb, tabs, activeTabId } = get()
+      if (!openConnectionId) return
+      flushWorkspace(openConnectionId, currentDb, tabs, activeTabId)
     },
     setQueryAutoLimit: (n) => {
       const { activeTabId, tabs } = get()

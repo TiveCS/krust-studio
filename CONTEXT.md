@@ -312,6 +312,13 @@ MySQL/MariaDB, double-quote on Postgres/SQLite) — so autocompleted identifiers
 are quoted correctly for the target engine. The editor/results split is
 drag-resizable.
 
+**Unsaved editor SQL is durable.** The query text you have typed but not yet run
+survives switching to another tab and back, and survives an app quit/restart —
+not only after **Run**. (Internally the editor keeps the live text in a buffer
+for typing speed and flushes it to the persisted **Workspace** on blur, on tab
+switch, and idly while you type; see
+[ADR-0018](docs/adr/0018-editor-draft-durability.md).)
+
 ### Command Palette
 A VSCode-style quick switcher (**Ctrl/⌘+P**) to fuzzy-search every table/view on
 the current connection and open it in a tab. Contains-match (startsWith ranked
@@ -391,6 +398,9 @@ remembers its own tabs). Only *where you were* is saved (entity, view, filters,
 sort, SQL text, draft, column widths), **not** the fetched rows/results or staged
 edits — content is transient and re-fetched on demand. Stored in the configurable
 data directory alongside connections/history (see **Data Location**).
+
+Saved SQL text includes **unrun** editor text, captured even on an abrupt quit
+(see **Query Execution** and [ADR-0018](docs/adr/0018-editor-draft-durability.md)).
 
 ### Schema Browser
 The left-sidebar navigation: a lazy-loaded, virtualized, filterable tree

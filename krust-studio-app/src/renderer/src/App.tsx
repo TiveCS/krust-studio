@@ -40,6 +40,18 @@ function App(): React.JSX.Element {
     })()
   }, [load, loadWorkspace, loadTemplates, autoOpenLast])
 
+  // Flush the workspace to disk on quit so an abrupt close doesn't drop the last
+  // <800ms of edits sitting in the save debounce (ADR-0018). The editor's own
+  // blur flush lands unsaved SQL in the store first (window-close blurs the
+  // focused element before beforeunload fires).
+  useEffect(() => {
+    const onBeforeUnload = (): void => {
+      useConnections.getState().flushWorkspaceNow()
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [])
+
   useEffect(() => {
     const ipc = window.electron.ipcRenderer
     const offAvailable = ipc.on('update:available', (_, version: string) => {

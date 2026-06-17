@@ -181,6 +181,27 @@ export function QueryView(): React.JSX.Element | null {
   const setQuerySqlRef = useRef(setQuerySql)
   setQuerySqlRef.current = setQuerySql
 
+  // This component is keyed by tab.id (TableTabView), so its tab identity is
+  // fixed for its whole lifetime. Capture it once: every flush (blur/debounce/
+  // unmount) targets THIS tab explicitly, never activeTabId — by flush time the
+  // active tab may have already moved away (ADR-0018).
+  const myTabIdRef = useRef(tab?.id)
+
+  // Debounced flush of the typing ref → store (500ms idle). Covers "paste, then
+  // sit on the focused tab" where neither blur nor unmount fires before quit.
+  const sqlFlushTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const scheduleSqlFlush = useCallback((v: string) => {
+    if (sqlFlushTimer.current) clearTimeout(sqlFlushTimer.current)
+    sqlFlushTimer.current = setTimeout(() => {
+      if (myTabIdRef.current) setQuerySqlRef.current(myTabIdRef.current, v)
+    }, 500)
+  }, [])
+
+  const flushSqlNow = useCallback(() => {
+    if (sqlFlushTimer.current) { clearTimeout(sqlFlushTimer.current); sqlFlushTimer.current = null }
+    if (myTabIdRef.current) setQuerySqlRef.current(myTabIdRef.current, sqlRef.current)
+  }, [])
+
   // When tab actually switches (id changes), sync ref from store
   const tabId = tab?.id
   useEffect(() => {
@@ -189,10 +210,10 @@ export function QueryView(): React.JSX.Element | null {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabId])
 
-  // Flush to store on unmount (tab close / tab switch)
+  // Flush to store on unmount (tab close / tab switch) — explicit tabId
   useEffect(() => {
-    return () => { setQuerySqlRef.current(sqlRef.current) }
-  }, [])
+    return () => { flushSqlNow() }
+  }, [flushSqlNow])
 
   // Resizable split ─────────────────────────────────────────────────────────
   // editorH drives initial render only; during drag we mutate the DOM directly
@@ -235,13 +256,13 @@ export function QueryView(): React.JSX.Element | null {
 
   const run = (sql: string): void => {
     // Sync store once so re-renders triggered by results use current SQL
-    setQuerySql(sql)
+    if (myTabIdRef.current) setQuerySql(myTabIdRef.current, sql)
     sqlRef.current = sql
     void runQuery(sql)
   }
 
   const explain = (analyze: boolean): void => {
-    setQuerySql(sqlRef.current)
+    if (myTabIdRef.current) setQuerySql(myTabIdRef.current, sqlRef.current)
     if (
       analyze &&
       !window.confirm(
@@ -312,7 +333,9 @@ export function QueryView(): React.JSX.Element | null {
             sqlRef.current = v
             setHasSql(v.trim().length > 0)
             loadReferencedTables(v)
+            scheduleSqlFlush(v)
           }}
+          onBlur={flushSqlNow}
           onRun={run}
           schema={schema}
           driver={driver}
