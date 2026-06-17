@@ -40,12 +40,12 @@
     "semantic_hash": "645ca53d8f7a16dce9787a17cdc46971"
   },
   "krust-studio-app/src/main/index.ts": {
-    "mtime": 1781016247.5940826,
+    "mtime": 1781710906.9347458,
     "ast_hash": "48338727219bc339ec5bb00c07b1ad5f",
     "semantic_hash": "48338727219bc339ec5bb00c07b1ad5f"
   },
   "krust-studio-app/src/main/ipc.ts": {
-    "mtime": 1781445172.9252102,
+    "mtime": 1781709020.1730044,
     "ast_hash": "e10c3b6e1b3cf0ad9c828e069488d3e1",
     "semantic_hash": "e10c3b6e1b3cf0ad9c828e069488d3e1"
   },
@@ -80,12 +80,12 @@
     "semantic_hash": "1e5d2d18230bb4eb73fd3be2e6aae75f"
   },
   "krust-studio-app/src/preload/index.ts": {
-    "mtime": 1781445172.9262178,
+    "mtime": 1781709020.1740077,
     "ast_hash": "fb266295596c9a6ecc084d919772743a",
     "semantic_hash": "fb266295596c9a6ecc084d919772743a"
   },
   "krust-studio-app/src/renderer/src/App.tsx": {
-    "mtime": 1781707613.2837577,
+    "mtime": 1781709020.621621,
     "ast_hash": "c83b81e09c930a3ed04e94b3e66d0e89",
     "semantic_hash": ""
   },
@@ -170,7 +170,7 @@
     "semantic_hash": "9fdd3d1be47d8c7b1b3b91080e574bec"
   },
   "krust-studio-app/src/renderer/src/components/QueryView.tsx": {
-    "mtime": 1781707592.6837528,
+    "mtime": 1781709020.6226344,
     "ast_hash": "efa0888baa66ff4a8a73ede05cc1dee4",
     "semantic_hash": ""
   },
@@ -185,7 +185,7 @@
     "semantic_hash": "2bdf15c807777bf3214bc0caa138da00"
   },
   "krust-studio-app/src/renderer/src/components/SqlEditor.tsx": {
-    "mtime": 1781707606.5939944,
+    "mtime": 1781709020.6229463,
     "ast_hash": "31fb22431e95c8258f14bc2d3b73806c",
     "semantic_hash": ""
   },
@@ -200,7 +200,7 @@
     "semantic_hash": "e4bbe8e305bac17b58a3fccc4d73c6bf"
   },
   "krust-studio-app/src/renderer/src/components/TabBar.tsx": {
-    "mtime": 1781414509.3503726,
+    "mtime": 1781709020.1765258,
     "ast_hash": "74803ad57dee3e06927b574f295cc9c0",
     "semantic_hash": "74803ad57dee3e06927b574f295cc9c0"
   },
@@ -370,7 +370,7 @@
     "semantic_hash": "33e2f401ba9e135c52718d3b480407ff"
   },
   "krust-studio-app/src/renderer/src/store/connections.ts": {
-    "mtime": 1781707564.6962898,
+    "mtime": 1781709020.62513,
     "ast_hash": "8b2e7b6eb72c4e89bbbe921a409d36ae",
     "semantic_hash": ""
   },
@@ -385,7 +385,7 @@
     "semantic_hash": "cff3067e83bfce421425368ca7e7fb81"
   },
   "krust-studio-app/src/shared/types.ts": {
-    "mtime": 1781445172.9402838,
+    "mtime": 1781709020.1775346,
     "ast_hash": "255b2d018d8c740cfec09b12be4631bd",
     "semantic_hash": "255b2d018d8c740cfec09b12be4631bd"
   },
@@ -440,8 +440,8 @@
     "semantic_hash": "467281193b7fec107688d4f207152f07"
   },
   "krust-studio-app/package.json": {
-    "mtime": 1781707630.7167935,
-    "ast_hash": "62fc46215005764d410b4a9b3f5b9dea",
+    "mtime": 1781711095.0590644,
+    "ast_hash": "e365bbc5a1d0ee59acfea333928b48c0",
     "semantic_hash": ""
   },
   "krust-studio-app/tsconfig.json": {
@@ -465,7 +465,7 @@
     "semantic_hash": "a3a38e5b51650cb28dbe57bddb65eceb"
   },
   "CHANGELOG.md": {
-    "mtime": 1781707630.9686377,
+    "mtime": 1781710172.4482045,
     "ast_hash": "d4037d04091e7b799dbf550825353603",
     "semantic_hash": ""
   },
@@ -475,7 +475,7 @@
     "semantic_hash": "8a6643a420fdad6bfb583523bc6cef16"
   },
   "CONTEXT.md": {
-    "mtime": 1781707334.965727,
+    "mtime": 1781709020.595188,
     "ast_hash": "53d91d9fbcd610013f5bb91edc778837",
     "semantic_hash": ""
   },
@@ -490,7 +490,7 @@
     "semantic_hash": "8453e4e9363dec88cec0240f77c01901"
   },
   "docs/TODO.md": {
-    "mtime": 1781445172.8289018,
+    "mtime": 1781710906.9157803,
     "ast_hash": "bf2f5ab1e20ac36b93296d86d800309c",
     "semantic_hash": "bf2f5ab1e20ac36b93296d86d800309c"
   },
@@ -740,8 +740,13 @@
     "semantic_hash": ""
   },
   "docs/adr/0018-editor-draft-durability.md": {
-    "mtime": 1781707323.0440474,
-    "ast_hash": "bdb709164631476d3208de63dd001562",
+    "mtime": 1781709020.5961874,
+    "ast_hash": "fe15beebde471da5de742bc8c40dfeb7",
+    "semantic_hash": ""
+  },
+  "krust-studio-app/scripts/diag-mysql-connect.mjs": {
+    "mtime": 1781710907.7984042,
+    "ast_hash": "db6d4e9c425ad68aa6c9ccf55270b2db",
     "semantic_hash": ""
   }
 }
