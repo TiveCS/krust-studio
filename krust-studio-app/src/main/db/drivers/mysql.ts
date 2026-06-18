@@ -524,6 +524,7 @@ export class MysqlDriver implements DbDriver {
     const perCol = new Map<string, Acc>()
     const moveOrder: string[] = []
     const renameReverse = new Map<string, string>() // newName -> oldName
+    const renamedCols = new Set<string>() // newNames that were renamed
     const acc = (n: string): Acc => {
       let a = perCol.get(n)
       if (!a) {
@@ -536,7 +537,7 @@ export class MysqlDriver implements DbDriver {
     // structural statements, bucketed for safe ordering
     const dropFk: string[] = []
     const dropIdx: string[] = []
-    const structural: string[] = [] // drop/add/rename columns
+    const structural: string[] = [] // drop/add columns (renames go via CHANGE below)
     const addFk: string[] = []
     const addIdx: string[] = []
 
@@ -556,9 +557,7 @@ export class MysqlDriver implements DbDriver {
           break
         case 'renameColumn':
           renameReverse.set(op.to, op.from)
-          structural.push(
-            `ALTER TABLE ${t} RENAME COLUMN ${quoteIdent(op.from)} TO ${quoteIdent(op.to)}`
-          )
+          renamedCols.add(op.to)
           break
         case 'alterColumn': {
           const a = acc(op.name)
@@ -596,11 +595,17 @@ export class MysqlDriver implements DbDriver {
       }
     }
 
-    // Build coalesced MODIFYs from the verbatim SHOW CREATE TABLE definition.
+    // Build coalesced CHANGE/MODIFYs from the verbatim SHOW CREATE TABLE def.
+    // Renames go through CHANGE (rename + verbatim redefine in one shot) rather
+    // than `RENAME COLUMN ... TO ...`, which only exists on MySQL 8.0.3 / MariaDB
+    // 10.5.2+. CHANGE is portable across every MySQL/MariaDB version. A rename
+    // that also retypes/moves is folded into that single CHANGE; in-place edits
+    // (no rename) stay MODIFY.
     const coalesced: string[] = []
-    if (perCol.size > 0) {
+    const affected = new Set<string>([...perCol.keys(), ...renamedCols])
+    if (affected.size > 0) {
       const createSql = await this.getCreateSql(entity)
-      const buildModify = (newName: string, a: Acc): string => {
+      const buildChange = (newName: string): string => {
         const oldName = renameReverse.get(newName) ?? newName
         const verbatim = extractColumnDef(createSql, oldName)
         if (verbatim == null)
@@ -608,16 +613,24 @@ export class MysqlDriver implements DbDriver {
             `Could not read the definition for column "${oldName}" from SHOW CREATE TABLE`
           )
         let def = verbatim
-        if (a.type !== undefined) def = spliceType(def, a.type)
-        if (a.nullable !== undefined) def = spliceNullable(def, a.nullable)
-        if (a.setDef !== undefined) def = spliceDefault(def, a.setDef)
-        if (a.dropDef) def = dropDefaultClause(def)
-        const pos = a.hasMove ? positionClause(a.after, quoteIdent) : ''
-        return `ALTER TABLE ${t} MODIFY ${quoteIdent(newName)} ${def.trim()}${pos}`
+        const a = perCol.get(newName)
+        if (a) {
+          if (a.type !== undefined) def = spliceType(def, a.type)
+          if (a.nullable !== undefined) def = spliceNullable(def, a.nullable)
+          if (a.setDef !== undefined) def = spliceDefault(def, a.setDef)
+          if (a.dropDef) def = dropDefaultClause(def)
+        }
+        const pos = a?.hasMove ? positionClause(a.after, quoteIdent) : ''
+        const verb =
+          oldName !== newName
+            ? `CHANGE ${quoteIdent(oldName)} ${quoteIdent(newName)}`
+            : `MODIFY ${quoteIdent(newName)}`
+        return `ALTER TABLE ${t} ${verb} ${def.trim()}${pos}`
       }
       // def-only columns first (no reposition), then moved columns in target order
-      for (const [name, a] of perCol) if (!a.hasMove) coalesced.push(buildModify(name, a))
-      for (const name of moveOrder) coalesced.push(buildModify(name, perCol.get(name)!))
+      for (const name of affected)
+        if (!perCol.get(name)?.hasMove) coalesced.push(buildChange(name))
+      for (const name of moveOrder) coalesced.push(buildChange(name))
     }
 
     const statements = [

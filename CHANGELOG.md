@@ -4,6 +4,18 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [1.6.2] — 2026-06-18
+
+### Fixed
+- **Renaming a MySQL/MariaDB column no longer errors on older servers** — the
+  alter path emitted `ALTER TABLE … RENAME COLUMN x TO y`, syntax that only
+  exists on MySQL 8.0.3+ / MariaDB 10.5.2+, so renames failed with a SQL syntax
+  error on older MariaDB. Renames now go through `CHANGE COLUMN`, which is
+  portable across every MySQL/MariaDB version; the column's verbatim
+  `SHOW CREATE TABLE` definition is preserved (type, collation, default,
+  comment, auto_increment). A rename combined with a retype or reorder is folded
+  into a single `CHANGE`.
+
 ## [1.6.1] — 2026-06-17
 
 ### Fixed
