@@ -4,6 +4,21 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [1.6.3] - 2026-06-23
+
+### Fixed
+- **macOS unsigned builds now launch after Gatekeeper bypass** - the CI package
+  path now ad-hoc signs the full `.app` bundle when no Apple Developer ID
+  certificate is configured, and verifies that the main app and Electron
+  Framework have matching Team IDs. This prevents the macOS `DYLD` launch crash
+  caused by mixed signatures while keeping Mac releases buildable without a paid
+  Apple Developer account.
+- **Date and datetime cells preserve database-style display values** - table
+  cells, copy/paste text, filter-by-value, edit drafts, review dialogs, and the
+  FK picker now render JavaScript `Date` values as SQL-style literals
+  (`yyyy-mm-dd` / `yyyy-mm-dd hh:mm:ss`) instead of UTC ISO strings. Hover
+  tooltips still show readable local and UTC time.
+
 ## [1.6.2] — 2026-06-18
 
 ### Fixed

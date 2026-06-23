@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { FilterBar } from '@/components/FilterBar'
-import { display } from '@/lib/cellDisplay'
+import { cellText, display } from '@/lib/cellDisplay'
 import { cn } from '@/lib/utils'
 import type {
   ColumnInfo,
@@ -23,13 +23,6 @@ import type {
 } from '../../../shared/types'
 
 const LIMIT = 50
-
-function cell(v: unknown): string {
-  if (v === null || v === undefined) return ''
-  if (v instanceof Date) return v.toISOString()
-  if (typeof v === 'object') return JSON.stringify(v)
-  return String(v)
-}
 
 interface Props {
   connId: string
@@ -264,9 +257,9 @@ export function FkInlinePicker({
                       <td
                         key={c.name}
                         className="max-w-[14rem] truncate px-2.5 py-1.5 whitespace-nowrap"
-                        title={cell(row[c.name])}
+                        title={cellText(row[c.name], c.type)}
                       >
-                        {display(row[c.name], fkCols.has(c.name))}
+                        {display(row[c.name], fkCols.has(c.name), c.type)}
                       </td>
                     ))}
                   </tr>

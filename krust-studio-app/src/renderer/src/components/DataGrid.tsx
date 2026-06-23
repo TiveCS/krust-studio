@@ -52,7 +52,7 @@ import {
 import { FilterBar } from '@/components/FilterBar'
 import { ViewSwitch } from '@/components/ViewSwitch'
 import { appendCellCondition } from '@/lib/filterSql'
-import { display } from '@/lib/cellDisplay'
+import { cellText, display } from '@/lib/cellDisplay'
 import { cn } from '@/lib/utils'
 import { useConnections, editKey } from '@/store/connections'
 import { useSettings } from '@/store/settings'
@@ -60,13 +60,6 @@ import { useSettings } from '@/store/settings'
 const ROWNUM_W = 48
 const DEFAULT_COL_W = 180
 const MIN_COL_W = 48
-
-function toText(v: unknown): string {
-  if (v === null || v === undefined) return ''
-  if (v instanceof Date) return v.toISOString()
-  if (typeof v === 'object') return JSON.stringify(v)
-  return String(v)
-}
 
 interface Sel {
   ar: number
@@ -504,11 +497,11 @@ export function DataGrid(): React.JSX.Element | null {
     if (!cellEditable(r)) return
     setSel({ ar: r, ac: c, fr: r, fc: c })
     setEditing({ r, c })
-    setDraft(toText(valueAt(r, c)))
+    setDraft(cellText(valueAt(r, c), cols[c]?.type))
   }
   const commitDraft = (): void => {
     if (editing) {
-      if (draft !== toText(valueAt(editing.r, editing.c)))
+      if (draft !== cellText(valueAt(editing.r, editing.c), cols[editing.c]?.type))
         setCellValue(editing.r, editing.c, draft)
     }
     setEditing(null)
@@ -563,7 +556,7 @@ export function DataGrid(): React.JSX.Element | null {
     for (let r = rect.minR; r <= rect.maxR; r++) {
       const cells: string[] = []
       for (let c = rect.minC; c <= rect.maxC; c++) {
-        cells.push(toText(valueAt(r, c)))
+        cells.push(cellText(valueAt(r, c), cols[c]?.type))
         count++
       }
       lines.push(cells.join('\t'))
@@ -982,10 +975,12 @@ export function DataGrid(): React.JSX.Element | null {
                                       const showPick =
                                         fk && cellEditable(r) && !!openConnectionId
                                       if (!fk || (!showNav && !showPick))
-                                        return display(v, !!fk)
+                                        return display(v, !!fk, col.type)
                                       return (
                                         <span className="flex items-center justify-between gap-1">
-                                          <span className="truncate">{display(v, true)}</span>
+                                          <span className="truncate">
+                                            {display(v, true, col.type)}
+                                          </span>
                                           <span className="flex shrink-0 items-center gap-0.5">
                                             {showPick && (
                                               <button
@@ -1080,7 +1075,7 @@ export function DataGrid(): React.JSX.Element | null {
               onSelect={() => {
                 if (ctx) {
                   setModal(ctx)
-                  setModalDraft(toText(valueAt(ctx.r, ctx.c)))
+                  setModalDraft(cellText(valueAt(ctx.r, ctx.c), cols[ctx.c]?.type))
                 }
               }}
             >
@@ -1120,7 +1115,7 @@ export function DataGrid(): React.JSX.Element | null {
                 const f =
                   v === null || v === undefined
                     ? { column: name, op: 'isnull' as const, value: '' }
-                    : { column: name, op: 'eq' as const, value: toText(v) }
+                    : { column: name, op: 'eq' as const, value: cellText(v, cols[ctx.c]?.type) }
                 void setFilters([...tab.filters, f])
               }}
             >
@@ -1467,8 +1462,10 @@ export function DataGrid(): React.JSX.Element | null {
               m[k.slice(sep + 1)] = v
               byRow.set(ri, m)
             }
+            const typeOf = (name: string): string | undefined =>
+              rawCols.find((c) => c.name === name)?.type
             const pkOf = (ri: number): string =>
-              pk.map((c) => `${c}=${toText(rows[ri]?.[c])}`).join(', ') ||
+              pk.map((c) => `${c}=${cellText(rows[ri]?.[c], typeOf(c))}`).join(', ') ||
               `row ${ri + 1}`
             const inserts = tab.inserts.filter(
               (r) => Object.keys(r).length > 0
@@ -1505,9 +1502,9 @@ export function DataGrid(): React.JSX.Element | null {
                           </span>
                           {Object.entries(changes).map(([col, to]) => (
                             <div key={col} className="ml-2">
-                              {col}: <span className="text-muted-foreground/50">{toText(rows[ri]?.[col])}</span>
+                              {col}: <span className="text-muted-foreground/50">{cellText(rows[ri]?.[col], typeOf(col))}</span>
                               {' → '}
-                              <span className="text-foreground">{toText(to)}</span>
+                              <span className="text-foreground">{cellText(to, typeOf(col))}</span>
                             </div>
                           ))}
                         </div>

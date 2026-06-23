@@ -2,6 +2,8 @@ appId: com.krust.studio
 productName: Krust Studio
 directories:
   buildResources: build
+afterPack: build/sign-mac-ad-hoc.cjs
+afterSign: build/verify-mac-signatures.cjs
 files:
   - '!**/.vscode/*'
   - '!src/*'

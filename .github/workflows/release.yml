@@ -6,7 +6,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
 
 permissions:
@@ -50,8 +50,44 @@ jobs:
         run: ${{ matrix.build }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # no signing certs in CI -> don't try to sign/notarize
-          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          # If Apple signing secrets are present, electron-builder can use them.
+          # Otherwise the macOS package is ad-hoc signed so it can still run
+          # after a manual Gatekeeper bypass.
+          CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: Verify macOS code signatures
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: |
+          app_path="$(find dist -maxdepth 3 -type d -name 'Krust Studio.app' | head -n 1)"
+          if [ -z "$app_path" ]; then
+            echo "::error::Krust Studio.app was not produced"
+            exit 1
+          fi
+
+          framework_path="$app_path/Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework"
+          if [ ! -f "$framework_path" ]; then
+            echo "::error::Electron Framework was not bundled at $framework_path"
+            exit 1
+          fi
+
+          codesign --verify --deep --strict --verbose=2 "$app_path"
+
+          app_team_id="$(codesign -dv --verbose=4 "$app_path" 2>&1 | sed -n 's/^TeamIdentifier=//p')"
+          framework_team_id="$(codesign -dv --verbose=4 "$framework_path" 2>&1 | sed -n 's/^TeamIdentifier=//p')"
+
+          echo "App Team ID: ${app_team_id:-<empty>}"
+          echo "Electron Framework Team ID: ${framework_team_id:-<empty>}"
+
+          if [ "$app_team_id" != "$framework_team_id" ]; then
+            echo "::error::macOS app and Electron Framework have different Team IDs"
+            exit 1
+          fi
 
       # NOTE: on a tag, electron-builder itself publishes ALL artifacts —
       # installers, update manifests (latest*.yml) and .blockmap files — to a
