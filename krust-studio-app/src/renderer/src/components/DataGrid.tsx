@@ -63,6 +63,9 @@ const MIN_COL_W = 48
 
 type DateEditKind = 'date' | 'datetime'
 
+const DATE_INPUT_RE = /^\d{4}-\d{2}-\d{2}$/
+const DATETIME_INPUT_RE = /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(?::\d{2})?$/
+
 function dateEditKind(type?: string): DateEditKind | null {
   const t = type?.trim().toLowerCase() ?? ''
   if (!t) return null
@@ -85,6 +88,12 @@ function toDateInputValue(value: string, kind: DateEditKind): string {
   const text = value.trim()
   if (kind === 'date') return text.slice(0, 10)
   return text.replace(' ', 'T').slice(0, 19)
+}
+
+function canUseDateInput(value: string, kind: DateEditKind): boolean {
+  const text = value.trim()
+  if (!text) return true
+  return kind === 'date' ? DATE_INPUT_RE.test(text) : DATETIME_INPUT_RE.test(text)
 }
 
 function fromDateInputValue(value: string, kind: DateEditKind): string {
@@ -962,6 +971,8 @@ export function DataGrid(): React.JSX.Element | null {
                                 const edited = isEditedCell(r, c)
                                 const isEditing = editing?.r === r && editing?.c === c
                                 const dateKind = dateEditKind(col.type)
+                                const useDateInput =
+                                  !!dateKind && canUseDateInput(draft, dateKind)
                                 const isFkTarget =
                                   fkTarget?.r === r && fkTarget?.c === c
                                 return (
@@ -988,7 +999,7 @@ export function DataGrid(): React.JSX.Element | null {
                                         onOpenChange={(o) => !o && setEditing(null)}
                                         className="h-auto rounded-none border-0 bg-transparent px-0 text-xs shadow-none focus-visible:ring-0"
                                       />
-                                    ) : isEditing && dateKind ? (
+                                    ) : isEditing && dateKind && useDateInput ? (
                                       <input
                                         autoFocus
                                         type={dateKind === 'date' ? 'date' : 'datetime-local'}
