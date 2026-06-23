@@ -1,15 +1,6 @@
 Patch release focused on making the macOS artifact runnable without paid Apple signing and preserving database-style date/time values in the table explorer.
 
 ## Fixed
-
-### macOS unsigned build launch
-
-Unsigned macOS builds could be blocked even after the user bypassed Gatekeeper because the app bundle was internally inconsistent: the main app executable and bundled Electron Framework could carry different signing Team IDs. macOS then failed at launch with a `DYLD` error before Krust Studio could start.
-
-The release workflow now keeps CI buildable without Apple Developer Program credentials by ad-hoc signing the full `.app` bundle when no certificate is configured. The macOS job also verifies that the app and Electron Framework signatures are internally consistent before artifacts are uploaded.
-
-This does not remove the normal macOS unidentified-developer warning. Users may still need to right-click and open manually, but the app should launch after that bypass.
-
 ### Date and datetime display
 
 `DATE` / `DATETIME` values in the table explorer could appear as JavaScript ISO strings such as `2026-06-16T17:00:00...`, which made date-only columns look like shifted datetimes.
