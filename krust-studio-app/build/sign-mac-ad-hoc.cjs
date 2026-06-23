@@ -1,6 +1,6 @@
-const { execFileSync } = require('node:child_process')
 const fs = require('node:fs')
 const path = require('node:path')
+const { signAsync } = require('@electron/osx-sign')
 
 exports.default = async function signMacAdHoc(context) {
   if (context.electronPlatformName !== 'darwin') {
@@ -19,7 +19,18 @@ exports.default = async function signMacAdHoc(context) {
   }
 
   console.log(`Ad-hoc signing unsigned macOS app at ${appPath}`)
-  execFileSync('codesign', ['--force', '--deep', '--sign', '-', appPath], {
-    stdio: 'inherit'
+  await signAsync({
+    app: appPath,
+    identity: '-',
+    identityValidation: false,
+    platform: 'darwin',
+    hardenedRuntime: false,
+    preAutoEntitlements: false,
+    entitlements: path.join(context.packager.projectDir, 'build', 'entitlements.mac.plist'),
+    entitlementsInherit: path.join(
+      context.packager.projectDir,
+      'build',
+      'entitlements.mac.plist'
+    )
   })
 }
