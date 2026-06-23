@@ -4,6 +4,22 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [1.6.4] - 2026-06-23
+
+### Added
+- **Native date and datetime editors in the table data grid** - editing a
+  `DATE` cell now opens a calendar input, and editing `DATETIME` /
+  timestamp-like cells opens a date-time input. Picked values are committed back
+  as database-style literals (`yyyy-mm-dd` / `yyyy-mm-dd hh:mm:ss`) instead of
+  browser `datetime-local` strings.
+
+### Fixed
+- **macOS CI packaging uses Electron Builder's supported ad-hoc signing path** -
+  unsigned macOS artifacts now use `mac.identity: "-"` with Electron's library
+  validation entitlement instead of a custom signing hook that failed in GitHub
+  Actions. Signature verification still catches real Team ID mismatches while
+  accepting the empty Team ID used by ad-hoc signatures.
+
 ## [1.6.3] - 2026-06-23
 
 ### Fixed

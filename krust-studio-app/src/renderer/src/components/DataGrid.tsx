@@ -61,6 +61,39 @@ const ROWNUM_W = 48
 const DEFAULT_COL_W = 180
 const MIN_COL_W = 48
 
+type DateEditKind = 'date' | 'datetime'
+
+function dateEditKind(type?: string): DateEditKind | null {
+  const t = type?.trim().toLowerCase() ?? ''
+  if (!t) return null
+  if (t === 'date') return 'date'
+  if (
+    t === 'datetime' ||
+    t === 'timestamp' ||
+    t === 'timestamptz' ||
+    t.startsWith('datetime(') ||
+    t.startsWith('timestamp(') ||
+    t.startsWith('timestamp with time zone') ||
+    t.startsWith('timestamp without time zone')
+  ) {
+    return 'datetime'
+  }
+  return null
+}
+
+function toDateInputValue(value: string, kind: DateEditKind): string {
+  const text = value.trim()
+  if (kind === 'date') return text.slice(0, 10)
+  return text.replace(' ', 'T').slice(0, 19)
+}
+
+function fromDateInputValue(value: string, kind: DateEditKind): string {
+  if (!value) return ''
+  if (kind === 'date') return value
+  const normalized = value.replace('T', ' ')
+  return normalized.length === 16 ? `${normalized}:00` : normalized
+}
+
 interface Sel {
   ar: number
   ac: number
@@ -928,6 +961,7 @@ export function DataGrid(): React.JSX.Element | null {
                               {cols.map((col, c) => {
                                 const edited = isEditedCell(r, c)
                                 const isEditing = editing?.r === r && editing?.c === c
+                                const dateKind = dateEditKind(col.type)
                                 const isFkTarget =
                                   fkTarget?.r === r && fkTarget?.c === c
                                 return (
@@ -953,6 +987,22 @@ export function DataGrid(): React.JSX.Element | null {
                                         autoOpen
                                         onOpenChange={(o) => !o && setEditing(null)}
                                         className="h-auto rounded-none border-0 bg-transparent px-0 text-xs shadow-none focus-visible:ring-0"
+                                      />
+                                    ) : isEditing && dateKind ? (
+                                      <input
+                                        autoFocus
+                                        type={dateKind === 'date' ? 'date' : 'datetime-local'}
+                                        step={dateKind === 'date' ? undefined : 1}
+                                        value={toDateInputValue(draft, dateKind)}
+                                        onChange={(e) =>
+                                          setDraft(fromDateInputValue(e.target.value, dateKind))
+                                        }
+                                        onBlur={commitDraft}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') commitDraft()
+                                          if (e.key === 'Escape') setEditing(null)
+                                        }}
+                                        className="w-full bg-transparent outline-none"
                                       />
                                     ) : isEditing ? (
                                       <input

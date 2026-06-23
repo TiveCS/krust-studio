@@ -84,9 +84,13 @@ jobs:
           echo "App Team ID: ${app_team_id:-<empty>}"
           echo "Electron Framework Team ID: ${framework_team_id:-<empty>}"
 
-          if [ "$app_team_id" != "$framework_team_id" ]; then
+          if [ -n "$app_team_id" ] && [ -n "$framework_team_id" ] && [ "$app_team_id" != "$framework_team_id" ]; then
             echo "::error::macOS app and Electron Framework have different Team IDs"
             exit 1
+          fi
+
+          if [ -z "$app_team_id" ] || [ -z "$framework_team_id" ]; then
+            echo "Ad-hoc macOS signature detected; empty Team ID is expected."
           fi
 
       # NOTE: on a tag, electron-builder itself publishes ALL artifacts —

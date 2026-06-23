@@ -51,7 +51,11 @@ exports.default = async function verifyMacSignatures(context) {
   console.log(`App Team ID: ${appTeamId || '<empty>'}`)
   console.log(`Electron Framework Team ID: ${frameworkTeamId || '<empty>'}`)
 
-  if (appTeamId !== frameworkTeamId) {
+  if (appTeamId && frameworkTeamId && appTeamId !== frameworkTeamId) {
     throw new Error('macOS app and Electron Framework have different Team IDs')
+  }
+
+  if (!appTeamId || !frameworkTeamId) {
+    console.log('Ad-hoc macOS signature detected; empty Team ID is expected.')
   }
 }
