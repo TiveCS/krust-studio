@@ -50,14 +50,11 @@ jobs:
         run: ${{ matrix.build }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # If Apple signing secrets are present, electron-builder can use them.
-          # Otherwise the macOS package is ad-hoc signed so it can still run
-          # after a manual Gatekeeper bypass.
-          CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # Keep unsigned CI builds on the explicit ad-hoc signing path
+          # configured in electron-builder.yml (`mac.identity: "-"`). Do not
+          # pass Apple signing env vars here unless the workflow grows a
+          # separate notarized release path; empty CSC_LINK values make
+          # electron-builder try to load the project directory as a certificate.
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
 
       - name: Verify macOS code signatures
