@@ -10,7 +10,8 @@ import {
   Undo2,
   X,
   Pencil,
-  TableProperties
+  TableProperties,
+  AlignLeft
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -132,6 +133,7 @@ export function StructureView(): React.JSX.Element | null {
 
   const [ddl, setDdl] = useState<string | null>(null)
   const [ddlLoading, setDdlLoading] = useState(false)
+  const [prettyDdl, setPrettyDdl] = useState(false)
 
   // ── staged structure changes (columns + indexes, committed together) ──────
   // These live on the tab (store) so they survive switching tabs within a live
@@ -160,6 +162,7 @@ export function StructureView(): React.JSX.Element | null {
 
   // commit / preview
   const [previewSql, setPreviewSql] = useState<string | null>(null)
+  const [prettyPreview, setPrettyPreview] = useState(false)
   const [previewing, setPreviewing] = useState(false)
   const [busy, setBusy] = useState(false)
 
@@ -401,6 +404,7 @@ export function StructureView(): React.JSX.Element | null {
         tab.entity,
         ops
       )
+      setPrettyPreview(false)
       setPreviewSql(
         statements.length
           ? statements.map((s) => `${s};`).join('\n\n')
@@ -478,6 +482,16 @@ export function StructureView(): React.JSX.Element | null {
               <div className="flex-1" />
               <Button
                 size="xs"
+                variant={prettyDdl ? 'secondary' : 'ghost'}
+                disabled={!ddl}
+                onClick={() => setPrettyDdl((v) => !v)}
+                title="Display formatted SQL; copied SQL remains exact"
+              >
+                <AlignLeft />
+                Pretty
+              </Button>
+              <Button
+                size="xs"
                 variant="ghost"
                 disabled={!ddl}
                 onClick={() => {
@@ -498,7 +512,7 @@ export function StructureView(): React.JSX.Element | null {
                   Loading…
                 </div>
               ) : ddl ? (
-                <SqlDisplay value={ddl} />
+                <SqlDisplay value={ddl} driver={driver} pretty={prettyDdl} />
               ) : null}
             </div>
           </div>
@@ -1011,7 +1025,19 @@ export function StructureView(): React.JSX.Element | null {
           className="w-[52vw] min-w-[34rem] gap-0 sm:max-w-[52vw]"
         >
           <SheetHeader className="border-b border-border">
-            <SheetTitle>Review generated DDL</SheetTitle>
+            <div className="flex items-center gap-2">
+              <SheetTitle>Review generated DDL</SheetTitle>
+              <div className="flex-1" />
+              <Button
+                size="xs"
+                variant={prettyPreview ? 'secondary' : 'ghost'}
+                onClick={() => setPrettyPreview((v) => !v)}
+                title="Display formatted SQL; executable and copied SQL remain exact"
+              >
+                <AlignLeft />
+                Pretty
+              </Button>
+            </div>
             <SheetDescription>
               Exactly what will run on{' '}
               <span className="font-mono">{tab.entity.name}</span>, in one
@@ -1020,7 +1046,9 @@ export function StructureView(): React.JSX.Element | null {
           </SheetHeader>
           <div className="min-h-0 flex-1 overflow-auto p-4">
             <div className="rounded-md border border-border bg-card/40 p-3">
-              {previewSql && <SqlDisplay value={previewSql} />}
+              {previewSql && (
+                <SqlDisplay value={previewSql} driver={driver} pretty={prettyPreview} />
+              )}
             </div>
           </div>
           <SheetFooter className="flex-row justify-end gap-2 border-t border-border">

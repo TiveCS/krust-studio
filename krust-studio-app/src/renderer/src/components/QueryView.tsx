@@ -7,11 +7,13 @@ import {
   XCircle,
   RefreshCw,
   Gauge,
-  Save
+  Save,
+  AlignLeft
 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { SqlEditor } from '@/components/SqlEditor'
+import { SqlEditor, type SqlEditorHandle } from '@/components/SqlEditor'
 import { QueryPlanPanel } from '@/components/QueryPlanPanel'
 import { useConnections } from '@/store/connections'
 import type { QueryResult, EntityInfo } from '../../../shared/types'
@@ -178,6 +180,7 @@ export function QueryView(): React.JSX.Element | null {
   // `hasSql` mirrors only the empty↔non-empty transition so Run/Explain enable
   // as you type (store `q.sql` lags behind the ref — setState bails on no change).
   const sqlRef = useRef(q?.sql ?? '')
+  const editorRef = useRef<SqlEditorHandle>(null)
   const [hasSql, setHasSql] = useState((q?.sql ?? '').trim().length > 0)
   const setQuerySqlRef = useRef(setQuerySql)
   setQuerySqlRef.current = setQuerySql
@@ -334,6 +337,16 @@ export function QueryView(): React.JSX.Element | null {
           <Save />
           Save .sql
         </Button>
+        <Button
+          size="xs"
+          variant="ghost"
+          onClick={() => editorRef.current?.format()}
+          disabled={!hasSql}
+          title="Format SQL (Shift+Alt+F)"
+        >
+          <AlignLeft />
+          Format SQL
+        </Button>
         <span className="text-muted-foreground/60">Ctrl+Enter runs selection</span>
         <div className="flex-1" />
         <label className="flex cursor-pointer items-center gap-1.5 text-muted-foreground">
@@ -348,6 +361,7 @@ export function QueryView(): React.JSX.Element | null {
       {/* editor pane — fixed height, user-resizable */}
       <div ref={editorPaneRef} className="shrink-0 overflow-hidden border-b border-border" style={{ height: editorH }}>
         <SqlEditor
+          ref={editorRef}
           value={q.sql}
           onChange={(v) => {
             sqlRef.current = v
@@ -359,6 +373,7 @@ export function QueryView(): React.JSX.Element | null {
           onRun={run}
           schema={schema}
           driver={driver}
+          onFormatError={(message) => toast.error('Could not format SQL', { description: message })}
         />
       </div>
 

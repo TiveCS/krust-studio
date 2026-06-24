@@ -4,6 +4,21 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [1.6.6] — 2026-06-24
+
+### Added
+- **Dialect-aware SQL formatting** — query tabs gain **Format SQL** and
+  `Shift+Alt+F`, using MySQL, PostgreSQL, or SQLite formatting based on active
+  connection. Formatting rewrites editor text as an undoable edit.
+- **Display-only DDL prettification** — Structure → DDL and generated DDL review
+  gain a **Pretty** toggle. Executable, copied, captured, and exported SQL stays
+  exact and is never reformatted automatically.
+
+### Validation
+- This release provides first real packaged update path after 1.6.5
+  restart-to-update fix. Successful installation must still be confirmed through
+  an actual 1.6.5 → 1.6.6 update before that updater fix is marked verified.
+
 ## [1.6.5] — 2026-06-24
 
 ### Added

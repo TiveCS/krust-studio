@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { EditorView, basicSetup } from 'codemirror'
 import { keymap } from '@codemirror/view'
 import { EditorState, Compartment, Prec } from '@codemirror/state'
 import { sql, MySQL, PostgreSQL, SQLite, type SQLDialect } from '@codemirror/lang-sql'
 import { syntaxHighlighting } from '@codemirror/language'
 import { krustHighlight, krustTheme } from '@/lib/cm-theme'
+import { formatSql } from '@/lib/sqlFormat'
 import type { DriverType } from '../../../shared/types'
 
 // Per-engine dialect → correct identifier quoting (MySQL backtick vs ANSI "..."),
@@ -26,20 +27,54 @@ interface Props {
   schema?: Record<string, string[]>
   /** connection engine — picks the SQL dialect (quoting/keywords) */
   driver?: DriverType
+  onFormatError?: (message: string) => void
 }
 
-export function SqlEditor({ value, onChange, onBlur, onRun, schema, driver }: Props): React.JSX.Element {
+export interface SqlEditorHandle {
+  format: () => void
+}
+
+export const SqlEditor = forwardRef<SqlEditorHandle, Props>(function SqlEditor(
+  { value, onChange, onBlur, onRun, schema, driver, onFormatError },
+  ref
+): React.JSX.Element {
   const host = useRef<HTMLDivElement>(null)
   const view = useRef<EditorView | null>(null)
   const onChangeRef = useRef(onChange)
   const onBlurRef = useRef(onBlur)
   const onRunRef = useRef(onRun)
+  const onFormatErrorRef = useRef(onFormatError)
   const sqlCompartment = useRef(new Compartment())
   onChangeRef.current = onChange
   onBlurRef.current = onBlur
   onRunRef.current = onRun
+  onFormatErrorRef.current = onFormatError
 
   const dialect = (driver && DIALECTS[driver]) || MySQL
+  const driverRef = useRef(driver)
+  driverRef.current = driver
+
+  const formatCurrent = (): boolean => {
+    const v = view.current
+    if (!v) return false
+    try {
+      const current = v.state.doc.toString()
+      const formatted = formatSql(current, driverRef.current)
+      if (formatted !== current) {
+        const cursor = Math.min(v.state.selection.main.head, formatted.length)
+        v.dispatch({
+          changes: { from: 0, to: v.state.doc.length, insert: formatted },
+          selection: { anchor: cursor }
+        })
+      }
+      return true
+    } catch (err) {
+      onFormatErrorRef.current?.(err instanceof Error ? err.message : String(err))
+      return false
+    }
+  }
+
+  useImperativeHandle(ref, () => ({ format: () => void formatCurrent() }))
 
   useEffect(() => {
     if (!host.current) return
@@ -60,6 +95,11 @@ export function SqlEditor({ value, onChange, onBlur, onRun, schema, driver }: Pr
                 onRunRef.current(text)
                 return true
               }
+            },
+            {
+              key: 'Shift-Alt-f',
+              preventDefault: true,
+              run: () => formatCurrent()
             }
           ])
         ),
@@ -115,4 +155,4 @@ export function SqlEditor({ value, onChange, onBlur, onRun, schema, driver }: Pr
   }, [value])
 
   return <div ref={host} className="h-full overflow-auto" />
-}
+})

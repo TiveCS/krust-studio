@@ -8,7 +8,7 @@ the release gates pass. Existing 1.6.x hotfixes continue from `main`.
 
 1. Add a native Redis key browser and staged editor.
 2. Add stored procedure and function browsing, execution, creation, and editing.
-3. Add dialect-aware SQL prettification to DDL and query workflows.
+3. Extend 1.6.6 SQL prettification to routines and StarRocks.
 4. Expose StarRocks as a distinct Experimental, read/query-focused engine.
 5. Replace the assumed-relational driver boundary with capability-based drivers.
 
@@ -171,19 +171,15 @@ rows, or SQL.
 
 ## SQL prettification
 
-Reuse the existing `sql-formatter` dependency.
+Core query-editor formatting and display-only Structure DDL/review toggles ship
+in 1.6.6. Version 1.7 extends that foundation:
 
 - Global Pretty preference defaults off.
 - Each object tab can temporarily override the global display preference.
-- Structure DDL and routine definition viewers get a display-only Pretty toggle.
-- DDL review gets an optional display-only Pretty toggle but defaults to exact
-  executable SQL.
-- Query editor gets **Format SQL** and `Shift+Alt+F`; it rewrites editor text and
-  is undoable.
+- Routine definition viewers get a display-only Pretty toggle.
+- StarRocks uses the MySQL formatter dialect.
 - History retains existing formatting.
 - Captured statements and Changeset exports are never reformatted automatically.
-- Dialects: MySQL/MariaDB/StarRocks → MySQL; PostgreSQL → PostgreSQL; SQLite →
-  SQLite.
 
 ## StarRocks (Experimental)
 
@@ -223,7 +219,7 @@ compatibility. **Changeset** and **Captured DDL** remain the canonical terms.
 
 1. Create the release branch.
 2. Introduce capability-based drivers without changing existing behavior.
-3. Add SQL formatting surfaces.
+3. Extend SQL formatting to new routine and StarRocks surfaces.
 4. Add procedures/functions and routine-aware statement splitting.
 5. Add the Redis connection, key browser, and staged editor.
 6. Integrate StarRocks under its restricted Experimental capability profile.
