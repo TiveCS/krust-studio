@@ -1,29 +1,30 @@
 # Krust Studio — Context
 
-Modern, fast SQL database explorer. Personal daily tool, vibe-coded, open-sourced
+Modern, fast database explorer. Personal daily tool, vibe-coded, open-sourced
 on GitHub (use-at-own-risk, no maintenance pledge). Goal: the UX of Beekeeper
 Studio without the paywall, and nothing like the clunky Java/Swing tools
 (DBeaver, MySQL Workbench).
 
 ## Core principle
 
-**No silent mutations.** Every change made through the GUI — schema edits *and*
-data edits — surfaces and logs the exact SQL it generated. Schema edits feed
-**Captured DDL** / **Changeset** (handed to DevOps); data edits feed the **Data
-Mutation** history. This is the central differentiator: Beekeeper performs GUI
-mutations but hides the underlying SQL.
+**No silent mutations.** Every change made through the GUI surfaces and logs the
+exact database command it generated: SQL for relational databases and Redis
+commands for Redis. Relational schema edits feed **Captured DDL** / **Changeset**
+(handed to DevOps); relational data edits feed the **Data Mutation** history.
+This is the central differentiator: comparable database tools perform GUI
+mutations but hide the underlying commands.
 
 ## Glossary
 
 ### Connection
-A saved set of credentials + host + driver that lets Krust talk to one database
-server. Distinct from a **Session** (an active, live link using a Connection).
+A saved endpoint, credentials, and Driver that lets Krust talk to one data
+engine. Distinct from a **Session** (an active, live link using a Connection).
 
 Secrets are encrypted at rest via the OS keychain (Electron `safeStorage` /
-Windows DPAPI — key tied to the OS login, no master password). Supports SSH
-tunnel and SSL/TLS for reaching/securing prod databases. Connections are
-personal (no team-share export in v1). Stored in the configurable data
-directory (see **Data Location**).
+Windows DPAPI — key tied to the OS login, no master password). Supports SSL/TLS
+for securing network connections. SSH tunneling is deferred.
+Connections are personal (no team-share export in v1). Stored in the
+configurable data directory (see **Data Location**).
 
 The **database name is optional** for network drivers (MySQL/MariaDB,
 PostgreSQL): leaving it empty connects at the server level so the user can
@@ -61,25 +62,59 @@ old database's open tabs and reloads entities/enums. SQLite cannot switch
 (single file). Database listing loads lazily/non-blocking after connect, so a
 slow server never delays the schema tree.
 
+Redis uses the same switcher for logical databases (`DB 0`, `DB 1`, etc.).
+Switching resets key discovery and closes the previous logical database's key
+tabs. Krust discovers the configured database count when permitted; otherwise
+the user can select a database index manually.
+
 ### Driver
-Adapter for one database engine. v1 drivers: MySQL/MariaDB, PostgreSQL, SQLite.
-Each Driver knows how to connect, introspect schema, and run queries for its
-engine. Interface stays open for later engines (MSSQL, etc.) but those are
-deferred.
+Adapter for one data engine. Relational Drivers expose databases, schema
+objects, SQL queries, and relational mutations. A Redis Driver exposes logical
+databases, keys, Redis commands, and key mutations. A Driver presents only the
+capabilities native to its engine rather than pretending every engine has
+tables and SQL.
+
+### Redis Key
+A named entry in a Redis logical database, consisting of a value type, value,
+and optional expiry. A key opens in a **Redis Key tab**, whose viewer and editor
+match the key's native type (string, hash, list, set, sorted set, or stream).
+Key edits are staged per tab and preview the exact Redis commands before an
+explicit commit. Expiry can be inspected, added, changed, or removed. Redis
+support is key-centric; a raw command console is outside the initial scope.
+_Avoid_: Table, row, entity
+
+### Routine
+A named database program: either a **Stored Procedure** or a **Stored
+Function**. Routines are first-class schema objects that can be browsed,
+executed, created, and edited; every definition mutation surfaces and captures
+its exact DDL. In PostgreSQL, a Routine's identity includes its schema, kind,
+name, and input argument types; routines with the same name but different input
+signatures are distinct overloads.
+_Avoid_: Query, script
+
+### Routine Recovery Copy
+A temporary local copy of a Routine's original definition, identity, and grants,
+created before a non-atomic MySQL/MariaDB replacement. It supports an explicit,
+reviewed restoration after partial failure and expires after 30 days.
+_Avoid_: Backup, draft
 
 ### Query History
-Log of executed statements, split into three distinct streams (never mixed):
+Log of executed database commands, split into distinct streams (never mixed):
 
 - **Data Retrieval** — `SELECT` and other read-only reads.
 - **Data Mutation** — `INSERT` / `UPDATE` / `DELETE` / `TRUNCATE` (row-contents
   changes).
-- **Table Mutation** — DDL: `ALTER` / `CREATE` / `DROP`, index/constraint
-  changes (structural changes to tables). See **Captured DDL** — this is the
-  most important feature.
+- **Schema Mutation** — DDL: `ALTER` / `CREATE` / `DROP` affecting schema
+  objects such as tables, views, indexes, constraints, procedures, and
+  functions. See **Captured DDL** — this is the most important feature.
+- **Routine Execution** — an explicitly confirmed stored-procedure call. Every
+  procedure is treated as potentially mutating because its effects cannot be
+  inferred reliably from `CALL`; execution is blocked on read-only connections.
+  Function calls made through ordinary `SELECT` remain Data Retrieval.
 
 The dividing rule is **object shape vs row contents**: a statement that changes
-the existence or shape of an object is **Table Mutation**; one that changes only
-the rows inside it is **Data Mutation**. So `DROP` (removes the object) is Table
+the existence or shape of an object is **Schema Mutation**; one that changes only
+the rows inside it is **Data Mutation**. So `DROP` (removes the object) is Schema
 Mutation, but `TRUNCATE` (keeps the object, empties its rows) is Data Mutation —
 filed with `DELETE`, despite being DDL syntactically. This keeps a destructive
 data-wipe out of the schema-migration **Changeset** export by default.
@@ -105,7 +140,7 @@ By default a destructive entry is **changeset-eligible** but its auto-attach
 behaviour depends on the **Auto-attach destructive DDL** setting (Settings →
 History, default **on**):
 
-- **On** (default): destructive **Table Mutation** DDL (`DROP TABLE`/`DROP VIEW`)
+- **On** (default): destructive **Schema Mutation** DDL (`DROP TABLE`/`DROP VIEW`)
   auto-attaches to the active changeset like any other DDL — so a forgotten drop
   isn't left out of an exported migration. Because the export orders by execution
   time, a manually-added drop also slots into its correct chronological place.
@@ -114,7 +149,7 @@ History, default **on**):
   no-silent-ride behaviour.
 
 `TRUNCATE` and row deletes are **never** auto-attached either way (they are Data
-Mutation, and only Table Mutation auto-attaches). The toggle lives globally in
+Mutation, and only Schema Mutation auto-attaches). The toggle lives globally in
 the history store (`history.db` `meta`), not per-connection. (Distinct from the
 **Read-only Connection** typed-confirmation, which gates *execution*; this tag is
 about *history/export* handling.)
@@ -578,7 +613,7 @@ The AI can never write — MCP is read-only by construction.
 Every MCP read is logged to a dedicated audit stream: timestamp, tool called,
 connection, table, row count, and which columns were masked. Never auto-purged.
 A live indicator shows when the AI is actively reading and what it is reading.
-Same no-silent / control-everything instinct as **Table Mutation** history,
+Same no-silent / control-everything instinct as **Schema Mutation** history,
 applied to the AI's access.
 
 ## Decisions
