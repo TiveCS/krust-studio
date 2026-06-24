@@ -2,6 +2,10 @@
 .claude/
 .codegraph/
 
+# graphify regenerable cache (AST cache + stat-index) — rebuilt on every graph
+# update; tracking it churned the tree. Graph outputs stay tracked.
+graphify-out/cache/
+
 # node / build (app has its own too)
 node_modules/
 dist/
