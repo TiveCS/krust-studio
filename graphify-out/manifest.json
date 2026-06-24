@@ -40,12 +40,12 @@
     "semantic_hash": "645ca53d8f7a16dce9787a17cdc46971"
   },
   "krust-studio-app/src/main/index.ts": {
-    "mtime": 1782259312.4741707,
+    "mtime": 1782259727.3230023,
     "ast_hash": "f6bab37bb225e9cef6c2b8ad138250db",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/ipc.ts": {
-    "mtime": 1782259047.0365963,
+    "mtime": 1782259727.323994,
     "ast_hash": "926d8f0431805c6760e1dc1f128e17ce",
     "semantic_hash": ""
   },
@@ -80,7 +80,7 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/preload/index.ts": {
-    "mtime": 1782259047.037597,
+    "mtime": 1782259727.3250487,
     "ast_hash": "bbd94bb65fc32bf6880ca8f1d96983f8",
     "semantic_hash": ""
   },
@@ -170,7 +170,7 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/QueryView.tsx": {
-    "mtime": 1782259047.0388117,
+    "mtime": 1782259727.326577,
     "ast_hash": "88bec3d14cf1ce0fe5c5126d30468d59",
     "semantic_hash": ""
   },
@@ -200,7 +200,7 @@
     "semantic_hash": "e4bbe8e305bac17b58a3fccc4d73c6bf"
   },
   "krust-studio-app/src/renderer/src/components/TabBar.tsx": {
-    "mtime": 1782259047.0403173,
+    "mtime": 1782259727.327585,
     "ast_hash": "9674699bd47643355af429e2118759b7",
     "semantic_hash": ""
   },
@@ -370,7 +370,7 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/store/connections.ts": {
-    "mtime": 1782259099.4327865,
+    "mtime": 1782259727.3290935,
     "ast_hash": "819cc3e0367d2b444830c5cf4aa0b148",
     "semantic_hash": ""
   },
@@ -385,7 +385,7 @@
     "semantic_hash": "cff3067e83bfce421425368ca7e7fb81"
   },
   "krust-studio-app/src/shared/types.ts": {
-    "mtime": 1782259047.0413284,
+    "mtime": 1782259727.3290935,
     "ast_hash": "924cdaf4f964d50b6228fe18ff16d54b",
     "semantic_hash": ""
   },
@@ -440,7 +440,7 @@
     "semantic_hash": ""
   },
   "krust-studio-app/package.json": {
-    "mtime": 1782259468.3703754,
+    "mtime": 1782259727.3219845,
     "ast_hash": "7fe7d5d4e236790a846eae551d71ae37",
     "semantic_hash": ""
   },
@@ -465,7 +465,7 @@
     "semantic_hash": ""
   },
   "CHANGELOG.md": {
-    "mtime": 1782259418.0091116,
+    "mtime": 1782259727.278697,
     "ast_hash": "5f94a8ae54d67ecd7d8b0ce3b87c589b",
     "semantic_hash": ""
   },
@@ -475,7 +475,7 @@
     "semantic_hash": "8a6643a420fdad6bfb583523bc6cef16"
   },
   "CONTEXT.md": {
-    "mtime": 1782259166.7659287,
+    "mtime": 1782259727.2802107,
     "ast_hash": "20f720f686ac40d25d58224be41d8c28",
     "semantic_hash": ""
   },
@@ -490,7 +490,7 @@
     "semantic_hash": "8453e4e9363dec88cec0240f77c01901"
   },
   "docs/TODO.md": {
-    "mtime": 1782259379.7638292,
+    "mtime": 1782259727.2817204,
     "ast_hash": "47f8f62163c5796b4af9ae61e0c88dcf",
     "semantic_hash": ""
   },
@@ -745,12 +745,12 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1782043596.4064047,
+    "mtime": 1782259727.278697,
     "ast_hash": "8a6643a420fdad6bfb583523bc6cef16",
     "semantic_hash": ""
   },
   "docs/adr/0019-update-restart-quit-ownership.md": {
-    "mtime": 1782259370.3589983,
+    "mtime": 1782259727.2827313,
     "ast_hash": "83f98df82ad31c13f1b3bb4f99fffc65",
     "semantic_hash": ""
   },
@@ -782,6 +782,16 @@
   "docs/release/v1.6.4/short.md": {
     "mtime": 1782259022.6713865,
     "ast_hash": "7609838543ecb5dc7cfbfba4d6e401df",
+    "semantic_hash": ""
+  },
+  "docs/release/v1.6.5/full.md": {
+    "mtime": 1782260132.1192749,
+    "ast_hash": "94be47516a2f1c6f06ef479bb834d08a",
+    "semantic_hash": ""
+  },
+  "docs/release/v1.6.5/short.md": {
+    "mtime": 1782260127.8961146,
+    "ast_hash": "15403200d265b84a8902980bf1da5189",
     "semantic_hash": ""
   }
 }
