@@ -1,6 +1,6 @@
 {
   "name": "krust-studio-app",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "description": "Modern, fast SQL database explorer",
   "packageManager": "pnpm@11.1.3",
   "main": "./out/main/index.js",
