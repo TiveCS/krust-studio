@@ -319,6 +319,15 @@ for typing speed and flushes it to the persisted **Workspace** on blur, on tab
 switch, and idly while you type; see
 [ADR-0018](docs/adr/0018-editor-draft-durability.md).)
 
+**Open / save `.sql` files.** A `.sql` file can be opened into a new query tab
+(tab bar **Open SQL file…** / tab right-click), and the editor's SQL saved out to
+a `.sql` file (**Save .sql** in the editor toolbar). Opening is a **one-shot
+import**: the file text seeds the tab and the filename shows as the tab label,
+but the tab is **not** linked to the file — editing it never touches the file on
+disk, and saving always goes through an explicit save dialog. (A file-backed
+editor — live path, Ctrl+S write-back, dirty-vs-file tracking — is deliberately
+deferred.)
+
 ### Command Palette
 A VSCode-style quick switcher (**Ctrl/⌘+P**) to fuzzy-search every table/view on
 the current connection and open it in a tab. Contains-match (startsWith ranked

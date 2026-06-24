@@ -549,6 +549,10 @@ export interface DialogApi {
     defaultName: string,
     content: string
   ) => Promise<{ saved: boolean; path?: string }>
+  /** OS open dialog → reads a `.sql` file's text (utf-8). One-shot import: the
+   *  path is returned for display only, not a persisted link (ADR — file-backed
+   *  editing deferred). */
+  openText: () => Promise<{ canceled: boolean; path?: string; content?: string }>
 }
 
 /** Serialized form of a tab — only the fields that survive a restart. */

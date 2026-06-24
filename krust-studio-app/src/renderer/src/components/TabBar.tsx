@@ -7,7 +7,8 @@ import {
   History,
   Plug,
   Pin,
-  PinOff
+  PinOff,
+  FolderOpen
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useConnections, tabIsDirty, type Tab } from '@/store/connections'
@@ -43,6 +44,7 @@ export function TabBar(): React.JSX.Element | null {
     setActiveTab,
     closeTab,
     openQuery,
+    openSqlFile,
     closeOtherTabs,
     closeTabsToRight,
     closeAllTabs,
@@ -165,6 +167,10 @@ export function TabBar(): React.JSX.Element | null {
                 <SquareTerminal className="size-3.5" />
                 New query tab
               </ContextMenuItem>
+              <ContextMenuItem disabled={!openConnectionId} onSelect={() => void openSqlFile()}>
+                <FolderOpen className="size-3.5" />
+                Open SQL file…
+              </ContextMenuItem>
               <ContextMenuSeparator />
               <ContextMenuItem onSelect={() => requestClose([t.id], () => closeTab(t.id))}>
                 Close
@@ -225,6 +231,14 @@ export function TabBar(): React.JSX.Element | null {
       >
         <Plus className="size-3.5" />
         <SquareTerminal className="size-3.5" />
+      </button>
+      <button
+        onClick={() => void openSqlFile()}
+        disabled={!openConnectionId}
+        title="Open SQL file…"
+        className="flex shrink-0 items-center border-l border-border px-3 text-xs text-muted-foreground hover:bg-accent/40 hover:text-foreground disabled:opacity-40"
+      >
+        <FolderOpen className="size-3.5" />
       </button>
 
       <Dialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>

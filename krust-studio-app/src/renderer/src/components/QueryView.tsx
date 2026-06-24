@@ -6,7 +6,8 @@ import {
   CheckCircle2,
   XCircle,
   RefreshCw,
-  Gauge
+  Gauge,
+  Save
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -261,6 +262,14 @@ export function QueryView(): React.JSX.Element | null {
     void runQuery(sql)
   }
 
+  // Save the editor SQL to a .sql file. Defaults to the opened filename (shown
+  // as the tab label) when this tab came from a file, else `query.sql`.
+  const saveSql = (): void => {
+    const label = tab?.entity.name ?? ''
+    const name = label.toLowerCase().endsWith('.sql') ? label : 'query.sql'
+    void window.api.dialog.saveText(name, sqlRef.current)
+  }
+
   const explain = (analyze: boolean): void => {
     if (myTabIdRef.current) setQuerySql(myTabIdRef.current, sqlRef.current)
     if (
@@ -313,6 +322,17 @@ export function QueryView(): React.JSX.Element | null {
           title="EXPLAIN ANALYZE — runs the query and shows real timings"
         >
           Analyze
+        </Button>
+        <div className="mx-1 h-4 w-px bg-border" />
+        <Button
+          size="xs"
+          variant="ghost"
+          onClick={saveSql}
+          disabled={!hasSql}
+          title="Save the editor SQL to a .sql file"
+        >
+          <Save />
+          Save .sql
         </Button>
         <span className="text-muted-foreground/60">Ctrl+Enter runs selection</span>
         <div className="flex-1" />

@@ -200,7 +200,11 @@ interface ConnectionsState {
     opts?: { view?: TabView; structureSub?: StructureSub }
   ) => Promise<void>
   openNewTable: (initial?: { name?: string; columns?: NewColumnSpec[] }) => void
-  openQuery: () => void
+  /** open a SQL editor tab; `seed` pre-fills the SQL and tab label (e.g. an
+   *  opened .sql file — display only, not file-backed) */
+  openQuery: (seed?: { sql?: string; name?: string }) => void
+  /** OS open dialog → import a .sql file into a new query tab (one-shot) */
+  openSqlFile: () => Promise<void>
   /** write editor SQL to a specific tab's query state. Takes an explicit tabId
    *  (not activeTabId) because deferred flushes (blur/debounce/unmount) can fire
    *  after the active tab has already moved — ADR-0018. */
@@ -891,10 +895,10 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       scheduleWorkspaceSave()
     },
 
-    openQuery: () => {
+    openQuery: (seed) => {
       const tab: Tab = {
         id: crypto.randomUUID(),
-        entity: { name: 'Query' },
+        entity: { name: seed?.name ?? 'Query' },
         data: null,
         loading: false,
         error: null,
@@ -919,7 +923,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         referencedByLoading: false,
         draft: null,
         query: {
-          sql: '',
+          sql: seed?.sql ?? '',
           results: [],
           running: false,
           autoLimit: 500,
@@ -929,6 +933,16 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       }
       set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
       scheduleWorkspaceSave()
+    },
+
+    openSqlFile: async () => {
+      if (!get().openConnectionId) return
+      const res = await window.api.dialog.openText()
+      if (res.canceled || res.content === undefined) return
+      // One-shot import: seed a new query tab with the file text and show the
+      // filename as the tab label. No path is kept — the tab is not file-backed.
+      const name = res.path ? res.path.split(/[\\/]/).pop() : undefined
+      get().openQuery({ sql: res.content, name })
     },
 
     setQuerySql: (tabId, sql) => {

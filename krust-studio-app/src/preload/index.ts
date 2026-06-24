@@ -135,7 +135,8 @@ const api: KrustApi = {
   },
   dialog: {
     saveText: (defaultName: string, content: string) =>
-      ipcRenderer.invoke('dialog:saveText', defaultName, content)
+      ipcRenderer.invoke('dialog:saveText', defaultName, content),
+    openText: () => ipcRenderer.invoke('dialog:openText')
   },
   history: {
     list: (query: HistoryQuery) => ipcRenderer.invoke('history:list', query),

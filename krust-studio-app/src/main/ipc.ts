@@ -1,5 +1,5 @@
 import { ipcMain, dialog, BrowserWindow, app } from 'electron'
-import { writeFileSync } from 'fs'
+import { writeFileSync, readFileSync } from 'fs'
 import {
   listConnections,
   saveConnection,
@@ -207,6 +207,25 @@ export function registerIpc(): void {
       if (res.canceled || !res.filePath) return { saved: false }
       writeFileSync(res.filePath, content, 'utf-8')
       return { saved: true, path: res.filePath }
+    }
+  )
+  ipcMain.handle(
+    'dialog:openText',
+    async (
+      e
+    ): Promise<{ canceled: boolean; path?: string; content?: string }> => {
+      const win = BrowserWindow.fromWebContents(e.sender) ?? undefined
+      const res = await dialog.showOpenDialog(win!, {
+        title: 'Open SQL file',
+        properties: ['openFile'],
+        filters: [
+          { name: 'SQL', extensions: ['sql'] },
+          { name: 'All files', extensions: ['*'] }
+        ]
+      })
+      if (res.canceled || !res.filePaths[0]) return { canceled: true }
+      const path = res.filePaths[0]
+      return { canceled: false, path, content: readFileSync(path, 'utf-8') }
     }
   )
   ipcMain.handle(

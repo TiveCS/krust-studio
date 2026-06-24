@@ -4,6 +4,15 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [1.6.5] — 2026-06-24
+
+### Added
+- **Open / save `.sql` files** — open a `.sql` into a new query tab (tab bar
+  **Open SQL file…** / tab right-click) and save the editor's SQL out with
+  **Save .sql**. Opening is a one-shot import (filename shows as the tab label;
+  the tab is not linked to the file). File-backed editing (write-back, dirty
+  tracking) is deferred.
+
 ## [1.6.4] - 2026-06-23
 
 ### Added
