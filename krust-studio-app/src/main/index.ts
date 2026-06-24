@@ -6,6 +6,9 @@ import icon from '../../resources/icon.png?asset'
 import { registerIpc } from './ipc'
 
 let updaterWired = false
+// Set while an in-app update is restarting, so `window-all-closed` doesn't fire
+// its own app.quit() and race electron-updater's paced quit (ADR-0019).
+let quittingForUpdate = false
 
 function setupAutoUpdater(win: BrowserWindow): void {
   if (updaterWired) return // once per app run (ready-to-show can re-fire)
@@ -25,12 +28,14 @@ function setupAutoUpdater(win: BrowserWindow): void {
   })
 
   ipcMain.on('update:install', () => {
-    // Destroy all windows synchronously so NSIS doesn't detect the app as
-    // still running when the installer starts (quitAndInstall spawns the
-    // installer before app.quit() fully drains the process).
-    for (const win of BrowserWindow.getAllWindows()) {
-      win.destroy()
-    }
+    // Let electron-updater own the shutdown: quitAndInstall spawns the detached
+    // NSIS installer and then quits at its own pace (setImmediate). We must NOT
+    // force-close windows here — destroying them fires `window-all-closed`,
+    // whose app.quit() exits the process before the installer child detaches,
+    // so nothing installs (the app just reopens on the old version). The
+    // installer itself taskkills any running instance (v1.3.3), so the old
+    // "app still running" guard is no longer needed. See ADR-0019.
+    quittingForUpdate = true
     autoUpdater.quitAndInstall(false, true)
   })
 
@@ -138,6 +143,9 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
+  // During an in-app update restart, electron-updater drives the quit itself —
+  // quitting here too would race it and abort the install (ADR-0019).
+  if (quittingForUpdate) return
   if (process.platform !== 'darwin') {
     app.quit()
   }

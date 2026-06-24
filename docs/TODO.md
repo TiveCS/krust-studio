@@ -563,3 +563,9 @@ CONTEXT.md **Session** + **Workspace & Tabs** + **Referenced By (Reverse FK)**.
 - Backup uses Postgres's reconstructed (approximate) CREATE TABLE for the schema
   dump — same caveat as the Structure → DDL sub-tab. mysql/sqlite use native
   SHOW CREATE / sqlite_master (exact).
+- Auto-update "Restart now" didn't install (closed, reopened on old version).
+  **Code fix shipped** in 1.6.5 (ADR-0019: `quitAndInstall` owns the quit, no
+  `win.destroy()`) but **unverified** — can't be tested in dev or locally; only a
+  real update cycle proves it. **TODO: once an auto-update actually installs
+  (first chance: a release after 1.6.5), add the confirmed "Fixed" line to that
+  version's CHANGELOG.** Until then it is deliberately left out of release notes.
