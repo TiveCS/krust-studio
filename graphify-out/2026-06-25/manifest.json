@@ -170,8 +170,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/QueryView.tsx": {
-    "mtime": 1782343568.0279515,
-    "ast_hash": "0357329ceeba1781d40235fdef84f19b",
+    "mtime": 1782315986.5373259,
+    "ast_hash": "fb69d20e0fed63bf1d4e7ca95b21dfe7",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/SettingsModal.tsx": {
@@ -180,13 +180,13 @@
     "semantic_hash": "099a3e73c663f39f02e62a6ff9a06d8b"
   },
   "krust-studio-app/src/renderer/src/components/SqlDisplay.tsx": {
-    "mtime": 1782343568.0289502,
-    "ast_hash": "09d4991a69f882884d8d42d1f2f9ad85",
+    "mtime": 1782315986.5361202,
+    "ast_hash": "48a1c5f0f7ef30cbe668ae75cc76322c",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/SqlEditor.tsx": {
-    "mtime": 1782343568.0299494,
-    "ast_hash": "d741eb68c53a905cbbe5e6fe311892e2",
+    "mtime": 1782316269.9052358,
+    "ast_hash": "e488c547a02522bfe21150dc84a46d60",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/StructureEditor.tsx": {
@@ -195,8 +195,8 @@
     "semantic_hash": "61d63c329365fca31577d8abca3e14a1"
   },
   "krust-studio-app/src/renderer/src/components/StructureView.tsx": {
-    "mtime": 1782343568.0319529,
-    "ast_hash": "4c7b6e1547c493dededf9c93a74c19cd",
+    "mtime": 1782316329.8054805,
+    "ast_hash": "3d76ab9f1e1edd4a170734f1c0a473d4",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/TabBar.tsx": {
@@ -440,8 +440,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/package.json": {
-    "mtime": 1782343568.0249498,
-    "ast_hash": "9065c0c04eda24bc6ebf6b9087b768d3",
+    "mtime": 1782316218.3090162,
+    "ast_hash": "290ba89ff7e78a89dca25e098681ea6d",
     "semantic_hash": ""
   },
   "krust-studio-app/tsconfig.json": {
@@ -465,8 +465,8 @@
     "semantic_hash": ""
   },
   "CHANGELOG.md": {
-    "mtime": 1782345861.373452,
-    "ast_hash": "1befc3678e6dd13908ca5e1b939f628d",
+    "mtime": 1782316122.3245277,
+    "ast_hash": "adff407ed319e0779af09641fb6ac237",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -490,8 +490,8 @@
     "semantic_hash": "8453e4e9363dec88cec0240f77c01901"
   },
   "docs/TODO.md": {
-    "mtime": 1782345861.3767526,
-    "ast_hash": "1833ef5381b82d0999d1a2ebed375787",
+    "mtime": 1782259727.2817204,
+    "ast_hash": "47f8f62163c5796b4af9ae61e0c88dcf",
     "semantic_hash": ""
   },
   "docs/adr/0001-electron-over-tauri.md": {
@@ -750,8 +750,8 @@
     "semantic_hash": ""
   },
   "docs/adr/0019-update-restart-quit-ownership.md": {
-    "mtime": 1782345861.3787577,
-    "ast_hash": "6b25355e5f0758c875b4467838475405",
+    "mtime": 1782259727.2827313,
+    "ast_hash": "83f98df82ad31c13f1b3bb4f99fffc65",
     "semantic_hash": ""
   },
   "docs/release/v1.6.3/blurb.md": {
@@ -800,28 +800,28 @@
     "semantic_hash": ""
   },
   "docs/release/v1.7.0/plan.md": {
-    "mtime": 1782343567.9999533,
-    "ast_hash": "68c6474d42a830294f81b7169d36e628",
+    "mtime": 1782316110.418097,
+    "ast_hash": "aecb3abdab38010cd49cca2abdeb0233",
     "semantic_hash": ""
   },
   "krust-studio-app/scripts/sql-format.test.ts": {
-    "mtime": 1782343568.0269508,
-    "ast_hash": "c769980aae119978cb4a336046175bef",
+    "mtime": 1782316248.362397,
+    "ast_hash": "0cd2332a8ae18a8b058f70b3f2d5f74d",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/lib/sqlFormat.ts": {
-    "mtime": 1782343568.0329516,
-    "ast_hash": "ee5db6a4e40beb9a79f9f20f57f9ebe1",
+    "mtime": 1782315986.5333312,
+    "ast_hash": "41f4ff47970a883f0f530a6e50f905b2",
     "semantic_hash": ""
   },
   "docs/release/v1.6.6/full.md": {
-    "mtime": 1782345861.375451,
-    "ast_hash": "1b93837405df2d400ca034214e7adf41",
+    "mtime": 1782316098.4945486,
+    "ast_hash": "e90a2298d75c5b85ab81ee065694d36e",
     "semantic_hash": ""
   },
   "docs/release/v1.6.6/short.md": {
-    "mtime": 1782343567.997953,
-    "ast_hash": "1fefa6d0ebcd70b35b12317a43621077",
+    "mtime": 1782316098.4945486,
+    "ast_hash": "5352cac5baa2393db0f87cd4d90b6789",
     "semantic_hash": ""
   }
 }
