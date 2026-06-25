@@ -4,9 +4,8 @@ Date: 2026-06-17
 
 ## Status
 
-Accepted — fix shipped, **pending confirmation via a real update cycle**. The
-CHANGELOG entry is deliberately withheld until an auto-update actually installs
-(first opportunity: a release after 1.6.5); see `docs/TODO.md` → Known bugs.
+Accepted and verified. Fix shipped in 1.6.5; a real `1.6.5 → 1.6.6` update
+downloaded, installed, and relaunched successfully on 2026-06-25.
 
 ## Context
 
@@ -59,3 +58,9 @@ Let electron-updater own the entire update shutdown:
 - Verification requires a real packaged update cycle (publish a build, update to
   it from a prior version) — it cannot be reproduced in dev (`is.dev` skips the
   updater).
+
+## Verification
+
+Verified on 2026-06-25 through a real packaged `1.6.5 → 1.6.6` update. The
+download completed, **Restart now** launched the installer, 1.6.6 installed, and
+the app relaunched on the new version.

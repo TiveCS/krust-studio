@@ -22,10 +22,13 @@ Structure → DDL and generated DDL review now have a display-only **Pretty**
 toggle. This never changes the SQL that Krust copies, executes, captures in
 History, or exports through Changesets.
 
-## Update validation
+## Fixed
 
-This is the first packaged release after the 1.6.5 restart-to-update fix. Test
-the real `1.6.5 → 1.6.6` in-app update before marking that fix verified.
+### In-app restart-to-update verified
+
+A real `1.6.5 → 1.6.6` update downloaded, installed, and relaunched
+successfully. This confirms the `quitAndInstall` shutdown-race fix shipped in
+1.6.5.
 
 ## Install
 

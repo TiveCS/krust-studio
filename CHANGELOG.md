@@ -14,10 +14,10 @@ All notable changes to Krust Studio. Format loosely follows
   gain a **Pretty** toggle. Executable, copied, captured, and exported SQL stays
   exact and is never reformatted automatically.
 
-### Validation
-- This release provides first real packaged update path after 1.6.5
-  restart-to-update fix. Successful installation must still be confirmed through
-  an actual 1.6.5 → 1.6.6 update before that updater fix is marked verified.
+### Fixed
+- **In-app restart-to-update verified** — a real `1.6.5 → 1.6.6` update
+  downloaded, installed, and relaunched successfully, confirming the
+  `quitAndInstall` shutdown-race fix shipped in 1.6.5.
 
 ## [1.6.5] — 2026-06-24
 
