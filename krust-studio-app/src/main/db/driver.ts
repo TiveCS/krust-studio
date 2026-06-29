@@ -21,20 +21,44 @@ import type {
 } from '../../shared/types'
 
 /**
- * A live database driver. One instance wraps one open connection (a Session).
- * Future contract additions (query/cancel, generate-DDL, transactions, etc.)
- * live here so every engine implements them uniformly.
+ * Capability-based driver contract (ADR-0020).
+ *
+ * A live driver wraps one open connection (a Session). Instead of one fat
+ * relational interface, the contract is split into a shared lifecycle core plus
+ * optional capability sub-interfaces; an engine composes only the capabilities
+ * native to it. The three relational engines compose every relational
+ * capability (so `DbDriver` below is structurally identical to the old fat
+ * interface and they implement it unchanged); Redis composes `DriverCore &
+ * KeyValueCapable` and never pretends to have tables or SQL.
  */
-export interface DbDriver {
+
+/** lifecycle shared by every engine — relational or not. */
+export interface DriverCore {
   connect(): Promise<void>
   /** databases/catalogs visible to this connection (mysql SHOW DATABASES,
-   *  pg pg_database). sqlite returns []. */
+   *  pg pg_database, redis logical DBs). sqlite returns []. */
   listDatabases(): Promise<string[]>
   /** switch the active database. mysql: `USE db` (same connection); pg:
-   *  reconnects bound to the new db; sqlite: throws (single-file). */
+   *  reconnects bound to the new db; redis: `SELECT n`; sqlite: throws. */
   useDatabase(name: string): Promise<void>
   /** the currently-active database name, or null when none selected. */
   currentDatabase(): string | null
+  /** cancel the in-flight query (pg/mysql); no-op/throw on sqlite/redis */
+  cancel(): Promise<void>
+  close(): Promise<void>
+}
+
+/** arbitrary SQL execution + query plans (relational engines). */
+export interface SqlCapable {
+  /** run one arbitrary statement (SQL editor); returns rows or affected count */
+  query(sql: string): Promise<RawQueryResult>
+  /** EXPLAIN / EXPLAIN ANALYZE → parsed plan tree (ADR-0014). `analyze` runs the
+   *  statement for real (engine-dependent). */
+  explainQuery(sql: string, analyze: boolean): Promise<QueryPlan>
+}
+
+/** schema-object browsing + tabular row reads (relational engines). */
+export interface TabularCapable {
   listEntities(): Promise<EntityInfo[]>
   listEnums(): Promise<EnumType[]>
   readRows(
@@ -54,12 +78,20 @@ export interface DbDriver {
     limit: number,
     offset: number
   ): Promise<SearchResult>
-  applyChanges(entity: EntityRef, changes: ChangeSet): Promise<ApplyResult>
   describeTable(entity: EntityRef): Promise<TableStructure>
   /** tables that reference this one (inbound FKs / "Referenced by"). */
   listReferencingTables(entity: EntityRef): Promise<ReferencingTable[]>
   /** the CREATE statement for a table/view; pg reconstructs from catalog. */
   getCreateSql(entity: EntityRef): Promise<string>
+}
+
+/** staged data-grid edits → DML (relational engines). */
+export interface TabularMutCapable {
+  applyChanges(entity: EntityRef, changes: ChangeSet): Promise<ApplyResult>
+}
+
+/** schema mutation / DDL (relational engines). */
+export interface SchemaMutCapable {
   createTable(spec: CreateTableSpec): Promise<{ ddl: string }>
   /** apply schema ops. `dryRun` builds + returns the statements without
    *  executing them (for the pre-commit DDL preview). */
@@ -76,15 +108,18 @@ export interface DbDriver {
   truncateTable(entity: EntityRef): Promise<{ statements: string[] }>
   createIndex(entity: EntityRef, spec: IndexSpec): Promise<{ statements: string[] }>
   dropIndex(entity: EntityRef, name: string): Promise<{ statements: string[] }>
-  /** run one arbitrary statement (SQL editor); returns rows or affected count */
-  query(sql: string): Promise<RawQueryResult>
-  /** EXPLAIN / EXPLAIN ANALYZE → parsed plan tree (ADR-0014). `analyze` runs the
-   *  statement for real (engine-dependent). */
-  explainQuery(sql: string, analyze: boolean): Promise<QueryPlan>
-  /** cancel the in-flight query (pg/mysql); no-op/throw on sqlite */
-  cancel(): Promise<void>
-  close(): Promise<void>
 }
+
+/**
+ * A relational driver: every relational capability composed. Structurally
+ * identical to the pre-ADR-0020 fat interface, so existing mysql/postgres/
+ * sqlite drivers satisfy it without changes.
+ */
+export type DbDriver = DriverCore &
+  SqlCapable &
+  TabularCapable &
+  TabularMutCapable &
+  SchemaMutCapable
 
 /**
  * Split a SQL script into statements on top-level `;`, skipping semicolons
