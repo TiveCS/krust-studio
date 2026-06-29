@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Loader2, RefreshCw, Trash2, Pencil, Plus, X, Clock, AlertTriangle } from 'lucide-react'
+import { Loader2, RefreshCw, Trash2, Pencil, Plus, Clock, AlertTriangle } from 'lucide-react'
 import { useRedis, buildCommands, type StagedEdit } from '@/store/redis'
 import { useConnections, type Tab } from '@/store/connections'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+import { JsonTree } from '@/components/JsonTree'
 import type { RedisArg } from '../../../shared/types'
 
 /** render a command argv for the preview (binary args shown as a byte count) */
@@ -172,7 +182,7 @@ function Header({
 }): React.JSX.Element {
   const redis = useRedis()
   const ident = tab.redisKey!
-  const [renaming, setRenaming] = useState(false)
+  const [renameOpen, setRenameOpen] = useState(false)
   const [newName, setNewName] = useState(ident.key)
   const [overwrite, setOverwrite] = useState(false)
   const [confirmDel, setConfirmDel] = useState('')
@@ -180,9 +190,11 @@ function Header({
   const [expirySecs, setExpirySecs] = useState('')
 
   const doRename = async (allowOverwrite: boolean): Promise<void> => {
+    if (!newName.trim() || newName === ident.key) return
     try {
       await redis.renameKey(ident.key, newName, allowOverwrite)
       toast.success('Renamed')
+      setRenameOpen(false)
       onClose()
     } catch (err) {
       const m = err instanceof Error ? err.message : String(err)
@@ -191,6 +203,12 @@ function Header({
         toast.error(`Key "${newName}" already exists — confirm overwrite`)
       } else toast.error(m)
     }
+  }
+
+  const openRename = (): void => {
+    setNewName(ident.key)
+    setOverwrite(false)
+    setRenameOpen(true)
   }
 
   return (
@@ -240,40 +258,55 @@ function Header({
         </div>
       )}
 
-      {/* rename — separate guarded action */}
-      {renaming ? (
-        <div className="flex items-center gap-1">
-          <input
+      {/* rename — separate guarded action, in a dialog */}
+      <Button size="xs" variant="ghost" onClick={openRename}>
+        <Pencil className="size-3.5" /> Rename
+      </Button>
+      <Dialog open={renameOpen} onOpenChange={setRenameOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Rename key</DialogTitle>
+            <DialogDescription className="font-mono text-xs">{ident.key}</DialogDescription>
+          </DialogHeader>
+          <Input
+            autoFocus
             value={newName}
             onChange={(e) => {
               setNewName(e.target.value)
               setOverwrite(false)
             }}
-            className="h-6 w-40 rounded border border-border bg-transparent px-1 font-mono text-xs"
-          />
-          {overwrite ? (
-            <Button size="xs" variant="destructive" onClick={() => void doRename(true)}>
-              Overwrite
-            </Button>
-          ) : (
-            <Button size="xs" variant="secondary" onClick={() => void doRename(false)}>
-              Save
-            </Button>
-          )}
-          <button
-            onClick={() => {
-              setRenaming(false)
-              setOverwrite(false)
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !overwrite) void doRename(false)
             }}
-          >
-            <X className="size-3.5 text-muted-foreground" />
-          </button>
-        </div>
-      ) : (
-        <Button size="xs" variant="ghost" onClick={() => setRenaming(true)}>
-          <Pencil className="size-3.5" /> Rename
-        </Button>
-      )}
+            placeholder="new key name"
+            className="font-mono"
+          />
+          {overwrite && (
+            <p className="text-xs text-destructive">
+              A key named <span className="font-mono">{newName}</span> already exists. Overwrite
+              replaces its value.
+            </p>
+          )}
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setRenameOpen(false)}>
+              Cancel
+            </Button>
+            {overwrite ? (
+              <Button variant="destructive" onClick={() => void doRename(true)}>
+                Overwrite
+              </Button>
+            ) : (
+              <Button
+                variant="secondary"
+                disabled={!newName.trim() || newName === ident.key}
+                onClick={() => void doRename(false)}
+              >
+                Rename
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* delete — typed key-name confirmation */}
       <div className="flex items-center gap-1">
@@ -449,11 +482,23 @@ function StringEditor({
 
   const [mode, setMode] = useState<ViewMode>(page.binary ? 'hex' : 'text')
   const [draft, setDraft] = useState(orig[page.binary ? 'hex' : 'text'])
+  // JSON mode renders a collapsible tree by default; 'raw' for the editable text
+  const [jsonView, setJsonView] = useState<'tree' | 'raw'>('tree')
 
   // reset the editor to the chosen mode's representation when value or mode changes
   useEffect(() => {
     setDraft(orig[mode])
   }, [orig, mode])
+
+  // parse the current JSON draft for the tree (null when not valid JSON)
+  const jsonParsed = React.useMemo(() => {
+    if (mode !== 'json') return undefined
+    try {
+      return { ok: true as const, value: JSON.parse(draft) }
+    } catch (e) {
+      return { ok: false as const, error: e instanceof Error ? e.message : 'invalid JSON' }
+    }
+  }, [mode, draft])
 
   if (page.tooLarge) {
     return (
@@ -522,15 +567,59 @@ function StringEditor({
             binary
           </span>
         )}
+        {mode === 'json' && (
+          <div className="ml-auto flex items-center gap-1">
+            {(['tree', 'raw'] as const).map((v) => (
+              <button
+                key={v}
+                onClick={() => setJsonView(v)}
+                className={cn(
+                  'rounded px-2 py-0.5 text-[11px] capitalize',
+                  jsonView === v
+                    ? 'bg-accent text-foreground'
+                    : 'text-muted-foreground hover:bg-accent/50'
+                )}
+              >
+                {v}
+              </button>
+            ))}
+            <button
+              onClick={() => {
+                if (jsonParsed?.ok) setDraft(JSON.stringify(jsonParsed.value, null, 2))
+              }}
+              className="rounded px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-accent/50"
+              title="Re-format (pretty-print)"
+            >
+              Format
+            </button>
+          </div>
+        )}
       </div>
-      <textarea
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        className="h-64 w-full resize-none rounded border border-border bg-transparent p-2 font-mono text-xs outline-none focus:border-ring"
-        spellCheck={false}
-      />
+
+      {mode === 'json' && jsonView === 'tree' ? (
+        <div className="h-64 w-full overflow-auto rounded border border-border bg-transparent p-2">
+          {jsonParsed?.ok ? (
+            <JsonTree data={jsonParsed.value} />
+          ) : (
+            <p className="text-xs text-destructive">Not valid JSON: {jsonParsed?.error}</p>
+          )}
+        </div>
+      ) : (
+        <textarea
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          className="h-64 w-full resize-none rounded border border-border bg-transparent p-2 font-mono text-xs outline-none focus:border-ring"
+          spellCheck={false}
+        />
+      )}
+
       <div className="flex items-center gap-2">
-        <Button size="xs" variant="secondary" disabled={!dirty} onClick={onStage}>
+        <Button
+          size="xs"
+          variant="secondary"
+          disabled={!dirty || (mode === 'json' && jsonView === 'tree')}
+          onClick={onStage}
+        >
           Stage value
         </Button>
         <span className="text-[11px] text-muted-foreground">

@@ -1,8 +1,16 @@
-import React, { useEffect } from 'react'
-import { Loader2, RefreshCw, History as HistoryIcon, Database } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { Loader2, RefreshCw, History as HistoryIcon, Database, Plus } from 'lucide-react'
 import { useRedis } from '@/store/redis'
 import { useConnections } from '@/store/connections'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { RedisAddKeyDialog } from '@/components/RedisAddKeyDialog'
 import { cn } from '@/lib/utils'
 import type { RedisKeyType } from '../../../shared/types'
 
@@ -35,6 +43,7 @@ export function RedisSidebar(): React.JSX.Element {
   const tabs = useConnections((s) => s.tabs)
 
   const { connId, dbInfo, list, init, setMatch, rescan, scanMore, selectDb } = useRedis()
+  const [addOpen, setAddOpen] = useState(false)
 
   // (re)initialise when the active Redis connection changes
   useEffect(() => {
@@ -49,22 +58,27 @@ export function RedisSidebar(): React.JSX.Element {
     <div className="flex min-h-0 flex-1 flex-col">
       {/* logical-db switcher + actions */}
       <div className="flex items-center gap-1 px-2 pt-2">
-        <div className="flex items-center gap-1 rounded border border-border px-1.5 py-1 text-xs">
-          <Database className="size-3.5 text-muted-foreground" />
-          <select
-            value={current}
-            onChange={(e) => void selectDb(Number(e.target.value))}
-            className="bg-transparent text-xs outline-none"
-            title="Logical database"
-          >
+        <Select value={String(current)} onValueChange={(v) => void selectDb(Number(v))}>
+          <SelectTrigger className="h-7 w-[5.5rem] gap-1 text-xs" title="Logical database">
+            <Database className="size-3.5 text-muted-foreground" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
             {Array.from({ length: dbCount }, (_, i) => (
-              <option key={i} value={i}>
+              <SelectItem key={i} value={String(i)}>
                 DB {i}
-              </option>
+              </SelectItem>
             ))}
-          </select>
-        </div>
+          </SelectContent>
+        </Select>
         <div className="flex-1" />
+        <button
+          onClick={() => setAddOpen(true)}
+          title="Add key"
+          className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+        >
+          <Plus className="size-3.5" />
+        </button>
         <button
           onClick={() => void rescan()}
           title="Rescan keys"
@@ -80,6 +94,8 @@ export function RedisSidebar(): React.JSX.Element {
           <HistoryIcon className="size-3.5" />
         </button>
       </div>
+
+      <RedisAddKeyDialog open={addOpen} onOpenChange={setAddOpen} />
 
       {/* MATCH glob filter (server-side SCAN MATCH; applies on Enter) */}
       <div className="px-2 pt-1.5">

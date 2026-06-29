@@ -71,6 +71,17 @@ rename, large-string gate, ACL-denied `CONFIG GET databases`.
 5. **Key TTL display** — `loadValue` fetches `keyMeta` alongside the value; the
    header shows a formatted remaining TTL and each sidebar row a compact label.
 
+## UX pass (post-live-test feedback)
+
+- DB switcher uses the shadcn `Select` (was a native, light-on-dark `<select>`).
+- Rename moved from a cramped inline field to a `Dialog` (prefilled current name,
+  Enter to submit, overwrite confirm inline).
+- JSON string view: collapsible **Tree** (read-only) / editable **Raw** subtabs +
+  a **Format** (pretty-print) action; compact/inline JSON renders pretty.
+- **Add key** (＋ in the sidebar): name + type + first value/member (+ optional
+  TTL) → creates via the same WATCH+MULTI commit with `expectedType:'none'`
+  (existing name rejected), then opens the new key.
+
 ## Known gaps / deliberate simplifications (remaining beta follow-ups)
 
 - **Binary key names read/delete** — flagged + blocked, not yet read/delete-only

@@ -30,6 +30,15 @@ export type StagedEdit =
   | { kind: 'list-removeval'; count: number; value: string }
   | { kind: 'stream-add'; fields: [string, string][] }
 
+/** initial value for a manually-created key (Redis can't hold an empty key) */
+export type NewKeyInput =
+  | { type: 'string'; value: string }
+  | { type: 'hash'; field: string; value: string }
+  | { type: 'set'; member: string }
+  | { type: 'zset'; member: string; score: number }
+  | { type: 'list'; value: string }
+  | { type: 'stream'; field: string; value: string }
+
 /** sidebar key-list state for the active connection's current logical db */
 interface KeyList {
   match: string
@@ -80,6 +89,8 @@ interface RedisState {
   cancelEmptyDelete: (tabId: string) => void
   deleteKey: (key: string) => Promise<void>
   renameKey: (from: string, to: string, overwrite: boolean) => Promise<void>
+  /** create a new key in the current db; resolves to an error string or null on success */
+  createKey: (name: string, input: NewKeyInput, ttlSeconds?: number) => Promise<string | null>
   disposeTab: (tabId: string) => void
 }
 
@@ -241,6 +252,33 @@ export const useRedis = create<RedisState>((set, get) => ({
     await get().rescan()
   },
 
+  createKey: async (name, input, ttlSeconds) => {
+    const { connId } = get()
+    if (!connId) return 'Not connected'
+    const commands = buildCreateCommands(name, input)
+    if (ttlSeconds && ttlSeconds > 0)
+      commands.push(cmd(['PEXPIRE', name, String(ttlSeconds * 1000)], `PEXPIRE ${name}`, false))
+    // expectedType 'none' → commit's WATCH passes only if the key doesn't exist yet
+    const batch: RedisCommitBatch = {
+      dbIndex: get().dbInfo?.current ?? 0,
+      key: name,
+      expectedType: 'none',
+      commands,
+      force: false
+    }
+    try {
+      const res = await window.api.redis.commit(connId, batch)
+      if (res.ok) {
+        await get().rescan()
+        return null
+      }
+      if ('conflict' in res) return `Key "${name}" already exists`
+      return 'Could not create key'
+    } catch (err) {
+      return msg(err)
+    }
+  },
+
   disposeTab: (tabId) =>
     set((s) => {
       const next = { ...s.tabs }
@@ -358,6 +396,24 @@ export function buildCommands(
     cmds.push(cmd(['PEXPIRE', key, String(ttlChange)], `PEXPIRE ${key} ${ttlChange}`, destructive))
   }
   return cmds
+}
+
+/** the single command that creates a new key with its first value/member */
+function buildCreateCommands(key: string, input: NewKeyInput): RedisCommand[] {
+  switch (input.type) {
+    case 'string':
+      return [cmd(['SET', key, input.value], `SET ${key}`, false)]
+    case 'hash':
+      return [cmd(['HSET', key, input.field, input.value], `HSET ${key} ${input.field}`, false)]
+    case 'set':
+      return [cmd(['SADD', key, input.member], `SADD ${key}`, false)]
+    case 'zset':
+      return [cmd(['ZADD', key, String(input.score), input.member], `ZADD ${key} ${input.member}`, false)]
+    case 'list':
+      return [cmd(['RPUSH', key, input.value], `RPUSH ${key}`, false)]
+    case 'stream':
+      return [cmd(['XADD', key, '*', input.field, input.value], `XADD ${key}`, false)]
+  }
 }
 
 function cmd(args: RedisArg[], label: string, destructive: boolean): RedisCommand {
