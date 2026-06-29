@@ -32,7 +32,8 @@ async function getDb(): Promise<DatabaseSync> {
       entity        TEXT,
       error         TEXT,
       changeset_id  INTEGER,
-      destructive   INTEGER NOT NULL DEFAULT 0
+      destructive   INTEGER NOT NULL DEFAULT 0,
+      commit_group  TEXT
     );
     CREATE INDEX IF NOT EXISTS idx_history_conn_stream_ts
       ON history_entries (connection_id, stream, ts DESC);
@@ -61,6 +62,9 @@ async function getDb(): Promise<DatabaseSync> {
     db.exec(
       'ALTER TABLE history_entries ADD COLUMN destructive INTEGER NOT NULL DEFAULT 0'
     )
+  }
+  if (!cols.some((c) => c.name === 'commit_group')) {
+    db.exec('ALTER TABLE history_entries ADD COLUMN commit_group TEXT')
   }
   return db
 }
@@ -113,8 +117,8 @@ export async function capture(input: CaptureInput): Promise<void> {
     const changesetId = autoAttach ? getActiveId(d, input.connectionId) : null
     d.prepare(
       `INSERT INTO history_entries
-         (ts, connection_id, stream, source, statement, status, affected, entity, error, changeset_id, destructive)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+         (ts, connection_id, stream, source, statement, status, affected, entity, error, changeset_id, destructive, commit_group)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).run(
       Date.now(),
       input.connectionId,
@@ -126,7 +130,8 @@ export async function capture(input: CaptureInput): Promise<void> {
       input.entity ?? null,
       input.error ?? null,
       changesetId,
-      destructive
+      destructive,
+      input.commitGroup ?? null
     )
   } catch (err) {
     console.error('history capture failed', err)
@@ -157,7 +162,7 @@ export async function listHistory(query: HistoryQuery): Promise<HistoryEntry[]> 
     .prepare(
       `SELECT id, ts, connection_id AS connectionId, stream, source, statement,
               status, affected, entity, error, changeset_id AS changesetId,
-              destructive
+              destructive, commit_group AS commitGroup
          FROM history_entries
          ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
         ORDER BY ts DESC, id DESC

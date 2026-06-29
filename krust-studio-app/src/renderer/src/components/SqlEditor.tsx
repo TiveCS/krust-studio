@@ -10,7 +10,7 @@ import type { DriverType } from '../../../shared/types'
 
 // Per-engine dialect → correct identifier quoting (MySQL backtick vs ANSI "..."),
 // keyword set, and string-escape rules.
-const DIALECTS: Record<DriverType, SQLDialect> = {
+const DIALECTS: Partial<Record<DriverType, SQLDialect>> = {
   mysql: MySQL,
   postgres: PostgreSQL,
   sqlite: SQLite

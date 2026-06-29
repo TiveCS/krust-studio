@@ -74,6 +74,42 @@ async function testSqlite(
   }
 }
 
+async function testRedis(
+  config: ConnectionConfig,
+  password?: string
+): Promise<{ serverVersion: string }> {
+  const { createClient } = await import('redis')
+  const client = createClient({
+    socket: {
+      host: config.host ?? '127.0.0.1',
+      port: config.port ?? 6379,
+      tls: config.ssl ? true : undefined,
+      connectTimeout: CONNECT_TIMEOUT_MS,
+      reconnectStrategy: false
+    },
+    username: config.user || undefined,
+    password: password || undefined,
+    database: config.redisDb ?? 0
+  })
+  client.on('error', () => {})
+  await client.connect()
+  try {
+    // auth + PING + SELECT exercised by connect(database); probe version
+    await client.ping()
+    let serverVersion = 'unknown'
+    try {
+      const info = await client.info('server')
+      const m = /redis_version:([^\r\n]+)/.exec(String(info))
+      if (m) serverVersion = m[1].trim()
+    } catch {
+      // INFO denied by ACL — connection still works
+    }
+    return { serverVersion }
+  } finally {
+    await client.disconnect()
+  }
+}
+
 export async function testConnection(
   config: ConnectionConfig,
   password?: string
@@ -90,6 +126,9 @@ export async function testConnection(
         break
       case 'sqlite':
         result = await testSqlite(config)
+        break
+      case 'redis':
+        result = await testRedis(config, password)
         break
       default:
         throw new Error(`Unsupported driver: ${config.driver}`)

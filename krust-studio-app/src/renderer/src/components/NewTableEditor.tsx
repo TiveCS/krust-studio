@@ -8,7 +8,7 @@ import { TemplateManager } from '@/components/TemplateManager'
 import { useConnections, type Tab } from '@/store/connections'
 import type { DriverType } from '../../../shared/types'
 
-const TYPES: Record<DriverType, string[]> = {
+const TYPES: Partial<Record<DriverType, string[]>> = {
   sqlite: ['INTEGER', 'TEXT', 'REAL', 'BLOB', 'NUMERIC'],
   mysql: ['INT', 'BIGINT', 'VARCHAR(255)', 'TEXT', 'DATETIME', 'DATE', 'DECIMAL(10,2)', 'BOOLEAN', 'FLOAT'],
   postgres: ['integer', 'bigint', 'serial', 'text', 'varchar(255)', 'boolean', 'timestamp', 'date', 'numeric', 'real']
@@ -18,7 +18,7 @@ export function NewTableEditor({ tab }: { tab: Tab }): React.JSX.Element {
   const { connections, openConnectionId, entities, enums, patchDraft, createTable, closeTab, openTable } =
     useConnections()
   const driver = connections.find((c) => c.id === openConnectionId)?.driver
-  const types = [...(driver ? TYPES[driver] : []), ...enums.map((e) => e.name)]
+  const types = [...(driver ? TYPES[driver] ?? [] : []), ...enums.map((e) => e.name)]
   const tables = entities.filter((e) => e.type === 'table').map((e) => e.name)
   const [busy, setBusy] = useState(false)
   const [tmplOpen, setTmplOpen] = useState(false)

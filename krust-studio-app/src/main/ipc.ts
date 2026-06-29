@@ -39,7 +39,15 @@ import {
   explainQuery,
   cancelQuery,
   disconnectSession,
-  reconnectSession
+  reconnectSession,
+  redisDbInfo,
+  redisSelectDb,
+  redisScan,
+  redisKeyMeta,
+  redisReadValue,
+  redisCommit,
+  redisRenameKey,
+  redisDeleteKey
 } from './db/session'
 import {
   listHistory,
@@ -68,7 +76,9 @@ import type {
   HistoryQuery,
   HistoryStream,
   WorkspaceData,
-  BackupSpec
+  BackupSpec,
+  ReadValueOpts,
+  RedisCommitBatch
 } from '../shared/types'
 import type {
   SaveConnectionInput,
@@ -272,6 +282,35 @@ export function registerIpc(): void {
     disconnectSession(id)
   )
   ipcMain.handle('session:reconnect', (_e, id: string) => reconnectSession(id))
+
+  // ── Redis key/value (ADR-0020) ──
+  ipcMain.handle('redis:dbInfo', (_e, id: string) => redisDbInfo(id))
+  ipcMain.handle('redis:selectDb', (_e, id: string, index: number) =>
+    redisSelectDb(id, index)
+  )
+  ipcMain.handle(
+    'redis:scan',
+    (_e, id: string, match: string, cursor: string, count: number) =>
+      redisScan(id, match, cursor, count)
+  )
+  ipcMain.handle('redis:keyMeta', (_e, id: string, key: string) =>
+    redisKeyMeta(id, key)
+  )
+  ipcMain.handle(
+    'redis:readValue',
+    (_e, id: string, key: string, opts: ReadValueOpts) => redisReadValue(id, key, opts)
+  )
+  ipcMain.handle('redis:commit', (_e, id: string, batch: RedisCommitBatch) =>
+    redisCommit(id, batch)
+  )
+  ipcMain.handle(
+    'redis:renameKey',
+    (_e, id: string, from: string, to: string, overwrite: boolean) =>
+      redisRenameKey(id, from, to, overwrite)
+  )
+  ipcMain.handle('redis:deleteKey', (_e, id: string, key: string) =>
+    redisDeleteKey(id, key)
+  )
 
   ipcMain.handle('workspace:load', () => loadWorkspace())
   ipcMain.handle('workspace:save', (_e, data: WorkspaceData) => saveWorkspace(data))

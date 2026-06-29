@@ -39,6 +39,9 @@ function fkGuards(driver: DriverType): { head: string; foot: string } {
           'SET session_replication_role = replica;\n\n',
         foot: '\nSET session_replication_role = origin;\n'
       }
+    default:
+      // non-relational engines (redis) never reach backup
+      return { head: '', foot: '' }
   }
 }
 

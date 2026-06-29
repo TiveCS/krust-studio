@@ -16,7 +16,9 @@ import type {
   HistoryStream,
   WorkspaceData,
   BackupSpec,
-  TableTemplate
+  TableTemplate,
+  ReadValueOpts,
+  RedisCommitBatch
 } from '../shared/types'
 
 const api: KrustApi = {
@@ -104,6 +106,23 @@ const api: KrustApi = {
     cancelQuery: (id: string) => ipcRenderer.invoke('session:cancelQuery', id),
     explainQuery: (id: string, sql: string, analyze: boolean) =>
       ipcRenderer.invoke('session:explainQuery', id, sql, analyze)
+  },
+  redis: {
+    dbInfo: (id: string) => ipcRenderer.invoke('redis:dbInfo', id),
+    selectDb: (id: string, index: number) =>
+      ipcRenderer.invoke('redis:selectDb', id, index),
+    scan: (id: string, match: string, cursor: string, count: number) =>
+      ipcRenderer.invoke('redis:scan', id, match, cursor, count),
+    keyMeta: (id: string, key: string) =>
+      ipcRenderer.invoke('redis:keyMeta', id, key),
+    readValue: (id: string, key: string, opts: ReadValueOpts) =>
+      ipcRenderer.invoke('redis:readValue', id, key, opts),
+    commit: (id: string, batch: RedisCommitBatch) =>
+      ipcRenderer.invoke('redis:commit', id, batch),
+    renameKey: (id: string, from: string, to: string, overwrite: boolean) =>
+      ipcRenderer.invoke('redis:renameKey', id, from, to, overwrite),
+    deleteKey: (id: string, key: string) =>
+      ipcRenderer.invoke('redis:deleteKey', id, key)
   },
   workspace: {
     load: () => ipcRenderer.invoke('workspace:load'),

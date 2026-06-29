@@ -15,7 +15,7 @@ import { useConnections } from '@/store/connections'
 import { templateToDraftColumns } from '@/lib/templates'
 import type { DriverType, NewColumnSpec } from '../../../shared/types'
 
-const TYPES: Record<DriverType, string[]> = {
+const TYPES: Partial<Record<DriverType, string[]>> = {
   sqlite: ['INTEGER', 'TEXT', 'REAL', 'BLOB', 'NUMERIC'],
   mysql: ['INT', 'BIGINT', 'VARCHAR(255)', 'TEXT', 'DATETIME', 'DATE', 'DECIMAL(10,2)', 'BOOLEAN', 'FLOAT'],
   postgres: ['integer', 'bigint', 'serial', 'text', 'varchar(255)', 'boolean', 'timestamp', 'date', 'numeric', 'real']
@@ -55,7 +55,7 @@ export function TemplateManager({ open, onOpenChange, initialColumns }: Props): 
     }
   }, [open, initialColumns])
 
-  const types = [...(driver ? TYPES[driver] : []), ...enums.map((e) => e.name)]
+  const types = [...(driver ? TYPES[driver] ?? [] : []), ...enums.map((e) => e.name)]
 
   const startNew = (): void =>
     setEditing({ id: null, name: '', columns: DEFAULT_COLS.map((c) => ({ ...c })) })

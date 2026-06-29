@@ -36,13 +36,14 @@ const schema = z
   .object({
     id: z.string().optional(),
     name: z.string().min(1, 'Name is required'),
-    driver: z.enum(['mysql', 'postgres', 'sqlite']),
+    driver: z.enum(['mysql', 'postgres', 'sqlite', 'redis']),
     host: z.string().optional(),
     port: z.coerce.number().int().positive().optional(),
     database: z.string().optional(),
     user: z.string().optional(),
     password: z.string().optional(),
     sqlitePath: z.string().optional(),
+    redisDb: z.coerce.number().int().min(0).optional(),
     ssl: z.boolean().optional(),
     readOnly: z.boolean().optional()
   })
@@ -54,6 +55,10 @@ const schema = z
           path: ['sqlitePath'],
           message: 'File path is required'
         })
+    } else if (val.driver === 'redis') {
+      // Redis: host required; username is optional (default user / no ACL)
+      if (!val.host)
+        ctx.addIssue({ code: 'custom', path: ['host'], message: 'Host is required' })
     } else {
       if (!val.host)
         ctx.addIssue({ code: 'custom', path: ['host'], message: 'Host is required' })
@@ -67,7 +72,8 @@ type FormValues = z.input<typeof schema>
 const DEFAULT_PORTS: Record<DriverType, number | undefined> = {
   mysql: 3306,
   postgres: 5432,
-  sqlite: undefined
+  sqlite: undefined,
+  redis: 6379
 }
 
 function emptyValues(): FormValues {
@@ -96,6 +102,7 @@ function toFormValues(c: ConnectionSummary): FormValues {
     user: c.user ?? '',
     password: '',
     sqlitePath: c.sqlitePath ?? '',
+    redisDb: c.redisDb ?? 0,
     ssl: c.ssl ?? false,
     readOnly: c.readOnly ?? false
   }
@@ -111,6 +118,7 @@ function toConfig(v: FormValues): ConnectionConfig {
     database: v.database || undefined,
     user: v.user || undefined,
     sqlitePath: v.sqlitePath || undefined,
+    redisDb: v.driver === 'redis' ? Number(v.redisDb ?? 0) : undefined,
     ssl: v.ssl,
     readOnly: v.readOnly
   }

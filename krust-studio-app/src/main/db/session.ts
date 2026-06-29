@@ -18,16 +18,26 @@ import type {
   Sort,
   TableStructure
 } from '../../shared/types'
-import type { DbDriver } from './driver'
+import type { DbDriver, DriverCore, RedisDriver } from './driver'
 import { splitStatements, classifyStatement, isConnectionFatal } from './driver'
 import { MysqlDriver } from './drivers/mysql'
 import { PostgresDriver } from './drivers/postgres'
 import { SqliteDriver } from './drivers/sqlite'
+import { RedisDriver as RedisDriverImpl } from './drivers/redis'
 import { getConnectionConfig, getStoredPassword } from '../store/connections'
 import { capture } from '../store/history'
-import type { HistoryStream } from '../../shared/types'
+import type {
+  HistoryStream,
+  ReadValueOpts,
+  RedisCommitBatch,
+  RedisCommitResult,
+  RedisDbInfo,
+  RedisKeyMeta,
+  RedisScanResult,
+  RedisValuePage
+} from '../../shared/types'
 
-const sessions = new Map<string, DbDriver>()
+const sessions = new Map<string, DriverCore>()
 
 /**
  * Run `fn` against the driver for `id`, retrying once after a connection-fatal
@@ -37,12 +47,34 @@ const sessions = new Map<string, DbDriver>()
 async function withRetry<T>(id: string, fn: (driver: DbDriver) => Promise<T>): Promise<T> {
   if (!sessions.has(id)) await connectSession(id)
   try {
-    return await fn(sessions.get(id)!)
+    return await fn(sessions.get(id)! as DbDriver)
   } catch (err) {
     if (!isConnectionFatal(err)) throw err
     sessions.delete(id)
     await connectSession(id)
-    return fn(sessions.get(id)!)
+    return fn(sessions.get(id)! as DbDriver)
+  }
+}
+
+/** the relational driver for a connected session (asserts non-Redis). Used by
+ *  the non-transactional DDL paths that access the session directly. */
+function rel(id: string): DbDriver {
+  return sessions.get(id)! as DbDriver
+}
+
+/** withRetry for the Redis (key/value) driver — same auto-recovery contract. */
+async function withRetryRedis<T>(
+  id: string,
+  fn: (driver: RedisDriver) => Promise<T>
+): Promise<T> {
+  if (!sessions.has(id)) await connectSession(id)
+  try {
+    return await fn(sessions.get(id)! as RedisDriver)
+  } catch (err) {
+    if (!isConnectionFatal(err)) throw err
+    sessions.delete(id)
+    await connectSession(id)
+    return fn(sessions.get(id)! as RedisDriver)
   }
 }
 
@@ -84,7 +116,7 @@ async function captureAll(
   }
 }
 
-function createDriver(config: ConnectionConfig, password?: string): DbDriver {
+function createDriver(config: ConnectionConfig, password?: string): DriverCore {
   const deps = { config, password }
   switch (config.driver) {
     case 'mysql':
@@ -93,6 +125,8 @@ function createDriver(config: ConnectionConfig, password?: string): DbDriver {
       return new PostgresDriver(deps)
     case 'sqlite':
       return new SqliteDriver(deps)
+    case 'redis':
+      return new RedisDriverImpl(deps)
     default:
       throw new Error(`Unsupported driver: ${config.driver}`)
   }
@@ -223,7 +257,7 @@ export async function createTable(
   if (config?.readOnly)
     throw new Error('Connection is read-only; schema changes blocked')
   if (!sessions.has(id)) await connectSession(id)
-  const res = await sessions.get(id)!.createTable(spec)
+  const res = await rel(id).createTable(spec)
   await captureAll(id, 'table_mutation', [res.ddl], spec.name)
   return res
 }
@@ -260,7 +294,7 @@ export async function dropEntity(
   if (config?.readOnly)
     throw new Error('Connection is read-only; schema changes blocked')
   if (!sessions.has(id)) await connectSession(id)
-  const res = await sessions.get(id)!.dropEntity(entity, type)
+  const res = await rel(id).dropEntity(entity, type)
   await captureAll(id, 'table_mutation', res.statements, entity.name, null, true)
   return res
 }
@@ -274,7 +308,7 @@ export async function renameTable(
   if (config?.readOnly)
     throw new Error('Connection is read-only; schema changes blocked')
   if (!sessions.has(id)) await connectSession(id)
-  const res = await sessions.get(id)!.renameTable(entity, newName)
+  const res = await rel(id).renameTable(entity, newName)
   await captureAll(id, 'table_mutation', res.statements, entity.name)
   return res
 }
@@ -287,7 +321,7 @@ export async function truncateTable(
   if (config?.readOnly)
     throw new Error('Connection is read-only; writes are blocked')
   if (!sessions.has(id)) await connectSession(id)
-  const res = await sessions.get(id)!.truncateTable(entity)
+  const res = await rel(id).truncateTable(entity)
   await captureAll(id, 'data_mutation', res.statements, entity.name, null, true)
   return res
 }
@@ -301,7 +335,7 @@ export async function createIndex(
   if (config?.readOnly)
     throw new Error('Connection is read-only; schema changes blocked')
   if (!sessions.has(id)) await connectSession(id)
-  const res = await sessions.get(id)!.createIndex(entity, spec)
+  const res = await rel(id).createIndex(entity, spec)
   await captureAll(id, 'table_mutation', res.statements, entity.name)
   return res
 }
@@ -315,7 +349,7 @@ export async function dropIndex(
   if (config?.readOnly)
     throw new Error('Connection is read-only; schema changes blocked')
   if (!sessions.has(id)) await connectSession(id)
-  const res = await sessions.get(id)!.dropIndex(entity, name)
+  const res = await rel(id).dropIndex(entity, name)
   await captureAll(id, 'table_mutation', res.statements, entity.name)
   return res
 }
@@ -327,7 +361,7 @@ export async function runScript(
 ): Promise<QueryResult[]> {
   const config = getConnectionConfig(id)
   if (!sessions.has(id)) await connectSession(id)
-  const driver = sessions.get(id)!
+  const driver = rel(id)
   const results: QueryResult[] = []
   for (const stmt of splitStatements(sql)) {
     const cls = classifyStatement(stmt)
@@ -426,7 +460,7 @@ export async function execRestoreStatement(id: string, sql: string): Promise<voi
     throw new Error('Connection is read-only; restore is blocked')
   if (!sessions.has(id)) await connectSession(id)
   const cls = classifyStatement(sql)
-  await sessions.get(id)!.query(sql)
+  await rel(id).query(sql)
   if (cls.stream === 'table_mutation') {
     await capture({
       connectionId: id,
@@ -454,4 +488,105 @@ export async function disconnectSession(id: string): Promise<void> {
 export async function reconnectSession(id: string): Promise<void> {
   await disconnectSession(id)
   await connectSession(id)
+}
+
+// ─────────────────────────── Redis (ADR-0020) ────────────────────────────
+// Key/value ops. Reads need no guard; every mutation enforces read-only in the
+// main process and captures the exact command(s) into the redis_mutation stream
+// grouped by commit (decision 4).
+
+export async function redisDbInfo(id: string): Promise<RedisDbInfo> {
+  return withRetryRedis(id, (d) => d.dbInfo())
+}
+
+export async function redisSelectDb(id: string, index: number): Promise<void> {
+  return withRetryRedis(id, (d) => d.useDatabase(String(index)))
+}
+
+export async function redisScan(
+  id: string,
+  match: string,
+  cursor: string,
+  count: number
+): Promise<RedisScanResult> {
+  return withRetryRedis(id, (d) => d.scanKeys(match, cursor, count))
+}
+
+export async function redisKeyMeta(id: string, key: string): Promise<RedisKeyMeta> {
+  return withRetryRedis(id, (d) => d.keyMeta(key))
+}
+
+export async function redisReadValue(
+  id: string,
+  key: string,
+  opts: ReadValueOpts
+): Promise<RedisValuePage> {
+  return withRetryRedis(id, (d) => d.readValue(key, opts))
+}
+
+export async function redisCommit(
+  id: string,
+  batch: RedisCommitBatch
+): Promise<RedisCommitResult> {
+  const config = getConnectionConfig(id)
+  if (config?.readOnly) throw new Error('Connection is read-only; writes are blocked')
+  const res = await withRetryRedis(id, (d) => d.commit(batch))
+  if (res.ok) {
+    for (const cmd of batch.commands) {
+      await capture({
+        connectionId: id,
+        stream: 'redis_mutation',
+        source: 'gui',
+        statement: cmd.args.join(' '),
+        status: 'success',
+        entity: batch.key,
+        commitGroup: res.commitGroup,
+        destructive: cmd.destructive
+      })
+    }
+  }
+  return res
+}
+
+export async function redisRenameKey(
+  id: string,
+  from: string,
+  to: string,
+  overwrite: boolean
+): Promise<RedisCommitResult> {
+  const config = getConnectionConfig(id)
+  if (config?.readOnly) throw new Error('Connection is read-only; writes are blocked')
+  const res = await withRetryRedis(id, (d) => d.renameKey(from, to, overwrite))
+  if (res.ok) {
+    await capture({
+      connectionId: id,
+      stream: 'redis_mutation',
+      source: 'gui',
+      statement: `${overwrite ? 'RENAME' : 'RENAMENX'} ${from} ${to}`,
+      status: 'success',
+      entity: from,
+      commitGroup: res.commitGroup,
+      destructive: overwrite // overwrite drops the target key's value
+    })
+  }
+  return res
+}
+
+export async function redisDeleteKey(id: string, key: string): Promise<RedisCommitResult> {
+  const config = getConnectionConfig(id)
+  if (config?.readOnly) throw new Error('Connection is read-only; writes are blocked')
+  const res = await withRetryRedis(id, (d) => d.deleteKey(key))
+  if (res.ok) {
+    await capture({
+      connectionId: id,
+      stream: 'redis_mutation',
+      source: 'gui',
+      statement: `UNLINK ${key}`,
+      status: 'success',
+      entity: key,
+      commitGroup: res.commitGroup,
+      destructive: true
+    })
+  }
+  return res
 }

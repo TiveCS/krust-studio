@@ -5,13 +5,14 @@ import { ColumnsEditor, type EditorColumn } from '@/components/ColumnsEditor'
 import { useConnections, type Tab } from '@/store/connections'
 import type { DriverType } from '../../../shared/types'
 
-const TYPES: Record<DriverType, string[]> = {
+// relational only — redis never opens the structure editor (no schema mutation)
+const TYPES: Partial<Record<DriverType, string[]>> = {
   sqlite: ['INTEGER', 'TEXT', 'REAL', 'BLOB', 'NUMERIC'],
   mysql: ['INT', 'BIGINT', 'VARCHAR(255)', 'TEXT', 'DATETIME', 'DATE', 'DECIMAL(10,2)', 'BOOLEAN', 'FLOAT'],
   postgres: ['integer', 'bigint', 'serial', 'text', 'varchar(255)', 'boolean', 'timestamp', 'date', 'numeric', 'real']
 }
 
-const LIMITS: Record<DriverType, string> = {
+const LIMITS: Partial<Record<DriverType, string>> = {
   sqlite:
     'SQLite can only add, rename, or drop columns on an existing table. Changing a column’s type or nullability is not supported by SQLite’s ALTER (would need a full table rebuild).',
   postgres:
@@ -44,7 +45,7 @@ export function StructureEditor({
   const st = tab.structure
   const canAlter = driver !== 'sqlite'
   const canReorder = driver === 'mysql'
-  const types = [...(driver ? TYPES[driver] : []), ...enums.map((e) => e.name)]
+  const types = [...(driver ? TYPES[driver] ?? [] : []), ...enums.map((e) => e.name)]
   const tableNames = entities.filter((e) => e.type === 'table').map((e) => e.name)
   const showBanner = driver === 'sqlite'
 
