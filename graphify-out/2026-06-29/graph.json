@@ -1166,7 +1166,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "db_backup",
-      "community": 0,
+      "community": 28,
       "norm_label": "backup.ts"
     },
     {
@@ -1176,7 +1176,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "db_backup_quoteident",
-      "community": 0,
+      "community": 28,
       "norm_label": "quoteident()"
     },
     {
@@ -1186,7 +1186,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "db_backup_fkguards",
-      "community": 0,
+      "community": 28,
       "norm_label": "fkguards()"
     },
     {
@@ -1196,7 +1196,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "db_backup_target",
-      "community": 0,
+      "community": 28,
       "norm_label": "target()"
     },
     {
@@ -1206,7 +1206,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "db_backup_pgarraybody",
-      "community": 0,
+      "community": 28,
       "norm_label": "pgarraybody()"
     },
     {
@@ -1216,7 +1216,7 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "db_backup_sqlliteral",
-      "community": 0,
+      "community": 28,
       "norm_label": "sqlliteral()"
     },
     {
@@ -1226,7 +1226,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "db_backup_backupprogress",
-      "community": 0,
+      "community": 28,
       "norm_label": "backupprogress"
     },
     {
@@ -2696,7 +2696,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "db_test_connection",
-      "community": 76,
+      "community": 117,
       "norm_label": "test-connection.ts"
     },
     {
@@ -2706,7 +2706,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "db_test_connection_testmysql",
-      "community": 76,
+      "community": 117,
       "norm_label": "testmysql()"
     },
     {
@@ -2716,7 +2716,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "db_test_connection_testpostgres",
-      "community": 76,
+      "community": 117,
       "norm_label": "testpostgres()"
     },
     {
@@ -2726,7 +2726,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "db_test_connection_testsqlite",
-      "community": 76,
+      "community": 117,
       "norm_label": "testsqlite()"
     },
     {
@@ -2736,7 +2736,7 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "db_test_connection_testconnection",
-      "community": 76,
+      "community": 117,
       "norm_label": "testconnection()"
     },
     {
@@ -3296,7 +3296,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "preload_index",
-      "community": 5,
+      "community": 8,
       "norm_label": "index.ts"
     },
     {
@@ -3306,7 +3306,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "preload_index_api",
-      "community": 5,
+      "community": 8,
       "norm_label": "api"
     },
     {
@@ -3466,7 +3466,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_columnseditor",
-      "community": 35,
+      "community": 27,
       "norm_label": "columnseditor.tsx"
     },
     {
@@ -3476,7 +3476,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "components_columnseditor_editorcolumn",
-      "community": 35,
+      "community": 27,
       "norm_label": "editorcolumn"
     },
     {
@@ -3486,7 +3486,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "components_columnseditor_rowchanged",
-      "community": 35,
+      "community": 27,
       "norm_label": "rowchanged()"
     },
     {
@@ -3496,7 +3496,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "components_columnseditor_fk_actions",
-      "community": 35,
+      "community": 27,
       "norm_label": "fk_actions"
     },
     {
@@ -3506,7 +3506,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "components_columnseditor_columnseditor",
-      "community": 35,
+      "community": 27,
       "norm_label": "columnseditor()"
     },
     {
@@ -3926,7 +3926,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "components_fkinlinepicker_fkinlinepicker",
-      "community": 7,
+      "community": 5,
       "norm_label": "fkinlinepicker()"
     },
     {
@@ -6586,7 +6586,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_sqlhighlight",
-      "community": 82,
+      "community": 3,
       "norm_label": "sqlhighlight.tsx"
     },
     {
@@ -6596,7 +6596,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "lib_sqlhighlight_colors",
-      "community": 82,
+      "community": 3,
       "norm_label": "colors"
     },
     {
@@ -6606,7 +6606,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "lib_sqlhighlight_highlighter",
-      "community": 82,
+      "community": 3,
       "norm_label": "highlighter"
     },
     {
@@ -6616,7 +6616,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "lib_sqlhighlight_dialectfor",
-      "community": 82,
+      "community": 3,
       "norm_label": "dialectfor()"
     },
     {
@@ -6626,7 +6626,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "lib_sqlhighlight_stylefor",
-      "community": 82,
+      "community": 3,
       "norm_label": "stylefor()"
     },
     {
@@ -6636,7 +6636,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "lib_sqlhighlight_highlightsql",
-      "community": 82,
+      "community": 3,
       "norm_label": "highlightsql()"
     },
     {
@@ -6646,7 +6646,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_templates",
-      "community": 27,
+      "community": 8,
       "norm_label": "templates.ts"
     },
     {
@@ -6656,7 +6656,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_templates_templatetodraftcolumns",
-      "community": 27,
+      "community": 8,
       "norm_label": "templatetodraftcolumns()"
     },
     {
@@ -6666,7 +6666,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "lib_templates_inserttemplatecolumns",
-      "community": 27,
+      "community": 8,
       "norm_label": "inserttemplatecolumns()"
     },
     {
@@ -7036,7 +7036,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "shared_types_saveconnectioninput",
-      "community": 13,
+      "community": 8,
       "norm_label": "saveconnectioninput"
     },
     {
@@ -7056,7 +7056,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "shared_types_testconnectionresult",
-      "community": 76,
+      "community": 117,
       "norm_label": "testconnectionresult"
     },
     {
@@ -7256,7 +7256,7 @@
       "source_location": "L209",
       "_origin": "ast",
       "id": "shared_types_historyquery",
-      "community": 0,
+      "community": 8,
       "norm_label": "historyquery"
     },
     {
@@ -7306,7 +7306,7 @@
       "source_location": "L307",
       "_origin": "ast",
       "id": "shared_types_structurecolumn",
-      "community": 35,
+      "community": 27,
       "norm_label": "structurecolumn"
     },
     {
@@ -7386,7 +7386,7 @@
       "source_location": "L403",
       "_origin": "ast",
       "id": "shared_types_tabletemplate",
-      "community": 27,
+      "community": 8,
       "norm_label": "tabletemplate"
     },
     {
@@ -7486,7 +7486,7 @@
       "source_location": "L610",
       "_origin": "ast",
       "id": "shared_types_backupspec",
-      "community": 0,
+      "community": 8,
       "norm_label": "backupspec"
     },
     {
@@ -7496,7 +7496,7 @@
       "source_location": "L616",
       "_origin": "ast",
       "id": "shared_types_backupresult",
-      "community": 8,
+      "community": 28,
       "norm_label": "backupresult"
     },
     {
@@ -7506,7 +7506,7 @@
       "source_location": "L624",
       "_origin": "ast",
       "id": "shared_types_restorestatement",
-      "community": 8,
+      "community": 28,
       "norm_label": "restorestatement"
     },
     {
@@ -7526,7 +7526,7 @@
       "source_location": "L639",
       "_origin": "ast",
       "id": "shared_types_restorerunresult",
-      "community": 8,
+      "community": 28,
       "norm_label": "restorerunresult"
     },
     {
@@ -8373,7 +8373,7 @@
       "label": "Routine",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L138",
+      "source_location": "L86",
       "_origin": "ast",
       "id": "context_routine",
       "community": 12,
@@ -8383,7 +8383,7 @@
       "label": "Routine Recovery Copy",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L147",
+      "source_location": "L95",
       "_origin": "ast",
       "id": "context_routine_recovery_copy",
       "community": 12,
@@ -8393,7 +8393,7 @@
       "label": "Query History",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L153",
+      "source_location": "L101",
       "_origin": "ast",
       "id": "context_query_history",
       "community": 12,
@@ -8403,7 +8403,7 @@
       "label": "Destructive (history tag)",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L191",
+      "source_location": "L131",
       "_origin": "ast",
       "id": "context_destructive_history_tag",
       "community": 12,
@@ -8413,7 +8413,7 @@
       "label": "Captured DDL",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L217",
+      "source_location": "L157",
       "_origin": "ast",
       "id": "context_captured_ddl",
       "community": 12,
@@ -8423,7 +8423,7 @@
       "label": "Changeset",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L234",
+      "source_location": "L174",
       "_origin": "ast",
       "id": "context_changeset",
       "community": 12,
@@ -8433,7 +8433,7 @@
       "label": "Filter (Data Grid)",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L252",
+      "source_location": "L192",
       "_origin": "ast",
       "id": "context_filter_data_grid",
       "community": 24,
@@ -8443,7 +8443,7 @@
       "label": "JSON Viewer",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L285",
+      "source_location": "L225",
       "_origin": "ast",
       "id": "context_json_viewer",
       "community": 12,
@@ -8453,7 +8453,7 @@
       "label": "FK Expansion",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L296",
+      "source_location": "L236",
       "_origin": "ast",
       "id": "context_fk_expansion",
       "community": 12,
@@ -8463,7 +8463,7 @@
       "label": "FK Navigation",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L307",
+      "source_location": "L247",
       "_origin": "ast",
       "id": "context_fk_navigation",
       "community": 12,
@@ -8473,7 +8473,7 @@
       "label": "Referenced By (Reverse FK)",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L313",
+      "source_location": "L253",
       "_origin": "ast",
       "id": "context_referenced_by_reverse_fk",
       "community": 12,
@@ -8483,7 +8483,7 @@
       "label": "FK Picker",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L328",
+      "source_location": "L268",
       "_origin": "ast",
       "id": "context_fk_picker",
       "community": 24,
@@ -8493,7 +8493,7 @@
       "label": "Backup",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L361",
+      "source_location": "L301",
       "_origin": "ast",
       "id": "context_backup",
       "community": 12,
@@ -8503,7 +8503,7 @@
       "label": "Restore (Import)",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L372",
+      "source_location": "L312",
       "_origin": "ast",
       "id": "context_restore_import",
       "community": 12,
@@ -8513,7 +8513,7 @@
       "label": "Data Location",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L384",
+      "source_location": "L324",
       "_origin": "ast",
       "id": "context_data_location",
       "community": 12,
@@ -8523,7 +8523,7 @@
       "label": "Query Execution",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L391",
+      "source_location": "L331",
       "_origin": "ast",
       "id": "context_query_execution",
       "community": 24,
@@ -8533,7 +8533,7 @@
       "label": "Command Palette",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L426",
+      "source_location": "L366",
       "_origin": "ast",
       "id": "context_command_palette",
       "community": 12,
@@ -8543,7 +8543,7 @@
       "label": "History Search",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L434",
+      "source_location": "L374",
       "_origin": "ast",
       "id": "context_history_search",
       "community": 12,
@@ -8553,7 +8553,7 @@
       "label": "Settings",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L440",
+      "source_location": "L380",
       "_origin": "ast",
       "id": "context_settings",
       "community": 12,
@@ -8563,7 +8563,7 @@
       "label": "Pinned Column",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L447",
+      "source_location": "L387",
       "_origin": "ast",
       "id": "context_pinned_column",
       "community": 12,
@@ -8573,7 +8573,7 @@
       "label": "Keybinding / Command",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L470",
+      "source_location": "L410",
       "_origin": "ast",
       "id": "context_keybinding_command",
       "community": 12,
@@ -8583,7 +8583,7 @@
       "label": "Workspace & Tabs",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L490",
+      "source_location": "L430",
       "_origin": "ast",
       "id": "context_workspace_tabs",
       "community": 12,
@@ -8593,7 +8593,7 @@
       "label": "Schema Browser",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L509",
+      "source_location": "L449",
       "_origin": "ast",
       "id": "context_schema_browser",
       "community": 12,
@@ -8603,7 +8603,7 @@
       "label": "Enum",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L516",
+      "source_location": "L456",
       "_origin": "ast",
       "id": "context_enum",
       "community": 12,
@@ -8613,7 +8613,7 @@
       "label": "Staged Edits",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L527",
+      "source_location": "L467",
       "_origin": "ast",
       "id": "context_staged_edits",
       "community": 24,
@@ -8623,7 +8623,7 @@
       "label": "Read-only Connection",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L544",
+      "source_location": "L484",
       "_origin": "ast",
       "id": "context_read_only_connection",
       "community": 12,
@@ -8633,7 +8633,7 @@
       "label": "Table Editor",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L550",
+      "source_location": "L490",
       "_origin": "ast",
       "id": "context_table_editor",
       "community": 24,
@@ -8643,7 +8643,7 @@
       "label": "Table Template",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L583",
+      "source_location": "L523",
       "_origin": "ast",
       "id": "context_table_template",
       "community": 24,
@@ -8653,7 +8653,7 @@
       "label": "Query Plan",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L606",
+      "source_location": "L546",
       "_origin": "ast",
       "id": "context_query_plan",
       "community": 46,
@@ -8663,7 +8663,7 @@
       "label": "MCP Server",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L648",
+      "source_location": "L588",
       "_origin": "ast",
       "id": "context_mcp_server",
       "community": 12,
@@ -8673,7 +8673,7 @@
       "label": "AI Read Allowlist",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L665",
+      "source_location": "L605",
       "_origin": "ast",
       "id": "context_ai_read_allowlist",
       "community": 12,
@@ -8683,7 +8683,7 @@
       "label": "AI Access Audit",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L672",
+      "source_location": "L612",
       "_origin": "ast",
       "id": "context_ai_access_audit",
       "community": 12,
@@ -8693,7 +8693,7 @@
       "label": "Decisions",
       "file_type": "document",
       "source_file": "CONTEXT.md",
-      "source_location": "L679",
+      "source_location": "L619",
       "_origin": "ast",
       "id": "context_decisions",
       "community": 12,
@@ -10320,64 +10320,14 @@
       "norm_label": "0020-capability-based-data-engine-drivers.md"
     },
     {
-      "label": "20. Capability-based data-engine drivers",
+      "label": "Capability-based data-engine drivers",
       "file_type": "document",
       "source_file": "docs/adr/0020-capability-based-data-engine-drivers.md",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "adr_0020_capability_based_data_engine_drivers_20_capability_based_data_engine_drivers",
+      "id": "adr_0020_capability_based_data_engine_drivers_capability_based_data_engine_drivers",
       "community": 75,
-      "norm_label": "20. capability-based data-engine drivers"
-    },
-    {
-      "label": "Status",
-      "file_type": "document",
-      "source_file": "docs/adr/0020-capability-based-data-engine-drivers.md",
-      "source_location": "L5",
-      "_origin": "ast",
-      "id": "adr_0020_capability_based_data_engine_drivers_status",
-      "community": 75,
-      "norm_label": "status"
-    },
-    {
-      "label": "Context",
-      "file_type": "document",
-      "source_file": "docs/adr/0020-capability-based-data-engine-drivers.md",
-      "source_location": "L10",
-      "_origin": "ast",
-      "id": "adr_0020_capability_based_data_engine_drivers_context",
-      "community": 75,
-      "norm_label": "context"
-    },
-    {
-      "label": "Decision",
-      "file_type": "document",
-      "source_file": "docs/adr/0020-capability-based-data-engine-drivers.md",
-      "source_location": "L25",
-      "_origin": "ast",
-      "id": "adr_0020_capability_based_data_engine_drivers_decision",
-      "community": 75,
-      "norm_label": "decision"
-    },
-    {
-      "label": "Alternatives considered",
-      "file_type": "document",
-      "source_file": "docs/adr/0020-capability-based-data-engine-drivers.md",
-      "source_location": "L71",
-      "_origin": "ast",
-      "id": "adr_0020_capability_based_data_engine_drivers_alternatives_considered",
-      "community": 75,
-      "norm_label": "alternatives considered"
-    },
-    {
-      "label": "Consequences",
-      "file_type": "document",
-      "source_file": "docs/adr/0020-capability-based-data-engine-drivers.md",
-      "source_location": "L83",
-      "_origin": "ast",
-      "id": "adr_0020_capability_based_data_engine_drivers_consequences",
-      "community": 75,
-      "norm_label": "consequences"
+      "norm_label": "capability-based data-engine drivers"
     },
     {
       "label": "v1.2.3.md",
@@ -11763,7 +11713,7 @@
       "label": "Procedures and functions",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
-      "source_location": "L113",
+      "source_location": "L110",
       "_origin": "ast",
       "id": "v1_7_0_plan_procedures_and_functions",
       "community": 11,
@@ -11773,7 +11723,7 @@
       "label": "Scope and identity",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
-      "source_location": "L115",
+      "source_location": "L112",
       "_origin": "ast",
       "id": "v1_7_0_plan_scope_and_identity",
       "community": 11,
@@ -11783,7 +11733,7 @@
       "label": "Browsing and execution",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
-      "source_location": "L125",
+      "source_location": "L122",
       "_origin": "ast",
       "id": "v1_7_0_plan_browsing_and_execution",
       "community": 11,
@@ -11793,7 +11743,7 @@
       "label": "Create, edit, replace, and drop",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
-      "source_location": "L141",
+      "source_location": "L138",
       "_origin": "ast",
       "id": "v1_7_0_plan_create_edit_replace_and_drop",
       "community": 11,
@@ -11803,7 +11753,7 @@
       "label": "Validation and script handling",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
-      "source_location": "L162",
+      "source_location": "L159",
       "_origin": "ast",
       "id": "v1_7_0_plan_validation_and_script_handling",
       "community": 11,
@@ -11813,7 +11763,7 @@
       "label": "SQL prettification",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
-      "source_location": "L175",
+      "source_location": "L172",
       "_origin": "ast",
       "id": "v1_7_0_plan_sql_prettification",
       "community": 11,
@@ -11823,7 +11773,7 @@
       "label": "StarRocks (Experimental)",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
-      "source_location": "L187",
+      "source_location": "L184",
       "_origin": "ast",
       "id": "v1_7_0_plan_starrocks_experimental",
       "community": 11,
@@ -11833,7 +11783,7 @@
       "label": "History terminology and persistence",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
-      "source_location": "L204",
+      "source_location": "L201",
       "_origin": "ast",
       "id": "v1_7_0_plan_history_terminology_and_persistence",
       "community": 11,
@@ -11843,7 +11793,7 @@
       "label": "Beta and branch workflow",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
-      "source_location": "L211",
+      "source_location": "L208",
       "_origin": "ast",
       "id": "v1_7_0_plan_beta_and_branch_workflow",
       "community": 11,
@@ -11853,7 +11803,7 @@
       "label": "Implementation sequence",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
-      "source_location": "L221",
+      "source_location": "L218",
       "_origin": "ast",
       "id": "v1_7_0_plan_implementation_sequence",
       "community": 11,
@@ -11863,7 +11813,7 @@
       "label": "Test matrix",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
-      "source_location": "L232",
+      "source_location": "L229",
       "_origin": "ast",
       "id": "v1_7_0_plan_test_matrix",
       "community": 11,
@@ -11873,7 +11823,7 @@
       "label": "Stable release gates",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
-      "source_location": "L246",
+      "source_location": "L243",
       "_origin": "ast",
       "id": "v1_7_0_plan_stable_release_gates",
       "community": 11,
@@ -11883,7 +11833,7 @@
       "label": "Explicit exclusions",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
-      "source_location": "L257",
+      "source_location": "L254",
       "_origin": "ast",
       "id": "v1_7_0_plan_explicit_exclusions",
       "community": 11,
@@ -11893,101 +11843,11 @@
       "label": "Beta feedback",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
-      "source_location": "L270",
+      "source_location": "L267",
       "_origin": "ast",
       "id": "v1_7_0_plan_beta_feedback",
       "community": 11,
       "norm_label": "beta feedback"
-    },
-    {
-      "label": "redis-build-plan.md",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "v1_7_0_redis_build_plan",
-      "community": 28,
-      "norm_label": "redis-build-plan.md"
-    },
-    {
-      "label": "Redis \u2014 Build Plan (1.7.0)",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "v1_7_0_redis_build_plan_redis_build_plan_1_7_0",
-      "community": 28,
-      "norm_label": "redis \u2014 build plan (1.7.0)"
-    },
-    {
-      "label": "Locked decisions",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L10",
-      "_origin": "ast",
-      "id": "v1_7_0_redis_build_plan_locked_decisions",
-      "community": 28,
-      "norm_label": "locked decisions"
-    },
-    {
-      "label": "Editor interaction model (decisions 12\u201316)",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L31",
-      "_origin": "ast",
-      "id": "v1_7_0_redis_build_plan_editor_interaction_model_decisions_12_16",
-      "community": 28,
-      "norm_label": "editor interaction model (decisions 12\u201316)"
-    },
-    {
-      "label": "Capability layer (decision 1 + 2)",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L56",
-      "_origin": "ast",
-      "id": "v1_7_0_redis_build_plan_capability_layer_decision_1_2",
-      "community": 28,
-      "norm_label": "capability layer (decision 1 + 2)"
-    },
-    {
-      "label": "IPC surface",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L102",
-      "_origin": "ast",
-      "id": "v1_7_0_redis_build_plan_ipc_surface",
-      "community": 28,
-      "norm_label": "ipc surface"
-    },
-    {
-      "label": "Implementation sequence",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L110",
-      "_origin": "ast",
-      "id": "v1_7_0_redis_build_plan_implementation_sequence",
-      "community": 28,
-      "norm_label": "implementation sequence"
-    },
-    {
-      "label": "Test matrix (Redis slice)",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L142",
-      "_origin": "ast",
-      "id": "v1_7_0_redis_build_plan_test_matrix_redis_slice",
-      "community": 28,
-      "norm_label": "test matrix (redis slice)"
-    },
-    {
-      "label": "Deviations from plan.md",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L157",
-      "_origin": "ast",
-      "id": "v1_7_0_redis_build_plan_deviations_from_plan_md",
-      "community": 28,
-      "norm_label": "deviations from plan.md"
     },
     {
       "label": "README.md",
@@ -29117,9 +28977,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/settings.ts",
       "source_location": "L11",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "store_settings",
-      "target": "store_settings_loadprettysql"
+      "target": "store_settings_loadprettysql",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -33198,59 +33058,9 @@
       "source_file": "docs/adr/0020-capability-based-data-engine-drivers.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "adr_0020_capability_based_data_engine_drivers",
-      "target": "adr_0020_capability_based_data_engine_drivers_20_capability_based_data_engine_drivers",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/adr/0020-capability-based-data-engine-drivers.md",
-      "source_location": "L71",
-      "weight": 1.0,
-      "source": "adr_0020_capability_based_data_engine_drivers_20_capability_based_data_engine_drivers",
-      "target": "adr_0020_capability_based_data_engine_drivers_alternatives_considered",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/adr/0020-capability-based-data-engine-drivers.md",
-      "source_location": "L83",
-      "weight": 1.0,
-      "source": "adr_0020_capability_based_data_engine_drivers_20_capability_based_data_engine_drivers",
-      "target": "adr_0020_capability_based_data_engine_drivers_consequences",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/adr/0020-capability-based-data-engine-drivers.md",
-      "source_location": "L10",
-      "weight": 1.0,
-      "source": "adr_0020_capability_based_data_engine_drivers_20_capability_based_data_engine_drivers",
-      "target": "adr_0020_capability_based_data_engine_drivers_context",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/adr/0020-capability-based-data-engine-drivers.md",
-      "source_location": "L25",
-      "weight": 1.0,
-      "source": "adr_0020_capability_based_data_engine_drivers_20_capability_based_data_engine_drivers",
-      "target": "adr_0020_capability_based_data_engine_drivers_decision",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/adr/0020-capability-based-data-engine-drivers.md",
-      "source_location": "L5",
-      "weight": 1.0,
-      "source": "adr_0020_capability_based_data_engine_drivers_20_capability_based_data_engine_drivers",
-      "target": "adr_0020_capability_based_data_engine_drivers_status",
-      "confidence_score": 1.0
+      "target": "adr_0020_capability_based_data_engine_drivers_capability_based_data_engine_drivers"
     },
     {
       "relation": "contains",
@@ -34711,86 +34521,6 @@
       "confidence_score": 1.0,
       "source": "v1_7_0_plan_procedures_and_functions",
       "target": "v1_7_0_plan_validation_and_script_handling"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L1",
-      "weight": 1.0,
-      "source": "v1_7_0_redis_build_plan",
-      "target": "v1_7_0_redis_build_plan_redis_build_plan_1_7_0",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L56",
-      "weight": 1.0,
-      "source": "v1_7_0_redis_build_plan_redis_build_plan_1_7_0",
-      "target": "v1_7_0_redis_build_plan_capability_layer_decision_1_2",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L157",
-      "weight": 1.0,
-      "source": "v1_7_0_redis_build_plan_redis_build_plan_1_7_0",
-      "target": "v1_7_0_redis_build_plan_deviations_from_plan_md",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L31",
-      "weight": 1.0,
-      "source": "v1_7_0_redis_build_plan_redis_build_plan_1_7_0",
-      "target": "v1_7_0_redis_build_plan_editor_interaction_model_decisions_12_16",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L110",
-      "weight": 1.0,
-      "source": "v1_7_0_redis_build_plan_redis_build_plan_1_7_0",
-      "target": "v1_7_0_redis_build_plan_implementation_sequence",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L102",
-      "weight": 1.0,
-      "source": "v1_7_0_redis_build_plan_redis_build_plan_1_7_0",
-      "target": "v1_7_0_redis_build_plan_ipc_surface",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L10",
-      "weight": 1.0,
-      "source": "v1_7_0_redis_build_plan_redis_build_plan_1_7_0",
-      "target": "v1_7_0_redis_build_plan_locked_decisions",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0/redis-build-plan.md",
-      "source_location": "L142",
-      "weight": 1.0,
-      "source": "v1_7_0_redis_build_plan_redis_build_plan_1_7_0",
-      "target": "v1_7_0_redis_build_plan_test_matrix_redis_slice",
-      "confidence_score": 1.0
     },
     {
       "relation": "references",

@@ -1,11 +1,11 @@
 # Graph Report - Krust Studio  (2026-06-29)
 
 ## Corpus Check
-- 157 files · ~108,164 words
+- 156 files · ~105,528 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1281 nodes · 2163 edges · 126 communities (102 shown, 24 thin omitted)
+- 1267 nodes · 2150 edges · 124 communities (99 shown, 25 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 142 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
@@ -91,13 +91,11 @@
 - [[_COMMUNITY_Community 73|Community 73]]
 - [[_COMMUNITY_TitleBar tsx|TitleBar tsx]]
 - [[_COMMUNITY_CONTEXT Core|CONTEXT Core]]
-- [[_COMMUNITY_Community 76|Community 76]]
 - [[_COMMUNITY_gen icon|gen icon]]
 - [[_COMMUNITY_cellDisplay tsx|cellDisplay tsx]]
 - [[_COMMUNITY_theme krustHighlight|theme krustHighlight]]
 - [[_COMMUNITY_select tsx|select tsx]]
 - [[_COMMUNITY_short Fixed|short Fixed]]
-- [[_COMMUNITY_Community 82|Community 82]]
 - [[_COMMUNITY_mobile useIsMobile|mobile useIsMobile]]
 - [[_COMMUNITY_tsconfig json|tsconfig json]]
 - [[_COMMUNITY_button tsx|button tsx]]
@@ -164,11 +162,11 @@
 - **Staged Schema-Edit Workflow Evolution** — v1_2_3_staged_schema_edits, v1_3_4_staged_edits_on_tab, v1_3_4_fk_column_drop, v1_4_0_relation_drop_toggle [INFERRED 0.75]
 - **Inline Filter Two-Mode Design** — 0017_builder_mode, 0017_raw_where_mode, 0017_one_way_seed, 0017_statement_separator_guard [EXTRACTED 1.00]
 
-## Communities (126 total, 24 thin omitted)
+## Communities (124 total, 25 thin omitted)
 
 ### Community 0 - "readStore writeStore"
-Cohesion: 0.06
-Nodes (88): BackupProgress, fkGuards(), pgArrayBody(), quoteIdent(), restorePreview(), restoreRun(), runBackup(), sqlLiteral() (+80 more)
+Cohesion: 0.07
+Nodes (80): restorePreview(), restoreRun(), runBackup(), classifyStatement(), isConnectionFatal(), splitStatements(), alterTable(), applyChanges() (+72 more)
 
 ### Community 1 - "tsx ConnectionSwitcher"
 Cohesion: 0.32
@@ -179,8 +177,8 @@ Cohesion: 0.08
 Nodes (25): devDependencies, electron, @electron-toolkit/eslint-config-prettier, @electron-toolkit/eslint-config-ts, @electron-toolkit/tsconfig, electron-vite, eslint, eslint-plugin-react (+17 more)
 
 ### Community 3 - "tsx CommandPalette"
-Cohesion: 0.18
-Nodes (9): Props, DIALECTS, Props, SqlEditor, SqlEditorHandle, LIMITS, StructureEditor(), TYPES (+1 more)
+Cohesion: 0.12
+Nodes (13): Props, DIALECTS, Props, SqlEditor, SqlEditorHandle, LIMITS, StructureEditor(), TYPES (+5 more)
 
 ### Community 4 - "full Fixed"
 Cohesion: 0.06
@@ -188,7 +186,7 @@ Nodes (33): Auto-Update via GitHub Releases, MySQL Column Reorder (AFTER), Ctrl/
 
 ### Community 5 - "applyChanges driver"
 Cohesion: 0.05
-Nodes (56): Props, buildCreateTable(), buildDelete(), buildInsert(), buildOrderBy(), buildSearch(), buildUpdate(), buildWhere() (+48 more)
+Nodes (56): FkInlinePicker(), Props, buildCreateTable(), buildDelete(), buildInsert(), buildOrderBy(), buildSearch(), buildUpdate() (+48 more)
 
 ### Community 6 - "codemirror react"
 Cohesion: 0.06
@@ -196,11 +194,11 @@ Nodes (32): dependencies, class-variance-authority, clsx, cmdk, codemirror, @cod
 
 ### Community 7 - "utils sidebar"
 Cohesion: 0.13
-Nodes (28): FkInlinePicker(), cn(), Sidebar(), SidebarContent(), SidebarContext, SidebarContextProps, SidebarFooter(), SidebarGroup() (+20 more)
+Nodes (27): cn(), Sidebar(), SidebarContent(), SidebarContext, SidebarContextProps, SidebarFooter(), SidebarGroup(), SidebarGroupAction() (+19 more)
 
 ### Community 8 - "DbDriver quoteIdent"
 Cohesion: 0.12
-Nodes (16): Window, BackupApi, BackupResult, ConnectionsApi, DialogApi, HistoryApi, IndexInfo, KrustApi (+8 more)
+Nodes (18): api, Window, BackupApi, BackupSpec, ConnectionsApi, DialogApi, HistoryApi, HistoryQuery (+10 more)
 
 ### Community 9 - "update auto"
 Cohesion: 0.05
@@ -219,8 +217,8 @@ Cohesion: 0.10
 Nodes (31): ADR-0003 In-app MCP Read-only Structured Tools, AI Access Audit, AI Read Allowlist, Backup, Captured DDL, Changeset, Command Palette, Core principle (+23 more)
 
 ### Community 13 - "MysqlDriver alterTable"
-Cohesion: 0.16
-Nodes (12): ConnectionWorkspace, QueryResult, RowEdit, SaveConnectionInput, SerializedTab, QueryState, SessionStatus, StructureSub (+4 more)
+Cohesion: 0.18
+Nodes (11): ConnectionWorkspace, QueryResult, RowEdit, SerializedTab, QueryState, SessionStatus, StructureSub, tabHasDataChanges() (+3 more)
 
 ### Community 14 - "components json"
 Cohesion: 0.11
@@ -275,12 +273,12 @@ Cohesion: 0.29
 Nodes (6): 19. In-app update restart: let quitAndInstall own the quit, Consequences, Context, Decision, Status, Verification
 
 ### Community 27 - "mysql coldef"
-Cohesion: 0.20
-Nodes (7): DEFAULT_COLS, Editing, Props, TemplateManager(), TYPES, NewColumnSpec, TableTemplate
+Cohesion: 0.17
+Nodes (10): ColumnsEditor(), EditorColumn, FK_ACTIONS, DEFAULT_COLS, Editing, Props, TemplateManager(), TYPES (+2 more)
 
 ### Community 28 - "AppSidebar tsx"
-Cohesion: 0.22
-Nodes (8): Capability layer (decision 1 + 2), Deviations from plan.md, Editor interaction model (decisions 12–16), Implementation sequence, IPC surface, Locked decisions, Redis — Build Plan (1.7.0), Test matrix (Redis slice)
+Cohesion: 0.24
+Nodes (9): BackupProgress, fkGuards(), pgArrayBody(), quoteIdent(), sqlLiteral(), target(), BackupResult, RestoreRunResult (+1 more)
 
 ### Community 29 - "TemplateManager tsx"
 Cohesion: 0.18
@@ -307,8 +305,8 @@ Cohesion: 0.20
 Nodes (8): Command(), CommandDialog(), CommandGroup(), CommandInput(), CommandItem(), CommandList(), CommandSeparator(), CommandShortcut()
 
 ### Community 35 - "columnDiff addFkOp"
-Cohesion: 0.19
-Nodes (10): ColumnsEditor(), EditorColumn, FK_ACTIONS, addFkOp(), diff(), diffMoves(), Fk, fkSame() (+2 more)
+Cohesion: 0.39
+Nodes (6): addFkOp(), diff(), diffMoves(), Fk, fkSame(), lisKeepSet()
 
 ### Community 36 - "commands CommandDef"
 Cohesion: 0.22
@@ -454,14 +452,6 @@ Nodes (4): DataGrid(), SCOPE_LABELS, SettingsModal(), useSettings
 Cohesion: 0.33
 Nodes (5): Added, Date and datetime picker editing, Fixed, Install, macOS unsigned build packaging
 
-### Community 75 - "CONTEXT Core"
-Cohesion: 0.29
-Nodes (6): 20. Capability-based data-engine drivers, Alternatives considered, Consequences, Context, Decision, Status
-
-### Community 76 - "Community 76"
-Cohesion: 0.53
-Nodes (5): testConnection(), testMysql(), testPostgres(), testSqlite(), TestConnectionResult
-
 ### Community 77 - "gen icon"
 Cohesion: 0.50
 Nodes (3): png1024, src, tmp
@@ -482,10 +472,6 @@ Nodes (3): SelectContent, SelectItem, SelectTrigger
 Cohesion: 0.50
 Nodes (3): 🐛 Fixed, 📦 Install, What's new
 
-### Community 82 - "Community 82"
-Cohesion: 0.40
-Nodes (4): COLORS, dialectFor(), highlighter, highlightSql()
-
 ### Community 108 - "Community 108"
 Cohesion: 0.50
 Nodes (3): fmtNum(), PlanRow(), QueryPlanPanel()
@@ -499,8 +485,8 @@ Cohesion: 0.50
 Nodes (3): Added, Fixed, Install
 
 ### Community 117 - "Community 117"
-Cohesion: 0.23
-Nodes (10): ConnectionForm(), DEFAULT_PORTS, emptyValues(), FormValues, Props, schema, toFormValues(), ConnectionConfig (+2 more)
+Cohesion: 0.16
+Nodes (15): ConnectionForm(), DEFAULT_PORTS, emptyValues(), FormValues, Props, schema, toFormValues(), testConnection() (+7 more)
 
 ### Community 118 - "Community 118"
 Cohesion: 0.24
@@ -523,24 +509,24 @@ Cohesion: 0.25
 Nodes (7): Added, Fixed, Format SQL, In-app restart-to-update verified, Install, Krust Studio 1.6.6, Pretty DDL
 
 ## Knowledge Gaps
-- **483 isolated node(s):** `$schema`, `style`, `rsc`, `tsx`, `config` (+478 more)
+- **472 isolated node(s):** `$schema`, `style`, `rsc`, `tsx`, `config` (+467 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **24 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **25 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `cn()` connect `utils sidebar` to `Community 133`, `context menu`, `dropdown menu`, `dialog tsx`, `sheet tsx`, `command tsx`, `columnDiff addFkOp`, `ExportDialog tsx`, `popover tsx`, `Community 60`, `alert tsx`, `tooltip tsx`, `MCP Read`, `TitleBar tsx`, `mobile useIsMobile`, `button tsx`, `combobox tsx`, `checkbox tsx`, `input tsx`, `separator tsx`, `skeleton tsx`, `Community 108`?**
-  _High betweenness centrality (0.108) - this node is a cross-community bridge._
-- **Why does `EntityRef` connect `applyChanges driver` to `readStore writeStore`, `Community 133`, `DbDriver quoteIdent`, `MysqlDriver alterTable`, `connections ConnectionWorkspace`?**
-  _High betweenness centrality (0.037) - this node is a cross-community bridge._
+- **Why does `cn()` connect `utils sidebar` to `applyChanges driver`, `Community 133`, `context menu`, `dropdown menu`, `mysql coldef`, `dialog tsx`, `sheet tsx`, `command tsx`, `ExportDialog tsx`, `popover tsx`, `Community 60`, `alert tsx`, `tooltip tsx`, `MCP Read`, `TitleBar tsx`, `mobile useIsMobile`, `button tsx`, `combobox tsx`, `checkbox tsx`, `input tsx`, `separator tsx`, `skeleton tsx`, `Community 108`?**
+  _High betweenness centrality (0.109) - this node is a cross-community bridge._
+- **Why does `EntityRef` connect `applyChanges driver` to `readStore writeStore`, `Community 133`, `DbDriver quoteIdent`, `MysqlDriver alterTable`, `connections ConnectionWorkspace`, `AppSidebar tsx`?**
+  _High betweenness centrality (0.038) - this node is a cross-community bridge._
 - **Why does `AppSidebar()` connect `Community 133` to `PostgresDriver connect`, `utils sidebar`?**
   _High betweenness centrality (0.021) - this node is a cross-community bridge._
 - **Are the 85 inferred relationships involving `cn()` (e.g. with `AppSidebar()` and `ColumnsEditor()`) actually correct?**
   _`cn()` has 85 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `$schema`, `style`, `rsc` to the rest of the system?**
-  _483 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _472 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `readStore writeStore` be split into smaller, more focused modules?**
-  _Cohesion score 0.05996212918156953 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06639427987742594 - nodes in this community are weakly interconnected._
 - **Should `electron react` be split into smaller, more focused modules?**
   _Cohesion score 0.08 - nodes in this community are weakly interconnected._

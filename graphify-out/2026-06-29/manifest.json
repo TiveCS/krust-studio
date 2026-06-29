@@ -475,8 +475,8 @@
     "semantic_hash": "8a6643a420fdad6bfb583523bc6cef16"
   },
   "CONTEXT.md": {
-    "mtime": 1782743901.5551274,
-    "ast_hash": "df59dccd2edf3a5838d8e6149b316799",
+    "mtime": 1782300556.4824493,
+    "ast_hash": "da7d73aac37eab29d8723ce0b9882970",
     "semantic_hash": ""
   },
   "HANDOVER.md": {
@@ -795,13 +795,13 @@
     "semantic_hash": ""
   },
   "docs/adr/0020-capability-based-data-engine-drivers.md": {
-    "mtime": 1782743285.0369263,
-    "ast_hash": "930790a3a50a6c045c97f9c4fbf3425c",
+    "mtime": 1782300556.4839575,
+    "ast_hash": "a21d2f30efb05ec64f19e79d888f9680",
     "semantic_hash": ""
   },
   "docs/release/v1.7.0/plan.md": {
-    "mtime": 1782742615.776944,
-    "ast_hash": "f2173d22414d4af87ea3178d8ee7bf41",
+    "mtime": 1782343567.9999533,
+    "ast_hash": "68c6474d42a830294f81b7169d36e628",
     "semantic_hash": ""
   },
   "krust-studio-app/scripts/sql-format.test.ts": {
@@ -822,11 +822,6 @@
   "docs/release/v1.6.6/short.md": {
     "mtime": 1782343567.997953,
     "ast_hash": "1fefa6d0ebcd70b35b12317a43621077",
-    "semantic_hash": ""
-  },
-  "docs/release/v1.7.0/redis-build-plan.md": {
-    "mtime": 1782743919.769956,
-    "ast_hash": "ccff394f6810ed19e48feefa2295c82e",
     "semantic_hash": ""
   }
 }
