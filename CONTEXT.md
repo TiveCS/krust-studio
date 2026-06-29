@@ -81,6 +81,58 @@ match the key's native type (string, hash, list, set, sorted set, or stream).
 Key edits are staged per tab and preview the exact Redis commands before an
 explicit commit. Expiry can be inspected, added, changed, or removed. Redis
 support is key-centric; a raw command console is outside the initial scope.
+
+The **commit unit is one key** (one tab): its staged commands run as a single
+`WATCH key` + `MULTI`/`EXEC`, captured as one **commit group** in **Redis
+Mutation** history. On a concurrency conflict (`EXEC` returns null because the
+watched key changed under it), the user is always offered **Reload** (re-read,
+rebase the staged edits). **Force overwrite** (replay the staged `MULTI` without
+`WATCH`, behind a second typed confirmation) is offered **only when the key still
+exists with the same value type** — a benign concurrent edit. If the key was
+deleted, expired, or its type changed, Force is **disabled** and only Reload is
+offered, because replaying type-specific commands against a changed key risks a
+`WRONGTYPE` error or corruption. (The recurring *automate for convenience, never
+force a silent overwrite* value, applied to optimistic concurrency.)
+
+The value is read through one polymorphic driver call whose result is
+discriminated by type (string / hash page / list range / set page / sorted-set
+page / stream range); collection types page lazily (cursor for hash/set/sorted
+set, index range for list, id range for stream). Strings over ~1 MB are gated:
+the size is shown (`STRLEN`) and explicit load is required. Binary-safe
+throughout — a value that is not valid UTF-8 defaults to a hex viewer (base64
+available) rather than text; a **binary key name** is escaped on display and, in
+the beta, limited to read/delete (key creation and rename accept UTF-8 names
+only).
+
+**TTL is preserved across value edits** by construction: string edits use `SET …
+KEEPTTL`, native collection ops leave expiry untouched, and only a full-collection
+rebuild re-applies the original expiry (`PEXPIRE` from the pre-read `PTTL`) inside
+the same `MULTI`/`EXEC`.
+
+Because **Redis cannot store an empty collection**, staged member removals that
+would empty a hash/list/set/sorted set are detected at commit (via `SCARD`/
+`HLEN`/`LLEN`/`ZCARD`) and surfaced as a **key deletion** — marked Destructive and
+routed through the same typed key-name confirmation as an explicit delete, never a
+silent vanish.
+
+**Editor interaction** reuses the data grid's **Staged Edits** language. Hash,
+set, and sorted-set collections render as a member grid with the same staged
+highlighting (amber = edited, red = staged-removed, green = staged-added) and a
+per-tab reviewed commit. Value/score changes are in-place single commands; editing
+a member's *identity* (hash field name, set member, sorted-set member) has no
+Redis primitive, so it is surfaced honestly in the preview as the **remove + add**
+pair it really is — never a fake atomic rename. A string edits in a value pane and
+writes the **exact bytes** of the active mode (text / hex / base64 / verbatim
+JSON); display transforms (JSON pretty-print) are never persisted, mirroring the
+SQL **Pretty** toggle. **Lists** are constrained in the beta to in-place edit at a
+loaded index, prepend/append, end-pop, and remove-by-value — no arbitrary
+insert/delete at an index (index shifting is unsafe under paged loads). **Streams**
+are append-only (`XADD`); existing entries are immutable.
+
+One staged value-commit carries all value/member edits **plus an expiry change**
+for that key in a single `WATCH`+`MULTI`/`EXEC`; **key rename** and **key
+deletion** stay separate guarded actions with their own typed confirmations,
+outside the value-commit.
 _Avoid_: Table, row, entity
 
 ### Routine
@@ -111,6 +163,14 @@ Log of executed database commands, split into distinct streams (never mixed):
   procedure is treated as potentially mutating because its effects cannot be
   inferred reliably from `CALL`; execution is blocked on read-only connections.
   Function calls made through ordinary `SELECT` remain Data Retrieval.
+- **Redis Mutation** — the exact Redis command(s) a **Redis Key** edit generated
+  (`SET`, `HSET`, `DEL`, `EXPIRE`, …), shown only on Redis connections. A
+  separate stream rather than folded into Data Mutation: it is a distinct command
+  class (not SQL DML), mirroring the Routine Execution precedent. Commands from
+  one staged commit share a **commit group** (the `MULTI`/`EXEC` batch) and are
+  ordered as executed. Redis commands **never** enter a **Changeset** (that
+  export is SQL-DDL only). `DEL`, `UNLINK`, and setting an expiry in the past are
+  flagged **Destructive**.
 
 The dividing rule is **object shape vs row contents**: a statement that changes
 the existence or shape of an object is **Schema Mutation**; one that changes only
@@ -123,10 +183,10 @@ Stored in a local SQLite file in the data directory. Each entry records:
 statement, timestamp, connection, source (`gui`/`manual`), status
 (success/error), affected-row count — not result sets — and a **Destructive**
 flag (see below). Retention differs by stream: **Data Retrieval** auto-trims on a
-rolling cap (high volume, low long-term value); **Data Mutation** and **Table
-Mutation** are never auto-purged (audit value), pruned only manually — by the
-per-stream **Clear** or by selecting entries and deleting them (hard delete,
-confirmed).
+rolling cap (high volume, low long-term value); **Data Mutation**, **Schema
+Mutation**, and **Redis Mutation** are never auto-purged (audit value), pruned
+only manually — by the per-stream **Clear** or by selecting entries and deleting
+them (hard delete, confirmed).
 
 ### Destructive (history tag)
 A cross-cutting flag on a history entry marking a statement that destroys data:

@@ -102,8 +102,11 @@ rows, or SQL.
 ### History
 
 - Do not log passive browsing reads.
-- Capture each exact Redis mutation command in Data Mutation history, grouped by
-  commit ID and ordered as executed.
+- Capture each exact Redis mutation command in a dedicated **Redis Mutation**
+  history stream (not Data Mutation — a distinct command class, mirroring the
+  Routine Execution precedent), grouped by commit ID (the `WATCH`+`MULTI`/`EXEC`
+  batch) and ordered as executed. Requires a `commit_group` column on
+  `history_entries`.
 - Redis commands never enter SQL Changesets.
 - Mark `DEL`, `UNLINK`, and expiry-to-past operations destructive.
 
