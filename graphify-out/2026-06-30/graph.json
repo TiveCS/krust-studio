@@ -1166,7 +1166,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_sql_format_test",
-      "community": 123,
+      "community": 3,
       "norm_label": "sql-format.test.ts"
     },
     {
@@ -1286,7 +1286,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "db_driver_drivercore",
-      "community": 110,
+      "community": 13,
       "norm_label": "drivercore"
     },
     {
@@ -1346,7 +1346,7 @@
       "source_location": "L132",
       "_origin": "ast",
       "id": "db_driver_keyvaluecapable",
-      "community": 119,
+      "community": 13,
       "norm_label": "keyvaluecapable"
     },
     {
@@ -1396,7 +1396,7 @@
       "source_location": "L254",
       "_origin": "ast",
       "id": "db_driver_buildcreatetable",
-      "community": 76,
+      "community": 5,
       "norm_label": "buildcreatetable()"
     },
     {
@@ -1496,7 +1496,7 @@
       "source_location": "L529",
       "_origin": "ast",
       "id": "db_driver_buildsearch",
-      "community": 130,
+      "community": 5,
       "norm_label": "buildsearch()"
     },
     {
@@ -1536,7 +1536,7 @@
       "source_location": "L583",
       "_origin": "ast",
       "id": "db_driver_driverdeps",
-      "community": 137,
+      "community": 76,
       "norm_label": "driverdeps"
     },
     {
@@ -1616,7 +1616,7 @@
       "source_location": "L127",
       "_origin": "ast",
       "id": "drivers_mysql_mysqldriver_constructor",
-      "community": 137,
+      "community": 76,
       "norm_label": ".constructor()"
     },
     {
@@ -1686,7 +1686,7 @@
       "source_location": "L200",
       "_origin": "ast",
       "id": "drivers_mysql_mysqldriver_listenums",
-      "community": 76,
+      "community": 129,
       "norm_label": ".listenums()"
     },
     {
@@ -1766,7 +1766,7 @@
       "source_location": "L500",
       "_origin": "ast",
       "id": "drivers_mysql_mysqldriver_createtable",
-      "community": 72,
+      "community": 5,
       "norm_label": ".createtable()"
     },
     {
@@ -1876,7 +1876,7 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_constructor",
-      "community": 137,
+      "community": 76,
       "norm_label": ".constructor()"
     },
     {
@@ -2036,297 +2036,217 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "drivers_redis",
-      "community": 110,
+      "community": 13,
       "norm_label": "redis.ts"
     },
     {
       "label": "Client",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L19",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "drivers_redis_client",
-      "community": 110,
+      "community": 13,
       "norm_label": "client"
-    },
-    {
-      "label": "REMOVAL_VERBS",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L22",
-      "_origin": "ast",
-      "id": "drivers_redis_removal_verbs",
-      "community": 110,
-      "norm_label": "removal_verbs"
-    },
-    {
-      "label": "ADD_VERBS",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L24",
-      "_origin": "ast",
-      "id": "drivers_redis_add_verbs",
-      "community": 110,
-      "norm_label": "add_verbs"
-    },
-    {
-      "label": "isValidUtf8()",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L26",
-      "_origin": "ast",
-      "id": "drivers_redis_isvalidutf8",
-      "community": 110,
-      "norm_label": "isvalidutf8()"
-    },
-    {
-      "label": "toClientArg()",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L36",
-      "_origin": "ast",
-      "id": "drivers_redis_toclientarg",
-      "community": 110,
-      "norm_label": "toclientarg()"
     },
     {
       "label": "Deps",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L43",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "drivers_redis_deps",
-      "community": 117,
+      "community": 13,
       "norm_label": "deps"
     },
     {
       "label": "RedisDriver",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L54",
+      "source_location": "L34",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver",
-      "community": 119,
+      "community": 13,
       "norm_label": "redisdriver"
     },
     {
       "label": ".constructor()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L62",
+      "source_location": "L40",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_constructor",
-      "community": 119,
+      "community": 13,
       "norm_label": ".constructor()"
     },
     {
       "label": ".c()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L68",
+      "source_location": "L46",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_c",
-      "community": 119,
+      "community": 13,
       "norm_label": ".c()"
-    },
-    {
-      "label": ".b()",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L74",
-      "_origin": "ast",
-      "id": "drivers_redis_redisdriver_b",
-      "community": 119,
-      "norm_label": ".b()"
     },
     {
       "label": ".connect()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L79",
+      "source_location": "L51",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_connect",
-      "community": 119,
+      "community": 13,
       "norm_label": ".connect()"
     },
     {
       "label": ".close()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L104",
+      "source_location": "L74",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_close",
-      "community": 119,
+      "community": 13,
       "norm_label": ".close()"
     },
     {
       "label": ".cancel()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L115",
+      "source_location": "L84",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_cancel",
-      "community": 119,
+      "community": 13,
       "norm_label": ".cancel()"
     },
     {
       "label": ".listDatabases()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L121",
+      "source_location": "L90",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_listdatabases",
-      "community": 119,
+      "community": 13,
       "norm_label": ".listdatabases()"
     },
     {
       "label": ".currentDatabase()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L127",
+      "source_location": "L96",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_currentdatabase",
-      "community": 119,
+      "community": 13,
       "norm_label": ".currentdatabase()"
     },
     {
       "label": ".useDatabase()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L131",
+      "source_location": "L100",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_usedatabase",
-      "community": 119,
+      "community": 13,
       "norm_label": ".usedatabase()"
     },
     {
       "label": ".dbInfo()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L138",
+      "source_location": "L107",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_dbinfo",
-      "community": 119,
+      "community": 13,
       "norm_label": ".dbinfo()"
     },
     {
       "label": ".scanKeys()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L160",
+      "source_location": "L129",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_scankeys",
-      "community": 119,
+      "community": 13,
       "norm_label": ".scankeys()"
     },
     {
       "label": ".keyMeta()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L187",
+      "source_location": "L152",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_keymeta",
-      "community": 110,
+      "community": 13,
       "norm_label": ".keymeta()"
-    },
-    {
-      "label": ".cardinality()",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L198",
-      "_origin": "ast",
-      "id": "drivers_redis_redisdriver_cardinality",
-      "community": 131,
-      "norm_label": ".cardinality()"
     },
     {
       "label": ".readValue()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L217",
+      "source_location": "L162",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_readvalue",
-      "community": 110,
+      "community": 13,
       "norm_label": ".readvalue()"
     },
     {
       "label": ".commit()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L298",
+      "source_location": "L223",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_commit",
-      "community": 110,
+      "community": 13,
       "norm_label": ".commit()"
     },
     {
       "label": ".renameKey()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L333",
+      "source_location": "L248",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_renamekey",
-      "community": 119,
+      "community": 13,
       "norm_label": ".renamekey()"
     },
     {
       "label": ".deleteKey()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L341",
+      "source_location": "L256",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_deletekey",
-      "community": 119,
+      "community": 13,
       "norm_label": ".deletekey()"
-    },
-    {
-      "label": "verbOf()",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L352",
-      "_origin": "ast",
-      "id": "drivers_redis_verbof",
-      "community": 110,
-      "norm_label": "verbof()"
-    },
-    {
-      "label": "emptiesCollection()",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L358",
-      "_origin": "ast",
-      "id": "drivers_redis_emptiescollection",
-      "community": 110,
-      "norm_label": "emptiescollection()"
     },
     {
       "label": "normalizeType()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L368",
+      "source_location": "L266",
       "_origin": "ast",
       "id": "drivers_redis_normalizetype",
-      "community": 110,
+      "community": 13,
       "norm_label": "normalizetype()"
     },
     {
       "label": "classifyConflict()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L377",
+      "source_location": "L275",
       "_origin": "ast",
       "id": "drivers_redis_classifyconflict",
-      "community": 110,
+      "community": 13,
       "norm_label": "classifyconflict()"
     },
     {
       "label": "buildConflict()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L382",
+      "source_location": "L280",
       "_origin": "ast",
       "id": "drivers_redis_buildconflict",
-      "community": 110,
+      "community": 13,
       "norm_label": "buildconflict()"
     },
     {
@@ -2356,7 +2276,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "drivers_sqlite_sqliteplannode",
-      "community": 5,
+      "community": 8,
       "norm_label": "sqliteplannode()"
     },
     {
@@ -2376,7 +2296,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_constructor",
-      "community": 137,
+      "community": 76,
       "norm_label": ".constructor()"
     },
     {
@@ -2426,7 +2346,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_listentities",
-      "community": 76,
+      "community": 8,
       "norm_label": ".listentities()"
     },
     {
@@ -2436,7 +2356,7 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_listenums",
-      "community": 76,
+      "community": 129,
       "norm_label": ".listenums()"
     },
     {
@@ -2466,7 +2386,7 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_searchrows",
-      "community": 130,
+      "community": 5,
       "norm_label": ".searchrows()"
     },
     {
@@ -2486,7 +2406,7 @@
       "source_location": "L252",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_describetable",
-      "community": 5,
+      "community": 8,
       "norm_label": ".describetable()"
     },
     {
@@ -2526,7 +2446,7 @@
       "source_location": "L388",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_createtable",
-      "community": 76,
+      "community": 5,
       "norm_label": ".createtable()"
     },
     {
@@ -2546,7 +2466,7 @@
       "source_location": "L447",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_dropentity",
-      "community": 39,
+      "community": 8,
       "norm_label": ".dropentity()"
     },
     {
@@ -2626,7 +2546,7 @@
       "source_location": "L516",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_explainquery",
-      "community": 5,
+      "community": 8,
       "norm_label": ".explainquery()"
     },
     {
@@ -3153,7 +3073,7 @@
       "label": "redisRenameKey()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/session.ts",
-      "source_location": "L557",
+      "source_location": "L551",
       "_origin": "ast",
       "id": "db_session_redisrenamekey",
       "community": 0,
@@ -3163,7 +3083,7 @@
       "label": "redisDeleteKey()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/session.ts",
-      "source_location": "L581",
+      "source_location": "L575",
       "_origin": "ast",
       "id": "db_session_redisdeletekey",
       "community": 0,
@@ -3296,7 +3216,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "store_connections_storedconnection",
-      "community": 117,
+      "community": 13,
       "norm_label": "storedconnection"
     },
     {
@@ -3716,7 +3636,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "store_workspace",
-      "community": 135,
+      "community": 0,
       "norm_label": "workspace.ts"
     },
     {
@@ -3726,7 +3646,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "store_workspace_empty",
-      "community": 135,
+      "community": 0,
       "norm_label": "empty"
     },
     {
@@ -3736,7 +3656,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "store_workspace_workspacepath",
-      "community": 135,
+      "community": 0,
       "norm_label": "workspacepath()"
     },
     {
@@ -3746,7 +3666,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "store_workspace_loadworkspace",
-      "community": 135,
+      "community": 0,
       "norm_label": "loadworkspace()"
     },
     {
@@ -3756,7 +3676,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "store_workspace_saveworkspace",
-      "community": 135,
+      "community": 0,
       "norm_label": "saveworkspace()"
     },
     {
@@ -4216,7 +4136,7 @@
       "source_location": "L113",
       "_origin": "ast",
       "id": "components_datagrid_datagrid",
-      "community": 136,
+      "community": 67,
       "norm_label": "datagrid()"
     },
     {
@@ -4246,7 +4166,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_exportdialog",
-      "community": 130,
+      "community": 60,
       "norm_label": "exportdialog.tsx"
     },
     {
@@ -4256,7 +4176,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "components_exportdialog_data",
-      "community": 130,
+      "community": 60,
       "norm_label": "data"
     },
     {
@@ -4266,7 +4186,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "components_exportdialog_scope",
-      "community": 130,
+      "community": 60,
       "norm_label": "scope"
     },
     {
@@ -4276,7 +4196,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "components_exportdialog_format",
-      "community": 130,
+      "community": 60,
       "norm_label": "format"
     },
     {
@@ -4286,7 +4206,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "components_exportdialog_props",
-      "community": 130,
+      "community": 60,
       "norm_label": "props"
     },
     {
@@ -4296,7 +4216,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "components_exportdialog_exportdialog",
-      "community": 130,
+      "community": 60,
       "norm_label": "exportdialog()"
     },
     {
@@ -4416,7 +4336,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "components_fkinlinepicker_fkinlinepicker",
-      "community": 40,
+      "community": 7,
       "norm_label": "fkinlinepicker()"
     },
     {
@@ -4426,7 +4346,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_historyview",
-      "community": 123,
+      "community": 3,
       "norm_label": "historyview.tsx"
     },
     {
@@ -4436,7 +4356,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "components_historyview_view",
-      "community": 123,
+      "community": 3,
       "norm_label": "view"
     },
     {
@@ -4446,7 +4366,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "components_historyview_when",
-      "community": 123,
+      "community": 3,
       "norm_label": "when()"
     },
     {
@@ -4456,7 +4376,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "components_historyview_withsemi",
-      "community": 123,
+      "community": 3,
       "norm_label": "withsemi()"
     },
     {
@@ -4466,7 +4386,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "components_historyview_oneline",
-      "community": 123,
+      "community": 3,
       "norm_label": "oneline()"
     },
     {
@@ -4476,7 +4396,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "components_historyview_fmtlang",
-      "community": 123,
+      "community": 3,
       "norm_label": "fmtlang()"
     },
     {
@@ -4486,7 +4406,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "components_historyview_tryformat",
-      "community": 123,
+      "community": 3,
       "norm_label": "tryformat()"
     },
     {
@@ -4496,7 +4416,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "components_historyview_historyview",
-      "community": 123,
+      "community": 3,
       "norm_label": "historyview()"
     },
     {
@@ -4506,7 +4426,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_jsonviewerpanel",
-      "community": 132,
+      "community": 60,
       "norm_label": "jsonviewerpanel.tsx"
     },
     {
@@ -4516,7 +4436,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "components_jsonviewerpanel_classify",
-      "community": 132,
+      "community": 60,
       "norm_label": "classify()"
     },
     {
@@ -4526,7 +4446,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "components_jsonviewerpanel_prim",
-      "community": 132,
+      "community": 60,
       "norm_label": "prim()"
     },
     {
@@ -4536,7 +4456,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "components_jsonviewerpanel_jsonvalue",
-      "community": 132,
+      "community": 60,
       "norm_label": "jsonvalue()"
     },
     {
@@ -4546,7 +4466,7 @@
       "source_location": "L92",
       "_origin": "ast",
       "id": "components_jsonviewerpanel_fkexpand",
-      "community": 132,
+      "community": 60,
       "norm_label": "fkexpand()"
     },
     {
@@ -4556,7 +4476,7 @@
       "source_location": "L174",
       "_origin": "ast",
       "id": "components_jsonviewerpanel_rowfields",
-      "community": 132,
+      "community": 60,
       "norm_label": "rowfields()"
     },
     {
@@ -4566,7 +4486,7 @@
       "source_location": "L233",
       "_origin": "ast",
       "id": "components_jsonviewerpanel_props",
-      "community": 132,
+      "community": 60,
       "norm_label": "props"
     },
     {
@@ -4576,7 +4496,7 @@
       "source_location": "L242",
       "_origin": "ast",
       "id": "components_jsonviewerpanel_jsonviewerpanel",
-      "community": 132,
+      "community": 60,
       "norm_label": "jsonviewerpanel()"
     },
     {
@@ -4706,34 +4626,14 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_rediskeyview",
-      "community": 122,
+      "community": 13,
       "norm_label": "rediskeyview.tsx"
-    },
-    {
-      "label": "argText()",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L11",
-      "_origin": "ast",
-      "id": "components_rediskeyview_argtext",
-      "community": 122,
-      "norm_label": "argtext()"
-    },
-    {
-      "label": "formatTtl()",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L16",
-      "_origin": "ast",
-      "id": "components_rediskeyview_formatttl",
-      "community": 122,
-      "norm_label": "formatttl()"
     },
     {
       "label": "RedisKeyView()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L32",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "components_rediskeyview_rediskeyview",
       "community": 13,
@@ -4743,120 +4643,70 @@
       "label": "Header()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L162",
+      "source_location": "L111",
       "_origin": "ast",
       "id": "components_rediskeyview_header",
-      "community": 122,
+      "community": 13,
       "norm_label": "header()"
     },
     {
       "label": "ForceButton()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L304",
+      "source_location": "L228",
       "_origin": "ast",
       "id": "components_rediskeyview_forcebutton",
-      "community": 122,
+      "community": 13,
       "norm_label": "forcebutton()"
     },
     {
       "label": "ValueBody()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L331",
+      "source_location": "L255",
       "_origin": "ast",
       "id": "components_rediskeyview_valuebody",
-      "community": 122,
+      "community": 13,
       "norm_label": "valuebody()"
-    },
-    {
-      "label": "ViewMode",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L406",
-      "_origin": "ast",
-      "id": "components_rediskeyview_viewmode",
-      "community": 122,
-      "norm_label": "viewmode"
-    },
-    {
-      "label": "b64ToBytes()",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L409",
-      "_origin": "ast",
-      "id": "components_rediskeyview_b64tobytes",
-      "community": 122,
-      "norm_label": "b64tobytes()"
-    },
-    {
-      "label": "bytesToB64()",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L415",
-      "_origin": "ast",
-      "id": "components_rediskeyview_bytestob64",
-      "community": 122,
-      "norm_label": "bytestob64()"
-    },
-    {
-      "label": "bytesToHex()",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L420",
-      "_origin": "ast",
-      "id": "components_rediskeyview_bytestohex",
-      "community": 122,
-      "norm_label": "bytestohex()"
-    },
-    {
-      "label": "hexToBytes()",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L423",
-      "_origin": "ast",
-      "id": "components_rediskeyview_hextobytes",
-      "community": 122,
-      "norm_label": "hextobytes()"
     },
     {
       "label": "StringEditor()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L431",
+      "source_location": "L330",
       "_origin": "ast",
       "id": "components_rediskeyview_stringeditor",
-      "community": 122,
+      "community": 13,
       "norm_label": "stringeditor()"
     },
     {
       "label": "MemberGrid()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L544",
+      "source_location": "L364",
       "_origin": "ast",
       "id": "components_rediskeyview_membergrid",
-      "community": 122,
+      "community": 13,
       "norm_label": "membergrid()"
     },
     {
       "label": "ListEditor()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L635",
+      "source_location": "L455",
       "_origin": "ast",
       "id": "components_rediskeyview_listeditor",
-      "community": 122,
+      "community": 13,
       "norm_label": "listeditor()"
     },
     {
       "label": "StreamViewer()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L707",
+      "source_location": "L527",
       "_origin": "ast",
       "id": "components_rediskeyview_streamviewer",
-      "community": 122,
+      "community": 13,
       "norm_label": "streamviewer()"
     },
     {
@@ -4866,37 +4716,27 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_redissidebar",
-      "community": 131,
+      "community": 13,
       "norm_label": "redissidebar.tsx"
-    },
-    {
-      "label": "ttlLabel()",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisSidebar.tsx",
-      "source_location": "L10",
-      "_origin": "ast",
-      "id": "components_redissidebar_ttllabel",
-      "community": 131,
-      "norm_label": "ttllabel()"
     },
     {
       "label": "TYPE_BADGE",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisSidebar.tsx",
-      "source_location": "L19",
+      "source_location": "L10",
       "_origin": "ast",
       "id": "components_redissidebar_type_badge",
-      "community": 131,
+      "community": 13,
       "norm_label": "type_badge"
     },
     {
       "label": "RedisSidebar()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisSidebar.tsx",
-      "source_location": "L30",
+      "source_location": "L21",
       "_origin": "ast",
       "id": "components_redissidebar_redissidebar",
-      "community": 131,
+      "community": 13,
       "norm_label": "redissidebar()"
     },
     {
@@ -4906,7 +4746,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_settingsmodal",
-      "community": 136,
+      "community": 67,
       "norm_label": "settingsmodal.tsx"
     },
     {
@@ -4916,7 +4756,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "components_settingsmodal_scope_labels",
-      "community": 136,
+      "community": 67,
       "norm_label": "scope_labels"
     },
     {
@@ -4926,7 +4766,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "components_settingsmodal_settingsmodal",
-      "community": 136,
+      "community": 67,
       "norm_label": "settingsmodal()"
     },
     {
@@ -5166,7 +5006,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_tabbar",
-      "community": 138,
+      "community": 23,
       "norm_label": "tabbar.tsx"
     },
     {
@@ -5176,7 +5016,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "components_tabbar_tabicon",
-      "community": 138,
+      "community": 23,
       "norm_label": "tabicon()"
     },
     {
@@ -5186,7 +5026,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "components_tabbar_tabbar",
-      "community": 138,
+      "community": 23,
       "norm_label": "tabbar()"
     },
     {
@@ -7106,7 +6946,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_export",
-      "community": 133,
+      "community": 60,
       "norm_label": "export.ts"
     },
     {
@@ -7116,7 +6956,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_export_row",
-      "community": 133,
+      "community": 60,
       "norm_label": "row"
     },
     {
@@ -7126,7 +6966,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_export_scalar",
-      "community": 133,
+      "community": 60,
       "norm_label": "scalar()"
     },
     {
@@ -7136,7 +6976,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "lib_export_tocsv",
-      "community": 133,
+      "community": 60,
       "norm_label": "tocsv()"
     },
     {
@@ -7146,7 +6986,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "lib_export_tojson",
-      "community": 133,
+      "community": 60,
       "norm_label": "tojson()"
     },
     {
@@ -7156,7 +6996,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "lib_export_formatrows",
-      "community": 133,
+      "community": 60,
       "norm_label": "formatrows()"
     },
     {
@@ -7236,7 +7076,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_sqlformat",
-      "community": 123,
+      "community": 3,
       "norm_label": "sqlformat.ts"
     },
     {
@@ -7246,7 +7086,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "lib_sqlformat_dialects",
-      "community": 123,
+      "community": 3,
       "norm_label": "dialects"
     },
     {
@@ -7256,7 +7096,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_sqlformat_formatsql",
-      "community": 123,
+      "community": 3,
       "norm_label": "formatsql()"
     },
     {
@@ -7266,7 +7106,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "lib_sqlformat_displaysql",
-      "community": 123,
+      "community": 3,
       "norm_label": "displaysql()"
     },
     {
@@ -7276,7 +7116,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_sqlhighlight",
-      "community": 134,
+      "community": 3,
       "norm_label": "sqlhighlight.tsx"
     },
     {
@@ -7286,7 +7126,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "lib_sqlhighlight_colors",
-      "community": 134,
+      "community": 3,
       "norm_label": "colors"
     },
     {
@@ -7296,7 +7136,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "lib_sqlhighlight_highlighter",
-      "community": 134,
+      "community": 3,
       "norm_label": "highlighter"
     },
     {
@@ -7306,7 +7146,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "lib_sqlhighlight_dialectfor",
-      "community": 134,
+      "community": 3,
       "norm_label": "dialectfor()"
     },
     {
@@ -7316,7 +7156,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "lib_sqlhighlight_stylefor",
-      "community": 134,
+      "community": 3,
       "norm_label": "stylefor()"
     },
     {
@@ -7326,7 +7166,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "lib_sqlhighlight_highlightsql",
-      "community": 134,
+      "community": 3,
       "norm_label": "highlightsql()"
     },
     {
@@ -7396,7 +7236,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "community": 126,
+      "community": 8,
       "norm_label": "connections.ts"
     },
     {
@@ -7406,7 +7246,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "store_connections_querystate",
-      "community": 126,
+      "community": 8,
       "norm_label": "querystate"
     },
     {
@@ -7416,7 +7256,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "store_connections_tabview",
-      "community": 126,
+      "community": 8,
       "norm_label": "tabview"
     },
     {
@@ -7426,7 +7266,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "store_connections_structuresub",
-      "community": 126,
+      "community": 8,
       "norm_label": "structuresub"
     },
     {
@@ -7436,7 +7276,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "store_connections_sessionstatus",
-      "community": 126,
+      "community": 8,
       "norm_label": "sessionstatus"
     },
     {
@@ -7456,7 +7296,7 @@
       "source_location": "L116",
       "_origin": "ast",
       "id": "store_connections_tabhasdatachanges",
-      "community": 126,
+      "community": 8,
       "norm_label": "tabhasdatachanges()"
     },
     {
@@ -7466,7 +7306,7 @@
       "source_location": "L125",
       "_origin": "ast",
       "id": "store_connections_tabhasdraftcontent",
-      "community": 126,
+      "community": 8,
       "norm_label": "tabhasdraftcontent()"
     },
     {
@@ -7476,7 +7316,7 @@
       "source_location": "L136",
       "_origin": "ast",
       "id": "store_connections_tabisdirty",
-      "community": 126,
+      "community": 8,
       "norm_label": "tabisdirty()"
     },
     {
@@ -7486,7 +7326,7 @@
       "source_location": "L140",
       "_origin": "ast",
       "id": "store_connections_editkey",
-      "community": 126,
+      "community": 8,
       "norm_label": "editkey()"
     },
     {
@@ -7496,7 +7336,7 @@
       "source_location": "L144",
       "_origin": "ast",
       "id": "store_connections_entitykey",
-      "community": 126,
+      "community": 8,
       "norm_label": "entitykey()"
     },
     {
@@ -7506,7 +7346,7 @@
       "source_location": "L148",
       "_origin": "ast",
       "id": "store_connections_connectionsstate",
-      "community": 76,
+      "community": 8,
       "norm_label": "connectionsstate"
     },
     {
@@ -7533,7 +7373,7 @@
       "label": "StagedEdit",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L17",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "store_redis_stagededit",
       "community": 13,
@@ -7543,7 +7383,7 @@
       "label": "KeyList",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L34",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "store_redis_keylist",
       "community": 13,
@@ -7553,7 +7393,7 @@
       "label": "KeyTab",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L44",
+      "source_location": "L40",
       "_origin": "ast",
       "id": "store_redis_keytab",
       "community": 13,
@@ -7563,17 +7403,17 @@
       "label": "RedisState",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L59",
+      "source_location": "L51",
       "_origin": "ast",
       "id": "store_redis_redisstate",
-      "community": 131,
+      "community": 13,
       "norm_label": "redisstate"
     },
     {
       "label": "EMPTY_LIST",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L86",
+      "source_location": "L75",
       "_origin": "ast",
       "id": "store_redis_empty_list",
       "community": 13,
@@ -7583,7 +7423,7 @@
       "label": "emptyTab()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L95",
+      "source_location": "L84",
       "_origin": "ast",
       "id": "store_redis_emptytab",
       "community": 13,
@@ -7593,17 +7433,17 @@
       "label": "useRedis",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L108",
+      "source_location": "L88",
       "_origin": "ast",
       "id": "store_redis_useredis",
-      "community": 131,
+      "community": 13,
       "norm_label": "useredis"
     },
     {
       "label": "doCommit()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L252",
+      "source_location": "L224",
       "_origin": "ast",
       "id": "store_redis_docommit",
       "community": 13,
@@ -7613,7 +7453,7 @@
       "label": "buildCommands()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L294",
+      "source_location": "L255",
       "_origin": "ast",
       "id": "store_redis_buildcommands",
       "community": 13,
@@ -7623,7 +7463,7 @@
       "label": "cmd()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L363",
+      "source_location": "L319",
       "_origin": "ast",
       "id": "store_redis_cmd",
       "community": 13,
@@ -7633,7 +7473,7 @@
       "label": "patchTab()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L367",
+      "source_location": "L323",
       "_origin": "ast",
       "id": "store_redis_patchtab",
       "community": 13,
@@ -7643,7 +7483,7 @@
       "label": "dedupe()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L378",
+      "source_location": "L334",
       "_origin": "ast",
       "id": "store_redis_dedupe",
       "community": 13,
@@ -7653,7 +7493,7 @@
       "label": "msg()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L383",
+      "source_location": "L339",
       "_origin": "ast",
       "id": "store_redis_msg",
       "community": 13,
@@ -7786,7 +7626,7 @@
       "source_location": "L108",
       "_origin": "ast",
       "id": "store_settings_usesettings",
-      "community": 136,
+      "community": 67,
       "norm_label": "usesettings"
     },
     {
@@ -7876,7 +7716,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "shared_types_connectionconfig",
-      "community": 117,
+      "community": 13,
       "norm_label": "connectionconfig"
     },
     {
@@ -7936,7 +7776,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "shared_types_entitytype",
-      "community": 39,
+      "community": 8,
       "norm_label": "entitytype"
     },
     {
@@ -7946,7 +7786,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "shared_types_enumtype",
-      "community": 76,
+      "community": 129,
       "norm_label": "enumtype"
     },
     {
@@ -7956,7 +7796,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "shared_types_entityinfo",
-      "community": 76,
+      "community": 8,
       "norm_label": "entityinfo"
     },
     {
@@ -7976,7 +7816,7 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "shared_types_columninfo",
-      "community": 40,
+      "community": 60,
       "norm_label": "columninfo"
     },
     {
@@ -8016,7 +7856,7 @@
       "source_location": "L108",
       "_origin": "ast",
       "id": "shared_types_searchresult",
-      "community": 130,
+      "community": 5,
       "norm_label": "searchresult"
     },
     {
@@ -8036,7 +7876,7 @@
       "source_location": "L137",
       "_origin": "ast",
       "id": "shared_types_queryplan",
-      "community": 5,
+      "community": 8,
       "norm_label": "queryplan"
     },
     {
@@ -8046,7 +7886,7 @@
       "source_location": "L148",
       "_origin": "ast",
       "id": "shared_types_queryresult",
-      "community": 126,
+      "community": 8,
       "norm_label": "queryresult"
     },
     {
@@ -8066,7 +7906,7 @@
       "source_location": "L167",
       "_origin": "ast",
       "id": "shared_types_rowedit",
-      "community": 126,
+      "community": 8,
       "norm_label": "rowedit"
     },
     {
@@ -8096,7 +7936,7 @@
       "source_location": "L188",
       "_origin": "ast",
       "id": "shared_types_historystream",
-      "community": 123,
+      "community": 3,
       "norm_label": "historystream"
     },
     {
@@ -8106,7 +7946,7 @@
       "source_location": "L195",
       "_origin": "ast",
       "id": "shared_types_historyentry",
-      "community": 123,
+      "community": 3,
       "norm_label": "historyentry"
     },
     {
@@ -8216,7 +8056,7 @@
       "source_location": "L378",
       "_origin": "ast",
       "id": "shared_types_tablestructure",
-      "community": 5,
+      "community": 8,
       "norm_label": "tablestructure"
     },
     {
@@ -8236,7 +8076,7 @@
       "source_location": "L404",
       "_origin": "ast",
       "id": "shared_types_createtablespec",
-      "community": 76,
+      "community": 5,
       "norm_label": "createtablespec"
     },
     {
@@ -8246,7 +8086,7 @@
       "source_location": "L414",
       "_origin": "ast",
       "id": "shared_types_tabletemplate",
-      "community": 27,
+      "community": 8,
       "norm_label": "tabletemplate"
     },
     {
@@ -8286,7 +8126,7 @@
       "source_location": "L570",
       "_origin": "ast",
       "id": "shared_types_serializedtab",
-      "community": 126,
+      "community": 8,
       "norm_label": "serializedtab"
     },
     {
@@ -8296,7 +8136,7 @@
       "source_location": "L596",
       "_origin": "ast",
       "id": "shared_types_connectionworkspace",
-      "community": 126,
+      "community": 8,
       "norm_label": "connectionworkspace"
     },
     {
@@ -8306,7 +8146,7 @@
       "source_location": "L601",
       "_origin": "ast",
       "id": "shared_types_workspacedata",
-      "community": 135,
+      "community": 8,
       "norm_label": "workspacedata"
     },
     {
@@ -8346,7 +8186,7 @@
       "source_location": "L621",
       "_origin": "ast",
       "id": "shared_types_backupspec",
-      "community": 8,
+      "community": 0,
       "norm_label": "backupspec"
     },
     {
@@ -8356,7 +8196,7 @@
       "source_location": "L627",
       "_origin": "ast",
       "id": "shared_types_backupresult",
-      "community": 8,
+      "community": 0,
       "norm_label": "backupresult"
     },
     {
@@ -8366,7 +8206,7 @@
       "source_location": "L635",
       "_origin": "ast",
       "id": "shared_types_restorestatement",
-      "community": 8,
+      "community": 0,
       "norm_label": "restorestatement"
     },
     {
@@ -8386,7 +8226,7 @@
       "source_location": "L650",
       "_origin": "ast",
       "id": "shared_types_restorerunresult",
-      "community": 8,
+      "community": 0,
       "norm_label": "restorerunresult"
     },
     {
@@ -8436,7 +8276,7 @@
       "source_location": "L714",
       "_origin": "ast",
       "id": "shared_types_rediskeytype",
-      "community": 131,
+      "community": 8,
       "norm_label": "rediskeytype"
     },
     {
@@ -8456,7 +8296,7 @@
       "source_location": "L735",
       "_origin": "ast",
       "id": "shared_types_redisscanresult",
-      "community": 119,
+      "community": 13,
       "norm_label": "redisscanresult"
     },
     {
@@ -8466,7 +8306,7 @@
       "source_location": "L743",
       "_origin": "ast",
       "id": "shared_types_readvalueopts",
-      "community": 110,
+      "community": 13,
       "norm_label": "readvalueopts"
     },
     {
@@ -8483,27 +8323,17 @@
       "label": "RedisKeyMeta",
       "file_type": "code",
       "source_file": "krust-studio-app/src/shared/types.ts",
-      "source_location": "L782",
+      "source_location": "L777",
       "_origin": "ast",
       "id": "shared_types_rediskeymeta",
       "community": 13,
       "norm_label": "rediskeymeta"
     },
     {
-      "label": "RedisArg",
-      "file_type": "code",
-      "source_file": "krust-studio-app/src/shared/types.ts",
-      "source_location": "L794",
-      "_origin": "ast",
-      "id": "shared_types_redisarg",
-      "community": 122,
-      "norm_label": "redisarg"
-    },
-    {
       "label": "RedisCommand",
       "file_type": "code",
       "source_file": "krust-studio-app/src/shared/types.ts",
-      "source_location": "L797",
+      "source_location": "L787",
       "_origin": "ast",
       "id": "shared_types_rediscommand",
       "community": 13,
@@ -8513,17 +8343,17 @@
       "label": "RedisCommitBatch",
       "file_type": "code",
       "source_file": "krust-studio-app/src/shared/types.ts",
-      "source_location": "L807",
+      "source_location": "L797",
       "_origin": "ast",
       "id": "shared_types_rediscommitbatch",
-      "community": 110,
+      "community": 13,
       "norm_label": "rediscommitbatch"
     },
     {
       "label": "RedisConflict",
       "file_type": "code",
       "source_file": "krust-studio-app/src/shared/types.ts",
-      "source_location": "L819",
+      "source_location": "L807",
       "_origin": "ast",
       "id": "shared_types_redisconflict",
       "community": 13,
@@ -8533,27 +8363,27 @@
       "label": "RedisCommitResult",
       "file_type": "code",
       "source_file": "krust-studio-app/src/shared/types.ts",
-      "source_location": "L828",
+      "source_location": "L816",
       "_origin": "ast",
       "id": "shared_types_rediscommitresult",
-      "community": 119,
+      "community": 13,
       "norm_label": "rediscommitresult"
     },
     {
       "label": "RedisDbInfo",
       "file_type": "code",
       "source_file": "krust-studio-app/src/shared/types.ts",
-      "source_location": "L834",
+      "source_location": "L820",
       "_origin": "ast",
       "id": "shared_types_redisdbinfo",
-      "community": 131,
+      "community": 13,
       "norm_label": "redisdbinfo"
     },
     {
       "label": "RedisApi",
       "file_type": "code",
       "source_file": "krust-studio-app/src/shared/types.ts",
-      "source_location": "L843",
+      "source_location": "L829",
       "_origin": "ast",
       "id": "shared_types_redisapi",
       "community": 8,
@@ -8563,7 +8393,7 @@
       "label": "KrustApi",
       "file_type": "code",
       "source_file": "krust-studio-app/src/shared/types.ts",
-      "source_location": "L871",
+      "source_location": "L857",
       "_origin": "ast",
       "id": "shared_types_krustapi",
       "community": 8,
@@ -13060,30 +12890,20 @@
       "norm_label": "needs live-redis verification (next session, with a server)"
     },
     {
-      "label": "Functional gaps 1\u20135 \u2014 DONE (second pass; compiles + builds, not live-tested)",
+      "label": "Known gaps / deliberate simplifications (beta follow-ups)",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/redis-status.md",
       "source_location": "L50",
       "_origin": "ast",
-      "id": "v1_7_0_redis_status_functional_gaps_1_5_done_second_pass_compiles_builds_not_live_tested",
+      "id": "v1_7_0_redis_status_known_gaps_deliberate_simplifications_beta_follow_ups",
       "community": 127,
-      "norm_label": "functional gaps 1\u20135 \u2014 done (second pass; compiles + builds, not live-tested)"
-    },
-    {
-      "label": "Known gaps / deliberate simplifications (remaining beta follow-ups)",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0/redis-status.md",
-      "source_location": "L74",
-      "_origin": "ast",
-      "id": "v1_7_0_redis_status_known_gaps_deliberate_simplifications_remaining_beta_follow_ups",
-      "community": 127,
-      "norm_label": "known gaps / deliberate simplifications (remaining beta follow-ups)"
+      "norm_label": "known gaps / deliberate simplifications (beta follow-ups)"
     },
     {
       "label": "Commits on feat/v1.7.0 (this pass)",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/redis-status.md",
-      "source_location": "L87",
+      "source_location": "L75",
       "_origin": "ast",
       "id": "v1_7_0_redis_status_commits_on_feat_v1_7_0_this_pass",
       "community": 127,
@@ -15864,9 +15684,9 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L132",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_driver",
-      "target": "db_driver_keyvaluecapable"
+      "target": "db_driver_keyvaluecapable",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -15874,9 +15694,9 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L151",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_driver",
-      "target": "db_driver_redisdriver"
+      "target": "db_driver_redisdriver",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -16119,9 +15939,9 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_driver",
-      "target": "shared_types_readvalueopts"
+      "target": "shared_types_readvalueopts",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -16130,9 +15950,9 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_driver",
-      "target": "shared_types_rediscommitbatch"
+      "target": "shared_types_rediscommitbatch",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -16141,9 +15961,9 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_driver",
-      "target": "shared_types_rediscommitresult"
+      "target": "shared_types_rediscommitresult",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -16152,9 +15972,9 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_driver",
-      "target": "shared_types_redisdbinfo"
+      "target": "shared_types_redisdbinfo",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -16163,9 +15983,9 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_driver",
-      "target": "shared_types_rediskeymeta"
+      "target": "shared_types_rediskeymeta",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -16174,9 +15994,9 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_driver",
-      "target": "shared_types_redisscanresult"
+      "target": "shared_types_redisscanresult",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -16185,9 +16005,9 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_driver",
-      "target": "shared_types_redisvaluepage"
+      "target": "shared_types_redisvaluepage",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -16295,9 +16115,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L15",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "db_driver"
+      "target": "db_driver",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -16328,9 +16148,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L15",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "db_driver_drivercore"
+      "target": "db_driver_drivercore",
+      "confidence_score": 1.0
     },
     {
       "relation": "implements",
@@ -16339,9 +16159,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L34",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "db_driver_drivercore"
+      "target": "db_driver_drivercore",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -16427,9 +16247,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L15",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "db_driver_keyvaluecapable"
+      "target": "db_driver_keyvaluecapable",
+      "confidence_score": 1.0
     },
     {
       "relation": "implements",
@@ -16438,9 +16258,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L34",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "db_driver_keyvaluecapable"
+      "target": "db_driver_keyvaluecapable",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -16449,9 +16269,9 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L21",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_session",
-      "target": "db_driver_redisdriver"
+      "target": "db_driver_redisdriver",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -17505,9 +17325,9 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L74",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_session_withretryredis",
-      "target": "db_driver_isconnectionfatal"
+      "target": "db_driver_isconnectionfatal",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -19560,18 +19380,8 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L26",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_session",
-      "target": "drivers_redis"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L24",
-      "weight": 1.0,
-      "source": "drivers_redis",
-      "target": "drivers_redis_add_verbs",
+      "target": "drivers_redis",
       "confidence_score": 1.0
     },
     {
@@ -19580,9 +19390,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L280",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "drivers_redis_buildconflict"
+      "target": "drivers_redis_buildconflict",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -19590,9 +19400,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L275",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "drivers_redis_classifyconflict"
+      "target": "drivers_redis_classifyconflict",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -19600,9 +19410,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L18",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "drivers_redis_client"
+      "target": "drivers_redis_client",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -19610,28 +19420,8 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L23",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "drivers_redis_deps"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L358",
-      "weight": 1.0,
-      "source": "drivers_redis",
-      "target": "drivers_redis_emptiescollection",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L26",
-      "weight": 1.0,
-      "source": "drivers_redis",
-      "target": "drivers_redis_isvalidutf8",
+      "target": "drivers_redis_deps",
       "confidence_score": 1.0
     },
     {
@@ -19640,9 +19430,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L266",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "drivers_redis_normalizetype"
+      "target": "drivers_redis_normalizetype",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -19650,38 +19440,8 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L34",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "drivers_redis_redisdriver"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L22",
-      "weight": 1.0,
-      "source": "drivers_redis",
-      "target": "drivers_redis_removal_verbs",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L36",
-      "weight": 1.0,
-      "source": "drivers_redis",
-      "target": "drivers_redis_toclientarg",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L352",
-      "weight": 1.0,
-      "source": "drivers_redis",
-      "target": "drivers_redis_verbof",
+      "target": "drivers_redis_redisdriver",
       "confidence_score": 1.0
     },
     {
@@ -19691,41 +19451,8 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "shared_types"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "drivers_redis",
-      "target": "shared_types_connectionconfig"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "drivers_redis",
-      "target": "shared_types_readvalueopts"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "drivers_redis",
-      "target": "shared_types_redisarg",
+      "target": "shared_types",
       "confidence_score": 1.0
     },
     {
@@ -19735,9 +19462,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "shared_types_rediscommitbatch"
+      "target": "shared_types_connectionconfig",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -19746,9 +19473,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "shared_types_rediscommitresult"
+      "target": "shared_types_readvalueopts",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -19757,9 +19484,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "shared_types_redisconflict"
+      "target": "shared_types_rediscommitbatch",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -19768,9 +19495,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "shared_types_redisdbinfo"
+      "target": "shared_types_rediscommitresult",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -19779,9 +19506,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "shared_types_rediskeyinfo"
+      "target": "shared_types_redisconflict",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -19790,9 +19517,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "shared_types_rediskeymeta"
+      "target": "shared_types_redisdbinfo",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -19801,9 +19528,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "shared_types_rediskeytype"
+      "target": "shared_types_rediskeyinfo",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -19812,9 +19539,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "shared_types_redisscanresult"
+      "target": "shared_types_rediskeymeta",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -19823,19 +19550,30 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis",
-      "target": "shared_types_redisvaluepage"
+      "target": "shared_types_rediskeytype",
+      "confidence_score": 1.0
     },
     {
-      "relation": "calls",
-      "context": "call",
+      "relation": "imports",
+      "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L241",
+      "source_location": "L2",
       "weight": 1.0,
-      "source": "drivers_redis_redisdriver_readvalue",
-      "target": "drivers_redis_isvalidutf8",
+      "source": "drivers_redis",
+      "target": "shared_types_redisscanresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "drivers_redis",
+      "target": "shared_types_redisvaluepage",
       "confidence_score": 1.0
     },
     {
@@ -19845,9 +19583,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L24",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_deps",
-      "target": "shared_types_connectionconfig"
+      "target": "shared_types_connectionconfig",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -19856,18 +19594,8 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L26",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_session",
-      "target": "drivers_redis_redisdriver"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L74",
-      "weight": 1.0,
-      "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_b",
+      "target": "drivers_redis_redisdriver",
       "confidence_score": 1.0
     },
     {
@@ -19876,9 +19604,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L46",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_c"
+      "target": "drivers_redis_redisdriver_c",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -19886,18 +19614,8 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L84",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_cancel"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L198",
-      "weight": 1.0,
-      "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_cardinality",
+      "target": "drivers_redis_redisdriver_cancel",
       "confidence_score": 1.0
     },
     {
@@ -19906,9 +19624,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L74",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_close"
+      "target": "drivers_redis_redisdriver_close",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -19916,9 +19634,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L223",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_commit"
+      "target": "drivers_redis_redisdriver_commit",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -19926,9 +19644,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L51",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_connect"
+      "target": "drivers_redis_redisdriver_connect",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -19936,9 +19654,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L40",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_constructor"
+      "target": "drivers_redis_redisdriver_constructor",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -19946,9 +19664,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L96",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_currentdatabase"
+      "target": "drivers_redis_redisdriver_currentdatabase",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -19956,9 +19674,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L107",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_dbinfo"
+      "target": "drivers_redis_redisdriver_dbinfo",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -19966,9 +19684,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L256",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_deletekey"
+      "target": "drivers_redis_redisdriver_deletekey",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -19976,9 +19694,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L152",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_keymeta"
+      "target": "drivers_redis_redisdriver_keymeta",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -19986,9 +19704,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L90",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_listdatabases"
+      "target": "drivers_redis_redisdriver_listdatabases",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -19996,9 +19714,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L162",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_readvalue"
+      "target": "drivers_redis_redisdriver_readvalue",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -20006,9 +19724,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L248",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_renamekey"
+      "target": "drivers_redis_redisdriver_renamekey",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -20016,9 +19734,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L129",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_scankeys"
+      "target": "drivers_redis_redisdriver_scankeys",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -20026,9 +19744,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L100",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "drivers_redis_redisdriver_usedatabase"
+      "target": "drivers_redis_redisdriver_usedatabase",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -20037,9 +19755,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L37",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver",
-      "target": "shared_types_connectionconfig"
+      "target": "shared_types_connectionconfig",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -20048,9 +19766,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L91",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_listdatabases",
-      "target": "drivers_redis_redisdriver_dbinfo"
+      "target": "drivers_redis_redisdriver_dbinfo",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -20059,9 +19777,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L107",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_dbinfo",
-      "target": "shared_types_redisdbinfo"
+      "target": "shared_types_redisdbinfo",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -20070,9 +19788,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L129",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_scankeys",
-      "target": "shared_types_redisscanresult"
+      "target": "shared_types_redisscanresult",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -20081,19 +19799,8 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L154",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_keymeta",
-      "target": "drivers_redis_normalizetype"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L193",
-      "weight": 1.0,
-      "source": "drivers_redis_redisdriver_keymeta",
-      "target": "drivers_redis_redisdriver_cardinality",
+      "target": "drivers_redis_normalizetype",
       "confidence_score": 1.0
     },
     {
@@ -20103,30 +19810,8 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L152",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_keymeta",
-      "target": "shared_types_rediskeymeta"
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L198",
-      "weight": 1.0,
-      "source": "drivers_redis_redisdriver_cardinality",
-      "target": "shared_types_rediskeytype",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L313",
-      "weight": 1.0,
-      "source": "drivers_redis_redisdriver_commit",
-      "target": "drivers_redis_redisdriver_cardinality",
+      "target": "shared_types_rediskeymeta",
       "confidence_score": 1.0
     },
     {
@@ -20136,9 +19821,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L163",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_readvalue",
-      "target": "drivers_redis_normalizetype"
+      "target": "drivers_redis_normalizetype",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -20147,9 +19832,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L162",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_readvalue",
-      "target": "shared_types_readvalueopts"
+      "target": "shared_types_readvalueopts",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -20158,9 +19843,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L162",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_readvalue",
-      "target": "shared_types_redisvaluepage"
+      "target": "shared_types_redisvaluepage",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -20169,9 +19854,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L243",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_commit",
-      "target": "drivers_redis_buildconflict"
+      "target": "drivers_redis_buildconflict",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -20180,19 +19865,8 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L230",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_commit",
-      "target": "drivers_redis_classifyconflict"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L312",
-      "weight": 1.0,
-      "source": "drivers_redis_redisdriver_commit",
-      "target": "drivers_redis_emptiescollection",
+      "target": "drivers_redis_classifyconflict",
       "confidence_score": 1.0
     },
     {
@@ -20202,9 +19876,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L229",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_commit",
-      "target": "drivers_redis_normalizetype"
+      "target": "drivers_redis_normalizetype",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -20213,9 +19887,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L223",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_commit",
-      "target": "shared_types_rediscommitbatch"
+      "target": "shared_types_rediscommitbatch",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -20224,9 +19898,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L223",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_commit",
-      "target": "shared_types_rediscommitresult"
+      "target": "shared_types_rediscommitresult",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -20235,9 +19909,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L248",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_renamekey",
-      "target": "shared_types_rediscommitresult"
+      "target": "shared_types_rediscommitresult",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -20246,19 +19920,8 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L256",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_redisdriver_deletekey",
-      "target": "shared_types_rediscommitresult"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L361",
-      "weight": 1.0,
-      "source": "drivers_redis_emptiescollection",
-      "target": "drivers_redis_verbof",
+      "target": "shared_types_rediscommitresult",
       "confidence_score": 1.0
     },
     {
@@ -20268,9 +19931,9 @@
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
       "source_location": "L277",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "drivers_redis_classifyconflict",
-      "target": "drivers_redis_buildconflict"
+      "target": "drivers_redis_buildconflict",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -22024,9 +21687,9 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L29",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_session",
-      "target": "shared_types_readvalueopts"
+      "target": "shared_types_readvalueopts",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -22035,9 +21698,9 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L29",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_session",
-      "target": "shared_types_rediscommitbatch"
+      "target": "shared_types_rediscommitbatch",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -22046,9 +21709,9 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L29",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_session",
-      "target": "shared_types_rediscommitresult"
+      "target": "shared_types_rediscommitresult",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -22057,9 +21720,9 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L29",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_session",
-      "target": "shared_types_redisdbinfo"
+      "target": "shared_types_redisdbinfo",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -22068,9 +21731,9 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L29",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_session",
-      "target": "shared_types_rediskeymeta"
+      "target": "shared_types_rediskeymeta",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -22079,9 +21742,9 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L29",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_session",
-      "target": "shared_types_redisscanresult"
+      "target": "shared_types_redisscanresult",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -22090,9 +21753,9 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L29",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "db_session",
-      "target": "shared_types_redisvaluepage"
+      "target": "shared_types_redisvaluepage",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -23754,9 +23417,9 @@
       "source_file": "krust-studio-app/src/main/ipc.ts",
       "source_location": "L67",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "main_ipc",
-      "target": "shared_types_readvalueopts"
+      "target": "shared_types_readvalueopts",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -23765,9 +23428,9 @@
       "source_file": "krust-studio-app/src/main/ipc.ts",
       "source_location": "L67",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "main_ipc",
-      "target": "shared_types_rediscommitbatch"
+      "target": "shared_types_rediscommitbatch",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -25502,9 +25165,9 @@
       "source_file": "krust-studio-app/src/preload/index.ts",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "preload_index",
-      "target": "shared_types_readvalueopts"
+      "target": "shared_types_readvalueopts",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -25513,9 +25176,9 @@
       "source_file": "krust-studio-app/src/preload/index.ts",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "preload_index",
-      "target": "shared_types_rediscommitbatch"
+      "target": "shared_types_rediscommitbatch",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -27308,46 +26971,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L11",
-      "weight": 1.0,
-      "source": "components_rediskeyview",
-      "target": "components_rediskeyview_argtext",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L409",
-      "weight": 1.0,
-      "source": "components_rediskeyview",
-      "target": "components_rediskeyview_b64tobytes",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L415",
-      "weight": 1.0,
-      "source": "components_rediskeyview",
-      "target": "components_rediskeyview_bytestob64",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L420",
-      "weight": 1.0,
-      "source": "components_rediskeyview",
-      "target": "components_rediskeyview_bytestohex",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
       "source_location": "L228",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -27358,31 +26981,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L16",
-      "weight": 1.0,
-      "source": "components_rediskeyview",
-      "target": "components_rediskeyview_formatttl",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
       "source_location": "L111",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "components_rediskeyview",
       "target": "components_rediskeyview_header"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L423",
-      "weight": 1.0,
-      "source": "components_rediskeyview",
-      "target": "components_rediskeyview_hextobytes",
-      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -27445,49 +27048,6 @@
       "target": "components_rediskeyview_valuebody"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L406",
-      "weight": 1.0,
-      "source": "components_rediskeyview",
-      "target": "components_rediskeyview_viewmode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L8",
-      "weight": 1.0,
-      "source": "components_rediskeyview",
-      "target": "shared_types",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L8",
-      "weight": 1.0,
-      "source": "components_rediskeyview",
-      "target": "shared_types_redisarg",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L207",
-      "weight": 1.0,
-      "source": "components_rediskeyview_header",
-      "target": "components_rediskeyview_formatttl",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "INFERRED",
@@ -27547,16 +27107,6 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RedisSidebar.tsx",
       "source_location": "L10",
       "weight": 1.0,
-      "source": "components_redissidebar",
-      "target": "components_redissidebar_ttllabel",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/components/RedisSidebar.tsx",
-      "source_location": "L10",
-      "weight": 1.0,
       "confidence_score": 1.0,
       "source": "components_redissidebar",
       "target": "components_redissidebar_type_badge"
@@ -27568,9 +27118,9 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RedisSidebar.tsx",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "components_redissidebar",
-      "target": "shared_types"
+      "target": "shared_types",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -27579,9 +27129,9 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RedisSidebar.tsx",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "components_redissidebar",
-      "target": "shared_types_rediskeytype"
+      "target": "shared_types_rediskeytype",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -31421,9 +30971,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types"
+      "target": "shared_types",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31432,9 +30982,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_connectionsummary"
+      "target": "shared_types_connectionsummary",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31443,9 +30993,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_connectionworkspace"
+      "target": "shared_types_connectionworkspace",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31454,9 +31004,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_createtablespec"
+      "target": "shared_types_createtablespec",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31465,9 +31015,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_entityinfo"
+      "target": "shared_types_entityinfo",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31476,9 +31026,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_entityref"
+      "target": "shared_types_entityref",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31487,9 +31037,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_entitytype"
+      "target": "shared_types_entitytype",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31498,9 +31048,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_enumtype"
+      "target": "shared_types_enumtype",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31509,9 +31059,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_filter"
+      "target": "shared_types_filter",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31520,9 +31070,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_indexspec"
+      "target": "shared_types_indexspec",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31531,9 +31081,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_newcolumnspec"
+      "target": "shared_types_newcolumnspec",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31542,9 +31092,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_queryplan"
+      "target": "shared_types_queryplan",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31553,9 +31103,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_queryresult"
+      "target": "shared_types_queryresult",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31564,9 +31114,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_rediskeytype"
+      "target": "shared_types_rediskeytype",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31575,9 +31125,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_referencingtable"
+      "target": "shared_types_referencingtable",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31586,9 +31136,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_rowedit"
+      "target": "shared_types_rowedit",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31597,9 +31147,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_rowsresult"
+      "target": "shared_types_rowsresult",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31608,9 +31158,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_saveconnectioninput"
+      "target": "shared_types_saveconnectioninput",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31619,9 +31169,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_serializedtab"
+      "target": "shared_types_serializedtab",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31630,9 +31180,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_sort"
+      "target": "shared_types_sort",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31641,9 +31191,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_tablestructure"
+      "target": "shared_types_tablestructure",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31652,9 +31202,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_tabletemplate"
+      "target": "shared_types_tabletemplate",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -31663,9 +31213,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "shared_types_workspacedata"
+      "target": "shared_types_workspacedata",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -31673,9 +31223,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L148",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "store_connections_connectionsstate"
+      "target": "store_connections_connectionsstate",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -31683,9 +31233,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L140",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "store_connections_editkey"
+      "target": "store_connections_editkey",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -31693,9 +31243,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L144",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "store_connections_entitykey"
+      "target": "store_connections_entitykey",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -31703,9 +31253,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L29",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "store_connections_querystate"
+      "target": "store_connections_querystate",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -31713,9 +31263,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L46",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "store_connections_sessionstatus"
+      "target": "store_connections_sessionstatus",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -31723,9 +31273,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L42",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "store_connections_structuresub"
+      "target": "store_connections_structuresub",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -31733,9 +31283,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L48",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "store_connections_tab"
+      "target": "store_connections_tab",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -31743,9 +31293,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L116",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "store_connections_tabhasdatachanges"
+      "target": "store_connections_tabhasdatachanges",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -31753,9 +31303,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L125",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "store_connections_tabhasdraftcontent"
+      "target": "store_connections_tabhasdraftcontent",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -31763,9 +31313,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L136",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "store_connections_tabisdirty"
+      "target": "store_connections_tabisdirty",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -31773,9 +31323,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L41",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "store_connections_tabview"
+      "target": "store_connections_tabview",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -31783,9 +31333,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L278",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "target": "store_connections_useconnections"
+      "target": "store_connections_useconnections",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -31860,9 +31410,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L55",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "store_connections_tab",
-      "target": "shared_types_rediskeytype"
+      "target": "shared_types_rediskeytype",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -32036,9 +31586,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L197",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "store_connections_connectionsstate",
-      "target": "shared_types_rediskeytype"
+      "target": "shared_types_rediskeytype",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -32069,19 +31619,8 @@
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "store_redis",
-      "target": "shared_types"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "store_redis",
-      "target": "shared_types_redisarg",
+      "target": "shared_types",
       "confidence_score": 1.0
     },
     {
@@ -32091,63 +31630,8 @@
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "store_redis",
-      "target": "shared_types_rediscommand"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "store_redis",
-      "target": "shared_types_rediscommitbatch"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "store_redis",
-      "target": "shared_types_redisconflict"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "store_redis",
-      "target": "shared_types_redisdbinfo"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "store_redis",
-      "target": "shared_types_rediskeyinfo"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "store_redis",
-      "target": "shared_types_rediskeymeta",
+      "target": "shared_types_rediscommand",
       "confidence_score": 1.0
     },
     {
@@ -32157,9 +31641,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "store_redis",
-      "target": "shared_types_rediskeytype"
+      "target": "shared_types_rediscommitbatch",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -32168,9 +31652,53 @@
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "store_redis",
-      "target": "shared_types_redisvaluepage"
+      "target": "shared_types_redisconflict",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "store_redis",
+      "target": "shared_types_redisdbinfo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "store_redis",
+      "target": "shared_types_rediskeyinfo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "store_redis",
+      "target": "shared_types_rediskeytype",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "store_redis",
+      "target": "shared_types_redisvaluepage",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -32309,20 +31837,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
       "source_location": "L32",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "store_redis_keylist",
-      "target": "shared_types_rediskeyinfo"
-    },
-    {
-      "relation": "references",
-      "context": "field",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
-      "source_location": "L47",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "store_redis_keytab",
-      "target": "shared_types_redisconflict"
+      "target": "shared_types_rediskeyinfo",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -32332,7 +31849,7 @@
       "source_location": "L47",
       "weight": 1.0,
       "source": "store_redis_keytab",
-      "target": "shared_types_rediskeymeta",
+      "target": "shared_types_redisconflict",
       "confidence_score": 1.0
     },
     {
@@ -32342,9 +31859,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
       "source_location": "L41",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "store_redis_keytab",
-      "target": "shared_types_redisvaluepage"
+      "target": "shared_types_redisvaluepage",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -32353,9 +31870,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
       "source_location": "L53",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "store_redis_redisstate",
-      "target": "shared_types_redisdbinfo"
+      "target": "shared_types_redisdbinfo",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -32364,9 +31881,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
       "source_location": "L68",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "store_redis_redisstate",
-      "target": "shared_types_rediskeytype"
+      "target": "shared_types_rediskeytype",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -32558,9 +32075,9 @@
       "source_file": "krust-studio-app/src/shared/capabilities.ts",
       "source_location": "L9",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_capabilities",
-      "target": "shared_capabilities_capabilities"
+      "target": "shared_capabilities_capabilities",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -32568,9 +32085,9 @@
       "source_file": "krust-studio-app/src/shared/capabilities.ts",
       "source_location": "L52",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_capabilities",
-      "target": "shared_capabilities_capabilitiesfor"
+      "target": "shared_capabilities_capabilitiesfor",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -32579,9 +32096,9 @@
       "source_file": "krust-studio-app/src/shared/capabilities.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_capabilities",
-      "target": "shared_types"
+      "target": "shared_types",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -32590,9 +32107,9 @@
       "source_file": "krust-studio-app/src/shared/capabilities.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_capabilities",
-      "target": "shared_types_drivercapabilities"
+      "target": "shared_types_drivercapabilities",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -32601,9 +32118,9 @@
       "source_file": "krust-studio-app/src/shared/capabilities.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_capabilities",
-      "target": "shared_types_drivertype"
+      "target": "shared_types_drivertype",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -32761,9 +32278,9 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L693",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_types",
-      "target": "shared_types_drivercapabilities"
+      "target": "shared_types_drivercapabilities",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -32971,9 +32488,9 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L743",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_types",
-      "target": "shared_types_readvalueopts"
+      "target": "shared_types_readvalueopts",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -32981,18 +32498,8 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L829",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_types",
-      "target": "shared_types_redisapi"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/src/shared/types.ts",
-      "source_location": "L794",
-      "weight": 1.0,
-      "source": "shared_types",
-      "target": "shared_types_redisarg",
+      "target": "shared_types_redisapi",
       "confidence_score": 1.0
     },
     {
@@ -33001,9 +32508,9 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L787",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_types",
-      "target": "shared_types_rediscommand"
+      "target": "shared_types_rediscommand",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -33011,9 +32518,9 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L797",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_types",
-      "target": "shared_types_rediscommitbatch"
+      "target": "shared_types_rediscommitbatch",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -33021,9 +32528,9 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L816",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_types",
-      "target": "shared_types_rediscommitresult"
+      "target": "shared_types_rediscommitresult",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -33031,9 +32538,9 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L807",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_types",
-      "target": "shared_types_redisconflict"
+      "target": "shared_types_redisconflict",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -33041,9 +32548,9 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L820",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_types",
-      "target": "shared_types_redisdbinfo"
+      "target": "shared_types_redisdbinfo",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -33051,9 +32558,9 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L725",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_types",
-      "target": "shared_types_rediskeyinfo"
+      "target": "shared_types_rediskeyinfo",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -33061,9 +32568,9 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L777",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_types",
-      "target": "shared_types_rediskeymeta"
+      "target": "shared_types_rediskeymeta",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -33071,9 +32578,9 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L714",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_types",
-      "target": "shared_types_rediskeytype"
+      "target": "shared_types_rediskeytype",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -33081,9 +32588,9 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L735",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_types",
-      "target": "shared_types_redisscanresult"
+      "target": "shared_types_redisscanresult",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -33091,9 +32598,9 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L755",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "shared_types",
-      "target": "shared_types_redisvaluepage"
+      "target": "shared_types_redisvaluepage",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -38352,19 +37859,9 @@
       "source_file": "docs/release/v1.7.0/redis-status.md",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_redis_status_redis_implementation_status_1_7_0",
-      "target": "v1_7_0_redis_status_functional_gaps_1_5_done_second_pass_compiles_builds_not_live_tested",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0/redis-status.md",
-      "source_location": "L74",
-      "weight": 1.0,
-      "source": "v1_7_0_redis_status_redis_implementation_status_1_7_0",
-      "target": "v1_7_0_redis_status_known_gaps_deliberate_simplifications_remaining_beta_follow_ups",
-      "confidence_score": 1.0
+      "target": "v1_7_0_redis_status_known_gaps_deliberate_simplifications_beta_follow_ups"
     },
     {
       "relation": "contains",
@@ -39342,5 +38839,5 @@
       "source_file": "docs/adr/0017-inline-filter-builder-with-raw-where.md"
     }
   ],
-  "built_at_commit": "fb5b231450def9e3846840cb20073eb2e0818d3a"
+  "built_at_commit": "200a4fee2cb611802a13f082e26cf284e923c4b2"
 }

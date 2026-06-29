@@ -30,8 +30,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/session.ts": {
-    "mtime": 1782772456.5570977,
-    "ast_hash": "a01635612b0100ef58bdf0a5fcb437e2",
+    "mtime": 1782745034.9149325,
+    "ast_hash": "c10c1ed08f0362b2b56e5c28ba26ba32",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/test-connection.ts": {
@@ -385,8 +385,8 @@
     "semantic_hash": "cff3067e83bfce421425368ca7e7fb81"
   },
   "krust-studio-app/src/shared/types.ts": {
-    "mtime": 1782772376.533089,
-    "ast_hash": "4c550576dba71e43d1a134e21771f4f7",
+    "mtime": 1782744429.539189,
+    "ast_hash": "6c42bbf7e945312754a276c166f51b87",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/index.html": {
@@ -830,8 +830,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/drivers/redis.ts": {
-    "mtime": 1782772449.4481387,
-    "ast_hash": "2c09e748a2b4694c082779fe847489ba",
+    "mtime": 1782744968.20345,
+    "ast_hash": "667396b62d28fd4c96949cc84a117828",
     "semantic_hash": ""
   },
   "krust-studio-app/src/shared/capabilities.ts": {
@@ -840,23 +840,23 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx": {
-    "mtime": 1782772617.752258,
-    "ast_hash": "9348aab4f9474c1b67614e703fa46e1f",
+    "mtime": 1782745781.6241314,
+    "ast_hash": "2b83de238cf4f0e2de7efc06b94f5bc1",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/RedisSidebar.tsx": {
-    "mtime": 1782772639.970098,
-    "ast_hash": "8890c501e75fc9a203e7d8943dd61821",
+    "mtime": 1782745586.3383837,
+    "ast_hash": "34156fb5fc0a45107ae5b39db1f24a2e",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/store/redis.ts": {
-    "mtime": 1782772525.6757522,
-    "ast_hash": "7669bc780c9f07eee3aa13c96c78fe2e",
+    "mtime": 1782745517.4342184,
+    "ast_hash": "069994983ac87f8483d033040f3689d1",
     "semantic_hash": ""
   },
   "docs/release/v1.7.0/redis-status.md": {
-    "mtime": 1782772741.8298786,
-    "ast_hash": "8a811fb404c842403d267c2be37a6250",
+    "mtime": 1782745932.4829504,
+    "ast_hash": "8f8d4028aa2616c9f6c2a67afa644686",
     "semantic_hash": ""
   }
 }
