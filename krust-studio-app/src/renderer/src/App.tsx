@@ -10,6 +10,7 @@ import { TabBar } from '@/components/TabBar'
 import { TableTabView } from '@/components/TableTabView'
 import { HistoryView } from '@/components/HistoryView'
 import { BackupView } from '@/components/BackupView'
+import { RedisKeyView } from '@/components/RedisKeyView'
 import { CommandPalette } from '@/components/CommandPalette'
 import { Toaster } from '@/components/ui/sonner'
 import { useConnections } from '@/store/connections'
@@ -163,6 +164,8 @@ function App(): React.JSX.Element {
     content = <HistoryView />
   } else if (activeTab?.kind === 'backup') {
     content = <BackupView />
+  } else if (activeTab?.kind === 'redis-key') {
+    content = <RedisKeyView />
   } else if (activeTab) {
     content = <TableTabView />
   } else {

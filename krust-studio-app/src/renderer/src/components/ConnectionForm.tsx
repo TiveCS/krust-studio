@@ -171,6 +171,7 @@ export function ConnectionForm({ existing, onSaved, onConnected }: Props): React
 
   const driver = watch('driver')
   const isSqlite = driver === 'sqlite'
+  const isRedis = driver === 'redis'
 
   const onDriverChange = (value: string): void => {
     const d = value as DriverType
@@ -221,6 +222,7 @@ export function ConnectionForm({ existing, onSaved, onConnected }: Props): React
               <SelectItem value="postgres">PostgreSQL</SelectItem>
               <SelectItem value="mysql">MySQL / MariaDB</SelectItem>
               <SelectItem value="sqlite">SQLite</SelectItem>
+              <SelectItem value="redis">Redis</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -254,17 +256,30 @@ export function ConnectionForm({ existing, onSaved, onConnected }: Props): React
                 <Input id="port" type="number" {...register('port')} />
               </div>
             </div>
-            <div className="space-y-1">
-              <Label htmlFor="database">
-                Database{' '}
-                <span className="text-muted-foreground">(optional)</span>
-              </Label>
-              <Input
-                id="database"
-                placeholder="Leave empty to browse all databases"
-                {...register('database')}
-              />
-            </div>
+            {isRedis ? (
+              <div className="space-y-1">
+                <Label htmlFor="redisDb">Initial logical database</Label>
+                <Input
+                  id="redisDb"
+                  type="number"
+                  min={0}
+                  placeholder="0"
+                  {...register('redisDb')}
+                />
+              </div>
+            ) : (
+              <div className="space-y-1">
+                <Label htmlFor="database">
+                  Database{' '}
+                  <span className="text-muted-foreground">(optional)</span>
+                </Label>
+                <Input
+                  id="database"
+                  placeholder="Leave empty to browse all databases"
+                  {...register('database')}
+                />
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
                 <Label htmlFor="user">User</Label>

@@ -57,6 +57,7 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { DatabaseSwitcher } from '@/components/DatabaseSwitcher'
+import { RedisSidebar } from '@/components/RedisSidebar'
 import { ConnectionSwitcher } from '@/components/ConnectionSwitcher'
 import { TemplateManager } from '@/components/TemplateManager'
 import { useConnections } from '@/store/connections'
@@ -102,6 +103,7 @@ export function AppSidebar(): React.JSX.Element {
 
   const current = connections.find((c) => c.id === openConnectionId)
   const readOnly = current?.readOnly ?? false
+  const isRedis = current?.driver === 'redis'
 
   const startRename = (entity: EntityRef): void => {
     setRenameTarget(entity)
@@ -236,7 +238,9 @@ export function AppSidebar(): React.JSX.Element {
           </div>
         )}
 
-        {sessionStatus === 'connected' && (
+        {sessionStatus === 'connected' && isRedis && <RedisSidebar />}
+
+        {sessionStatus === 'connected' && !isRedis && (
           <>
             <div className="flex items-center gap-1 px-2 pt-2">
               <SidebarInput

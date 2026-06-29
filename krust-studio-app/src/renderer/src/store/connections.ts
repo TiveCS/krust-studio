@@ -22,7 +22,8 @@ import type {
   WorkspaceData,
   Sort,
   TableStructure,
-  TableTemplate
+  TableTemplate,
+  RedisKeyType
 } from '../../../shared/types'
 
 export interface QueryState {
@@ -48,7 +49,10 @@ export interface Tab {
   id: string
   entity: EntityRef
   /** undefined / absent = regular table/query/new-table tab */
-  kind?: 'history' | 'connection-editor' | 'backup'
+  kind?: 'history' | 'connection-editor' | 'backup' | 'redis-key'
+  /** redis-key tab identity; value + staged-edit state live in the useRedis
+   *  store keyed by tab id (decision 3: fat-Tab marker, heavy state external) */
+  redisKey?: { dbIndex: number; key: string; type: RedisKeyType }
   /** pinned tabs stay at the left edge + survive bulk-close (persisted) */
   pinned?: boolean
   /** set on connection-editor tabs: which connection to edit (null = new) */
@@ -189,6 +193,8 @@ interface ConnectionsState {
   openHistoryTab: () => void
   /** Open/focus the Backup & Restore tab for the current connection (singleton). */
   openBackupTab: () => void
+  /** Open/focus a Redis Key tab (one per key+db); value state lives in useRedis. */
+  openRedisKey: (key: string, type: RedisKeyType, dbIndex: number) => void
   /** Open/focus a connection-editor tab. `connectionId` null = new connection. */
   openConnectionEditorTab: (connectionId: string | null) => void
   /** Update an editor tab's stored connectionId after saving a new connection. */
@@ -311,7 +317,14 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       activeTabId,
       tabs: tabs
         .map((tab): SerializedTab | null => {
-          if (tab.kind === 'connection-editor' || tab.kind === 'backup') return null
+          // redis-key tabs are not yet persisted to workspace (value state is
+          // transient + lives in useRedis); restore is a follow-up.
+          if (
+            tab.kind === 'connection-editor' ||
+            tab.kind === 'backup' ||
+            tab.kind === 'redis-key'
+          )
+            return null
           return {
             id: tab.id,
             entity: tab.entity,
@@ -535,6 +548,16 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       })
       try {
         await window.api.sessions.connect(id)
+        // Redis has no relational entities/enums — its key browser (RedisSidebar)
+        // drives itself off the useRedis store. Skip the schema fetch entirely.
+        const isRedis = get().connections.find((c) => c.id === id)?.driver === 'redis'
+        if (isRedis) {
+          let currentDb: string | null = null
+          try { currentDb = await window.api.sessions.currentDatabase(id) } catch { /* ignore */ }
+          set({ sessionStatus: 'connected', entities: [], enums: [], currentDb })
+          set({ databases: [] })
+          return
+        }
         const entities = await window.api.sessions.listEntities(id)
         const enums = await window.api.sessions.listEnums(id)
         // Fetch currentDatabase synchronously — fast cached call, needed for workspace key
@@ -747,6 +770,29 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         id: crypto.randomUUID(),
         kind: 'backup',
         entity: { name: 'Backup & Restore' },
+        data: null, loading: false, error: null, pageIndex: 0, total: null,
+        counting: false, filters: [], filterMode: 'builder', rawWhere: '',
+        filterError: null, orderBy: [], edits: {}, deletes: [],
+        inserts: [], colWidths: {}, committing: false, view: 'data',
+        structureSub: 'columns', referencedBy: null, referencedByLoading: false,
+        structure: null, structureLoading: false, draft: null, query: null
+      }
+      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
+    },
+
+    openRedisKey: (key, type, dbIndex) => {
+      const existing = get().tabs.find(
+        (t) => t.kind === 'redis-key' && t.redisKey?.key === key && t.redisKey?.dbIndex === dbIndex
+      )
+      if (existing) {
+        set({ activeTabId: existing.id })
+        return
+      }
+      const tab: Tab = {
+        id: crypto.randomUUID(),
+        kind: 'redis-key',
+        redisKey: { dbIndex, key, type },
+        entity: { name: key },
         data: null, loading: false, error: null, pageIndex: 0, total: null,
         counting: false, filters: [], filterMode: 'builder', rawWhere: '',
         filterError: null, orderBy: [], edits: {}, deletes: [],
