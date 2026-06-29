@@ -1,10 +1,10 @@
-export type DriverType = 'mysql' | 'postgres' | 'sqlite'
+export type DriverType = 'mysql' | 'postgres' | 'sqlite' | 'redis'
 
 export interface ConnectionConfig {
   id: string
   name: string
   driver: DriverType
-  /** network drivers (mysql/postgres) */
+  /** network drivers (mysql/postgres/redis) */
   host?: string
   port?: number
   database?: string
@@ -12,6 +12,8 @@ export interface ConnectionConfig {
   ssl?: boolean
   /** sqlite */
   sqlitePath?: string
+  /** redis: initial logical database index (0..N). Defaults to 0. */
+  redisDb?: number
   /** mark prod: blocks all mutation paths (enforced in main) */
   readOnly?: boolean
 }
@@ -183,7 +185,12 @@ export interface ApplyResult {
 }
 
 /** Query History streams (CONTEXT.md). Data Retrieval deferred until SQL editor. */
-export type HistoryStream = 'data_mutation' | 'table_mutation' | 'data_retrieval'
+export type HistoryStream =
+  | 'data_mutation'
+  | 'table_mutation'
+  | 'data_retrieval'
+  /** Redis key mutations — a distinct command class, never changeset-eligible */
+  | 'redis_mutation'
 
 export interface HistoryEntry {
   id: number
@@ -204,6 +211,8 @@ export interface HistoryEntry {
   changesetId: number | null
   /** TRUNCATE / DROP / DELETE|UPDATE without WHERE — not auto-attached to changeset */
   destructive: boolean
+  /** groups commands from one Redis staged commit (WATCH+MULTI/EXEC); null otherwise */
+  commitGroup: string | null
 }
 
 export interface HistoryQuery {
@@ -243,6 +252,8 @@ export interface CaptureInput {
   entity?: string | null
   error?: string | null
   destructive?: boolean
+  /** groups commands from one Redis staged commit */
+  commitGroup?: string | null
 }
 
 export interface HistoryApi {
@@ -674,6 +685,189 @@ export interface TemplatesApi {
   remove: (id: string) => Promise<void>
 }
 
+// ──────────────────────── Capabilities (ADR-0020) ────────────────────────
+
+/** Structural capabilities of an engine — drives which UI the renderer mounts.
+ *  Static per DriverType (see shared/capabilities.ts); a runtime probe refines
+ *  Redis-specific facts (db count, ACL) but never these structural flags. */
+export interface DriverCapabilities {
+  /** arbitrary SQL editor + query execution */
+  sql: boolean
+  /** schema-object tree + tabular row reads */
+  tabular: boolean
+  /** DDL / schema mutation */
+  schemaMut: boolean
+  /** staged data-grid edits → DML */
+  tabularMut: boolean
+  /** stored procedures / functions (1.7 routines) */
+  routines: boolean
+  /** query plan (EXPLAIN) */
+  plan: boolean
+  /** Redis-style key/value workflow */
+  keys: boolean
+  /** can switch the active logical database */
+  switchDatabase: boolean
+}
+
+// ───────────────────────────── Redis (ADR-0020) ──────────────────────────
+
+export type RedisKeyType =
+  | 'string'
+  | 'hash'
+  | 'list'
+  | 'set'
+  | 'zset'
+  | 'stream'
+  | 'none'
+  | 'unknown'
+
+/** one key row in the sidebar KeyList */
+export interface RedisKeyInfo {
+  /** key name; binary-safe (escaped for display by the renderer) */
+  key: string
+  type: RedisKeyType
+  /** remaining ms TTL: -1 = no expiry, -2 = key missing, null = not yet fetched */
+  ttl: number | null
+  /** true when the key name held bytes that aren't valid UTF-8 */
+  binary: boolean
+}
+
+export interface RedisScanResult {
+  keys: RedisKeyInfo[]
+  /** cursor to pass back for the next page; '0' means iteration complete */
+  cursor: string
+  /** running count of keys loaded for this db+filter (not a filtered total) */
+  loaded: number
+}
+
+export interface ReadValueOpts {
+  /** collection cursor (hash/set/zset) for the next page; '0' to start */
+  cursor?: string
+  /** list index range start (inclusive) */
+  start?: number
+  /** page size */
+  count: number
+  /** load a large string the size-gate flagged (explicit user action) */
+  forceLoadLarge?: boolean
+}
+
+/** polymorphic value read, discriminated by key type (decision 5) */
+export type RedisValuePage =
+  | {
+      type: 'string'
+      /** best-effort UTF-8 decode — authoritative only when `binary` is false */
+      text: string
+      /** raw bytes, base64 — source for the hex/base64/JSON views and binary writes */
+      base64: string
+      encoding: 'utf8' | 'binary'
+      bytes: number
+      truncated: boolean
+      /** true when the raw bytes are not valid UTF-8 (show hex/base64, not text) */
+      binary: boolean
+      /** true when the size-gate blocked the load (>1MB, not yet forced) */
+      tooLarge?: boolean
+    }
+  | { type: 'hash'; fields: { field: string; value: string }[]; cursor: string }
+  | { type: 'list'; items: string[]; start: number; end: number; length: number }
+  | { type: 'set'; members: string[]; cursor: string }
+  | { type: 'zset'; members: { member: string; score: number }[]; cursor: string }
+  | {
+      type: 'stream'
+      entries: { id: string; fields: [string, string][] }[]
+      lastId: string
+    }
+  | { type: 'none' }
+
+/** metadata for one key (TYPE + PTTL + cheap size) */
+export interface RedisKeyMeta {
+  key: string
+  type: RedisKeyType
+  /** remaining ms TTL: -1 none, -2 missing */
+  ttl: number
+  /** STRLEN for strings; null for collections (they page instead) */
+  bytes: number | null
+  /** element count for collections (HLEN/SCARD/ZCARD/LLEN/XLEN); null for strings */
+  cardinality: number | null
+}
+
+/** one Redis command argument: a UTF-8 string, or raw bytes (base64) for binary writes */
+export type RedisArg = string | { b64: string }
+
+/** one staged Redis command — rendered in the preview, run inside MULTI */
+export interface RedisCommand {
+  /** full command argv, e.g. ['HSET','user:1','name','Bob']; binary args as { b64 } */
+  args: RedisArg[]
+  /** human label for the preview row */
+  label: string
+  /** DEL/UNLINK/expiry-in-the-past — flagged destructive in history */
+  destructive: boolean
+}
+
+/** a staged value-commit for one key (decision 16) */
+export interface RedisCommitBatch {
+  dbIndex: number
+  key: string
+  /** value type at read time — used for the WATCH conflict compatibility check */
+  expectedType: RedisKeyType
+  commands: RedisCommand[]
+  /** skip WATCH and replay — compatibility-gated Force (decision 6) */
+  force?: boolean
+  /** caller acknowledged the staged removals will empty (and thus delete) the key */
+  confirmEmptyDelete?: boolean
+}
+
+export interface RedisConflict {
+  /** what changed under the WATCH */
+  kind: 'changed' | 'type-changed' | 'deleted'
+  /** the key's current type now */
+  currentType: RedisKeyType
+  /** true when Force is allowed (key still exists, same type) */
+  forceAllowed: boolean
+}
+
+export type RedisCommitResult =
+  | { ok: true; commitGroup: string }
+  | { ok: false; conflict: RedisConflict }
+  /** staged removals would empty (delete) the key — re-commit with confirmEmptyDelete */
+  | { ok: false; emptyDelete: true; cardinality: number }
+
+export interface RedisDbInfo {
+  /** active logical database index */
+  current: number
+  /** configured db count when discoverable; null when CONFIG GET was denied */
+  count: number | null
+  /** server version string when probed */
+  serverVersion?: string
+}
+
+export interface RedisApi {
+  dbInfo: (id: string) => Promise<RedisDbInfo>
+  selectDb: (id: string, index: number) => Promise<void>
+  scan: (
+    id: string,
+    match: string,
+    cursor: string,
+    count: number
+  ) => Promise<RedisScanResult>
+  keyMeta: (id: string, key: string) => Promise<RedisKeyMeta>
+  readValue: (
+    id: string,
+    key: string,
+    opts: ReadValueOpts
+  ) => Promise<RedisValuePage>
+  /** run a staged value-commit (WATCH+MULTI/EXEC). Read-only blocked in main. */
+  commit: (id: string, batch: RedisCommitBatch) => Promise<RedisCommitResult>
+  /** rename a key (RENAMENX unless overwrite). Read-only blocked. */
+  renameKey: (
+    id: string,
+    from: string,
+    to: string,
+    overwrite: boolean
+  ) => Promise<RedisCommitResult>
+  /** delete a key (UNLINK→DEL). Read-only blocked. Destructive. */
+  deleteKey: (id: string, key: string) => Promise<RedisCommitResult>
+}
+
 export interface KrustApi {
   connections: ConnectionsApi
   sessions: SessionApi
@@ -683,4 +877,5 @@ export interface KrustApi {
   backup: BackupApi
   templates: TemplatesApi
   window: WindowControlApi
+  redis: RedisApi
 }

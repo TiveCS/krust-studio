@@ -537,7 +537,13 @@ export async function redisCommit(
         connectionId: id,
         stream: 'redis_mutation',
         source: 'gui',
-        statement: cmd.args.join(' '),
+        statement: cmd.args
+          .map((a) =>
+            typeof a === 'string'
+              ? a
+              : `<binary ${Math.floor((a.b64.length * 3) / 4)} bytes>`
+          )
+          .join(' '),
         status: 'success',
         entity: batch.key,
         commitGroup: res.commitGroup,

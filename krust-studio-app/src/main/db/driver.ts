@@ -17,7 +17,14 @@ import type {
   SchemaOp,
   SearchResult,
   Sort,
-  TableStructure
+  TableStructure,
+  RedisDbInfo,
+  RedisScanResult,
+  RedisKeyMeta,
+  RedisValuePage,
+  ReadValueOpts,
+  RedisCommitBatch,
+  RedisCommitResult
 } from '../../shared/types'
 
 /**
@@ -120,6 +127,28 @@ export type DbDriver = DriverCore &
   TabularCapable &
   TabularMutCapable &
   SchemaMutCapable
+
+/** Redis-style key/value workflow (no tables, no SQL). */
+export interface KeyValueCapable {
+  /** logical-db count + server version probe (ACL-tolerant — denials degrade) */
+  dbInfo(): Promise<RedisDbInfo>
+  /** incremental SCAN page (never KEYS); cursor '0' starts, '0' returned = done */
+  scanKeys(match: string, cursor: string, count: number): Promise<RedisScanResult>
+  /** TYPE + PTTL + cheap size for one key */
+  keyMeta(key: string): Promise<RedisKeyMeta>
+  /** polymorphic value read, discriminated by key type */
+  readValue(key: string, opts: ReadValueOpts): Promise<RedisValuePage>
+  /** staged value-commit (WATCH+MULTI/EXEC); returns a conflict instead on a
+   *  tripped WATCH so the UI can offer Reload / compatibility-gated Force. */
+  commit(batch: RedisCommitBatch): Promise<RedisCommitResult>
+  /** RENAMENX unless overwrite; guarded by the UI's typed confirm */
+  renameKey(from: string, to: string, overwrite: boolean): Promise<RedisCommitResult>
+  /** UNLINK→DEL; destructive, guarded by the UI's typed confirm */
+  deleteKey(key: string): Promise<RedisCommitResult>
+}
+
+/** A Redis driver: lifecycle + key/value, nothing relational. */
+export type RedisDriver = DriverCore & KeyValueCapable
 
 /**
  * Split a SQL script into statements on top-level `;`, skipping semicolons
@@ -579,6 +608,14 @@ export function isConnectionFatal(err: unknown): boolean {
   if (['08006', '08001', '08003', '57P01'].includes(code)) return true
   if (
     /connection terminated|connection refused|connection reset|broken pipe/i.test(err.message)
+  )
+    return true
+  // node-redis: client/socket closed unexpectedly (Krust owns reconnect, so the
+  // client's own reconnect is off; a dropped socket surfaces as one of these).
+  if (
+    /ClientClosedError|SocketClosedUnexpectedlyError|ConnectionTimeoutError|The client is closed|Socket closed unexpectedly/i.test(
+      err.name + ' ' + err.message
+    )
   )
     return true
   return false

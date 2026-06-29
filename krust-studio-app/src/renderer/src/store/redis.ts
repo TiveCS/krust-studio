@@ -1,10 +1,12 @@
 import { create } from 'zustand'
 import type {
+  RedisArg,
   RedisCommand,
   RedisCommitBatch,
   RedisConflict,
   RedisDbInfo,
   RedisKeyInfo,
+  RedisKeyMeta,
   RedisKeyType,
   RedisValuePage
 } from '../../../shared/types'
@@ -14,6 +16,8 @@ const PAGE = 200
 /** one staged edit on a key tab; buildCommands turns these into Redis commands */
 export type StagedEdit =
   | { kind: 'string-set'; value: string }
+  /** binary string write — exact raw bytes (base64) from a hex/base64 editor */
+  | { kind: 'string-set-bin'; b64: string; bytes: number }
   | { kind: 'hash-set'; field: string; value: string }
   | { kind: 'hash-del'; field: string }
   | { kind: 'set-add'; member: string }
@@ -39,12 +43,16 @@ interface KeyList {
 /** per Redis-Key tab: loaded value + staged edits + commit state */
 interface KeyTab {
   page: RedisValuePage | null
+  /** TYPE + PTTL + size/cardinality, fetched alongside the value */
+  meta: RedisKeyMeta | null
   loading: boolean
   error: string | null
   staged: StagedEdit[]
   /** undefined = TTL unchanged; null = PERSIST (remove); number = PEXPIRE ms */
   ttlChange?: number | null
   conflict: RedisConflict | null
+  /** set when a commit would empty (delete) the key — awaits explicit confirm */
+  emptyDelete: { cardinality: number } | null
   committing: boolean
 }
 
@@ -67,6 +75,9 @@ interface RedisState {
   setTtlChange: (tabId: string, ms: number | null | undefined) => void
   commit: (tabId: string, key: string, type: RedisKeyType) => Promise<boolean>
   forceCommit: (tabId: string, key: string, type: RedisKeyType) => Promise<boolean>
+  /** re-run the commit after the user acknowledged the empty-delete warning */
+  confirmEmptyCommit: (tabId: string, key: string, type: RedisKeyType) => Promise<boolean>
+  cancelEmptyDelete: (tabId: string) => void
   deleteKey: (key: string) => Promise<void>
   renameKey: (from: string, to: string, overwrite: boolean) => Promise<void>
   disposeTab: (tabId: string) => void
@@ -82,7 +93,16 @@ const EMPTY_LIST: KeyList = {
 }
 
 function emptyTab(): KeyTab {
-  return { page: null, loading: false, error: null, staged: [], conflict: null, committing: false }
+  return {
+    page: null,
+    meta: null,
+    loading: false,
+    error: null,
+    staged: [],
+    conflict: null,
+    emptyDelete: null,
+    committing: false
+  }
 }
 
 export const useRedis = create<RedisState>((set, get) => ({
@@ -164,7 +184,12 @@ export const useRedis = create<RedisState>((set, get) => ({
         count: PAGE,
         forceLoadLarge: opts?.force
       })
-      patchTab(set, tabId, { page, loading: false })
+      // refresh meta (TTL + cardinality) on a full (re)load, not on paging
+      const isPaging = opts?.cursor !== undefined || opts?.start !== undefined
+      const meta = isPaging
+        ? get().tabs[tabId]?.meta ?? null
+        : await window.api.redis.keyMeta(connId, key).catch(() => null)
+      patchTab(set, tabId, { page, meta, loading: false })
     } catch (err) {
       patchTab(set, tabId, { loading: false, error: msg(err) })
     }
@@ -196,8 +221,11 @@ export const useRedis = create<RedisState>((set, get) => ({
       return { tabs: { ...s.tabs, [tabId]: { ...t, ttlChange: ms } } }
     }),
 
-  commit: (tabId, key, type) => doCommit(get, set, tabId, key, type, false),
-  forceCommit: (tabId, key, type) => doCommit(get, set, tabId, key, type, true),
+  commit: (tabId, key, type) => doCommit(get, set, tabId, key, type, { force: false }),
+  forceCommit: (tabId, key, type) => doCommit(get, set, tabId, key, type, { force: true }),
+  confirmEmptyCommit: (tabId, key, type) =>
+    doCommit(get, set, tabId, key, type, { force: false, confirmEmptyDelete: true }),
+  cancelEmptyDelete: (tabId) => patchTab(set, tabId, { emptyDelete: null }),
 
   deleteKey: async (key) => {
     const { connId } = get()
@@ -227,20 +255,31 @@ async function doCommit(
   tabId: string,
   key: string,
   type: RedisKeyType,
-  force: boolean
+  opts: { force: boolean; confirmEmptyDelete?: boolean }
 ): Promise<boolean> {
   const { connId, tabs } = get()
   const t = tabs[tabId]
   if (!connId || !t) return false
   const commands = buildCommands(key, t.staged, t.ttlChange)
   if (commands.length === 0) return true
-  patchTab(set, tabId, { committing: true, conflict: null })
-  const batch: RedisCommitBatch = { dbIndex: get().dbInfo?.current ?? 0, key, expectedType: type, commands, force }
+  patchTab(set, tabId, { committing: true, conflict: null, emptyDelete: null })
+  const batch: RedisCommitBatch = {
+    dbIndex: get().dbInfo?.current ?? 0,
+    key,
+    expectedType: type,
+    commands,
+    force: opts.force,
+    confirmEmptyDelete: opts.confirmEmptyDelete
+  }
   try {
     const res = await window.api.redis.commit(connId, batch)
     if (res.ok) {
       patchTab(set, tabId, { committing: false, staged: [], ttlChange: undefined, conflict: null })
       return true
+    }
+    if ('emptyDelete' in res) {
+      patchTab(set, tabId, { committing: false, emptyDelete: { cardinality: res.cardinality } })
+      return false
     }
     patchTab(set, tabId, { committing: false, conflict: res.conflict })
     return false
@@ -262,6 +301,11 @@ export function buildCommands(
     switch (e.kind) {
       case 'string-set':
         cmds.push(cmd(['SET', key, e.value, 'KEEPTTL'], `SET ${key}`, false))
+        break
+      case 'string-set-bin':
+        cmds.push(
+          cmd(['SET', key, { b64: e.b64 }, 'KEEPTTL'], `SET ${key} <binary ${e.bytes}B>`, false)
+        )
         break
       case 'hash-set':
         cmds.push(cmd(['HSET', key, e.field, e.value], `HSET ${key} ${e.field}`, false))
@@ -316,7 +360,7 @@ export function buildCommands(
   return cmds
 }
 
-function cmd(args: string[], label: string, destructive: boolean): RedisCommand {
+function cmd(args: RedisArg[], label: string, destructive: boolean): RedisCommand {
   return { args, label, destructive }
 }
 

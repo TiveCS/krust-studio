@@ -47,30 +47,42 @@ commit → reload shows the change → history shows the `redis_mutation` entry.
 Then: WATCH conflict (edit the key externally mid-stage), TTL preserve, delete,
 rename, large-string gate, ACL-denied `CONFIG GET databases`.
 
-## Known gaps / deliberate simplifications (beta follow-ups)
+## Functional gaps 1–5 — DONE (second pass; compiles + builds, not live-tested)
 
-1. **Binary values/keys** — node-redis returns decoded UTF-8 strings, so the
-   string viewer is `encoding:'utf8'` only; true binary (hex/base64 of non-UTF8
-   bytes) needs Buffer type-mapping. The plan's "full binary support" +
-   binary-key read/delete-only is **not** yet realised. Flagged in
-   [redis.ts](../../../krust-studio-app/src/main/db/drivers/redis.ts).
-2. **String viewer modes** — only the plain text pane is built; the
-   text/JSON/hex/base64 toggle (decision 11/15 display side) is not. Writes use
-   exact bytes of the (utf8) pane.
-3. **Empty-collection → key-deletion surfacing** (decision 10) — the cardinality
-   check (SCARD/HLEN/LLEN/ZCARD) + explicit "key will be deleted" confirm is
-   **not** wired; emptying a collection currently just deletes the key
-   server-side without the dedicated warning.
-4. **Rename overwrite** — `TARGET_EXISTS` surfaces an error; the second-confirm
-   overwrite (`RENAME`) path is not yet offered in the UI.
-5. **Workspace persistence** — redis-key tabs are not persisted/restored across
-   restart yet (excluded from `SerializedTab`).
-6. **Key-list TTL display** — the header has a TTL editor but does not show the
-   current remaining TTL (no `keyMeta` fetch in the view yet).
-7. **disposeTab** on close — `useRedis` tab state isn't cleared when a key tab
-   closes (minor memory only).
-8. Stream entry field rendering assumes a flat message map; verify against real
-   `XRANGE` shape.
+1. **Binary string values** — `readValue` reads strings via a buffer-typed view
+   of the same connection (`withTypeMapping({ BLOB_STRING: Buffer })`), computes a
+   UTF-8 validity flag, and returns both `text` and raw `base64`. Binary writes
+   flow through a `string-set-bin` staged edit → `SET key <bytes> KEEPTTL` with a
+   `{ b64 }` `RedisArg` (Buffer at the wire). **Binary key NAMES** are detected
+   during SCAN (buffer view) and flagged `binary:true`; shown with a `bin` badge
+   but **open disabled** (a mangled UTF-8 name can't be safely addressed). True
+   binary-key read/delete still needs a base64-keyed path (follow-up).
+2. **String viewer modes** — text / JSON / hex / base64 toggle in `StringEditor`,
+   all derived from `page.base64`. Text/JSON stage as UTF-8 (`string-set`);
+   hex/base64 decode to bytes and stage binary (`string-set-bin`). Binary values
+   default to the hex view with text/JSON disabled.
+3. **Empty-collection → key-deletion confirm** (decision 10) — `commit` runs a
+   cardinality check (HLEN/SCARD/ZCARD/LLEN/XLEN) under the WATCH; a removal-only
+   batch that would drain the collection returns `{ emptyDelete, cardinality }`
+   instead of executing. The view shows a destructive confirm; re-commit carries
+   `confirmEmptyDelete`.
+4. **Rename overwrite** — `TARGET_EXISTS` surfaces an "Overwrite" confirm in the
+   header that re-runs `renameKey(..., overwrite:true)` (`RENAME`).
+5. **Key TTL display** — `loadValue` fetches `keyMeta` alongside the value; the
+   header shows a formatted remaining TTL and each sidebar row a compact label.
+
+## Known gaps / deliberate simplifications (remaining beta follow-ups)
+
+- **Binary key names read/delete** — flagged + blocked, not yet read/delete-only
+  (needs a base64-keyed identity through scan/readValue/deleteKey).
+- **Binary collection members** — hash/set/zset/list values are still UTF-8
+  decoded; only string values get the binary path.
+- **Workspace persistence** — redis-key tabs aren't restored across restart
+  (excluded from `SerializedTab`).
+- **disposeTab** on close — `useRedis` tab state isn't cleared when a key tab
+  closes (minor memory only).
+- Stream entry field rendering assumes a flat message map; verify against real
+  `XRANGE` shape.
 
 ## Commits on feat/v1.7.0 (this pass)
 

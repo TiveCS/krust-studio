@@ -1,10 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Loader2, RefreshCw, Trash2, Pencil, Plus, X, Clock } from 'lucide-react'
+import { Loader2, RefreshCw, Trash2, Pencil, Plus, X, Clock, AlertTriangle } from 'lucide-react'
 import { useRedis, buildCommands, type StagedEdit } from '@/store/redis'
 import { useConnections, type Tab } from '@/store/connections'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import type { RedisArg } from '../../../shared/types'
+
+/** render a command argv for the preview (binary args shown as a byte count) */
+function argText(a: RedisArg): string {
+  return typeof a === 'string' ? a : `<binary ${Math.floor((a.b64.length * 3) / 4)}B>`
+}
+
+/** format remaining ms TTL for display (-1 = no expiry, -2 = key gone) */
+function formatTtl(ms: number): string {
+  if (ms === -1) return 'no expiry'
+  if (ms === -2) return 'expired'
+  const s = Math.round(ms / 1000)
+  if (s < 60) return `${s}s`
+  if (s < 3600) return `${Math.floor(s / 60)}m ${s % 60}s`
+  if (s < 86400) return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`
+  return `${Math.floor(s / 86400)}d`
+}
 
 /**
  * Redis Key tab (ADR-0020). Reuses the Staged Edits language: collections render
@@ -35,10 +52,44 @@ export function RedisKeyView(): React.JSX.Element {
   const page = tabState?.page ?? null
   const staged = tabState?.staged ?? []
   const commands = buildCommands(ident.key, staged, tabState?.ttlChange)
+  const emptyDelete = tabState?.emptyDelete ?? null
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <Header tab={tab} onReload={() => void redis.loadValue(tabId, ident.key, { force: true })} onClose={() => closeTab(tabId)} />
+      <Header
+        tab={tab}
+        ttl={tabState?.meta?.ttl ?? null}
+        onReload={() => void redis.loadValue(tabId, ident.key, { force: true })}
+        onClose={() => closeTab(tabId)}
+      />
+
+      {emptyDelete && (
+        <div className="m-2 rounded border border-destructive/50 bg-destructive/10 p-2 text-xs">
+          <p className="flex items-center gap-1.5 font-medium text-destructive">
+            <AlertTriangle className="size-3.5" /> This empties the collection — Redis will
+            delete the key <span className="font-mono">{ident.key}</span> ({emptyDelete.cardinality}{' '}
+            {emptyDelete.cardinality === 1 ? 'member' : 'members'} removed).
+          </p>
+          <div className="mt-1 flex gap-2">
+            <Button size="xs" variant="ghost" onClick={() => redis.cancelEmptyDelete(tabId)}>
+              Cancel
+            </Button>
+            <Button
+              size="xs"
+              variant="destructive"
+              onClick={async () => {
+                const ok = await redis.confirmEmptyCommit(tabId, ident.key, ident.type)
+                if (ok) {
+                  toast.success('Committed — key deleted')
+                  closeTab(tabId)
+                }
+              }}
+            >
+              Delete key
+            </Button>
+          </div>
+        </div>
+      )}
 
       {tabState?.conflict && (
         <div className="m-2 rounded border border-amber-500/50 bg-amber-500/10 p-2 text-xs">
@@ -98,7 +149,7 @@ export function RedisKeyView(): React.JSX.Element {
           <div className="max-h-28 space-y-0.5 overflow-auto font-mono text-[11px]">
             {commands.map((c, i) => (
               <div key={i} className={cn('truncate', c.destructive && 'text-destructive')}>
-                {c.args.join(' ')}
+                {c.args.map(argText).join(' ')}
               </div>
             ))}
           </div>
@@ -110,10 +161,12 @@ export function RedisKeyView(): React.JSX.Element {
 
 function Header({
   tab,
+  ttl,
   onReload,
   onClose
 }: {
   tab: Tab
+  ttl: number | null
   onReload: () => void
   onClose: () => void
 }): React.JSX.Element {
@@ -121,9 +174,24 @@ function Header({
   const ident = tab.redisKey!
   const [renaming, setRenaming] = useState(false)
   const [newName, setNewName] = useState(ident.key)
+  const [overwrite, setOverwrite] = useState(false)
   const [confirmDel, setConfirmDel] = useState('')
   const [expiryOpen, setExpiryOpen] = useState(false)
   const [expirySecs, setExpirySecs] = useState('')
+
+  const doRename = async (allowOverwrite: boolean): Promise<void> => {
+    try {
+      await redis.renameKey(ident.key, newName, allowOverwrite)
+      toast.success('Renamed')
+      onClose()
+    } catch (err) {
+      const m = err instanceof Error ? err.message : String(err)
+      if (m.includes('TARGET_EXISTS')) {
+        setOverwrite(true)
+        toast.error(`Key "${newName}" already exists — confirm overwrite`)
+      } else toast.error(m)
+    }
+  }
 
   return (
     <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-border px-3 py-1.5">
@@ -131,6 +199,14 @@ function Header({
       <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
         {ident.type}
       </span>
+      {ttl !== null && (
+        <span
+          className="flex items-center gap-1 rounded bg-muted/60 px-1.5 py-0.5 text-[10px] text-muted-foreground"
+          title="Remaining time to live"
+        >
+          <Clock className="size-3" /> {formatTtl(ttl)}
+        </span>
+      )}
       <div className="flex-1" />
 
       <Button size="xs" variant="ghost" onClick={onReload} title="Reload from server">
@@ -169,27 +245,27 @@ function Header({
         <div className="flex items-center gap-1">
           <input
             value={newName}
-            onChange={(e) => setNewName(e.target.value)}
+            onChange={(e) => {
+              setNewName(e.target.value)
+              setOverwrite(false)
+            }}
             className="h-6 w-40 rounded border border-border bg-transparent px-1 font-mono text-xs"
           />
-          <Button
-            size="xs"
-            variant="secondary"
-            onClick={async () => {
-              try {
-                await redis.renameKey(ident.key, newName, false)
-                toast.success('Renamed')
-                onClose()
-              } catch (err) {
-                const m = err instanceof Error ? err.message : String(err)
-                if (m.includes('TARGET_EXISTS')) toast.error('Target key exists — overwrite not yet wired')
-                else toast.error(m)
-              }
+          {overwrite ? (
+            <Button size="xs" variant="destructive" onClick={() => void doRename(true)}>
+              Overwrite
+            </Button>
+          ) : (
+            <Button size="xs" variant="secondary" onClick={() => void doRename(false)}>
+              Save
+            </Button>
+          )}
+          <button
+            onClick={() => {
+              setRenaming(false)
+              setOverwrite(false)
             }}
           >
-            Save
-          </Button>
-          <button onClick={() => setRenaming(false)}>
             <X className="size-3.5 text-muted-foreground" />
           </button>
         </div>
@@ -327,6 +403,31 @@ function ValueBody({
   }
 }
 
+type ViewMode = 'text' | 'json' | 'hex' | 'base64'
+
+// ── byte/encoding helpers (renderer-side, derived from page.base64) ──────────
+function b64ToBytes(b64: string): Uint8Array {
+  const bin = atob(b64)
+  const out = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i)
+  return out
+}
+function bytesToB64(bytes: Uint8Array): string {
+  let s = ''
+  for (const b of bytes) s += String.fromCharCode(b)
+  return btoa(s)
+}
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join(' ')
+}
+function hexToBytes(hex: string): Uint8Array {
+  const clean = hex.replace(/[^0-9a-fA-F]/g, '')
+  if (clean.length % 2 !== 0) throw new Error('Hex must have an even number of digits')
+  const out = new Uint8Array(clean.length / 2)
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(clean.slice(i * 2, i * 2 + 2), 16)
+  return out
+}
+
 function StringEditor({
   page,
   stage
@@ -334,28 +435,107 @@ function StringEditor({
   page: Extract<import('../../../shared/types').RedisValuePage, { type: 'string' }>
   stage: (e: StagedEdit) => void
 }): React.JSX.Element {
-  const [text, setText] = useState(page.text)
-  useEffect(() => setText(page.text), [page.text])
+  // original value in each representation, derived once from the raw bytes
+  const orig = React.useMemo(() => {
+    const bytes = page.base64 ? b64ToBytes(page.base64) : new Uint8Array()
+    let json = page.text
+    try {
+      json = JSON.stringify(JSON.parse(page.text), null, 2)
+    } catch {
+      json = page.text
+    }
+    return { text: page.text, json, hex: bytesToHex(bytes), base64: page.base64 }
+  }, [page.base64, page.text])
+
+  const [mode, setMode] = useState<ViewMode>(page.binary ? 'hex' : 'text')
+  const [draft, setDraft] = useState(orig[page.binary ? 'hex' : 'text'])
+
+  // reset the editor to the chosen mode's representation when value or mode changes
+  useEffect(() => {
+    setDraft(orig[mode])
+  }, [orig, mode])
+
   if (page.tooLarge) {
     return (
       <p className="text-sm text-muted-foreground">
-        Value is {(page.bytes / 1024 / 1024).toFixed(2)} MB. Use <strong>Reload</strong> to load it explicitly.
+        Value is {(page.bytes / 1024 / 1024).toFixed(2)} MB. Use <strong>Reload</strong> to load it
+        explicitly.
       </p>
     )
   }
+
+  const dirty = draft !== orig[mode]
+  const onStage = (): void => {
+    try {
+      switch (mode) {
+        case 'text':
+          stage({ kind: 'string-set', value: draft })
+          break
+        case 'json': {
+          JSON.parse(draft) // validate; store the text as-typed
+          stage({ kind: 'string-set', value: draft })
+          break
+        }
+        case 'hex': {
+          const bytes = hexToBytes(draft)
+          stage({ kind: 'string-set-bin', b64: bytesToB64(bytes), bytes: bytes.length })
+          break
+        }
+        case 'base64': {
+          const bytes = b64ToBytes(draft.trim())
+          stage({ kind: 'string-set-bin', b64: bytesToB64(bytes), bytes: bytes.length })
+          break
+        }
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Invalid value for this view')
+    }
+  }
+
+  const MODES: { id: ViewMode; label: string; disabled?: boolean }[] = [
+    { id: 'text', label: 'Text', disabled: page.binary },
+    { id: 'json', label: 'JSON', disabled: page.binary },
+    { id: 'hex', label: 'Hex' },
+    { id: 'base64', label: 'Base64' }
+  ]
+
   return (
     <div className="space-y-2">
+      <div className="flex items-center gap-1">
+        {MODES.map((m) => (
+          <button
+            key={m.id}
+            disabled={m.disabled}
+            onClick={() => setMode(m.id)}
+            className={cn(
+              'rounded px-2 py-0.5 text-[11px]',
+              mode === m.id ? 'bg-accent text-foreground' : 'text-muted-foreground hover:bg-accent/50',
+              m.disabled && 'cursor-not-allowed opacity-40'
+            )}
+            title={m.disabled ? 'Value is not valid UTF-8' : undefined}
+          >
+            {m.label}
+          </button>
+        ))}
+        {page.binary && (
+          <span className="ml-1 rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] text-amber-400">
+            binary
+          </span>
+        )}
+      </div>
       <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
         className="h-64 w-full resize-none rounded border border-border bg-transparent p-2 font-mono text-xs outline-none focus:border-ring"
         spellCheck={false}
       />
       <div className="flex items-center gap-2">
-        <Button size="xs" variant="secondary" disabled={text === page.text} onClick={() => stage({ kind: 'string-set', value: text })}>
+        <Button size="xs" variant="secondary" disabled={!dirty} onClick={onStage}>
           Stage value
         </Button>
-        <span className="text-[11px] text-muted-foreground">{page.bytes} bytes · {page.encoding}</span>
+        <span className="text-[11px] text-muted-foreground">
+          {page.bytes} bytes · {page.encoding}
+        </span>
       </div>
     </div>
   )

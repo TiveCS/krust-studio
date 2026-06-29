@@ -6,6 +6,15 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { RedisKeyType } from '../../../shared/types'
 
+/** compact remaining-TTL label for a key row (ms in) */
+function ttlLabel(ms: number): string {
+  const s = Math.round(ms / 1000)
+  if (s < 60) return `${s}s`
+  if (s < 3600) return `${Math.floor(s / 60)}m`
+  if (s < 86400) return `${Math.floor(s / 3600)}h`
+  return `${Math.floor(s / 86400)}d`
+}
+
 /** short type badge for a key row */
 const TYPE_BADGE: Record<RedisKeyType, { label: string; cls: string }> = {
   string: { label: 'str', cls: 'text-sky-400' },
@@ -98,17 +107,26 @@ export function RedisSidebar(): React.JSX.Element {
           return (
             <button
               key={k.key}
-              onClick={() => openRedisKey(k.key, k.type, current)}
+              disabled={k.binary}
+              onClick={() => !k.binary && openRedisKey(k.key, k.type, current)}
               className={cn(
                 'flex w-full items-center gap-2 rounded px-2 py-1 text-left text-xs hover:bg-accent',
-                activeKey === k.key && 'bg-accent'
+                activeKey === k.key && 'bg-accent',
+                k.binary && 'cursor-not-allowed opacity-60 hover:bg-transparent'
               )}
-              title={k.key}
+              title={k.binary ? `${k.key} (binary key name — not editable here)` : k.key}
             >
               <span className={cn('w-9 shrink-0 font-mono', badge.cls)}>{badge.label}</span>
               <span className="flex-1 truncate font-mono">{k.key}</span>
+              {k.binary && (
+                <span className="shrink-0 rounded bg-amber-500/15 px-1 text-[9px] text-amber-400">
+                  bin
+                </span>
+              )}
               {k.ttl !== null && k.ttl >= 0 && (
-                <span className="shrink-0 text-[10px] text-muted-foreground">ttl</span>
+                <span className="shrink-0 text-[10px] tabular-nums text-muted-foreground">
+                  {ttlLabel(k.ttl)}
+                </span>
               )}
             </button>
           )
