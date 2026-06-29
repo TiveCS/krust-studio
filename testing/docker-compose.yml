@@ -1,0 +1,32 @@
+# Redis test fixture for Krust Studio's Redis key browser (ADR-0020).
+#
+#   docker compose up            # start Redis + seed it, then connect Krust
+#   docker compose run --rm seeder   # re-seed (resets db0 + db1)
+#   docker compose down -v       # stop and wipe data
+#
+# Connect Krust to:  host localhost  port 6379  password krust  (user blank)
+services:
+  redis:
+    image: redis:7-alpine
+    # requirepass so Krust exercises the auth path; keepit simple (default user)
+    command: ["redis-server", "--requirepass", "krust", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "krust", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  seeder:
+    image: node:22-alpine
+    depends_on:
+      redis:
+        condition: service_healthy
+    working_dir: /seed
+    volumes:
+      - ./seed:/seed
+    environment:
+      REDIS_URL: "redis://:krust@redis:6379"
+    # install node-redis then populate every key type + edge case
+    command: ["sh", "-c", "npm install --no-audit --no-fund --silent && node seed.mjs"]

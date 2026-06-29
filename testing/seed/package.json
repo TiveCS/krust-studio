@@ -1,0 +1,9 @@
+{
+  "name": "krust-redis-seed",
+  "private": true,
+  "type": "module",
+  "description": "Seeds a Redis instance with fixtures for Krust Studio's Redis key browser",
+  "dependencies": {
+    "redis": "^6.0.1"
+  }
+}
