@@ -8,6 +8,8 @@ import {
   DialogDescription
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { cn } from '@/lib/utils'
 import { useSettings } from '@/store/settings'
 import {
@@ -206,10 +208,9 @@ export function SettingsModal({
             <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-auto p-4">
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-xs font-medium">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={prettySql}
-                    onChange={(e) => setPrettySql(e.target.checked)}
+                    onCheckedChange={(c) => setPrettySql(c === true)}
                   />
                   Pretty-print SQL by default
                 </label>
@@ -384,13 +385,12 @@ export function SettingsModal({
 
               <div className="space-y-2 border-t pt-4">
                 <label className="flex items-center gap-2 text-xs font-medium">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={pinPrimaryKey.enabled}
-                    onChange={(e) =>
+                    onCheckedChange={(c) =>
                       setPinPrimaryKey({
                         ...pinPrimaryKey,
-                        enabled: e.target.checked
+                        enabled: c === true
                       })
                     }
                   />
@@ -400,22 +400,19 @@ export function SettingsModal({
                   Freezes each table's primary key column(s) automatically.
                 </p>
                 {pinPrimaryKey.enabled && (
-                  <span className="flex w-fit overflow-hidden rounded border border-border">
+                  <RadioGroup
+                    value={pinPrimaryKey.side}
+                    onValueChange={(v) =>
+                      setPinPrimaryKey({ ...pinPrimaryKey, side: v as 'left' | 'right' })
+                    }
+                    className="flex gap-4"
+                  >
                     {(['left', 'right'] as const).map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => setPinPrimaryKey({ ...pinPrimaryKey, side: s })}
-                        className={cn(
-                          'px-2.5 py-0.5 text-[11px] capitalize',
-                          pinPrimaryKey.side === s
-                            ? 'bg-primary text-primary-foreground'
-                            : 'text-muted-foreground hover:bg-accent'
-                        )}
-                      >
-                        {s}
-                      </button>
+                      <label key={s} className="flex items-center gap-1.5 text-[11px] capitalize">
+                        <RadioGroupItem value={s} /> {s}
+                      </label>
                     ))}
-                  </span>
+                  </RadioGroup>
                 )}
               </div>
 
@@ -431,12 +428,11 @@ export function SettingsModal({
             <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-auto p-4">
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-xs font-medium">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={autoAttachDestructive ?? true}
                     disabled={autoAttachDestructive === null}
-                    onChange={(e) => {
-                      const on = e.target.checked
+                    onCheckedChange={(c) => {
+                      const on = c === true
                       setAutoAttachDestructive(on)
                       void window.api.history.setAutoAttachDestructive(on)
                     }}

@@ -17,6 +17,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -314,14 +315,20 @@ export function ConnectionForm({ existing, onSaved, onConnected }: Props): React
               </div>
             </div>
             <label className="flex items-center gap-2 text-xs text-muted-foreground">
-              <input type="checkbox" {...register('ssl')} />
+              <Checkbox
+                checked={!!watch('ssl')}
+                onCheckedChange={(c) => setValue('ssl', c === true)}
+              />
               Use SSL/TLS
             </label>
           </>
         )}
 
         <label className="flex items-center gap-2 text-xs text-muted-foreground">
-          <input type="checkbox" {...register('readOnly')} />
+          <Checkbox
+            checked={!!watch('readOnly')}
+            onCheckedChange={(c) => setValue('readOnly', c === true)}
+          />
           Read-only connection (blocks all writes)
         </label>
 

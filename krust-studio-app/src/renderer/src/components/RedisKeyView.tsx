@@ -185,6 +185,7 @@ function Header({
   const [renameOpen, setRenameOpen] = useState(false)
   const [newName, setNewName] = useState(ident.key)
   const [overwrite, setOverwrite] = useState(false)
+  const [delOpen, setDelOpen] = useState(false)
   const [confirmDel, setConfirmDel] = useState('')
   const [expiryOpen, setExpiryOpen] = useState(false)
   const [expirySecs, setExpirySecs] = useState('')
@@ -308,28 +309,54 @@ function Header({
         </DialogContent>
       </Dialog>
 
-      {/* delete — typed key-name confirmation */}
-      <div className="flex items-center gap-1">
-        <input
-          value={confirmDel}
-          onChange={(e) => setConfirmDel(e.target.value)}
-          placeholder="type key to delete"
-          className="h-6 w-28 rounded border border-border bg-transparent px-1 font-mono text-[11px]"
-        />
-        <Button
-          size="xs"
-          variant="ghost"
-          disabled={confirmDel !== ident.key}
-          className="text-destructive"
-          onClick={async () => {
-            await redis.deleteKey(ident.key)
-            toast.success('Deleted')
-            onClose()
-          }}
-        >
-          <Trash2 className="size-3.5" />
-        </Button>
-      </div>
+      {/* delete — typed key-name confirmation, in a dialog */}
+      <Button
+        size="xs"
+        variant="ghost"
+        className="text-destructive"
+        title="Delete key"
+        onClick={() => {
+          setConfirmDel('')
+          setDelOpen(true)
+        }}
+      >
+        <Trash2 className="size-3.5" /> Delete
+      </Button>
+      <Dialog open={delOpen} onOpenChange={setDelOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete key</DialogTitle>
+            <DialogDescription>
+              This permanently removes <span className="font-mono">{ident.key}</span> and its value.
+              Type the key name to confirm.
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            autoFocus
+            value={confirmDel}
+            onChange={(e) => setConfirmDel(e.target.value)}
+            placeholder={ident.key}
+            className="font-mono"
+          />
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setDelOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={confirmDel !== ident.key}
+              onClick={async () => {
+                await redis.deleteKey(ident.key)
+                toast.success('Deleted')
+                setDelOpen(false)
+                onClose()
+              }}
+            >
+              <Trash2 className="size-3.5" /> Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -500,6 +527,12 @@ function StringEditor({
     }
   }, [mode, draft])
 
+  // invalid JSON has no tree — fall back to the raw editor
+  const jsonInvalid = mode === 'json' && jsonParsed !== undefined && !jsonParsed.ok
+  useEffect(() => {
+    if (jsonInvalid && jsonView === 'tree') setJsonView('raw')
+  }, [jsonInvalid, jsonView])
+
   if (page.tooLarge) {
     return (
       <p className="text-sm text-muted-foreground">
@@ -569,25 +602,35 @@ function StringEditor({
         )}
         {mode === 'json' && (
           <div className="ml-auto flex items-center gap-1">
-            {(['tree', 'raw'] as const).map((v) => (
-              <button
-                key={v}
-                onClick={() => setJsonView(v)}
-                className={cn(
-                  'rounded px-2 py-0.5 text-[11px] capitalize',
-                  jsonView === v
-                    ? 'bg-accent text-foreground'
-                    : 'text-muted-foreground hover:bg-accent/50'
-                )}
-              >
-                {v}
-              </button>
-            ))}
+            {(['tree', 'raw'] as const).map((v) => {
+              const disabled = v === 'tree' && jsonInvalid
+              return (
+                <button
+                  key={v}
+                  disabled={disabled}
+                  onClick={() => setJsonView(v)}
+                  title={disabled ? 'Value is not valid JSON' : undefined}
+                  className={cn(
+                    'rounded px-2 py-0.5 text-[11px] capitalize',
+                    jsonView === v
+                      ? 'bg-accent text-foreground'
+                      : 'text-muted-foreground hover:bg-accent/50',
+                    disabled && 'cursor-not-allowed opacity-40'
+                  )}
+                >
+                  {v}
+                </button>
+              )
+            })}
             <button
+              disabled={!jsonParsed?.ok}
               onClick={() => {
                 if (jsonParsed?.ok) setDraft(JSON.stringify(jsonParsed.value, null, 2))
               }}
-              className="rounded px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-accent/50"
+              className={cn(
+                'rounded px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-accent/50',
+                !jsonParsed?.ok && 'cursor-not-allowed opacity-40'
+              )}
               title="Re-format (pretty-print)"
             >
               Format
@@ -596,13 +639,9 @@ function StringEditor({
         )}
       </div>
 
-      {mode === 'json' && jsonView === 'tree' ? (
+      {mode === 'json' && jsonView === 'tree' && jsonParsed?.ok ? (
         <div className="h-64 w-full overflow-auto rounded border border-border bg-transparent p-2">
-          {jsonParsed?.ok ? (
-            <JsonTree data={jsonParsed.value} />
-          ) : (
-            <p className="text-xs text-destructive">Not valid JSON: {jsonParsed?.error}</p>
-          )}
+          <JsonTree data={jsonParsed.value} />
         </div>
       ) : (
         <textarea
