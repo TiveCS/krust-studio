@@ -3,6 +3,18 @@ import { create } from 'zustand'
 const STORAGE_KEY = 'krust-settings-keybindings'
 const STORAGE_KEY_PINS = 'krust-settings-pinned-columns'
 const STORAGE_KEY_GRID = 'krust-settings-grid'
+const STORAGE_KEY_PRETTY = 'krust-settings-pretty-sql'
+
+/** global default for the display-only "Pretty" SQL toggle on object tabs.
+ *  Each tab seeds its toggle from this; a per-tab flip is a temporary override
+ *  that does not write back here. Captured/exported SQL is never reformatted. */
+function loadPrettySql(): boolean {
+  try {
+    return localStorage.getItem(STORAGE_KEY_PRETTY) === 'true'
+  } catch {
+    return false
+  }
+}
 
 /** rows on a page above which the data grid switches to virtualized rendering.
  *  Small pages (≤ this) render plainly — fast in a prod build and free of
@@ -82,6 +94,11 @@ interface SettingsState {
   /** rows/page above which the grid virtualizes; below, all rows render in DOM */
   virtualizeThreshold: number
   setVirtualizeThreshold: (n: number) => void
+
+  // ── SQL display ──
+  /** global default for the per-tab display-only Pretty SQL toggle */
+  prettySql: boolean
+  setPrettySql: (v: boolean) => void
 }
 
 function savePins(s: PinSettings): void {
@@ -156,5 +173,12 @@ export const useSettings = create<SettingsState>((set) => ({
       const virtualizeThreshold = Math.max(0, Math.floor(n) || 0)
       localStorage.setItem(STORAGE_KEY_GRID, JSON.stringify({ virtualizeThreshold }))
       return { virtualizeThreshold }
+    }),
+
+  prettySql: loadPrettySql(),
+  setPrettySql: (prettySql) =>
+    set(() => {
+      localStorage.setItem(STORAGE_KEY_PRETTY, String(prettySql))
+      return { prettySql }
     })
 }))

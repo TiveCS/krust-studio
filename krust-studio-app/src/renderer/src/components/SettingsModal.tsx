@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { RotateCcw, Keyboard, Pin, X, History, Table2 } from 'lucide-react'
+import { RotateCcw, Keyboard, Pin, X, History, Table2, AlignLeft } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -41,11 +41,13 @@ export function SettingsModal({
     setPinnedColumnSide,
     setPinPrimaryKey,
     virtualizeThreshold,
-    setVirtualizeThreshold
+    setVirtualizeThreshold,
+    prettySql,
+    setPrettySql
   } = useSettings()
   const [recording, setRecording] = useState<CommandId | null>(null)
   const [search, setSearch] = useState('')
-  const [section, setSection] = useState<'keybindings' | 'pinned' | 'history' | 'grid'>(
+  const [section, setSection] = useState<'keybindings' | 'pinned' | 'history' | 'grid' | 'sql'>(
     'keybindings'
   )
   const [pinName, setPinName] = useState('')
@@ -157,6 +159,18 @@ export function SettingsModal({
               <Table2 className="size-3.5" />
               Data Grid
             </button>
+            <button
+              onClick={() => setSection('sql')}
+              className={cn(
+                'flex w-full items-center gap-2 rounded px-2 py-1.5 text-xs font-medium',
+                section === 'sql'
+                  ? 'bg-accent text-foreground'
+                  : 'text-muted-foreground hover:bg-accent/40'
+              )}
+            >
+              <AlignLeft className="size-3.5" />
+              SQL
+            </button>
           </div>
 
           {/* grid content */}
@@ -183,6 +197,29 @@ export function SettingsModal({
                   Default 150: small pages render plainly, big pages virtualize.
                   0 = always virtualize. Page size caps the rows fetched.
                 </p>
+              </div>
+            </div>
+          )}
+
+          {/* sql content */}
+          {section === 'sql' && (
+            <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-auto p-4">
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-xs font-medium">
+                  <input
+                    type="checkbox"
+                    checked={prettySql}
+                    onChange={(e) => setPrettySql(e.target.checked)}
+                  />
+                  Pretty-print SQL by default
+                </label>
+                <p className="text-[11px] text-muted-foreground">
+                  When on, object tabs (CREATE statement, generated DDL) open with the
+                  display-only Pretty toggle already enabled. Each tab can still flip its
+                  own toggle to override this default for that tab. Copied, executed, and
+                  exported SQL is never reformatted — only the on-screen display changes.
+                </p>
+                <p className="text-[11px] text-muted-foreground/70">Default off.</p>
               </div>
             </div>
           )}

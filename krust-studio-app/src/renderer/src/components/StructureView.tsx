@@ -54,6 +54,7 @@ import { type EditorColumn } from '@/components/ColumnsEditor'
 import { seed, diff } from '@/lib/columnDiff'
 import { insertTemplateColumns } from '@/lib/templates'
 import { useConnections, type StructureSub as Sub } from '@/store/connections'
+import { useSettings } from '@/store/settings'
 import type { EntityRef, IndexSpec, NewColumnSpec, SchemaOp } from '../../../shared/types'
 
 const SUBS: Sub[] = ['columns', 'indexes', 'relations', 'referencedBy', 'ddl']
@@ -133,7 +134,11 @@ export function StructureView(): React.JSX.Element | null {
 
   const [ddl, setDdl] = useState<string | null>(null)
   const [ddlLoading, setDdlLoading] = useState(false)
-  const [prettyDdl, setPrettyDdl] = useState(false)
+  // Global default seeds the toggle; `null` follows the global pref, a non-null
+  // value is a temporary per-tab override (not persisted).
+  const prettySqlDefault = useSettings((s) => s.prettySql)
+  const [prettyDdlOverride, setPrettyDdlOverride] = useState<boolean | null>(null)
+  const prettyDdl = prettyDdlOverride ?? prettySqlDefault
 
   // ── staged structure changes (columns + indexes, committed together) ──────
   // These live on the tab (store) so they survive switching tabs within a live
@@ -162,7 +167,8 @@ export function StructureView(): React.JSX.Element | null {
 
   // commit / preview
   const [previewSql, setPreviewSql] = useState<string | null>(null)
-  const [prettyPreview, setPrettyPreview] = useState(false)
+  const [prettyPreviewOverride, setPrettyPreviewOverride] = useState<boolean | null>(null)
+  const prettyPreview = prettyPreviewOverride ?? prettySqlDefault
   const [previewing, setPreviewing] = useState(false)
   const [busy, setBusy] = useState(false)
 
@@ -404,7 +410,7 @@ export function StructureView(): React.JSX.Element | null {
         tab.entity,
         ops
       )
-      setPrettyPreview(false)
+      setPrettyPreviewOverride(null)
       setPreviewSql(
         statements.length
           ? statements.map((s) => `${s};`).join('\n\n')
@@ -484,7 +490,7 @@ export function StructureView(): React.JSX.Element | null {
                 size="xs"
                 variant={prettyDdl ? 'secondary' : 'ghost'}
                 disabled={!ddl}
-                onClick={() => setPrettyDdl((v) => !v)}
+                onClick={() => setPrettyDdlOverride(!prettyDdl)}
                 title="Display formatted SQL; copied SQL remains exact"
               >
                 <AlignLeft />
@@ -1031,7 +1037,7 @@ export function StructureView(): React.JSX.Element | null {
               <Button
                 size="xs"
                 variant={prettyPreview ? 'secondary' : 'ghost'}
-                onClick={() => setPrettyPreview((v) => !v)}
+                onClick={() => setPrettyPreviewOverride(!prettyPreview)}
                 title="Display formatted SQL; executable and copied SQL remain exact"
               >
                 <AlignLeft />

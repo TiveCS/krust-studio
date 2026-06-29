@@ -359,7 +359,7 @@ export function HistoryView(): React.JSX.Element {
           onClick={() => setView({ kind: 'stream', stream: 'table_mutation' })}
           className={railItem(view.kind === 'stream' && view.stream === 'table_mutation')}
         >
-          Table Mutation (all)
+          Schema Mutation (all)
         </button>
         <button
           onClick={() => setView({ kind: 'stream', stream: 'data_mutation' })}
@@ -384,7 +384,7 @@ export function HistoryView(): React.JSX.Element {
               : view.kind === 'unassigned'
                 ? 'Unassigned'
                 : view.stream === 'table_mutation'
-                  ? 'Table Mutation'
+                  ? 'Schema Mutation'
                   : view.stream === 'data_mutation'
                     ? 'Data Mutation'
                     : 'Data Retrieval'}
