@@ -1166,7 +1166,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_sql_format_test",
-      "community": 123,
+      "community": 138,
       "norm_label": "sql-format.test.ts"
     },
     {
@@ -1286,7 +1286,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "db_driver_drivercore",
-      "community": 110,
+      "community": 119,
       "norm_label": "drivercore"
     },
     {
@@ -1386,7 +1386,7 @@
       "source_location": "L249",
       "_origin": "ast",
       "id": "db_driver_defaultindexname",
-      "community": 5,
+      "community": 39,
       "norm_label": "defaultindexname()"
     },
     {
@@ -1536,7 +1536,7 @@
       "source_location": "L583",
       "_origin": "ast",
       "id": "db_driver_driverdeps",
-      "community": 82,
+      "community": 76,
       "norm_label": "driverdeps"
     },
     {
@@ -1616,7 +1616,7 @@
       "source_location": "L127",
       "_origin": "ast",
       "id": "drivers_mysql_mysqldriver_constructor",
-      "community": 82,
+      "community": 76,
       "norm_label": ".constructor()"
     },
     {
@@ -1686,7 +1686,7 @@
       "source_location": "L200",
       "_origin": "ast",
       "id": "drivers_mysql_mysqldriver_listenums",
-      "community": 129,
+      "community": 132,
       "norm_label": ".listenums()"
     },
     {
@@ -1766,7 +1766,7 @@
       "source_location": "L500",
       "_origin": "ast",
       "id": "drivers_mysql_mysqldriver_createtable",
-      "community": 72,
+      "community": 5,
       "norm_label": ".createtable()"
     },
     {
@@ -1876,7 +1876,7 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_constructor",
-      "community": 82,
+      "community": 76,
       "norm_label": ".constructor()"
     },
     {
@@ -2376,7 +2376,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_constructor",
-      "community": 82,
+      "community": 76,
       "norm_label": ".constructor()"
     },
     {
@@ -2426,7 +2426,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_listentities",
-      "community": 8,
+      "community": 132,
       "norm_label": ".listentities()"
     },
     {
@@ -2436,7 +2436,7 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_listenums",
-      "community": 129,
+      "community": 132,
       "norm_label": ".listenums()"
     },
     {
@@ -2486,7 +2486,7 @@
       "source_location": "L252",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_describetable",
-      "community": 76,
+      "community": 82,
       "norm_label": ".describetable()"
     },
     {
@@ -2546,7 +2546,7 @@
       "source_location": "L447",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_dropentity",
-      "community": 39,
+      "community": 132,
       "norm_label": ".dropentity()"
     },
     {
@@ -2576,7 +2576,7 @@
       "source_location": "L475",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_createindexsql",
-      "community": 8,
+      "community": 39,
       "norm_label": ".createindexsql()"
     },
     {
@@ -2596,7 +2596,7 @@
       "source_location": "L485",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_createindex",
-      "community": 8,
+      "community": 39,
       "norm_label": ".createindex()"
     },
     {
@@ -3786,7 +3786,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "preload_index",
-      "community": 8,
+      "community": 132,
       "norm_label": "index.ts"
     },
     {
@@ -3796,7 +3796,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "preload_index_api",
-      "community": 8,
+      "community": 132,
       "norm_label": "api"
     },
     {
@@ -3806,7 +3806,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app",
-      "community": 137,
+      "community": 23,
       "norm_label": "app.tsx"
     },
     {
@@ -3816,7 +3816,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "src_app_app",
-      "community": 137,
+      "community": 23,
       "norm_label": "app()"
     },
     {
@@ -3956,7 +3956,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_columnseditor",
-      "community": 35,
+      "community": 136,
       "norm_label": "columnseditor.tsx"
     },
     {
@@ -3966,7 +3966,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "components_columnseditor_editorcolumn",
-      "community": 35,
+      "community": 136,
       "norm_label": "editorcolumn"
     },
     {
@@ -3976,7 +3976,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "components_columnseditor_rowchanged",
-      "community": 35,
+      "community": 136,
       "norm_label": "rowchanged()"
     },
     {
@@ -3986,7 +3986,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "components_columnseditor_fk_actions",
-      "community": 35,
+      "community": 136,
       "norm_label": "fk_actions"
     },
     {
@@ -3996,7 +3996,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "components_columnseditor_columnseditor",
-      "community": 35,
+      "community": 136,
       "norm_label": "columnseditor()"
     },
     {
@@ -4033,7 +4033,7 @@
       "label": "schema",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/ConnectionForm.tsx",
-      "source_location": "L35",
+      "source_location": "L36",
       "_origin": "ast",
       "id": "components_connectionform_schema",
       "community": 117,
@@ -4043,7 +4043,7 @@
       "label": "FormValues",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/ConnectionForm.tsx",
-      "source_location": "L70",
+      "source_location": "L71",
       "_origin": "ast",
       "id": "components_connectionform_formvalues",
       "community": 117,
@@ -4053,7 +4053,7 @@
       "label": "DEFAULT_PORTS",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/ConnectionForm.tsx",
-      "source_location": "L72",
+      "source_location": "L73",
       "_origin": "ast",
       "id": "components_connectionform_default_ports",
       "community": 117,
@@ -4063,7 +4063,7 @@
       "label": "emptyValues()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/ConnectionForm.tsx",
-      "source_location": "L79",
+      "source_location": "L80",
       "_origin": "ast",
       "id": "components_connectionform_emptyvalues",
       "community": 117,
@@ -4073,7 +4073,7 @@
       "label": "toFormValues()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/ConnectionForm.tsx",
-      "source_location": "L94",
+      "source_location": "L95",
       "_origin": "ast",
       "id": "components_connectionform_toformvalues",
       "community": 117,
@@ -4083,7 +4083,7 @@
       "label": "toConfig()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/ConnectionForm.tsx",
-      "source_location": "L111",
+      "source_location": "L112",
       "_origin": "ast",
       "id": "components_connectionform_toconfig",
       "community": 117,
@@ -4093,7 +4093,7 @@
       "label": "Props",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/ConnectionForm.tsx",
-      "source_location": "L127",
+      "source_location": "L128",
       "_origin": "ast",
       "id": "components_connectionform_props",
       "community": 117,
@@ -4103,7 +4103,7 @@
       "label": "ConnectionForm()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/ConnectionForm.tsx",
-      "source_location": "L136",
+      "source_location": "L137",
       "_origin": "ast",
       "id": "components_connectionform_connectionform",
       "community": 117,
@@ -4216,7 +4216,7 @@
       "source_location": "L113",
       "_origin": "ast",
       "id": "components_datagrid_datagrid",
-      "community": 67,
+      "community": 137,
       "norm_label": "datagrid()"
     },
     {
@@ -4226,7 +4226,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_databaseswitcher",
-      "community": 1,
+      "community": 23,
       "norm_label": "databaseswitcher.tsx"
     },
     {
@@ -4236,7 +4236,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "components_databaseswitcher_databaseswitcher",
-      "community": 1,
+      "community": 23,
       "norm_label": "databaseswitcher()"
     },
     {
@@ -4816,7 +4816,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "components_rediskeyview_rediskeyview",
-      "community": 131,
+      "community": 13,
       "norm_label": "rediskeyview()"
     },
     {
@@ -4833,7 +4833,7 @@
       "label": "ForceButton()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L337",
+      "source_location": "L364",
       "_origin": "ast",
       "id": "components_rediskeyview_forcebutton",
       "community": 122,
@@ -4843,7 +4843,7 @@
       "label": "ValueBody()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L364",
+      "source_location": "L391",
       "_origin": "ast",
       "id": "components_rediskeyview_valuebody",
       "community": 122,
@@ -4853,7 +4853,7 @@
       "label": "ViewMode",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L439",
+      "source_location": "L466",
       "_origin": "ast",
       "id": "components_rediskeyview_viewmode",
       "community": 122,
@@ -4863,7 +4863,7 @@
       "label": "b64ToBytes()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L442",
+      "source_location": "L469",
       "_origin": "ast",
       "id": "components_rediskeyview_b64tobytes",
       "community": 122,
@@ -4873,7 +4873,7 @@
       "label": "bytesToB64()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L448",
+      "source_location": "L475",
       "_origin": "ast",
       "id": "components_rediskeyview_bytestob64",
       "community": 122,
@@ -4883,7 +4883,7 @@
       "label": "bytesToHex()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L453",
+      "source_location": "L480",
       "_origin": "ast",
       "id": "components_rediskeyview_bytestohex",
       "community": 122,
@@ -4893,7 +4893,7 @@
       "label": "hexToBytes()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L456",
+      "source_location": "L483",
       "_origin": "ast",
       "id": "components_rediskeyview_hextobytes",
       "community": 122,
@@ -4903,7 +4903,7 @@
       "label": "StringEditor()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L464",
+      "source_location": "L491",
       "_origin": "ast",
       "id": "components_rediskeyview_stringeditor",
       "community": 122,
@@ -4913,7 +4913,7 @@
       "label": "MemberGrid()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L633",
+      "source_location": "L672",
       "_origin": "ast",
       "id": "components_rediskeyview_membergrid",
       "community": 122,
@@ -4923,7 +4923,7 @@
       "label": "ListEditor()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L724",
+      "source_location": "L763",
       "_origin": "ast",
       "id": "components_rediskeyview_listeditor",
       "community": 122,
@@ -4933,7 +4933,7 @@
       "label": "StreamViewer()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
-      "source_location": "L796",
+      "source_location": "L835",
       "_origin": "ast",
       "id": "components_rediskeyview_streamviewer",
       "community": 122,
@@ -4946,7 +4946,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_redissidebar",
-      "community": 131,
+      "community": 140,
       "norm_label": "redissidebar.tsx"
     },
     {
@@ -4956,7 +4956,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "components_redissidebar_ttllabel",
-      "community": 131,
+      "community": 140,
       "norm_label": "ttllabel()"
     },
     {
@@ -4966,7 +4966,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "components_redissidebar_type_badge",
-      "community": 131,
+      "community": 140,
       "norm_label": "type_badge"
     },
     {
@@ -4976,7 +4976,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "components_redissidebar_redissidebar",
-      "community": 131,
+      "community": 140,
       "norm_label": "redissidebar()"
     },
     {
@@ -4986,27 +4986,27 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_settingsmodal",
-      "community": 67,
+      "community": 137,
       "norm_label": "settingsmodal.tsx"
     },
     {
       "label": "SCOPE_LABELS",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/SettingsModal.tsx",
-      "source_location": "L21",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "components_settingsmodal_scope_labels",
-      "community": 67,
+      "community": 137,
       "norm_label": "scope_labels"
     },
     {
       "label": "SettingsModal()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/renderer/src/components/SettingsModal.tsx",
-      "source_location": "L28",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "components_settingsmodal_settingsmodal",
-      "community": 67,
+      "community": 137,
       "norm_label": "settingsmodal()"
     },
     {
@@ -5096,7 +5096,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_structureeditor",
-      "community": 132,
+      "community": 3,
       "norm_label": "structureeditor.tsx"
     },
     {
@@ -5106,7 +5106,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "components_structureeditor_types",
-      "community": 132,
+      "community": 3,
       "norm_label": "types"
     },
     {
@@ -5116,7 +5116,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "components_structureeditor_limits",
-      "community": 132,
+      "community": 3,
       "norm_label": "limits"
     },
     {
@@ -5126,7 +5126,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "components_structureeditor_structureeditor",
-      "community": 132,
+      "community": 3,
       "norm_label": "structureeditor()"
     },
     {
@@ -5246,7 +5246,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_tabbar",
-      "community": 1,
+      "community": 142,
       "norm_label": "tabbar.tsx"
     },
     {
@@ -5256,7 +5256,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "components_tabbar_tabicon",
-      "community": 1,
+      "community": 142,
       "norm_label": "tabicon()"
     },
     {
@@ -5266,7 +5266,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "components_tabbar_tabbar",
-      "community": 1,
+      "community": 142,
       "norm_label": "tabbar()"
     },
     {
@@ -5286,7 +5286,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_tabletabview_tabletabview",
-      "community": 1,
+      "community": 23,
       "norm_label": "tabletabview()"
     },
     {
@@ -5396,7 +5396,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_viewswitch",
-      "community": 136,
+      "community": 23,
       "norm_label": "viewswitch.tsx"
     },
     {
@@ -5406,7 +5406,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "components_viewswitch_views",
-      "community": 136,
+      "community": 23,
       "norm_label": "views"
     },
     {
@@ -5416,7 +5416,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_viewswitch_viewswitch",
-      "community": 136,
+      "community": 23,
       "norm_label": "viewswitch()"
     },
     {
@@ -6248,6 +6248,36 @@
       "id": "ui_popover_popoverdescription",
       "community": 43,
       "norm_label": "popoverdescription()"
+    },
+    {
+      "label": "radio-group.tsx",
+      "file_type": "code",
+      "source_file": "krust-studio-app/src/renderer/src/components/ui/radio-group.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "ui_radio_group",
+      "community": 143,
+      "norm_label": "radio-group.tsx"
+    },
+    {
+      "label": "RadioGroup()",
+      "file_type": "code",
+      "source_file": "krust-studio-app/src/renderer/src/components/ui/radio-group.tsx",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "ui_radio_group_radiogroup",
+      "community": 143,
+      "norm_label": "radiogroup()"
+    },
+    {
+      "label": "RadioGroupItem()",
+      "file_type": "code",
+      "source_file": "krust-studio-app/src/renderer/src/components/ui/radio-group.tsx",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "ui_radio_group_radiogroupitem",
+      "community": 143,
+      "norm_label": "radiogroupitem()"
     },
     {
       "label": "select.tsx",
@@ -7316,7 +7346,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_sqlformat",
-      "community": 123,
+      "community": 138,
       "norm_label": "sqlformat.ts"
     },
     {
@@ -7326,7 +7356,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "lib_sqlformat_dialects",
-      "community": 123,
+      "community": 138,
       "norm_label": "dialects"
     },
     {
@@ -7336,7 +7366,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_sqlformat_formatsql",
-      "community": 123,
+      "community": 138,
       "norm_label": "formatsql()"
     },
     {
@@ -7346,7 +7376,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "lib_sqlformat_displaysql",
-      "community": 123,
+      "community": 138,
       "norm_label": "displaysql()"
     },
     {
@@ -7416,7 +7446,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_templates",
-      "community": 8,
+      "community": 27,
       "norm_label": "templates.ts"
     },
     {
@@ -7426,7 +7456,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_templates_templatetodraftcolumns",
-      "community": 8,
+      "community": 27,
       "norm_label": "templatetodraftcolumns()"
     },
     {
@@ -7436,7 +7466,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "lib_templates_inserttemplatecolumns",
-      "community": 8,
+      "community": 27,
       "norm_label": "inserttemplatecolumns()"
     },
     {
@@ -7466,7 +7496,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_main",
-      "community": 137,
+      "community": 23,
       "norm_label": "main.tsx"
     },
     {
@@ -7476,7 +7506,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "community": 8,
+      "community": 132,
       "norm_label": "connections.ts"
     },
     {
@@ -7486,7 +7516,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "store_connections_querystate",
-      "community": 8,
+      "community": 132,
       "norm_label": "querystate"
     },
     {
@@ -7496,7 +7526,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "store_connections_tabview",
-      "community": 8,
+      "community": 132,
       "norm_label": "tabview"
     },
     {
@@ -7506,7 +7536,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "store_connections_structuresub",
-      "community": 8,
+      "community": 132,
       "norm_label": "structuresub"
     },
     {
@@ -7516,7 +7546,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "store_connections_sessionstatus",
-      "community": 8,
+      "community": 132,
       "norm_label": "sessionstatus"
     },
     {
@@ -7536,7 +7566,7 @@
       "source_location": "L116",
       "_origin": "ast",
       "id": "store_connections_tabhasdatachanges",
-      "community": 8,
+      "community": 132,
       "norm_label": "tabhasdatachanges()"
     },
     {
@@ -7546,7 +7576,7 @@
       "source_location": "L125",
       "_origin": "ast",
       "id": "store_connections_tabhasdraftcontent",
-      "community": 8,
+      "community": 132,
       "norm_label": "tabhasdraftcontent()"
     },
     {
@@ -7556,7 +7586,7 @@
       "source_location": "L136",
       "_origin": "ast",
       "id": "store_connections_tabisdirty",
-      "community": 8,
+      "community": 132,
       "norm_label": "tabisdirty()"
     },
     {
@@ -7566,7 +7596,7 @@
       "source_location": "L140",
       "_origin": "ast",
       "id": "store_connections_editkey",
-      "community": 8,
+      "community": 132,
       "norm_label": "editkey()"
     },
     {
@@ -7576,7 +7606,7 @@
       "source_location": "L144",
       "_origin": "ast",
       "id": "store_connections_entitykey",
-      "community": 8,
+      "community": 132,
       "norm_label": "entitykey()"
     },
     {
@@ -7586,7 +7616,7 @@
       "source_location": "L148",
       "_origin": "ast",
       "id": "store_connections_connectionsstate",
-      "community": 8,
+      "community": 132,
       "norm_label": "connectionsstate"
     },
     {
@@ -7596,7 +7626,7 @@
       "source_location": "L278",
       "_origin": "ast",
       "id": "store_connections_useconnections",
-      "community": 1,
+      "community": 23,
       "norm_label": "useconnections"
     },
     {
@@ -7656,7 +7686,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "store_redis_redisstate",
-      "community": 131,
+      "community": 13,
       "norm_label": "redisstate"
     },
     {
@@ -7686,7 +7716,7 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "store_redis_useredis",
-      "community": 131,
+      "community": 122,
       "norm_label": "useredis"
     },
     {
@@ -7886,7 +7916,7 @@
       "source_location": "L108",
       "_origin": "ast",
       "id": "store_settings_usesettings",
-      "community": 67,
+      "community": 137,
       "norm_label": "usesettings"
     },
     {
@@ -7926,7 +7956,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "shared_capabilities",
-      "community": 3,
+      "community": 141,
       "norm_label": "capabilities.ts"
     },
     {
@@ -7936,7 +7966,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "shared_capabilities_capabilities",
-      "community": 3,
+      "community": 141,
       "norm_label": "capabilities"
     },
     {
@@ -7946,7 +7976,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "shared_capabilities_capabilitiesfor",
-      "community": 3,
+      "community": 141,
       "norm_label": "capabilitiesfor()"
     },
     {
@@ -7996,7 +8026,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "shared_types_saveconnectioninput",
-      "community": 8,
+      "community": 132,
       "norm_label": "saveconnectioninput"
     },
     {
@@ -8036,7 +8066,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "shared_types_entitytype",
-      "community": 8,
+      "community": 132,
       "norm_label": "entitytype"
     },
     {
@@ -8046,7 +8076,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "shared_types_enumtype",
-      "community": 129,
+      "community": 132,
       "norm_label": "enumtype"
     },
     {
@@ -8056,7 +8086,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "shared_types_entityinfo",
-      "community": 8,
+      "community": 132,
       "norm_label": "entityinfo"
     },
     {
@@ -8146,7 +8176,7 @@
       "source_location": "L148",
       "_origin": "ast",
       "id": "shared_types_queryresult",
-      "community": 8,
+      "community": 132,
       "norm_label": "queryresult"
     },
     {
@@ -8266,7 +8296,7 @@
       "source_location": "L318",
       "_origin": "ast",
       "id": "shared_types_structurecolumn",
-      "community": 35,
+      "community": 136,
       "norm_label": "structurecolumn"
     },
     {
@@ -8286,7 +8316,7 @@
       "source_location": "L342",
       "_origin": "ast",
       "id": "shared_types_indexspec",
-      "community": 8,
+      "community": 39,
       "norm_label": "indexspec"
     },
     {
@@ -8316,7 +8346,7 @@
       "source_location": "L378",
       "_origin": "ast",
       "id": "shared_types_tablestructure",
-      "community": 76,
+      "community": 82,
       "norm_label": "tablestructure"
     },
     {
@@ -8336,7 +8366,7 @@
       "source_location": "L404",
       "_origin": "ast",
       "id": "shared_types_createtablespec",
-      "community": 8,
+      "community": 5,
       "norm_label": "createtablespec"
     },
     {
@@ -8346,7 +8376,7 @@
       "source_location": "L414",
       "_origin": "ast",
       "id": "shared_types_tabletemplate",
-      "community": 8,
+      "community": 132,
       "norm_label": "tabletemplate"
     },
     {
@@ -8406,7 +8436,7 @@
       "source_location": "L601",
       "_origin": "ast",
       "id": "shared_types_workspacedata",
-      "community": 0,
+      "community": 132,
       "norm_label": "workspacedata"
     },
     {
@@ -8526,7 +8556,7 @@
       "source_location": "L693",
       "_origin": "ast",
       "id": "shared_types_drivercapabilities",
-      "community": 3,
+      "community": 141,
       "norm_label": "drivercapabilities"
     },
     {
@@ -8536,7 +8566,7 @@
       "source_location": "L714",
       "_origin": "ast",
       "id": "shared_types_rediskeytype",
-      "community": 131,
+      "community": 132,
       "norm_label": "rediskeytype"
     },
     {
@@ -8596,7 +8626,7 @@
       "source_location": "L794",
       "_origin": "ast",
       "id": "shared_types_redisarg",
-      "community": 122,
+      "community": 110,
       "norm_label": "redisarg"
     },
     {
@@ -8646,7 +8676,7 @@
       "source_location": "L834",
       "_origin": "ast",
       "id": "shared_types_redisdbinfo",
-      "community": 119,
+      "community": 13,
       "norm_label": "redisdbinfo"
     },
     {
@@ -27167,9 +27197,9 @@
       "source_file": "krust-studio-app/src/renderer/src/components/JsonTree.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_jsontree",
-      "target": "components_jsontree_jsontree",
-      "confidence_score": 1.0
+      "target": "components_jsontree_jsontree"
     },
     {
       "relation": "contains",
@@ -27177,9 +27207,9 @@
       "source_file": "krust-studio-app/src/renderer/src/components/JsonTree.tsx",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_jsontree",
-      "target": "components_jsontree_node",
-      "confidence_score": 1.0
+      "target": "components_jsontree_node"
     },
     {
       "relation": "contains",
@@ -27187,9 +27217,9 @@
       "source_file": "krust-studio-app/src/renderer/src/components/JsonTree.tsx",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_jsontree",
-      "target": "components_jsontree_primitive",
-      "confidence_score": 1.0
+      "target": "components_jsontree_primitive"
     },
     {
       "relation": "calls",
@@ -27621,9 +27651,9 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RedisAddKeyDialog.tsx",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_redisaddkeydialog",
-      "target": "components_redisaddkeydialog_creatabletype",
-      "confidence_score": 1.0
+      "target": "components_redisaddkeydialog_creatabletype"
     },
     {
       "relation": "contains",
@@ -27631,9 +27661,9 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RedisAddKeyDialog.tsx",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_redisaddkeydialog",
-      "target": "components_redisaddkeydialog_redisaddkeydialog",
-      "confidence_score": 1.0
+      "target": "components_redisaddkeydialog_redisaddkeydialog"
     },
     {
       "relation": "contains",
@@ -27641,9 +27671,9 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RedisAddKeyDialog.tsx",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_redisaddkeydialog",
-      "target": "components_redisaddkeydialog_types",
-      "confidence_score": 1.0
+      "target": "components_redisaddkeydialog_types"
     },
     {
       "relation": "imports_from",
@@ -27652,9 +27682,9 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RedisAddKeyDialog.tsx",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_redisaddkeydialog",
-      "target": "shared_types",
-      "confidence_score": 1.0
+      "target": "shared_types"
     },
     {
       "relation": "imports",
@@ -27663,9 +27693,9 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RedisAddKeyDialog.tsx",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_redisaddkeydialog",
-      "target": "shared_types_rediskeytype",
-      "confidence_score": 1.0
+      "target": "shared_types_rediskeytype"
     },
     {
       "relation": "calls",
@@ -27915,6 +27945,17 @@
       "weight": 1.0,
       "source": "components_rediskeyview_header",
       "target": "store_redis_useredis"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx",
+      "source_location": "L630",
+      "weight": 1.0,
+      "source": "components_rediskeyview_stringeditor",
+      "target": "lib_utils_cn"
     },
     {
       "relation": "contains",
@@ -29863,6 +29904,48 @@
       "source_location": "L73",
       "weight": 1.0,
       "source": "ui_popover_popoverdescription",
+      "target": "lib_utils_cn"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/renderer/src/components/ui/radio-group.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "ui_radio_group",
+      "target": "ui_radio_group_radiogroup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/renderer/src/components/ui/radio-group.tsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "ui_radio_group",
+      "target": "ui_radio_group_radiogroupitem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "krust-studio-app/src/renderer/src/components/ui/radio-group.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "ui_radio_group_radiogroup",
+      "target": "lib_utils_cn"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "krust-studio-app/src/renderer/src/components/ui/radio-group.tsx",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "ui_radio_group_radiogroupitem",
       "target": "lib_utils_cn"
     },
     {
@@ -32573,9 +32656,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
       "source_location": "L402",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_redis",
-      "target": "store_redis_buildcreatecommands",
-      "confidence_score": 1.0
+      "target": "store_redis_buildcreatecommands"
     },
     {
       "relation": "contains",
@@ -32663,9 +32746,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_redis",
-      "target": "store_redis_newkeyinput",
-      "confidence_score": 1.0
+      "target": "store_redis_newkeyinput"
     },
     {
       "relation": "contains",
@@ -32824,9 +32907,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/redis.ts",
       "source_location": "L405",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_redis_buildcreatecommands",
-      "target": "store_redis_cmd",
-      "confidence_score": 1.0
+      "target": "store_redis_cmd"
     },
     {
       "relation": "contains",
@@ -38888,9 +38971,9 @@
       "source_file": "docs/release/v1.7.0/redis-status.md",
       "source_location": "L74",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_redis_status_redis_implementation_status_1_7_0",
-      "target": "v1_7_0_redis_status_ux_pass_post_live_test_feedback",
-      "confidence_score": 1.0
+      "target": "v1_7_0_redis_status_ux_pass_post_live_test_feedback"
     },
     {
       "relation": "contains",
@@ -39898,5 +39981,5 @@
       "source_file": "docs/adr/0017-inline-filter-builder-with-raw-where.md"
     }
   ],
-  "built_at_commit": "f1fd78acf3fdb41431a20d9af4214c5b7a62a968"
+  "built_at_commit": "9d837d4c8a15341a2a315ce9fb77ba32df7a2928"
 }
