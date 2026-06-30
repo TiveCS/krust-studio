@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   X,
   Table2,
@@ -56,6 +56,22 @@ export function TabBar(): React.JSX.Element | null {
   // drag-reorder state: id being dragged + the id currently hovered over
   const [dragId, setDragId] = useState<string | null>(null)
   const [overId, setOverId] = useState<string | null>(null)
+  // translate vertical mouse-wheel into horizontal scroll over the tab strip —
+  // a horizontal-only overflow ignores deltaY natively. Native non-passive
+  // listener so preventDefault stops the page scrolling instead.
+  const stripRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = stripRef.current
+    if (!el) return
+    const onWheel = (e: WheelEvent): void => {
+      if (e.deltaY === 0 || e.shiftKey) return
+      if (el.scrollWidth <= el.clientWidth) return
+      e.preventDefault()
+      el.scrollLeft += e.deltaY
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [])
 
   if (tabs.length === 0 && !openConnectionId) return null
 
@@ -215,7 +231,7 @@ export function TabBar(): React.JSX.Element | null {
 
   return (
     <div className="flex h-9 shrink-0 items-stretch border-b border-border bg-card/30">
-      <div className="flex min-w-0 flex-1 items-stretch overflow-x-auto">
+      <div ref={stripRef} className="flex min-w-0 flex-1 items-stretch overflow-x-auto">
         {pinned.length > 0 && (
           <div className="sticky left-0 z-20 flex items-stretch bg-card shadow-[3px_0_5px_-2px_rgba(0,0,0,0.45)]">
             {pinned.map((t) => renderTab(t, tabs.indexOf(t)))}
