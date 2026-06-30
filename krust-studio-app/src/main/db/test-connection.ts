@@ -89,7 +89,10 @@ async function testRedis(
     },
     username: config.user || undefined,
     password: password || undefined,
-    database: config.redisDb ?? 0
+    database: config.redisDb ?? 0,
+    // RESP2: node-redis v6 defaults to RESP3 (HELLO handshake), which Redis <6
+    // rejects. Legacy AUTH keeps the test compatible with old + new servers.
+    RESP: 2
   })
   client.on('error', () => {})
   await client.connect()

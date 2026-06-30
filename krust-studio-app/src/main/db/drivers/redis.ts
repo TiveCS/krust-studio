@@ -88,6 +88,11 @@ export class RedisDriver implements DriverCore, KeyValueCapable {
       username: this.config.user || undefined,
       password: this.password || undefined,
       database: this.dbIndex,
+      // Pin RESP2: node-redis v6 defaults to RESP3, which authenticates via a
+      // single HELLO handshake. Redis <6 has no HELLO and rejects the whole
+      // connect ("ERR unknown command `HELLO`"). RESP2 uses the legacy AUTH
+      // command, so we stay compatible with old + new servers (matches ARDM).
+      RESP: 2,
       // reject commands while disconnected instead of queueing → no silent
       // replay of a mutation after a reconnect (matches the SQL safety line).
       disableOfflineQueue: true
