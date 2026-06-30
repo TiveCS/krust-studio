@@ -590,8 +590,8 @@ function StringEditor({
   ]
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-1">
+    <div className="flex h-full min-h-0 flex-col gap-2">
+      <div className="flex shrink-0 items-center gap-1">
         {MODES.map((m) => (
           <button
             key={m.id}
@@ -652,19 +652,19 @@ function StringEditor({
       </div>
 
       {mode === 'json' && jsonView === 'tree' && jsonParsed?.ok ? (
-        <div className="h-64 w-full overflow-auto rounded border border-border bg-transparent p-2">
+        <div className="min-h-0 w-full flex-1 overflow-auto rounded border border-border bg-transparent p-2">
           <JsonTree data={jsonParsed.value} />
         </div>
       ) : (
         <textarea
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          className="h-64 w-full resize-none rounded border border-border bg-transparent p-2 font-mono text-xs outline-none focus:border-ring"
+          className="min-h-0 w-full flex-1 resize-none rounded border border-border bg-transparent p-2 font-mono text-xs outline-none focus:border-ring"
           spellCheck={false}
         />
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         <Button
           size="xs"
           variant="secondary"
