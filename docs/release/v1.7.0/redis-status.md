@@ -105,18 +105,27 @@ rename, large-string gate, ACL-denied `CONFIG GET databases`.
   re-`EXPIRE` after scanning drifts the local clock until the next rescan. A
   periodic light `pTTL` re-sync of loaded keys would fix it if it ever bites.
 
+## Persistence pass
+
+- **Workspace persistence** — redis-key tabs now serialize their identity
+  (`redisKey { dbIndex, key, type }`) into `SerializedTab` and restore across
+  restart; value/staged state stays transient and reloads on mount (the load
+  effect also re-fires once `useRedis.connId` is set, since a restored tab mounts
+  before the sidebar's init). Tabs saved for a logical db other than the one
+  currently selected restore but show "not found" until that db is reselected.
+- **disposeTab on close** — `closeTab` now calls `useRedis.disposeTab(tabId)` for
+  redis-key tabs, freeing their value/staged state.
+
 ## Known gaps / deliberate simplifications (remaining beta follow-ups)
 
 - **Binary key names read/delete** — flagged + blocked, not yet read/delete-only
   (needs a base64-keyed identity through scan/readValue/deleteKey).
 - **Binary collection members** — hash/set/zset/list values are still UTF-8
   decoded; only string values get the binary path.
-- **Workspace persistence** — redis-key tabs aren't restored across restart
-  (excluded from `SerializedTab`).
-- **disposeTab** on close — `useRedis` tab state isn't cleared when a key tab
-  closes (minor memory only).
 - Stream entry field rendering assumes a flat message map; verify against real
   `XRANGE` shape.
+- TTL countdown drifts on external `PERSIST`/re-`EXPIRE` until the next rescan
+  (no periodic `pTTL` re-sync of loaded keys yet).
 
 ## Commits on feat/v1.7.0 (this pass)
 

@@ -571,8 +571,10 @@ export interface SerializedTab {
   id: string
   entity: EntityRef
   /** undefined = regular table tab */
-  kind?: 'history' | 'connection-editor'
+  kind?: 'history' | 'connection-editor' | 'redis-key'
   connectionEditor?: { connectionId: string | null }
+  /** redis-key tabs: the key identity (value/staged state is transient, not saved) */
+  redisKey?: { dbIndex: number; key: string; type: RedisKeyType }
   view: 'data' | 'structure'
   /** which Structure sub-tab was open (survives restore) */
   structureSub?: 'columns' | 'indexes' | 'relations' | 'referencedBy' | 'ddl'

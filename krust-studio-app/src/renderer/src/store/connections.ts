@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { EditorColumn } from '@/components/ColumnsEditor'
 import { filtersToWhere } from '@/lib/filterSql'
+import { useRedis } from '@/store/redis'
 import type {
   ConnectionSummary,
   EntityInfo,
@@ -317,18 +318,15 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       activeTabId,
       tabs: tabs
         .map((tab): SerializedTab | null => {
-          // redis-key tabs are not yet persisted to workspace (value state is
-          // transient + lives in useRedis); restore is a follow-up.
-          if (
-            tab.kind === 'connection-editor' ||
-            tab.kind === 'backup' ||
-            tab.kind === 'redis-key'
-          )
-            return null
+          // connection-editor + backup tabs are session-only; everything else,
+          // including redis-key tabs (identity only — value state stays transient
+          // in useRedis and reloads on restore), is persisted.
+          if (tab.kind === 'connection-editor' || tab.kind === 'backup') return null
           return {
             id: tab.id,
             entity: tab.entity,
             kind: tab.kind,
+            ...(tab.kind === 'redis-key' && tab.redisKey ? { redisKey: tab.redisKey } : {}),
             connectionEditor: tab.connectionEditor,
             view: tab.view,
             structureSub: tab.structureSub,
@@ -353,6 +351,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       id: t.id,
       entity: t.entity,
       kind: t.kind,
+      redisKey: t.redisKey,
       pinned: t.pinned,
       connectionEditor: t.connectionEditor,
       data: null,
@@ -1089,6 +1088,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     },
 
     closeTab: (tabId) => {
+      const closing = get().tabs.find((t) => t.id === tabId)
       set((s) => {
         const idx = s.tabs.findIndex((t) => t.id === tabId)
         const tabs = s.tabs.filter((t) => t.id !== tabId)
@@ -1099,6 +1099,8 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         }
         return { tabs, activeTabId }
       })
+      // free the redis-key tab's value/staged state held in the useRedis store
+      if (closing?.kind === 'redis-key') useRedis.getState().disposeTab(tabId)
       scheduleWorkspaceSave()
     },
 
