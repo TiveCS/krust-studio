@@ -840,18 +840,18 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx": {
-    "mtime": 1782776517.2432926,
-    "ast_hash": "de211dda294ac24e0888055d76e21f6e",
+    "mtime": 1782778754.6491778,
+    "ast_hash": "be685bbf12fc94b4fd44aef378a13d70",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/RedisSidebar.tsx": {
-    "mtime": 1782775546.8972902,
-    "ast_hash": "46c468f7b070517c88f6bef7e3a0f26c",
+    "mtime": 1782778734.785213,
+    "ast_hash": "7ccd25dc487b2bbf1cc4660a2b060964",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/store/redis.ts": {
-    "mtime": 1782775336.1977713,
-    "ast_hash": "d52912cf4379dfa41f10914ffc1a8bc2",
+    "mtime": 1782778815.5837884,
+    "ast_hash": "c1fa4972a96488c26af542b55a69debd",
     "semantic_hash": ""
   },
   "docs/release/v1.7.0/redis-status.md": {
