@@ -82,6 +82,29 @@ rename, large-string gate, ACL-denied `CONFIG GET databases`.
   TTL) → creates via the same WATCH+MULTI commit with `expectedType:'none'`
   (existing name rejected), then opens the new key.
 
+## UX pass 2 (post-live-test feedback)
+
+- **Delete** moved from a confusing inline "type key" field (it read like the
+  rename box) to a `Dialog` with a typed key-name confirm, matching rename.
+- **Invalid JSON** disables the Tree subtab and falls back to Raw (was rendering
+  a parse error inside the tree pane); Format is disabled until the draft parses.
+- **shadcn controls**: every remaining native `<input type=checkbox>`
+  (ConnectionForm SSL + read-only; Settings pretty-SQL, auto-pin PK, auto-attach
+  destructive) is now the shadcn `Checkbox`; the pin-side left/right segmented
+  control is a shadcn `RadioGroup` (pulled via the shadcn CLI).
+
+## Live TTL countdown
+
+- Each scanned row is stamped with an absolute `expiresAt` (`Date.now()` +
+  remaining TTL). The sidebar ticks once a second, counts the label down live
+  (amber under 10s), and prunes expired rows — purely client-side, no extra SCAN.
+  `pruneExpired` no-ops when nothing expired (avoids needless re-renders).
+- The open key tab schedules a one-shot reload at its exact expiry, so an expired
+  key reflects ("not found") without a manual refresh.
+- Caveat: the countdown is from the scan-time snapshot; an external `PERSIST` /
+  re-`EXPIRE` after scanning drifts the local clock until the next rescan. A
+  periodic light `pTTL` re-sync of loaded keys would fix it if it ever bites.
+
 ## Known gaps / deliberate simplifications (remaining beta follow-ups)
 
 - **Binary key names read/delete** — flagged + blocked, not yet read/delete-only
