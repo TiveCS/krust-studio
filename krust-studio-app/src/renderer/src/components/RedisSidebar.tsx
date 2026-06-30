@@ -42,13 +42,24 @@ export function RedisSidebar(): React.JSX.Element {
   const activeTabId = useConnections((s) => s.activeTabId)
   const tabs = useConnections((s) => s.tabs)
 
-  const { connId, dbInfo, list, init, setMatch, rescan, scanMore, selectDb } = useRedis()
+  const { connId, dbInfo, list, init, setMatch, rescan, scanMore, selectDb, pruneExpired } =
+    useRedis()
   const [addOpen, setAddOpen] = useState(false)
+  // 1s tick drives the live TTL countdown and drops keys as they expire
+  const [now, setNow] = useState(Date.now())
 
   // (re)initialise when the active Redis connection changes
   useEffect(() => {
     if (openConnectionId && openConnectionId !== connId) void init(openConnectionId)
   }, [openConnectionId, connId, init])
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      pruneExpired()
+      setNow(Date.now())
+    }, 1000)
+    return () => clearInterval(id)
+  }, [pruneExpired])
 
   const activeKey = tabs.find((t) => t.id === activeTabId)?.redisKey?.key
   const dbCount = dbInfo?.count ?? 16
@@ -139,9 +150,15 @@ export function RedisSidebar(): React.JSX.Element {
                   bin
                 </span>
               )}
-              {k.ttl !== null && k.ttl >= 0 && (
-                <span className="shrink-0 text-[10px] tabular-nums text-muted-foreground">
-                  {ttlLabel(k.ttl)}
+              {k.expiresAt !== null && (
+                <span
+                  className={cn(
+                    'shrink-0 text-[10px] tabular-nums',
+                    k.expiresAt - now < 10_000 ? 'text-amber-400' : 'text-muted-foreground'
+                  )}
+                  title="Time to live (live)"
+                >
+                  {ttlLabel(Math.max(0, k.expiresAt - now))}
                 </span>
               )}
             </button>

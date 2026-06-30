@@ -55,6 +55,16 @@ export function RedisKeyView(): React.JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabId, ident?.key])
 
+  // auto-reload exactly when the key's TTL elapses, so an expired key reflects
+  // without a manual refresh (the reload surfaces the now-missing value)
+  const ttlMs = tabState?.meta?.ttl
+  useEffect(() => {
+    if (!ident || !tabId || ttlMs === undefined || ttlMs < 0) return
+    const id = setTimeout(() => void redis.loadValue(tabId, ident.key), ttlMs + 250)
+    return () => clearTimeout(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabId, ident?.key, ttlMs])
+
   if (!tab || !ident) {
     return <div className="p-6 text-sm text-muted-foreground">No key selected.</div>
   }

@@ -39,10 +39,25 @@ export type NewKeyInput =
   | { type: 'list'; value: string }
   | { type: 'stream'; field: string; value: string }
 
+/** a scanned key plus the wall-clock instant it expires (for the live countdown) */
+export interface KeyRow extends RedisKeyInfo {
+  /** Date.now() ms at which the key expires; null = no expiry / unknown */
+  expiresAt: number | null
+}
+
+/** stamp each row's absolute expiry from its remaining-ms TTL at scan time */
+function enrich(keys: RedisKeyInfo[]): KeyRow[] {
+  const now = Date.now()
+  return keys.map((k) => ({
+    ...k,
+    expiresAt: k.ttl !== null && k.ttl >= 0 ? now + k.ttl : null
+  }))
+}
+
 /** sidebar key-list state for the active connection's current logical db */
 interface KeyList {
   match: string
-  keys: RedisKeyInfo[]
+  keys: KeyRow[]
   cursor: string
   scanning: boolean
   done: boolean
@@ -75,6 +90,8 @@ interface RedisState {
   setMatch: (match: string) => void
   rescan: () => Promise<void>
   scanMore: () => Promise<void>
+  /** drop locally-expired keys from the list (TTL countdown reached zero) */
+  pruneExpired: () => void
   selectDb: (index: number) => Promise<void>
 
   loadValue: (tabId: string, key: string, opts?: { cursor?: string; start?: number; force?: boolean }) => Promise<void>
@@ -144,7 +161,7 @@ export const useRedis = create<RedisState>((set, get) => ({
       set((s) => ({
         list: {
           ...s.list,
-          keys: res.keys,
+          keys: enrich(res.keys),
           cursor: res.cursor,
           done: res.cursor === '0',
           scanning: false
@@ -164,7 +181,7 @@ export const useRedis = create<RedisState>((set, get) => ({
       set((s) => ({
         list: {
           ...s.list,
-          keys: dedupe([...s.list.keys, ...res.keys]),
+          keys: dedupe([...s.list.keys, ...enrich(res.keys)]),
           cursor: res.cursor,
           done: res.cursor === '0',
           scanning: false
@@ -174,6 +191,14 @@ export const useRedis = create<RedisState>((set, get) => ({
       set((s) => ({ list: { ...s.list, scanning: false, error: msg(err) } }))
     }
   },
+
+  pruneExpired: () =>
+    set((s) => {
+      const now = Date.now()
+      const keys = s.list.keys.filter((k) => k.expiresAt === null || k.expiresAt > now)
+      if (keys.length === s.list.keys.length) return {} // nothing expired → no re-render
+      return { list: { ...s.list, keys } }
+    }),
 
   selectDb: async (index) => {
     const { connId } = get()
@@ -431,7 +456,7 @@ function patchTab(
   })
 }
 
-function dedupe(keys: RedisKeyInfo[]): RedisKeyInfo[] {
+function dedupe(keys: KeyRow[]): KeyRow[] {
   const seen = new Set<string>()
   return keys.filter((k) => (seen.has(k.key) ? false : (seen.add(k.key), true)))
 }
