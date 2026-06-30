@@ -370,8 +370,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/store/connections.ts": {
-    "mtime": 1782745775.7556553,
-    "ast_hash": "1ec4fdec6268d79bda55994f914667b8",
+    "mtime": 1782780398.902845,
+    "ast_hash": "7a14fdcf0095a443c94c30900955ab43",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/store/settings.ts": {
@@ -385,8 +385,8 @@
     "semantic_hash": "cff3067e83bfce421425368ca7e7fb81"
   },
   "krust-studio-app/src/shared/types.ts": {
-    "mtime": 1782772376.533089,
-    "ast_hash": "4c550576dba71e43d1a134e21771f4f7",
+    "mtime": 1782780361.4224312,
+    "ast_hash": "b18120e02128db2b5b3e4d8904f43407",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/index.html": {
@@ -840,8 +840,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx": {
-    "mtime": 1782778754.6491778,
-    "ast_hash": "be685bbf12fc94b4fd44aef378a13d70",
+    "mtime": 1782780407.21744,
+    "ast_hash": "3184bee172cf539a441aadd85810e4c7",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/RedisSidebar.tsx": {
@@ -855,8 +855,8 @@
     "semantic_hash": ""
   },
   "docs/release/v1.7.0/redis-status.md": {
-    "mtime": 1782775626.9223802,
-    "ast_hash": "25fe4506c4738b52ff5c05753a1eafe3",
+    "mtime": 1782780477.5934806,
+    "ast_hash": "bc31a8368d961c301b308cdb3f5016c5",
     "semantic_hash": ""
   },
   "testing/seed/package.json": {
