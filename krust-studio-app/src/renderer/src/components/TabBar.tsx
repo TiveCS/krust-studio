@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   X,
   Table2,
@@ -58,6 +58,23 @@ export function TabBar(): React.JSX.Element | null {
   // drag-reorder state: id being dragged + the id currently hovered over
   const [dragId, setDragId] = useState<string | null>(null)
   const [overId, setOverId] = useState<string | null>(null)
+
+  // Vertical mouse-wheel scrolls the tab strip horizontally (VSCode-style).
+  // Native non-passive listener so preventDefault actually works (React's
+  // onWheel is passive); only hijacks when the strip actually overflows.
+  const stripRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = stripRef.current
+    if (!el) return
+    const onWheel = (e: WheelEvent): void => {
+      if (e.deltaY === 0 || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return
+      if (el.scrollWidth <= el.clientWidth) return
+      el.scrollLeft += e.deltaY
+      e.preventDefault()
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [openConnectionId])
 
   if (tabs.length === 0 && !openConnectionId) return null
 
@@ -217,7 +234,7 @@ export function TabBar(): React.JSX.Element | null {
 
   return (
     <div className="flex h-9 shrink-0 items-stretch border-b border-border bg-card/30">
-      <div className="flex min-w-0 flex-1 items-stretch overflow-x-auto">
+      <div ref={stripRef} className="flex min-w-0 flex-1 items-stretch overflow-x-auto">
         {pinned.length > 0 && (
           <div className="sticky left-0 z-20 flex items-stretch bg-card shadow-[3px_0_5px_-2px_rgba(0,0,0,0.45)]">
             {pinned.map((t) => renderTab(t, tabs.indexOf(t)))}
