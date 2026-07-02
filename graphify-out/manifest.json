@@ -110,8 +110,8 @@
     "semantic_hash": "f15d6adbaf8f43a011da57fe0b025a61"
   },
   "krust-studio-app/src/renderer/src/components/CommandPalette.tsx": {
-    "mtime": 1781409421.3882504,
-    "ast_hash": "a7969357f4bfcb09e64d26a763d6b91c",
+    "mtime": 1783003142.1713483,
+    "ast_hash": "7d669c10c010c12d90efcbfea72928ac",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/ConnectionForm.tsx": {

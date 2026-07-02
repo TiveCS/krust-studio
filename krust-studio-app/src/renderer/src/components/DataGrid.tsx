@@ -575,15 +575,36 @@ export function DataGrid(): React.JSX.Element | null {
   const dataRowToVirt = (r: number): number =>
     fkTarget === null || r <= fkTarget.r ? r : r + 1
 
-  // keep the active cell visible: vertical via the row virtualizer (rows may be
-  // off-DOM), horizontal via the rendered cell element (sticky pinned cols stay
-  // put, so a plain scrollIntoView is enough for the scrollable columns).
+  // keep the active cell visible. Vertical: the row virtualizer (rows may be
+  // off-DOM). Horizontal + non-virtualized vertical: manual scroll computed from
+  // the cell rect — a plain scrollIntoView clips the cell under the sticky
+  // row-number gutter / left-pinned columns (it aligns to the container edge, not
+  // past the sticky region). Pinned columns are always visible, so skip them.
   const scrollActiveIntoView = (r: number, c: number): void => {
+    const container = containerRef.current
+    if (!container) return
     if (virtualize) rowVirtualizer.scrollToIndex(dataRowToVirt(r), { align: 'auto' })
     requestAnimationFrame(() => {
-      containerRef.current
-        ?.querySelector<HTMLElement>(`td[data-r="${r}"][data-c="${c}"]`)
-        ?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+      const td = container.querySelector<HTMLElement>(`td[data-r="${r}"][data-c="${c}"]`)
+      if (!td) return
+      const cr = td.getBoundingClientRect()
+      const wr = container.getBoundingClientRect()
+      if (!pinInfo.has(cols[c].name)) {
+        const leftSticky = ROWNUM_W + leftCols.reduce((s, col) => s + colW(col.name), 0)
+        const relLeft = cr.left - wr.left
+        const relRight = cr.right - wr.left
+        if (relLeft < leftSticky) container.scrollLeft -= leftSticky - relLeft
+        else if (relRight > container.clientWidth)
+          container.scrollLeft += relRight - container.clientWidth
+      }
+      if (!virtualize) {
+        const headH = container.querySelector('thead')?.getBoundingClientRect().height ?? 0
+        const relTop = cr.top - wr.top
+        const relBottom = cr.bottom - wr.top
+        if (relTop < headH) container.scrollTop -= headH - relTop
+        else if (relBottom > container.clientHeight)
+          container.scrollTop += relBottom - container.clientHeight
+      }
     })
   }
 
@@ -605,6 +626,13 @@ export function DataGrid(): React.JSX.Element | null {
     scrollActiveIntoView(nr, nc)
   }
 
+  // select every loaded cell (all rows × all columns)
+  const selectAll = (): void => {
+    if (total === 0 || cols.length === 0) return
+    containerRef.current?.focus()
+    setSel({ ar: 0, ac: 0, fr: total - 1, fc: cols.length - 1 })
+  }
+
   // move to an absolute column in the active row (Home/End)
   const moveActiveToCol = (nc: number): void => {
     if (total === 0 || !sel) {
@@ -616,20 +644,17 @@ export function DataGrid(): React.JSX.Element | null {
     scrollActiveIntoView(sel.ar, c)
   }
 
-  // stage the current draft (commitDraft) then move the active cell + refocus the
-  // grid so keyboard nav continues. "commit" here = stage the edit (amber), NOT a
-  // DB write — that stays behind the explicit Commit button.
-  const commitDraftAndMove = (dr: number, dc: number): void => {
-    const cur = editing
-    commitDraft()
-    if (!cur) return
-    const nr = Math.max(0, Math.min(total - 1, cur.r + dr))
-    const nc = Math.max(0, Math.min(cols.length - 1, cur.c + dc))
-    setSel({ ar: nr, ac: nc, fr: nr, fc: nc })
-    requestAnimationFrame(() => {
-      containerRef.current?.focus()
-      scrollActiveIntoView(nr, nc)
-    })
+  // return focus to the grid container after leaving an edit input, so keyboard
+  // nav (arrows) keeps working instead of the browser scrolling the container.
+  const refocusGrid = (): void => {
+    requestAnimationFrame(() => containerRef.current?.focus())
+  }
+  // Enter in an edit input: stage the draft (amber, NOT a DB write) and STAY on
+  // the same cell; Esc: cancel. Both hand focus back to the grid.
+  const finishEdit = (stage: boolean): void => {
+    if (stage) commitDraft()
+    else setEditing(null)
+    refocusGrid()
   }
 
   const selectedRows = (): number[] => {
@@ -726,6 +751,11 @@ export function DataGrid(): React.JSX.Element | null {
     }
     if (mod && e.key.toLowerCase() === 'v') {
       void pasteSelection()
+      e.preventDefault()
+      return
+    }
+    if (mod && e.key.toLowerCase() === 'a') {
+      selectAll()
       e.preventDefault()
       return
     }
@@ -910,7 +940,14 @@ export function DataGrid(): React.JSX.Element | null {
                 </colgroup>
                 <thead className="sticky top-0 z-10 bg-background">
                   <tr className="border-b border-border">
-                    <th className="sticky left-0 z-20 bg-background px-2 py-1.5 text-right font-normal text-muted-foreground/50">
+                    <th
+                      onMouseDown={(e) => {
+                        e.preventDefault()
+                        selectAll()
+                      }}
+                      title="Select all (Ctrl/⌘+A)"
+                      className="sticky left-0 z-20 cursor-pointer bg-background px-2 py-1.5 text-right font-normal text-muted-foreground/50 hover:text-foreground"
+                    >
                       #
                     </th>
                     {cols.map((c, ci) => (
@@ -1143,7 +1180,12 @@ export function DataGrid(): React.JSX.Element | null {
                                         creatable
                                         placeholder="value"
                                         autoOpen
-                                        onOpenChange={(o) => !o && setEditing(null)}
+                                        onOpenChange={(o) => {
+                                          if (!o) {
+                                            setEditing(null)
+                                            refocusGrid()
+                                          }
+                                        }}
                                         className="h-auto rounded-none border-0 bg-transparent px-0 text-xs shadow-none focus-visible:ring-0"
                                       />
                                     ) : isEditing && dateKind && useDateInput ? (
@@ -1159,9 +1201,12 @@ export function DataGrid(): React.JSX.Element | null {
                                         onKeyDown={(e) => {
                                           if (e.key === 'Enter') {
                                             e.preventDefault()
-                                            commitDraftAndMove(1, 0)
+                                            finishEdit(true)
                                           }
-                                          if (e.key === 'Escape') setEditing(null)
+                                          if (e.key === 'Escape') {
+                                            e.preventDefault()
+                                            finishEdit(false)
+                                          }
                                         }}
                                         className="w-full bg-transparent outline-none"
                                       />
@@ -1174,9 +1219,12 @@ export function DataGrid(): React.JSX.Element | null {
                                         onKeyDown={(e) => {
                                           if (e.key === 'Enter') {
                                             e.preventDefault()
-                                            commitDraftAndMove(1, 0)
+                                            finishEdit(true)
                                           }
-                                          if (e.key === 'Escape') setEditing(null)
+                                          if (e.key === 'Escape') {
+                                            e.preventDefault()
+                                            finishEdit(false)
+                                          }
                                         }}
                                         className="w-full bg-transparent outline-none"
                                       />
