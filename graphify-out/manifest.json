@@ -125,8 +125,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/DataGrid.tsx": {
-    "mtime": 1783002870.413909,
-    "ast_hash": "946d445508604a0c6d26c42bd3750fcd",
+    "mtime": 1783005332.6110945,
+    "ast_hash": "644b49f375f000bfa4fd4b41dd72ad94",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/DatabaseSwitcher.tsx": {
@@ -475,8 +475,8 @@
     "semantic_hash": "8a6643a420fdad6bfb583523bc6cef16"
   },
   "CONTEXT.md": {
-    "mtime": 1783000589.5873404,
-    "ast_hash": "874f1aff8c9e31c6e6c3c756ca754ec7",
+    "mtime": 1783005249.2260802,
+    "ast_hash": "ebe2db25b05963777ed753157c1202b2",
     "semantic_hash": ""
   },
   "HANDOVER.md": {

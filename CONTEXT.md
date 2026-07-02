@@ -325,6 +325,19 @@ data) with one guard: a **statement separator (`;`) is rejected** so a predicate
 can't smuggle a second statement. The same builder component is reused, in a
 self-contained ephemeral instance, by the **FK Picker**'s parent-table browser.
 
+### Find (Data Grid)
+A client-side, in-page text search over the data grid's **currently loaded page**
+— a browser-style **Ctrl/⌘+F**. Distinct from **Filter** (which narrows rows via
+a server-side WHERE), from the **Command Palette** (schema objects), and from
+**History Search** (past statements): Find issues **no SQL** and only sees the
+rows already on screen. Case-insensitive substring over each cell's **displayed
+text** (staged edits and insert rows included). All matching cells are
+highlighted; the current match is emphasised. **Next / Previous** (Enter /
+Shift+Enter) set the grid's active cell to each match and scroll it into view, so
+the found cell stays selected (ready to edit/copy) after Find closes. Off-page
+values are not found — that is what **Filter** is for.
+_Avoid_: Filter, Search (unqualified)
+
 ### JSON Viewer
 A dedicated side panel that renders the currently selected row as full JSON
 (including nested JSON columns like `profile`). Has a key filter (text / regex)

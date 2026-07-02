@@ -145,6 +145,11 @@ export function DataGrid(): React.JSX.Element | null {
   const [editing, setEditing] = useState<{ r: number; c: number } | null>(null)
   const [draft, setDraft] = useState('')
   const [sel, setSel] = useState<Sel | null>(null)
+  // in-grid client-side Find (Ctrl/⌘+F) over the loaded page
+  const [findOpen, setFindOpen] = useState(false)
+  const [findQuery, setFindQuery] = useState('')
+  const [findIndex, setFindIndex] = useState(0)
+  const findInputRef = useRef<HTMLInputElement>(null)
   const [ctx, setCtx] = useState<{ r: number; c: number } | null>(null)
   const [modal, setModal] = useState<{ r: number; c: number } | null>(null)
   const [modalDraft, setModalDraft] = useState('')
@@ -261,6 +266,9 @@ export function DataGrid(): React.JSX.Element | null {
     setSel(null)
     setJsonOpen(false)
     setEditing(null)
+    setFindOpen(false)
+    setFindQuery('')
+    setFindIndex(0)
   }, [activeTabId])
 
   // auto-focus the grid when a tab's rows load so keyboard nav works without a
@@ -440,6 +448,52 @@ export function DataGrid(): React.JSX.Element | null {
     const name = cols[c].name
     if (isInsert(r)) setInsertCell(insIdx(r), name, v)
     else setCellEdit(realIdx(r), name, v)
+  }
+
+  // ── in-grid Find (client-side, current page only) ──
+  // case-insensitive substring over each cell's DISPLAYED text (staged edits +
+  // insert rows included), scanned row-major so Next goes left→right, top→bottom.
+  const computeMatches = (q: string): { r: number; c: number }[] => {
+    const s = q.trim().toLowerCase()
+    if (!s) return []
+    const out: { r: number; c: number }[] = []
+    for (let r = 0; r < total; r++)
+      for (let c = 0; c < cols.length; c++)
+        if (cellText(valueAt(r, c), cols[c]?.type).toLowerCase().includes(s))
+          out.push({ r, c })
+    return out
+  }
+  const findMatches = findOpen ? computeMatches(findQuery) : []
+  const findSet = new Set(findMatches.map((m) => `${m.r}|${m.c}`))
+  const curMatch = findMatches[findIndex] ?? null
+  const isFindMatch = (r: number, c: number): boolean =>
+    findOpen && findSet.has(`${r}|${c}`)
+  const isCurMatch = (r: number, c: number): boolean =>
+    !!curMatch && curMatch.r === r && curMatch.c === c
+
+  const jumpToMatch = (m: { r: number; c: number }): void => {
+    setSel({ ar: m.r, ac: m.c, fr: m.r, fc: m.c })
+    scrollActiveIntoView(m.r, m.c)
+  }
+  const findStep = (dir: 1 | -1): void => {
+    if (!findMatches.length) return
+    const ni = (findIndex + dir + findMatches.length) % findMatches.length
+    setFindIndex(ni)
+    jumpToMatch(findMatches[ni])
+  }
+  const openFind = (): void => {
+    setFindOpen(true)
+    requestAnimationFrame(() => findInputRef.current?.select())
+  }
+  const closeFind = (): void => {
+    setFindOpen(false)
+    refocusGrid()
+  }
+  const onFindQueryChange = (q: string): void => {
+    setFindQuery(q)
+    setFindIndex(0)
+    const ms = computeMatches(q)
+    if (ms[0]) jumpToMatch(ms[0])
   }
 
   const rect = sel && {
@@ -759,6 +813,11 @@ export function DataGrid(): React.JSX.Element | null {
       e.preventDefault()
       return
     }
+    if (mod && e.key.toLowerCase() === 'f') {
+      openFind()
+      e.preventDefault()
+      return
+    }
     // ── keyboard navigation (Excel-style) ──
     const pageRows = Math.max(
       1,
@@ -905,7 +964,62 @@ export function DataGrid(): React.JSX.Element | null {
         onApplyRaw={(t) => void applyRawWhere(t)}
       />
 
-      <div className="flex min-h-0 flex-1">
+      <div className="relative flex min-h-0 flex-1">
+        {findOpen && (
+          <div className="absolute top-2 right-3 z-40 flex items-center gap-1 rounded-md border border-border bg-popover px-2 py-1 shadow-md">
+            <Search className="size-3.5 shrink-0 text-muted-foreground" />
+            <input
+              ref={findInputRef}
+              autoFocus
+              value={findQuery}
+              onChange={(e) => onFindQueryChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  findStep(e.shiftKey ? -1 : 1)
+                } else if (e.key === 'Escape') {
+                  e.preventDefault()
+                  closeFind()
+                } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+                  e.preventDefault()
+                  findInputRef.current?.select()
+                }
+              }}
+              placeholder="Find in page…"
+              className="h-6 w-44 bg-transparent text-xs outline-none"
+            />
+            <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">
+              {findQuery.trim()
+                ? findMatches.length
+                  ? `${findIndex + 1}/${findMatches.length}`
+                  : '0/0'
+                : ''}
+            </span>
+            <button
+              onClick={() => findStep(-1)}
+              disabled={!findMatches.length}
+              title="Previous (Shift+Enter)"
+              className="rounded p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-40"
+            >
+              <ArrowUp className="size-3.5" />
+            </button>
+            <button
+              onClick={() => findStep(1)}
+              disabled={!findMatches.length}
+              title="Next (Enter)"
+              className="rounded p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-40"
+            >
+              <ArrowDown className="size-3.5" />
+            </button>
+            <button
+              onClick={closeFind}
+              title="Close (Esc)"
+              className="rounded p-0.5 text-muted-foreground hover:text-foreground"
+            >
+              <X className="size-3.5" />
+            </button>
+          </div>
+        )}
         <ContextMenu>
           <ContextMenuTrigger asChild>
             <div
@@ -1168,6 +1282,8 @@ export function DataGrid(): React.JSX.Element | null {
                                     className={cn(
                                       'group/cell relative overflow-hidden px-3 py-1 whitespace-nowrap text-ellipsis select-none',
                                       edited && !ins && 'bg-edit-cell',
+                                      isFindMatch(r, c) && 'bg-amber-400/25',
+                                      isCurMatch(r, c) && 'bg-amber-400/50',
                                       isFkTarget &&
                                         'outline outline-2 -outline-offset-2 outline-primary'
                                     )}
