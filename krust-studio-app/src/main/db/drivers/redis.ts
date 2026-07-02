@@ -1,4 +1,8 @@
-import { createClient, RESP_TYPES } from 'redis'
+// `redis` is imported LAZILY inside connect() (like mysql2/pg) so a packaging
+// or dependency problem in node-redis surfaces as a connect-time error toast —
+// never a fatal main-process crash at startup (session.ts imports this module
+// eagerly). Type-only import here is erased and triggers no runtime load.
+import type { createClient } from 'redis'
 import type {
   ConnectionConfig,
   ReadValueOpts,
@@ -77,6 +81,7 @@ export class RedisDriver implements DriverCore, KeyValueCapable {
   }
 
   async connect(): Promise<void> {
+    const { createClient, RESP_TYPES } = await import('redis')
     const client = createClient({
       socket: {
         host: this.config.host ?? '127.0.0.1',

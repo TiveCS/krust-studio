@@ -750,10 +750,20 @@
       "norm_label": "clsx"
     },
     {
-      "label": "cmdk",
+      "label": "cluster-key-slot",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
       "source_location": "L44",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_cluster_key_slot",
+      "community": 6,
+      "norm_label": "cluster-key-slot"
+    },
+    {
+      "label": "cmdk",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L45",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_cmdk",
       "community": 6,
@@ -763,7 +773,7 @@
       "label": "codemirror",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L45",
+      "source_location": "L46",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_codemirror",
       "community": 6,
@@ -773,7 +783,7 @@
       "label": "electron-updater",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L46",
+      "source_location": "L47",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_electron_updater",
       "community": 6,
@@ -783,7 +793,7 @@
       "label": "lucide-react",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L47",
+      "source_location": "L48",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_lucide_react",
       "community": 6,
@@ -793,7 +803,7 @@
       "label": "mysql2",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L48",
+      "source_location": "L49",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_mysql2",
       "community": 6,
@@ -803,7 +813,7 @@
       "label": "next-themes",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L49",
+      "source_location": "L50",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_next_themes",
       "community": 6,
@@ -813,7 +823,7 @@
       "label": "pg",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L50",
+      "source_location": "L51",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_pg",
       "community": 6,
@@ -823,7 +833,7 @@
       "label": "radix-ui",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L51",
+      "source_location": "L52",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_radix_ui",
       "community": 6,
@@ -833,7 +843,7 @@
       "label": "react-hook-form",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L52",
+      "source_location": "L53",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_react_hook_form",
       "community": 6,
@@ -843,7 +853,7 @@
       "label": "redis",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L53",
+      "source_location": "L54",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_redis",
       "community": 6,
@@ -853,7 +863,7 @@
       "label": "sonner",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L54",
+      "source_location": "L55",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_sonner",
       "community": 6,
@@ -863,7 +873,7 @@
       "label": "sql-formatter",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L55",
+      "source_location": "L56",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_sql_formatter",
       "community": 6,
@@ -873,7 +883,7 @@
       "label": "tailwind-merge",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L56",
+      "source_location": "L57",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_tailwind_merge",
       "community": 6,
@@ -883,7 +893,7 @@
       "label": "zod",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L57",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_zod",
       "community": 6,
@@ -893,7 +903,7 @@
       "label": "zustand",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L58",
+      "source_location": "L59",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_zustand",
       "community": 6,
@@ -903,7 +913,7 @@
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L60",
+      "source_location": "L61",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies",
       "community": 2,
@@ -913,7 +923,7 @@
       "label": "@electron-toolkit/eslint-config-prettier",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L61",
+      "source_location": "L62",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_electron_toolkit_eslint_config_prettier",
       "community": 2,
@@ -923,7 +933,7 @@
       "label": "@electron-toolkit/eslint-config-ts",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L62",
+      "source_location": "L63",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_electron_toolkit_eslint_config_ts",
       "community": 2,
@@ -933,7 +943,7 @@
       "label": "@electron-toolkit/tsconfig",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L63",
+      "source_location": "L64",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_electron_toolkit_tsconfig",
       "community": 2,
@@ -943,7 +953,7 @@
       "label": "@tailwindcss/vite",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L64",
+      "source_location": "L65",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_tailwindcss_vite",
       "community": 2,
@@ -953,7 +963,7 @@
       "label": "@types/node",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L65",
+      "source_location": "L66",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_types_node",
       "community": 2,
@@ -963,7 +973,7 @@
       "label": "@types/pg",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L66",
+      "source_location": "L67",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_types_pg",
       "community": 2,
@@ -973,7 +983,7 @@
       "label": "@types/react",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L67",
+      "source_location": "L68",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_types_react",
       "community": 2,
@@ -983,7 +993,7 @@
       "label": "@types/react-dom",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L68",
+      "source_location": "L69",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_types_react_dom",
       "community": 2,
@@ -993,7 +1003,7 @@
       "label": "@vitejs/plugin-react",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L69",
+      "source_location": "L70",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_vitejs_plugin_react",
       "community": 2,
@@ -1003,7 +1013,7 @@
       "label": "electron",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L70",
+      "source_location": "L71",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_electron",
       "community": 2,
@@ -1013,17 +1023,17 @@
       "label": "electron-builder",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L71",
+      "source_location": "L72",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_electron_builder",
-      "community": 118,
+      "community": 2,
       "norm_label": "electron-builder"
     },
     {
       "label": "electron-vite",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L72",
+      "source_location": "L73",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_electron_vite",
       "community": 2,
@@ -1033,7 +1043,7 @@
       "label": "eslint",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L73",
+      "source_location": "L74",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_eslint",
       "community": 2,
@@ -1043,7 +1053,7 @@
       "label": "eslint-plugin-react",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L74",
+      "source_location": "L75",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_eslint_plugin_react",
       "community": 2,
@@ -1053,7 +1063,7 @@
       "label": "eslint-plugin-react-hooks",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L75",
+      "source_location": "L76",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_eslint_plugin_react_hooks",
       "community": 2,
@@ -1063,7 +1073,7 @@
       "label": "eslint-plugin-react-refresh",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L76",
+      "source_location": "L77",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_eslint_plugin_react_refresh",
       "community": 2,
@@ -1073,7 +1083,7 @@
       "label": "icon-gen",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L77",
+      "source_location": "L78",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_icon_gen",
       "community": 2,
@@ -1083,7 +1093,7 @@
       "label": "prettier",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L78",
+      "source_location": "L79",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_prettier",
       "community": 2,
@@ -1093,7 +1103,7 @@
       "label": "react",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L79",
+      "source_location": "L80",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_react",
       "community": 2,
@@ -1103,7 +1113,7 @@
       "label": "react-dom",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L80",
+      "source_location": "L81",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_react_dom",
       "community": 2,
@@ -1113,7 +1123,7 @@
       "label": "sharp",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L81",
+      "source_location": "L82",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_sharp",
       "community": 2,
@@ -1123,7 +1133,7 @@
       "label": "tailwindcss",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L82",
+      "source_location": "L83",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_tailwindcss",
       "community": 2,
@@ -1133,7 +1143,7 @@
       "label": "tw-animate-css",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L83",
+      "source_location": "L84",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_tw_animate_css",
       "community": 2,
@@ -1143,7 +1153,7 @@
       "label": "typescript",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L84",
+      "source_location": "L85",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_typescript",
       "community": 2,
@@ -1153,7 +1163,7 @@
       "label": "vite",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L85",
+      "source_location": "L86",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_vite",
       "community": 2,
@@ -1166,7 +1176,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_sql_format_test",
-      "community": 108,
+      "community": 3,
       "norm_label": "sql-format.test.ts"
     },
     {
@@ -1176,7 +1186,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "db_backup",
-      "community": 68,
+      "community": 0,
       "norm_label": "backup.ts"
     },
     {
@@ -1186,7 +1196,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "db_backup_quoteident",
-      "community": 68,
+      "community": 0,
       "norm_label": "quoteident()"
     },
     {
@@ -1196,7 +1206,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "db_backup_fkguards",
-      "community": 68,
+      "community": 0,
       "norm_label": "fkguards()"
     },
     {
@@ -1206,7 +1216,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "db_backup_target",
-      "community": 68,
+      "community": 0,
       "norm_label": "target()"
     },
     {
@@ -1216,7 +1226,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "db_backup_pgarraybody",
-      "community": 68,
+      "community": 0,
       "norm_label": "pgarraybody()"
     },
     {
@@ -1226,7 +1236,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "db_backup_sqlliteral",
-      "community": 68,
+      "community": 0,
       "norm_label": "sqlliteral()"
     },
     {
@@ -1236,7 +1246,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "db_backup_backupprogress",
-      "community": 68,
+      "community": 0,
       "norm_label": "backupprogress"
     },
     {
@@ -1246,7 +1256,7 @@
       "source_location": "L106",
       "_origin": "ast",
       "id": "db_backup_runbackup",
-      "community": 68,
+      "community": 0,
       "norm_label": "runbackup()"
     },
     {
@@ -1256,7 +1266,7 @@
       "source_location": "L191",
       "_origin": "ast",
       "id": "db_backup_restorepreview",
-      "community": 68,
+      "community": 0,
       "norm_label": "restorepreview()"
     },
     {
@@ -1266,7 +1276,7 @@
       "source_location": "L212",
       "_origin": "ast",
       "id": "db_backup_restorerun",
-      "community": 68,
+      "community": 0,
       "norm_label": "restorerun()"
     },
     {
@@ -1286,7 +1296,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "db_driver_drivercore",
-      "community": 5,
+      "community": 119,
       "norm_label": "drivercore"
     },
     {
@@ -1356,7 +1366,7 @@
       "source_location": "L156",
       "_origin": "ast",
       "id": "db_driver_redisdriver",
-      "community": 5,
+      "community": 0,
       "norm_label": "redisdriver"
     },
     {
@@ -1376,7 +1386,7 @@
       "source_location": "L185",
       "_origin": "ast",
       "id": "db_driver_splitstatements",
-      "community": 68,
+      "community": 0,
       "norm_label": "splitstatements()"
     },
     {
@@ -1396,7 +1406,7 @@
       "source_location": "L303",
       "_origin": "ast",
       "id": "db_driver_routineargliteral",
-      "community": 76,
+      "community": 5,
       "norm_label": "routineargliteral()"
     },
     {
@@ -1446,7 +1456,7 @@
       "source_location": "L387",
       "_origin": "ast",
       "id": "db_driver_buildorderby",
-      "community": 76,
+      "community": 23,
       "norm_label": "buildorderby()"
     },
     {
@@ -1456,7 +1466,7 @@
       "source_location": "L399",
       "_origin": "ast",
       "id": "db_driver_buildinsert",
-      "community": 5,
+      "community": 76,
       "norm_label": "buildinsert()"
     },
     {
@@ -1466,7 +1476,7 @@
       "source_location": "L419",
       "_origin": "ast",
       "id": "db_driver_builddelete",
-      "community": 5,
+      "community": 76,
       "norm_label": "builddelete()"
     },
     {
@@ -1476,7 +1486,7 @@
       "source_location": "L436",
       "_origin": "ast",
       "id": "db_driver_buildupdate",
-      "community": 5,
+      "community": 76,
       "norm_label": "buildupdate()"
     },
     {
@@ -1496,7 +1506,7 @@
       "source_location": "L482",
       "_origin": "ast",
       "id": "db_driver_buildwhere",
-      "community": 82,
+      "community": 23,
       "norm_label": "buildwhere()"
     },
     {
@@ -1506,7 +1516,7 @@
       "source_location": "L576",
       "_origin": "ast",
       "id": "db_driver_buildwhereclause",
-      "community": 82,
+      "community": 23,
       "norm_label": "buildwhereclause()"
     },
     {
@@ -1516,7 +1526,7 @@
       "source_location": "L597",
       "_origin": "ast",
       "id": "db_driver_buildsearch",
-      "community": 76,
+      "community": 35,
       "norm_label": "buildsearch()"
     },
     {
@@ -1546,7 +1556,7 @@
       "source_location": "L641",
       "_origin": "ast",
       "id": "db_driver_safepaging",
-      "community": 76,
+      "community": 23,
       "norm_label": "safepaging()"
     },
     {
@@ -1716,7 +1726,7 @@
       "source_location": "L237",
       "_origin": "ast",
       "id": "drivers_mysql_readrows",
-      "community": 76,
+      "community": 23,
       "norm_label": "readrows()"
     },
     {
@@ -1746,7 +1756,7 @@
       "source_location": "L340",
       "_origin": "ast",
       "id": "drivers_mysql_applychanges",
-      "community": 5,
+      "community": 76,
       "norm_label": "applychanges()"
     },
     {
@@ -1836,7 +1846,7 @@
       "source_location": "L899",
       "_origin": "ast",
       "id": "drivers_mysql_if",
-      "community": 76,
+      "community": 5,
       "norm_label": "if()"
     },
     {
@@ -1876,7 +1886,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "drivers_postgres_quoteident",
-      "community": 82,
+      "community": 68,
       "norm_label": "quoteident()"
     },
     {
@@ -1896,7 +1906,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver",
-      "community": 82,
+      "community": 68,
       "norm_label": "postgresdriver"
     },
     {
@@ -1916,7 +1926,7 @@
       "source_location": "L110",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_connect",
-      "community": 82,
+      "community": 68,
       "norm_label": ".connect()"
     },
     {
@@ -1926,7 +1936,7 @@
       "source_location": "L140",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_ensure",
-      "community": 82,
+      "community": 68,
       "norm_label": ".ensure()"
     },
     {
@@ -1936,7 +1946,7 @@
       "source_location": "L145",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_currentdatabase",
-      "community": 82,
+      "community": 68,
       "norm_label": ".currentdatabase()"
     },
     {
@@ -1946,7 +1956,7 @@
       "source_location": "L149",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_listdatabases",
-      "community": 82,
+      "community": 68,
       "norm_label": ".listdatabases()"
     },
     {
@@ -1956,7 +1966,7 @@
       "source_location": "L158",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_usedatabase",
-      "community": 82,
+      "community": 68,
       "norm_label": ".usedatabase()"
     },
     {
@@ -1966,7 +1976,7 @@
       "source_location": "L166",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_listentities",
-      "community": 82,
+      "community": 68,
       "norm_label": ".listentities()"
     },
     {
@@ -1976,7 +1986,7 @@
       "source_location": "L180",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_listenums",
-      "community": 82,
+      "community": 68,
       "norm_label": ".listenums()"
     },
     {
@@ -1986,7 +1996,7 @@
       "source_location": "L203",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_readrows",
-      "community": 82,
+      "community": 23,
       "norm_label": ".readrows()"
     },
     {
@@ -1996,7 +2006,7 @@
       "source_location": "L285",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_countrows",
-      "community": 82,
+      "community": 68,
       "norm_label": ".countrows()"
     },
     {
@@ -2006,7 +2016,7 @@
       "source_location": "L298",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_searchrows",
-      "community": 82,
+      "community": 68,
       "norm_label": ".searchrows()"
     },
     {
@@ -2016,7 +2026,7 @@
       "source_location": "L337",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_applychanges",
-      "community": 5,
+      "community": 68,
       "norm_label": ".applychanges()"
     },
     {
@@ -2026,7 +2036,7 @@
       "source_location": "L384",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_describetable",
-      "community": 82,
+      "community": 68,
       "norm_label": ".describetable()"
     },
     {
@@ -2036,7 +2046,7 @@
       "source_location": "L506",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_listreferencingtables",
-      "community": 82,
+      "community": 68,
       "norm_label": ".listreferencingtables()"
     },
     {
@@ -2046,7 +2056,7 @@
       "source_location": "L556",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_getcreatesql",
-      "community": 82,
+      "community": 68,
       "norm_label": ".getcreatesql()"
     },
     {
@@ -2063,7 +2073,7 @@
       "label": "Client",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L19",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "drivers_redis_client",
       "community": 110,
@@ -2073,7 +2083,7 @@
       "label": "REMOVAL_VERBS",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L22",
+      "source_location": "L26",
       "_origin": "ast",
       "id": "drivers_redis_removal_verbs",
       "community": 110,
@@ -2083,7 +2093,7 @@
       "label": "ADD_VERBS",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L24",
+      "source_location": "L28",
       "_origin": "ast",
       "id": "drivers_redis_add_verbs",
       "community": 110,
@@ -2093,7 +2103,7 @@
       "label": "isValidUtf8()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L26",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "drivers_redis_isvalidutf8",
       "community": 110,
@@ -2103,7 +2113,7 @@
       "label": "toClientArg()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L36",
+      "source_location": "L40",
       "_origin": "ast",
       "id": "drivers_redis_toclientarg",
       "community": 110,
@@ -2113,7 +2123,7 @@
       "label": "Deps",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L43",
+      "source_location": "L47",
       "_origin": "ast",
       "id": "drivers_redis_deps",
       "community": 117,
@@ -2123,7 +2133,7 @@
       "label": "RedisDriver",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L54",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver",
       "community": 119,
@@ -2133,7 +2143,7 @@
       "label": ".constructor()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L62",
+      "source_location": "L66",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_constructor",
       "community": 119,
@@ -2143,7 +2153,7 @@
       "label": ".c()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L68",
+      "source_location": "L72",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_c",
       "community": 119,
@@ -2153,7 +2163,7 @@
       "label": ".b()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L74",
+      "source_location": "L78",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_b",
       "community": 119,
@@ -2163,7 +2173,7 @@
       "label": ".connect()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L79",
+      "source_location": "L83",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_connect",
       "community": 119,
@@ -2173,7 +2183,7 @@
       "label": ".close()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L109",
+      "source_location": "L114",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_close",
       "community": 119,
@@ -2183,7 +2193,7 @@
       "label": ".cancel()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L120",
+      "source_location": "L125",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_cancel",
       "community": 119,
@@ -2193,7 +2203,7 @@
       "label": ".listDatabases()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L126",
+      "source_location": "L131",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_listdatabases",
       "community": 119,
@@ -2203,7 +2213,7 @@
       "label": ".currentDatabase()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L132",
+      "source_location": "L137",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_currentdatabase",
       "community": 119,
@@ -2213,7 +2223,7 @@
       "label": ".useDatabase()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L136",
+      "source_location": "L141",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_usedatabase",
       "community": 119,
@@ -2223,7 +2233,7 @@
       "label": ".dbInfo()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L143",
+      "source_location": "L148",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_dbinfo",
       "community": 119,
@@ -2233,7 +2243,7 @@
       "label": ".scanKeys()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L165",
+      "source_location": "L170",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_scankeys",
       "community": 119,
@@ -2243,7 +2253,7 @@
       "label": ".keyMeta()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L192",
+      "source_location": "L197",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_keymeta",
       "community": 110,
@@ -2253,17 +2263,17 @@
       "label": ".cardinality()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L203",
+      "source_location": "L208",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_cardinality",
-      "community": 141,
+      "community": 110,
       "norm_label": ".cardinality()"
     },
     {
       "label": ".readValue()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L222",
+      "source_location": "L227",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_readvalue",
       "community": 110,
@@ -2273,7 +2283,7 @@
       "label": ".commit()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L303",
+      "source_location": "L308",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_commit",
       "community": 110,
@@ -2283,7 +2293,7 @@
       "label": ".renameKey()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L338",
+      "source_location": "L343",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_renamekey",
       "community": 119,
@@ -2293,7 +2303,7 @@
       "label": ".deleteKey()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L346",
+      "source_location": "L351",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_deletekey",
       "community": 119,
@@ -2303,7 +2313,7 @@
       "label": "verbOf()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L357",
+      "source_location": "L362",
       "_origin": "ast",
       "id": "drivers_redis_verbof",
       "community": 110,
@@ -2313,7 +2323,7 @@
       "label": "emptiesCollection()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L363",
+      "source_location": "L368",
       "_origin": "ast",
       "id": "drivers_redis_emptiescollection",
       "community": 110,
@@ -2323,7 +2333,7 @@
       "label": "normalizeType()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L373",
+      "source_location": "L378",
       "_origin": "ast",
       "id": "drivers_redis_normalizetype",
       "community": 110,
@@ -2333,7 +2343,7 @@
       "label": "classifyConflict()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L382",
+      "source_location": "L387",
       "_origin": "ast",
       "id": "drivers_redis_classifyconflict",
       "community": 110,
@@ -2343,7 +2353,7 @@
       "label": "buildConflict()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/db/drivers/redis.ts",
-      "source_location": "L387",
+      "source_location": "L392",
       "_origin": "ast",
       "id": "drivers_redis_buildconflict",
       "community": 110,
@@ -2356,7 +2366,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "drivers_sqlite",
-      "community": 5,
+      "community": 23,
       "norm_label": "sqlite.ts"
     },
     {
@@ -2376,7 +2386,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "drivers_sqlite_sqliteplannode",
-      "community": 5,
+      "community": 8,
       "norm_label": "sqliteplannode()"
     },
     {
@@ -2446,7 +2456,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_listentities",
-      "community": 132,
+      "community": 8,
       "norm_label": ".listentities()"
     },
     {
@@ -2456,7 +2466,7 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_listenums",
-      "community": 132,
+      "community": 8,
       "norm_label": ".listenums()"
     },
     {
@@ -2466,7 +2476,7 @@
       "source_location": "L115",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_readrows",
-      "community": 82,
+      "community": 23,
       "norm_label": ".readrows()"
     },
     {
@@ -2476,7 +2486,7 @@
       "source_location": "L168",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_countrows",
-      "community": 82,
+      "community": 23,
       "norm_label": ".countrows()"
     },
     {
@@ -2486,7 +2496,7 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_searchrows",
-      "community": 76,
+      "community": 35,
       "norm_label": ".searchrows()"
     },
     {
@@ -2506,7 +2516,7 @@
       "source_location": "L252",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_describetable",
-      "community": 5,
+      "community": 68,
       "norm_label": ".describetable()"
     },
     {
@@ -2546,7 +2556,7 @@
       "source_location": "L388",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_createtable",
-      "community": 132,
+      "community": 8,
       "norm_label": ".createtable()"
     },
     {
@@ -2566,7 +2576,7 @@
       "source_location": "L447",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_dropentity",
-      "community": 132,
+      "community": 39,
       "norm_label": ".dropentity()"
     },
     {
@@ -2646,7 +2656,7 @@
       "source_location": "L516",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_explainquery",
-      "community": 5,
+      "community": 8,
       "norm_label": ".explainquery()"
     },
     {
@@ -2676,7 +2686,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "db_mysql_coldef",
-      "community": 144,
+      "community": 76,
       "norm_label": "mysql-coldef.ts"
     },
     {
@@ -2686,7 +2696,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "db_mysql_coldef_extractcolumndef",
-      "community": 144,
+      "community": 76,
       "norm_label": "extractcolumndef()"
     },
     {
@@ -2696,7 +2706,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "db_mysql_coldef_splicetype",
-      "community": 144,
+      "community": 76,
       "norm_label": "splicetype()"
     },
     {
@@ -2706,7 +2716,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "db_mysql_coldef_insertbefore",
-      "community": 144,
+      "community": 76,
       "norm_label": "insertbefore()"
     },
     {
@@ -2716,7 +2726,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "db_mysql_coldef_splicenullable",
-      "community": 144,
+      "community": 76,
       "norm_label": "splicenullable()"
     },
     {
@@ -2726,7 +2736,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "db_mysql_coldef_splicedefault",
-      "community": 144,
+      "community": 76,
       "norm_label": "splicedefault()"
     },
     {
@@ -2736,7 +2746,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "db_mysql_coldef_dropdefault",
-      "community": 144,
+      "community": 76,
       "norm_label": "dropdefault()"
     },
     {
@@ -2786,7 +2796,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "db_session_rel",
-      "community": 68,
+      "community": 0,
       "norm_label": "rel()"
     },
     {
@@ -2806,7 +2816,7 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "db_session_isdestructivestatement",
-      "community": 68,
+      "community": 0,
       "norm_label": "isdestructivestatement()"
     },
     {
@@ -2816,7 +2826,7 @@
       "source_location": "L102",
       "_origin": "ast",
       "id": "db_session_captureall",
-      "community": 68,
+      "community": 0,
       "norm_label": "captureall()"
     },
     {
@@ -2826,7 +2836,7 @@
       "source_location": "L124",
       "_origin": "ast",
       "id": "db_session_createdriver",
-      "community": 68,
+      "community": 0,
       "norm_label": "createdriver()"
     },
     {
@@ -2836,7 +2846,7 @@
       "source_location": "L140",
       "_origin": "ast",
       "id": "db_session_connectsession",
-      "community": 68,
+      "community": 0,
       "norm_label": "connectsession()"
     },
     {
@@ -2976,7 +2986,7 @@
       "source_location": "L257",
       "_origin": "ast",
       "id": "db_session_createtable",
-      "community": 68,
+      "community": 0,
       "norm_label": "createtable()"
     },
     {
@@ -3006,7 +3016,7 @@
       "source_location": "L293",
       "_origin": "ast",
       "id": "db_session_dropentity",
-      "community": 68,
+      "community": 0,
       "norm_label": "dropentity()"
     },
     {
@@ -3016,7 +3026,7 @@
       "source_location": "L307",
       "_origin": "ast",
       "id": "db_session_renametable",
-      "community": 68,
+      "community": 0,
       "norm_label": "renametable()"
     },
     {
@@ -3026,7 +3036,7 @@
       "source_location": "L321",
       "_origin": "ast",
       "id": "db_session_truncatetable",
-      "community": 68,
+      "community": 0,
       "norm_label": "truncatetable()"
     },
     {
@@ -3036,7 +3046,7 @@
       "source_location": "L334",
       "_origin": "ast",
       "id": "db_session_createindex",
-      "community": 68,
+      "community": 0,
       "norm_label": "createindex()"
     },
     {
@@ -3046,7 +3056,7 @@
       "source_location": "L348",
       "_origin": "ast",
       "id": "db_session_dropindex",
-      "community": 68,
+      "community": 0,
       "norm_label": "dropindex()"
     },
     {
@@ -3056,7 +3066,7 @@
       "source_location": "L362",
       "_origin": "ast",
       "id": "db_session_runscript",
-      "community": 68,
+      "community": 0,
       "norm_label": "runscript()"
     },
     {
@@ -3076,7 +3086,7 @@
       "source_location": "L462",
       "_origin": "ast",
       "id": "db_session_execrestorestatement",
-      "community": 68,
+      "community": 0,
       "norm_label": "execrestorestatement()"
     },
     {
@@ -3086,7 +3096,7 @@
       "source_location": "L485",
       "_origin": "ast",
       "id": "db_session_routinecap",
-      "community": 68,
+      "community": 0,
       "norm_label": "routinecap()"
     },
     {
@@ -3136,7 +3146,7 @@
       "source_location": "L529",
       "_origin": "ast",
       "id": "db_session_createroutine",
-      "community": 68,
+      "community": 0,
       "norm_label": "createroutine()"
     },
     {
@@ -3146,7 +3156,7 @@
       "source_location": "L542",
       "_origin": "ast",
       "id": "db_session_droproutine",
-      "community": 68,
+      "community": 0,
       "norm_label": "droproutine()"
     },
     {
@@ -3333,7 +3343,7 @@
       "label": "setupAutoUpdater()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/index.ts",
-      "source_location": "L14",
+      "source_location": "L33",
       "_origin": "ast",
       "id": "main_index_setupautoupdater",
       "community": 134,
@@ -3343,7 +3353,7 @@
       "label": "createWindow()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/index.ts",
-      "source_location": "L94",
+      "source_location": "L113",
       "_origin": "ast",
       "id": "main_index_createwindow",
       "community": 134,
@@ -3476,7 +3486,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "store_connections_getconnectionconfig",
-      "community": 68,
+      "community": 0,
       "norm_label": "getconnectionconfig()"
     },
     {
@@ -3506,7 +3516,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "store_history",
-      "community": 108,
+      "community": 0,
       "norm_label": "history.ts"
     },
     {
@@ -3516,7 +3526,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "store_history_getdb",
-      "community": 108,
+      "community": 0,
       "norm_label": "getdb()"
     },
     {
@@ -3526,7 +3536,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "store_history_activekey",
-      "community": 108,
+      "community": 0,
       "norm_label": "activekey()"
     },
     {
@@ -3536,7 +3546,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "store_history_getactiveid",
-      "community": 108,
+      "community": 0,
       "norm_label": "getactiveid()"
     },
     {
@@ -3546,7 +3556,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "store_history_getautoattachdestructivesync",
-      "community": 108,
+      "community": 0,
       "norm_label": "getautoattachdestructivesync()"
     },
     {
@@ -3556,7 +3566,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "store_history_getautoattachdestructive",
-      "community": 108,
+      "community": 0,
       "norm_label": "getautoattachdestructive()"
     },
     {
@@ -3566,7 +3576,7 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "store_history_setautoattachdestructive",
-      "community": 108,
+      "community": 0,
       "norm_label": "setautoattachdestructive()"
     },
     {
@@ -3576,7 +3586,7 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "store_history_capture",
-      "community": 108,
+      "community": 0,
       "norm_label": "capture()"
     },
     {
@@ -3586,7 +3596,7 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "store_history_listhistory",
-      "community": 108,
+      "community": 0,
       "norm_label": "listhistory()"
     },
     {
@@ -3596,7 +3606,7 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "store_history_clearhistory",
-      "community": 108,
+      "community": 0,
       "norm_label": "clearhistory()"
     },
     {
@@ -3606,7 +3616,7 @@
       "source_location": "L189",
       "_origin": "ast",
       "id": "store_history_listchangesets",
-      "community": 108,
+      "community": 0,
       "norm_label": "listchangesets()"
     },
     {
@@ -3616,7 +3626,7 @@
       "source_location": "L207",
       "_origin": "ast",
       "id": "store_history_createchangeset",
-      "community": 108,
+      "community": 0,
       "norm_label": "createchangeset()"
     },
     {
@@ -3626,7 +3636,7 @@
       "source_location": "L236",
       "_origin": "ast",
       "id": "store_history_renamechangeset",
-      "community": 108,
+      "community": 0,
       "norm_label": "renamechangeset()"
     },
     {
@@ -3636,7 +3646,7 @@
       "source_location": "L249",
       "_origin": "ast",
       "id": "store_history_deletechangeset",
-      "community": 108,
+      "community": 0,
       "norm_label": "deletechangeset()"
     },
     {
@@ -3646,7 +3656,7 @@
       "source_location": "L260",
       "_origin": "ast",
       "id": "store_history_setactivesync",
-      "community": 108,
+      "community": 0,
       "norm_label": "setactivesync()"
     },
     {
@@ -3656,7 +3666,7 @@
       "source_location": "L275",
       "_origin": "ast",
       "id": "store_history_setactivechangeset",
-      "community": 108,
+      "community": 0,
       "norm_label": "setactivechangeset()"
     },
     {
@@ -3666,7 +3676,7 @@
       "source_location": "L283",
       "_origin": "ast",
       "id": "store_history_assignentries",
-      "community": 108,
+      "community": 0,
       "norm_label": "assignentries()"
     },
     {
@@ -3676,7 +3686,7 @@
       "source_location": "L297",
       "_origin": "ast",
       "id": "store_history_buildchangesetsql",
-      "community": 108,
+      "community": 0,
       "norm_label": "buildchangesetsql()"
     },
     {
@@ -3686,7 +3696,7 @@
       "source_location": "L334",
       "_origin": "ast",
       "id": "store_history_deleteentries",
-      "community": 108,
+      "community": 0,
       "norm_label": "deleteentries()"
     },
     {
@@ -3696,7 +3706,7 @@
       "source_location": "L343",
       "_origin": "ast",
       "id": "store_history_markexported",
-      "community": 108,
+      "community": 0,
       "norm_label": "markexported()"
     },
     {
@@ -3706,7 +3716,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "store_paths",
-      "community": 108,
+      "community": 117,
       "norm_label": "paths.ts"
     },
     {
@@ -3716,7 +3726,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "store_paths_getdatadir",
-      "community": 108,
+      "community": 117,
       "norm_label": "getdatadir()"
     },
     {
@@ -3736,7 +3746,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "store_paths_templatesfile",
-      "community": 108,
+      "community": 117,
       "norm_label": "templatesfile()"
     },
     {
@@ -3816,7 +3826,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "store_templates",
-      "community": 108,
+      "community": 117,
       "norm_label": "templates.ts"
     },
     {
@@ -3826,7 +3836,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "store_templates_readstore",
-      "community": 108,
+      "community": 117,
       "norm_label": "readstore()"
     },
     {
@@ -3836,7 +3846,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "store_templates_writestore",
-      "community": 108,
+      "community": 117,
       "norm_label": "writestore()"
     },
     {
@@ -3846,7 +3856,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "store_templates_listtemplates",
-      "community": 108,
+      "community": 117,
       "norm_label": "listtemplates()"
     },
     {
@@ -3856,7 +3866,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "store_templates_savetemplate",
-      "community": 108,
+      "community": 117,
       "norm_label": "savetemplate()"
     },
     {
@@ -3866,7 +3876,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "store_templates_removetemplate",
-      "community": 108,
+      "community": 117,
       "norm_label": "removetemplate()"
     },
     {
@@ -3876,7 +3886,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "store_workspace",
-      "community": 146,
+      "community": 0,
       "norm_label": "workspace.ts"
     },
     {
@@ -3886,7 +3896,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "store_workspace_empty",
-      "community": 146,
+      "community": 0,
       "norm_label": "empty"
     },
     {
@@ -3896,7 +3906,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "store_workspace_workspacepath",
-      "community": 146,
+      "community": 0,
       "norm_label": "workspacepath()"
     },
     {
@@ -3906,7 +3916,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "store_workspace_loadworkspace",
-      "community": 146,
+      "community": 0,
       "norm_label": "loadworkspace()"
     },
     {
@@ -3916,7 +3926,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "store_workspace_saveworkspace",
-      "community": 146,
+      "community": 0,
       "norm_label": "saveworkspace()"
     },
     {
@@ -3926,7 +3936,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "preload_index_d",
-      "community": 132,
+      "community": 8,
       "norm_label": "index.d.ts"
     },
     {
@@ -3936,7 +3946,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "preload_index_d_window",
-      "community": 132,
+      "community": 8,
       "norm_label": "window"
     },
     {
@@ -3946,7 +3956,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "preload_index",
-      "community": 132,
+      "community": 8,
       "norm_label": "index.ts"
     },
     {
@@ -3956,7 +3966,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "preload_index_api",
-      "community": 132,
+      "community": 8,
       "norm_label": "api"
     },
     {
@@ -3966,7 +3976,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app",
-      "community": 67,
+      "community": 118,
       "norm_label": "app.tsx"
     },
     {
@@ -3976,7 +3986,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "src_app_app",
-      "community": 67,
+      "community": 118,
       "norm_label": "app()"
     },
     {
@@ -3986,7 +3996,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_appsidebar",
-      "community": 142,
+      "community": 8,
       "norm_label": "appsidebar.tsx"
     },
     {
@@ -3996,7 +4006,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "components_appsidebar_appsidebar",
-      "community": 142,
+      "community": 8,
       "norm_label": "appsidebar()"
     },
     {
@@ -4006,7 +4016,7 @@
       "source_location": "L591",
       "_origin": "ast",
       "id": "components_appsidebar_routinegroup",
-      "community": 142,
+      "community": 8,
       "norm_label": "routinegroup()"
     },
     {
@@ -4016,7 +4026,7 @@
       "source_location": "L681",
       "_origin": "ast",
       "id": "components_appsidebar_entitygroup",
-      "community": 142,
+      "community": 8,
       "norm_label": "entitygroup()"
     },
     {
@@ -4026,7 +4036,7 @@
       "source_location": "L799",
       "_origin": "ast",
       "id": "components_appsidebar_enumgroup",
-      "community": 142,
+      "community": 8,
       "norm_label": "enumgroup()"
     },
     {
@@ -4296,7 +4306,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_connectionswitcher",
-      "community": 8,
+      "community": 1,
       "norm_label": "connectionswitcher.tsx"
     },
     {
@@ -4306,7 +4316,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "components_connectionswitcher_driver_label",
-      "community": 8,
+      "community": 1,
       "norm_label": "driver_label"
     },
     {
@@ -4316,7 +4326,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "components_connectionswitcher_statusdot",
-      "community": 8,
+      "community": 1,
       "norm_label": "statusdot()"
     },
     {
@@ -4326,7 +4336,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "components_connectionswitcher_connectionswitcher",
-      "community": 8,
+      "community": 1,
       "norm_label": "connectionswitcher()"
     },
     {
@@ -4336,7 +4346,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_datagrid",
-      "community": 67,
+      "community": 121,
       "norm_label": "datagrid.tsx"
     },
     {
@@ -4346,7 +4356,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "components_datagrid_dateeditkind",
-      "community": 67,
+      "community": 121,
       "norm_label": "dateeditkind"
     },
     {
@@ -4356,7 +4366,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "components_datagrid_todateinputvalue",
-      "community": 67,
+      "community": 121,
       "norm_label": "todateinputvalue()"
     },
     {
@@ -4366,7 +4376,7 @@
       "source_location": "L94",
       "_origin": "ast",
       "id": "components_datagrid_canusedateinput",
-      "community": 67,
+      "community": 121,
       "norm_label": "canusedateinput()"
     },
     {
@@ -4376,7 +4386,7 @@
       "source_location": "L100",
       "_origin": "ast",
       "id": "components_datagrid_fromdateinputvalue",
-      "community": 67,
+      "community": 121,
       "norm_label": "fromdateinputvalue()"
     },
     {
@@ -4386,7 +4396,7 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "components_datagrid_sel",
-      "community": 67,
+      "community": 121,
       "norm_label": "sel"
     },
     {
@@ -4396,7 +4406,7 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "components_datagrid_datagrid",
-      "community": 67,
+      "community": 118,
       "norm_label": "datagrid()"
     },
     {
@@ -4406,7 +4416,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_databaseswitcher",
-      "community": 1,
+      "community": 118,
       "norm_label": "databaseswitcher.tsx"
     },
     {
@@ -4416,7 +4426,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "components_databaseswitcher_databaseswitcher",
-      "community": 1,
+      "community": 118,
       "norm_label": "databaseswitcher()"
     },
     {
@@ -4576,7 +4586,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_fkinlinepicker",
-      "community": 82,
+      "community": 23,
       "norm_label": "fkinlinepicker.tsx"
     },
     {
@@ -4586,7 +4596,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "components_fkinlinepicker_props",
-      "community": 82,
+      "community": 23,
       "norm_label": "props"
     },
     {
@@ -4596,7 +4606,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "components_fkinlinepicker_fkinlinepicker",
-      "community": 82,
+      "community": 7,
       "norm_label": "fkinlinepicker()"
     },
     {
@@ -4606,7 +4616,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_historyview",
-      "community": 108,
+      "community": 3,
       "norm_label": "historyview.tsx"
     },
     {
@@ -4616,7 +4626,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "components_historyview_view",
-      "community": 108,
+      "community": 3,
       "norm_label": "view"
     },
     {
@@ -4626,7 +4636,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "components_historyview_when",
-      "community": 108,
+      "community": 3,
       "norm_label": "when()"
     },
     {
@@ -4636,7 +4646,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "components_historyview_withsemi",
-      "community": 108,
+      "community": 3,
       "norm_label": "withsemi()"
     },
     {
@@ -4646,7 +4656,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "components_historyview_oneline",
-      "community": 108,
+      "community": 3,
       "norm_label": "oneline()"
     },
     {
@@ -4656,7 +4666,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "components_historyview_fmtlang",
-      "community": 108,
+      "community": 3,
       "norm_label": "fmtlang()"
     },
     {
@@ -4666,7 +4676,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "components_historyview_tryformat",
-      "community": 108,
+      "community": 3,
       "norm_label": "tryformat()"
     },
     {
@@ -4676,7 +4686,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "components_historyview_historyview",
-      "community": 108,
+      "community": 3,
       "norm_label": "historyview()"
     },
     {
@@ -4806,7 +4816,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_newtableeditor",
-      "community": 1,
+      "community": 118,
       "norm_label": "newtableeditor.tsx"
     },
     {
@@ -4816,7 +4826,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "components_newtableeditor_types",
-      "community": 1,
+      "community": 118,
       "norm_label": "types"
     },
     {
@@ -4826,7 +4836,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "components_newtableeditor_newtableeditor",
-      "community": 1,
+      "community": 118,
       "norm_label": "newtableeditor()"
     },
     {
@@ -4886,7 +4896,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_queryview",
-      "community": 1,
+      "community": 118,
       "norm_label": "queryview.tsx"
     },
     {
@@ -4896,7 +4906,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "components_queryview_cell",
-      "community": 1,
+      "community": 118,
       "norm_label": "cell()"
     },
     {
@@ -4906,7 +4916,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "components_queryview_resultrows",
-      "community": 1,
+      "community": 118,
       "norm_label": "resultrows()"
     },
     {
@@ -4916,7 +4926,7 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "components_queryview_queryview",
-      "community": 1,
+      "community": 118,
       "norm_label": "queryview()"
     },
     {
@@ -4986,7 +4996,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "components_rediskeyview_formatttl",
-      "community": 141,
+      "community": 122,
       "norm_label": "formatttl()"
     },
     {
@@ -5006,7 +5016,7 @@
       "source_location": "L184",
       "_origin": "ast",
       "id": "components_rediskeyview_header",
-      "community": 141,
+      "community": 122,
       "norm_label": "header()"
     },
     {
@@ -5166,7 +5176,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_routineview",
-      "community": 23,
+      "community": 108,
       "norm_label": "routineview.tsx"
     },
     {
@@ -5176,7 +5186,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "components_routineview_subview",
-      "community": 23,
+      "community": 108,
       "norm_label": "subview"
     },
     {
@@ -5186,7 +5196,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "components_routineview_routineview",
-      "community": 23,
+      "community": 108,
       "norm_label": "routineview()"
     },
     {
@@ -5196,7 +5206,7 @@
       "source_location": "L421",
       "_origin": "ast",
       "id": "components_routineview_subtab",
-      "community": 23,
+      "community": 108,
       "norm_label": "subtab()"
     },
     {
@@ -5206,7 +5216,7 @@
       "source_location": "L443",
       "_origin": "ast",
       "id": "components_routineview_routineresult",
-      "community": 23,
+      "community": 108,
       "norm_label": "routineresult()"
     },
     {
@@ -5216,7 +5226,7 @@
       "source_location": "L487",
       "_origin": "ast",
       "id": "components_routineview_resulttable",
-      "community": 23,
+      "community": 108,
       "norm_label": "resulttable()"
     },
     {
@@ -5226,7 +5236,7 @@
       "source_location": "L524",
       "_origin": "ast",
       "id": "components_routineview_fmtcell",
-      "community": 23,
+      "community": 108,
       "norm_label": "fmtcell()"
     },
     {
@@ -5266,7 +5276,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_sqldisplay",
-      "community": 3,
+      "community": 82,
       "norm_label": "sqldisplay.tsx"
     },
     {
@@ -5276,7 +5286,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "components_sqldisplay_props",
-      "community": 3,
+      "community": 82,
       "norm_label": "props"
     },
     {
@@ -5286,7 +5296,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "components_sqldisplay_sqldisplay",
-      "community": 3,
+      "community": 82,
       "norm_label": "sqldisplay()"
     },
     {
@@ -5296,7 +5306,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_sqleditor",
-      "community": 3,
+      "community": 82,
       "norm_label": "sqleditor.tsx"
     },
     {
@@ -5306,7 +5316,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "components_sqleditor_dialects",
-      "community": 3,
+      "community": 82,
       "norm_label": "dialects"
     },
     {
@@ -5316,7 +5326,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "components_sqleditor_props",
-      "community": 3,
+      "community": 82,
       "norm_label": "props"
     },
     {
@@ -5326,7 +5336,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "components_sqleditor_sqleditorhandle",
-      "community": 3,
+      "community": 82,
       "norm_label": "sqleditorhandle"
     },
     {
@@ -5336,7 +5346,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "components_sqleditor_sqleditor",
-      "community": 3,
+      "community": 82,
       "norm_label": "sqleditor"
     },
     {
@@ -5346,7 +5356,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_structureeditor",
-      "community": 3,
+      "community": 82,
       "norm_label": "structureeditor.tsx"
     },
     {
@@ -5356,7 +5366,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "components_structureeditor_types",
-      "community": 3,
+      "community": 82,
       "norm_label": "types"
     },
     {
@@ -5366,7 +5376,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "components_structureeditor_limits",
-      "community": 3,
+      "community": 82,
       "norm_label": "limits"
     },
     {
@@ -5376,7 +5386,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "components_structureeditor_structureeditor",
-      "community": 3,
+      "community": 82,
       "norm_label": "structureeditor()"
     },
     {
@@ -5486,7 +5496,7 @@
       "source_location": "L112",
       "_origin": "ast",
       "id": "components_structureview_structureview",
-      "community": 15,
+      "community": 118,
       "norm_label": "structureview()"
     },
     {
@@ -5496,7 +5506,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_tabbar",
-      "community": 1,
+      "community": 120,
       "norm_label": "tabbar.tsx"
     },
     {
@@ -5506,7 +5516,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "components_tabbar_tabicon",
-      "community": 1,
+      "community": 120,
       "norm_label": "tabicon()"
     },
     {
@@ -5516,7 +5526,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "components_tabbar_tabbar",
-      "community": 1,
+      "community": 120,
       "norm_label": "tabbar()"
     },
     {
@@ -5526,7 +5536,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_tabletabview",
-      "community": 1,
+      "community": 118,
       "norm_label": "tabletabview.tsx"
     },
     {
@@ -5536,7 +5546,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_tabletabview_tabletabview",
-      "community": 1,
+      "community": 118,
       "norm_label": "tabletabview()"
     },
     {
@@ -5646,7 +5656,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_viewswitch",
-      "community": 1,
+      "community": 129,
       "norm_label": "viewswitch.tsx"
     },
     {
@@ -5656,7 +5666,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "components_viewswitch_views",
-      "community": 1,
+      "community": 129,
       "norm_label": "views"
     },
     {
@@ -5666,7 +5676,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_viewswitch_viewswitch",
-      "community": 1,
+      "community": 129,
       "norm_label": "viewswitch()"
     },
     {
@@ -7466,7 +7476,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_export",
-      "community": 35,
+      "community": 144,
       "norm_label": "export.ts"
     },
     {
@@ -7476,7 +7486,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_export_row",
-      "community": 35,
+      "community": 144,
       "norm_label": "row"
     },
     {
@@ -7486,7 +7496,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_export_scalar",
-      "community": 35,
+      "community": 144,
       "norm_label": "scalar()"
     },
     {
@@ -7496,7 +7506,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "lib_export_tocsv",
-      "community": 35,
+      "community": 144,
       "norm_label": "tocsv()"
     },
     {
@@ -7506,7 +7516,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "lib_export_tojson",
-      "community": 35,
+      "community": 144,
       "norm_label": "tojson()"
     },
     {
@@ -7516,7 +7526,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "lib_export_formatrows",
-      "community": 35,
+      "community": 144,
       "norm_label": "formatrows()"
     },
     {
@@ -7596,7 +7606,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_sqlformat",
-      "community": 108,
+      "community": 3,
       "norm_label": "sqlformat.ts"
     },
     {
@@ -7606,7 +7616,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "lib_sqlformat_dialects",
-      "community": 108,
+      "community": 3,
       "norm_label": "dialects"
     },
     {
@@ -7616,7 +7626,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_sqlformat_formatsql",
-      "community": 108,
+      "community": 3,
       "norm_label": "formatsql()"
     },
     {
@@ -7626,7 +7636,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "lib_sqlformat_displaysql",
-      "community": 108,
+      "community": 3,
       "norm_label": "displaysql()"
     },
     {
@@ -7636,7 +7646,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_sqlhighlight",
-      "community": 129,
+      "community": 132,
       "norm_label": "sqlhighlight.tsx"
     },
     {
@@ -7646,7 +7656,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "lib_sqlhighlight_colors",
-      "community": 129,
+      "community": 132,
       "norm_label": "colors"
     },
     {
@@ -7656,7 +7666,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "lib_sqlhighlight_highlighter",
-      "community": 129,
+      "community": 132,
       "norm_label": "highlighter"
     },
     {
@@ -7666,7 +7676,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "lib_sqlhighlight_dialectfor",
-      "community": 129,
+      "community": 132,
       "norm_label": "dialectfor()"
     },
     {
@@ -7676,7 +7686,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "lib_sqlhighlight_stylefor",
-      "community": 129,
+      "community": 132,
       "norm_label": "stylefor()"
     },
     {
@@ -7686,7 +7696,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "lib_sqlhighlight_highlightsql",
-      "community": 129,
+      "community": 132,
       "norm_label": "highlightsql()"
     },
     {
@@ -7696,7 +7706,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_templates",
-      "community": 123,
+      "community": 8,
       "norm_label": "templates.ts"
     },
     {
@@ -7706,7 +7716,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_templates_templatetodraftcolumns",
-      "community": 123,
+      "community": 8,
       "norm_label": "templatetodraftcolumns()"
     },
     {
@@ -7716,7 +7726,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "lib_templates_inserttemplatecolumns",
-      "community": 123,
+      "community": 8,
       "norm_label": "inserttemplatecolumns()"
     },
     {
@@ -7746,7 +7756,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_main",
-      "community": 67,
+      "community": 118,
       "norm_label": "main.tsx"
     },
     {
@@ -7756,7 +7766,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections",
-      "community": 132,
+      "community": 8,
       "norm_label": "connections.ts"
     },
     {
@@ -7766,7 +7776,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "store_connections_querystate",
-      "community": 132,
+      "community": 8,
       "norm_label": "querystate"
     },
     {
@@ -7776,7 +7786,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "store_connections_tabview",
-      "community": 132,
+      "community": 8,
       "norm_label": "tabview"
     },
     {
@@ -7786,7 +7796,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "store_connections_structuresub",
-      "community": 132,
+      "community": 8,
       "norm_label": "structuresub"
     },
     {
@@ -7796,7 +7806,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "store_connections_sessionstatus",
-      "community": 132,
+      "community": 8,
       "norm_label": "sessionstatus"
     },
     {
@@ -7806,7 +7816,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "store_connections_tab",
-      "community": 132,
+      "community": 23,
       "norm_label": "tab"
     },
     {
@@ -7816,7 +7826,7 @@
       "source_location": "L130",
       "_origin": "ast",
       "id": "store_connections_tabhasdatachanges",
-      "community": 132,
+      "community": 8,
       "norm_label": "tabhasdatachanges()"
     },
     {
@@ -7826,7 +7836,7 @@
       "source_location": "L139",
       "_origin": "ast",
       "id": "store_connections_tabhasdraftcontent",
-      "community": 132,
+      "community": 8,
       "norm_label": "tabhasdraftcontent()"
     },
     {
@@ -7836,7 +7846,7 @@
       "source_location": "L150",
       "_origin": "ast",
       "id": "store_connections_tabisdirty",
-      "community": 132,
+      "community": 8,
       "norm_label": "tabisdirty()"
     },
     {
@@ -7846,7 +7856,7 @@
       "source_location": "L154",
       "_origin": "ast",
       "id": "store_connections_editkey",
-      "community": 132,
+      "community": 8,
       "norm_label": "editkey()"
     },
     {
@@ -7856,7 +7866,7 @@
       "source_location": "L158",
       "_origin": "ast",
       "id": "store_connections_entitykey",
-      "community": 132,
+      "community": 8,
       "norm_label": "entitykey()"
     },
     {
@@ -7866,7 +7876,7 @@
       "source_location": "L162",
       "_origin": "ast",
       "id": "store_connections_routinekey",
-      "community": 132,
+      "community": 8,
       "norm_label": "routinekey()"
     },
     {
@@ -7876,7 +7886,7 @@
       "source_location": "L167",
       "_origin": "ast",
       "id": "store_connections_newroutinetemplate",
-      "community": 132,
+      "community": 8,
       "norm_label": "newroutinetemplate()"
     },
     {
@@ -7886,7 +7896,7 @@
       "source_location": "L173",
       "_origin": "ast",
       "id": "store_connections_connectionsstate",
-      "community": 132,
+      "community": 8,
       "norm_label": "connectionsstate"
     },
     {
@@ -7896,7 +7906,7 @@
       "source_location": "L319",
       "_origin": "ast",
       "id": "store_connections_useconnections",
-      "community": 1,
+      "community": 118,
       "norm_label": "useconnections"
     },
     {
@@ -7976,7 +7986,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "store_redis_redisstate",
-      "community": 13,
+      "community": 141,
       "norm_label": "redisstate"
     },
     {
@@ -8226,7 +8236,7 @@
       "source_location": "L144",
       "_origin": "ast",
       "id": "store_settings_usesettings",
-      "community": 67,
+      "community": 118,
       "norm_label": "usesettings"
     },
     {
@@ -8266,7 +8276,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "shared_capabilities",
-      "community": 142,
+      "community": 8,
       "norm_label": "capabilities.ts"
     },
     {
@@ -8276,7 +8286,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "shared_capabilities_capabilities",
-      "community": 142,
+      "community": 8,
       "norm_label": "capabilities"
     },
     {
@@ -8286,7 +8296,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "shared_capabilities_capabilitiesfor",
-      "community": 142,
+      "community": 8,
       "norm_label": "capabilitiesfor()"
     },
     {
@@ -8296,7 +8306,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "shared_types",
-      "community": 132,
+      "community": 8,
       "norm_label": "types.ts"
     },
     {
@@ -8306,7 +8316,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "shared_types_drivertype",
-      "community": 3,
+      "community": 82,
       "norm_label": "drivertype"
     },
     {
@@ -8336,7 +8346,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "shared_types_saveconnectioninput",
-      "community": 132,
+      "community": 8,
       "norm_label": "saveconnectioninput"
     },
     {
@@ -8346,7 +8356,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "shared_types_testconnectioninput",
-      "community": 132,
+      "community": 8,
       "norm_label": "testconnectioninput"
     },
     {
@@ -8366,7 +8376,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "shared_types_connectionsapi",
-      "community": 132,
+      "community": 8,
       "norm_label": "connectionsapi"
     },
     {
@@ -8376,7 +8386,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "shared_types_entitytype",
-      "community": 132,
+      "community": 39,
       "norm_label": "entitytype"
     },
     {
@@ -8386,7 +8396,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "shared_types_enumtype",
-      "community": 132,
+      "community": 8,
       "norm_label": "enumtype"
     },
     {
@@ -8396,7 +8406,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "shared_types_entityinfo",
-      "community": 132,
+      "community": 8,
       "norm_label": "entityinfo"
     },
     {
@@ -8406,7 +8416,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "shared_types_entityref",
-      "community": 82,
+      "community": 68,
       "norm_label": "entityref"
     },
     {
@@ -8416,7 +8426,7 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "shared_types_columninfo",
-      "community": 82,
+      "community": 23,
       "norm_label": "columninfo"
     },
     {
@@ -8436,7 +8446,7 @@
       "source_location": "L94",
       "_origin": "ast",
       "id": "shared_types_sort",
-      "community": 82,
+      "community": 23,
       "norm_label": "sort"
     },
     {
@@ -8446,7 +8456,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "shared_types_rowsresult",
-      "community": 82,
+      "community": 23,
       "norm_label": "rowsresult"
     },
     {
@@ -8456,7 +8466,7 @@
       "source_location": "L108",
       "_origin": "ast",
       "id": "shared_types_searchresult",
-      "community": 76,
+      "community": 35,
       "norm_label": "searchresult"
     },
     {
@@ -8466,7 +8476,7 @@
       "source_location": "L117",
       "_origin": "ast",
       "id": "shared_types_routinekind",
-      "community": 132,
+      "community": 8,
       "norm_label": "routinekind"
     },
     {
@@ -8476,7 +8486,7 @@
       "source_location": "L118",
       "_origin": "ast",
       "id": "shared_types_routineparammode",
-      "community": 132,
+      "community": 8,
       "norm_label": "routineparammode"
     },
     {
@@ -8486,7 +8496,7 @@
       "source_location": "L122",
       "_origin": "ast",
       "id": "shared_types_routineref",
-      "community": 132,
+      "community": 8,
       "norm_label": "routineref"
     },
     {
@@ -8496,7 +8506,7 @@
       "source_location": "L131",
       "_origin": "ast",
       "id": "shared_types_routineinfo",
-      "community": 132,
+      "community": 8,
       "norm_label": "routineinfo"
     },
     {
@@ -8516,7 +8526,7 @@
       "source_location": "L150",
       "_origin": "ast",
       "id": "shared_types_routinedef",
-      "community": 132,
+      "community": 8,
       "norm_label": "routinedef"
     },
     {
@@ -8526,7 +8536,7 @@
       "source_location": "L166",
       "_origin": "ast",
       "id": "shared_types_routinearg",
-      "community": 132,
+      "community": 8,
       "norm_label": "routinearg"
     },
     {
@@ -8556,7 +8566,7 @@
       "source_location": "L208",
       "_origin": "ast",
       "id": "shared_types_queryplan",
-      "community": 5,
+      "community": 8,
       "norm_label": "queryplan"
     },
     {
@@ -8566,7 +8576,7 @@
       "source_location": "L219",
       "_origin": "ast",
       "id": "shared_types_queryresult",
-      "community": 132,
+      "community": 8,
       "norm_label": "queryresult"
     },
     {
@@ -8586,7 +8596,7 @@
       "source_location": "L238",
       "_origin": "ast",
       "id": "shared_types_rowedit",
-      "community": 132,
+      "community": 8,
       "norm_label": "rowedit"
     },
     {
@@ -8626,7 +8636,7 @@
       "source_location": "L268",
       "_origin": "ast",
       "id": "shared_types_historyentry",
-      "community": 108,
+      "community": 3,
       "norm_label": "historyentry"
     },
     {
@@ -8636,7 +8646,7 @@
       "source_location": "L291",
       "_origin": "ast",
       "id": "shared_types_historyquery",
-      "community": 132,
+      "community": 0,
       "norm_label": "historyquery"
     },
     {
@@ -8646,7 +8656,7 @@
       "source_location": "L318",
       "_origin": "ast",
       "id": "shared_types_captureinput",
-      "community": 108,
+      "community": 0,
       "norm_label": "captureinput"
     },
     {
@@ -8656,7 +8666,7 @@
       "source_location": "L332",
       "_origin": "ast",
       "id": "shared_types_historyapi",
-      "community": 132,
+      "community": 8,
       "norm_label": "historyapi"
     },
     {
@@ -8676,7 +8686,7 @@
       "source_location": "L377",
       "_origin": "ast",
       "id": "shared_types_filter",
-      "community": 82,
+      "community": 23,
       "norm_label": "filter"
     },
     {
@@ -8696,7 +8706,7 @@
       "source_location": "L407",
       "_origin": "ast",
       "id": "shared_types_indexinfo",
-      "community": 132,
+      "community": 8,
       "norm_label": "indexinfo"
     },
     {
@@ -8716,7 +8726,7 @@
       "source_location": "L424",
       "_origin": "ast",
       "id": "shared_types_relation",
-      "community": 132,
+      "community": 8,
       "norm_label": "relation"
     },
     {
@@ -8736,7 +8746,7 @@
       "source_location": "L451",
       "_origin": "ast",
       "id": "shared_types_tablestructure",
-      "community": 5,
+      "community": 68,
       "norm_label": "tablestructure"
     },
     {
@@ -8756,7 +8766,7 @@
       "source_location": "L477",
       "_origin": "ast",
       "id": "shared_types_createtablespec",
-      "community": 132,
+      "community": 8,
       "norm_label": "createtablespec"
     },
     {
@@ -8766,7 +8776,7 @@
       "source_location": "L487",
       "_origin": "ast",
       "id": "shared_types_tabletemplate",
-      "community": 132,
+      "community": 8,
       "norm_label": "tabletemplate"
     },
     {
@@ -8786,7 +8796,7 @@
       "source_location": "L521",
       "_origin": "ast",
       "id": "shared_types_sessionapi",
-      "community": 132,
+      "community": 8,
       "norm_label": "sessionapi"
     },
     {
@@ -8796,7 +8806,7 @@
       "source_location": "L630",
       "_origin": "ast",
       "id": "shared_types_dialogapi",
-      "community": 132,
+      "community": 8,
       "norm_label": "dialogapi"
     },
     {
@@ -8806,7 +8816,7 @@
       "source_location": "L643",
       "_origin": "ast",
       "id": "shared_types_serializedtab",
-      "community": 132,
+      "community": 8,
       "norm_label": "serializedtab"
     },
     {
@@ -8816,7 +8826,7 @@
       "source_location": "L676",
       "_origin": "ast",
       "id": "shared_types_connectionworkspace",
-      "community": 132,
+      "community": 8,
       "norm_label": "connectionworkspace"
     },
     {
@@ -8826,7 +8836,7 @@
       "source_location": "L681",
       "_origin": "ast",
       "id": "shared_types_workspacedata",
-      "community": 132,
+      "community": 0,
       "norm_label": "workspacedata"
     },
     {
@@ -8836,7 +8846,7 @@
       "source_location": "L686",
       "_origin": "ast",
       "id": "shared_types_workspaceapi",
-      "community": 132,
+      "community": 8,
       "norm_label": "workspaceapi"
     },
     {
@@ -8866,7 +8876,7 @@
       "source_location": "L701",
       "_origin": "ast",
       "id": "shared_types_backupspec",
-      "community": 132,
+      "community": 0,
       "norm_label": "backupspec"
     },
     {
@@ -8876,7 +8886,7 @@
       "source_location": "L707",
       "_origin": "ast",
       "id": "shared_types_backupresult",
-      "community": 68,
+      "community": 0,
       "norm_label": "backupresult"
     },
     {
@@ -8886,7 +8896,7 @@
       "source_location": "L715",
       "_origin": "ast",
       "id": "shared_types_restorestatement",
-      "community": 68,
+      "community": 0,
       "norm_label": "restorestatement"
     },
     {
@@ -8906,7 +8916,7 @@
       "source_location": "L730",
       "_origin": "ast",
       "id": "shared_types_restorerunresult",
-      "community": 68,
+      "community": 0,
       "norm_label": "restorerunresult"
     },
     {
@@ -8916,7 +8926,7 @@
       "source_location": "L737",
       "_origin": "ast",
       "id": "shared_types_backupapi",
-      "community": 132,
+      "community": 8,
       "norm_label": "backupapi"
     },
     {
@@ -8926,7 +8936,7 @@
       "source_location": "L750",
       "_origin": "ast",
       "id": "shared_types_windowcontrolapi",
-      "community": 132,
+      "community": 8,
       "norm_label": "windowcontrolapi"
     },
     {
@@ -8936,7 +8946,7 @@
       "source_location": "L761",
       "_origin": "ast",
       "id": "shared_types_templatesapi",
-      "community": 132,
+      "community": 8,
       "norm_label": "templatesapi"
     },
     {
@@ -8946,7 +8956,7 @@
       "source_location": "L773",
       "_origin": "ast",
       "id": "shared_types_drivercapabilities",
-      "community": 142,
+      "community": 8,
       "norm_label": "drivercapabilities"
     },
     {
@@ -9016,7 +9026,7 @@
       "source_location": "L874",
       "_origin": "ast",
       "id": "shared_types_redisarg",
-      "community": 110,
+      "community": 122,
       "norm_label": "redisarg"
     },
     {
@@ -9066,7 +9076,7 @@
       "source_location": "L914",
       "_origin": "ast",
       "id": "shared_types_redisdbinfo",
-      "community": 13,
+      "community": 119,
       "norm_label": "redisdbinfo"
     },
     {
@@ -9076,7 +9086,7 @@
       "source_location": "L923",
       "_origin": "ast",
       "id": "shared_types_redisapi",
-      "community": 132,
+      "community": 8,
       "norm_label": "redisapi"
     },
     {
@@ -9086,7 +9096,7 @@
       "source_location": "L952",
       "_origin": "ast",
       "id": "shared_types_routineapi",
-      "community": 132,
+      "community": 8,
       "norm_label": "routineapi"
     },
     {
@@ -9096,7 +9106,7 @@
       "source_location": "L974",
       "_origin": "ast",
       "id": "shared_types_krustapi",
-      "community": 132,
+      "community": 8,
       "norm_label": "krustapi"
     },
     {
@@ -13590,6 +13600,26 @@
       "norm_label": "krust studio 1.7.0-beta.1"
     },
     {
+      "label": "short.md",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.2/short.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_2_short",
+      "community": 142,
+      "norm_label": "short.md"
+    },
+    {
+      "label": "Krust Studio 1.7.0-beta.2",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.2/short.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_2_short_krust_studio_1_7_0_beta_2",
+      "community": 142,
+      "norm_label": "krust studio 1.7.0-beta.2"
+    },
+    {
       "label": "plan.md",
       "file_type": "document",
       "source_file": "docs/release/v1.7.0/plan.md",
@@ -14076,7 +14106,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "krust_studio_app_readme",
-      "community": 118,
+      "community": 10,
       "norm_label": "readme.md"
     },
     {
@@ -14086,7 +14116,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "krust_studio_app_readme_krust_studio_app",
-      "community": 120,
+      "community": 10,
       "norm_label": "krust-studio-app"
     },
     {
@@ -14096,7 +14126,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "krust_studio_app_readme_recommended_ide_setup",
-      "community": 120,
+      "community": 10,
       "norm_label": "recommended ide setup"
     },
     {
@@ -14106,7 +14136,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "krust_studio_app_readme_project_setup",
-      "community": 120,
+      "community": 10,
       "norm_label": "project setup"
     },
     {
@@ -14116,7 +14146,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "krust_studio_app_readme_install",
-      "community": 120,
+      "community": 10,
       "norm_label": "install"
     },
     {
@@ -14126,7 +14156,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "krust_studio_app_readme_development",
-      "community": 120,
+      "community": 10,
       "norm_label": "development"
     },
     {
@@ -14136,7 +14166,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "krust_studio_app_readme_type_check",
-      "community": 120,
+      "community": 10,
       "norm_label": "type-check"
     },
     {
@@ -14146,7 +14176,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "krust_studio_app_readme_build",
-      "community": 120,
+      "community": 10,
       "norm_label": "build"
     },
     {
@@ -14156,7 +14186,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "krust_studio_app_readme_releasing_auto_update",
-      "community": 120,
+      "community": 10,
       "norm_label": "releasing (auto-update)"
     },
     {
@@ -14206,7 +14236,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "llm_components",
-      "community": 121,
+      "community": 10,
       "norm_label": "components"
     },
     {
@@ -14216,7 +14246,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "llm_form_input",
-      "community": 121,
+      "community": 10,
       "norm_label": "form & input"
     },
     {
@@ -14226,7 +14256,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "llm_layout_navigation",
-      "community": 121,
+      "community": 10,
       "norm_label": "layout & navigation"
     },
     {
@@ -14236,7 +14266,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "llm_overlays_dialogs",
-      "community": 121,
+      "community": 10,
       "norm_label": "overlays & dialogs"
     },
     {
@@ -14246,7 +14276,7 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "llm_feedback_status",
-      "community": 121,
+      "community": 10,
       "norm_label": "feedback & status"
     },
     {
@@ -14256,7 +14286,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "llm_display_media",
-      "community": 121,
+      "community": 10,
       "norm_label": "display & media"
     },
     {
@@ -14266,7 +14296,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "llm_misc",
-      "community": 121,
+      "community": 10,
       "norm_label": "misc"
     },
     {
@@ -15009,7 +15039,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 118,
+      "community": 10,
       "norm_label": "electron + electron-vite + react 19 stack",
       "id": "krust_studio_app_readme_electron_stack"
     },
@@ -15022,7 +15052,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 118,
+      "community": 10,
       "norm_label": "github releases auto-update",
       "id": "krust_studio_app_readme_auto_update"
     },
@@ -15035,7 +15065,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 118,
+      "community": 10,
       "norm_label": "nsis windows installer (directory picker)",
       "id": "krust_studio_app_readme_nsis_installer"
     },
@@ -15048,7 +15078,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 118,
+      "community": 10,
       "norm_label": "release workflow (version bump, build, github release)",
       "id": "krust_studio_app_readme_release_workflow"
     },
@@ -15061,61 +15091,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 118,
+      "community": 10,
       "norm_label": "dev-app-update.yml",
       "id": "dev_app_update"
-    },
-    {
-      "label": "electron-builder.yml",
-      "file_type": "concept",
-      "source_file": "krust-studio-app/electron-builder.yml",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 118,
-      "norm_label": "electron-builder.yml",
-      "id": "electron_builder"
-    },
-    {
-      "label": "GitHub Publish (draft release)",
-      "file_type": "rationale",
-      "source_file": "krust-studio-app/electron-builder.yml",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 118,
-      "norm_label": "github publish (draft release)",
-      "id": "electron_builder_github_publish"
-    },
-    {
-      "label": "NSIS Assisted Installer Config",
-      "file_type": "rationale",
-      "source_file": "krust-studio-app/electron-builder.yml",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 118,
-      "norm_label": "nsis assisted installer config",
-      "id": "electron_builder_nsis_config"
-    },
-    {
-      "label": "Multi-platform Build Targets (win/mac/linux)",
-      "file_type": "concept",
-      "source_file": "krust-studio-app/electron-builder.yml",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 118,
-      "norm_label": "multi-platform build targets (win/mac/linux)",
-      "id": "electron_builder_targets"
     },
     {
       "label": "pnpm-workspace.yaml",
@@ -15653,6 +15631,16 @@
       "confidence_score": 1.0,
       "source": "krust_studio_app_package_dependencies",
       "target": "krust_studio_app_package_dependencies_clsx"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L44",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "krust_studio_app_package_dependencies",
+      "target": "krust_studio_app_package_dependencies_cluster_key_slot"
     },
     {
       "relation": "contains",
@@ -16203,17 +16191,6 @@
       "confidence_score": 1.0,
       "source": "krust_studio_app_package_devdependencies",
       "target": "krust_studio_app_package_devdependencies_vitejs_plugin_react"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "source_file": "krust-studio-app/package.json",
-      "source_location": "L69",
-      "weight": 1.0,
-      "context": "import",
-      "confidence_score": 1.0,
-      "source": "krust_studio_app_package_devdependencies_electron_builder",
-      "target": "electron_builder"
     },
     {
       "relation": "imports_from",
@@ -24924,9 +24901,9 @@
       "source_file": "krust-studio-app/src/main/index.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "main_index",
-      "target": "store_prefs",
-      "confidence_score": 1.0
+      "target": "store_prefs"
     },
     {
       "relation": "imports",
@@ -24935,9 +24912,9 @@
       "source_file": "krust-studio-app/src/main/index.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "main_index",
-      "target": "store_prefs_getbetaupdates",
-      "confidence_score": 1.0
+      "target": "store_prefs_getbetaupdates"
     },
     {
       "relation": "imports",
@@ -24946,9 +24923,9 @@
       "source_file": "krust-studio-app/src/main/index.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "main_index",
-      "target": "store_prefs_setbetaupdates",
-      "confidence_score": 1.0
+      "target": "store_prefs_setbetaupdates"
     },
     {
       "relation": "calls",
@@ -24957,9 +24934,9 @@
       "source_file": "krust-studio-app/src/main/index.ts",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "main_index_setupautoupdater",
-      "target": "store_prefs_getbetaupdates",
-      "confidence_score": 1.0
+      "target": "store_prefs_getbetaupdates"
     },
     {
       "relation": "calls",
@@ -24968,9 +24945,9 @@
       "source_file": "krust-studio-app/src/main/index.ts",
       "source_location": "L77",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "main_index_setupautoupdater",
-      "target": "store_prefs_setbetaupdates",
-      "confidence_score": 1.0
+      "target": "store_prefs_setbetaupdates"
     },
     {
       "relation": "contains",
@@ -26483,9 +26460,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_prefs",
-      "target": "store_prefs_defaults",
-      "confidence_score": 1.0
+      "target": "store_prefs_defaults"
     },
     {
       "relation": "contains",
@@ -26493,9 +26470,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_prefs",
-      "target": "store_prefs_file",
-      "confidence_score": 1.0
+      "target": "store_prefs_file"
     },
     {
       "relation": "contains",
@@ -26503,9 +26480,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_prefs",
-      "target": "store_prefs_getbetaupdates",
-      "confidence_score": 1.0
+      "target": "store_prefs_getbetaupdates"
     },
     {
       "relation": "contains",
@@ -26513,9 +26490,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_prefs",
-      "target": "store_prefs_load",
-      "confidence_score": 1.0
+      "target": "store_prefs_load"
     },
     {
       "relation": "contains",
@@ -26523,9 +26500,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_prefs",
-      "target": "store_prefs_prefs",
-      "confidence_score": 1.0
+      "target": "store_prefs_prefs"
     },
     {
       "relation": "contains",
@@ -26533,9 +26510,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L36",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_prefs",
-      "target": "store_prefs_setbetaupdates",
-      "confidence_score": 1.0
+      "target": "store_prefs_setbetaupdates"
     },
     {
       "relation": "calls",
@@ -26544,9 +26521,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_prefs_load",
-      "target": "store_prefs_file",
-      "confidence_score": 1.0
+      "target": "store_prefs_file"
     },
     {
       "relation": "calls",
@@ -26555,9 +26532,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_prefs_setbetaupdates",
-      "target": "store_prefs_file",
-      "confidence_score": 1.0
+      "target": "store_prefs_file"
     },
     {
       "relation": "calls",
@@ -26566,9 +26543,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L33",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_prefs_getbetaupdates",
-      "target": "store_prefs_load",
-      "confidence_score": 1.0
+      "target": "store_prefs_load"
     },
     {
       "relation": "calls",
@@ -26577,9 +26554,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L37",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_prefs_setbetaupdates",
-      "target": "store_prefs_load",
-      "confidence_score": 1.0
+      "target": "store_prefs_load"
     },
     {
       "relation": "imports_from",
@@ -37638,9 +37615,9 @@
       "source_file": "docs/TODO.md",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_1_7_0_beta_release_in_progress",
-      "confidence_score": 1.0
+      "target": "docs_todo_1_7_0_beta_release_in_progress"
     },
     {
       "relation": "contains",
@@ -40278,9 +40255,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_beta_tracking_issue",
-      "target": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue"
     },
     {
       "relation": "contains",
@@ -40288,9 +40265,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
-      "target": "v1_7_0_beta_1_beta_tracking_issue_existing_driver_regressions",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_beta_tracking_issue_existing_driver_regressions"
     },
     {
       "relation": "contains",
@@ -40298,9 +40275,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
-      "target": "v1_7_0_beta_1_beta_tracking_issue_procedures_functions",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_beta_tracking_issue_procedures_functions"
     },
     {
       "relation": "contains",
@@ -40308,9 +40285,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
-      "target": "v1_7_0_beta_1_beta_tracking_issue_redis",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_beta_tracking_issue_redis"
     },
     {
       "relation": "contains",
@@ -40318,9 +40295,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
-      "target": "v1_7_0_beta_1_beta_tracking_issue_sql_prettification",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_beta_tracking_issue_sql_prettification"
     },
     {
       "relation": "contains",
@@ -40328,9 +40305,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
       "source_location": "L31",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
-      "target": "v1_7_0_beta_1_beta_tracking_issue_starrocks_experimental",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_beta_tracking_issue_starrocks_experimental"
     },
     {
       "relation": "contains",
@@ -40338,9 +40315,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/full.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_full",
-      "target": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1"
     },
     {
       "relation": "contains",
@@ -40348,9 +40325,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/full.md",
       "source_location": "L36",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_data_grid",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_full_data_grid"
     },
     {
       "relation": "contains",
@@ -40358,9 +40335,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/full.md",
       "source_location": "L63",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_not_in_this_beta_planned_for_later_1_7_0_betas",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_full_not_in_this_beta_planned_for_later_1_7_0_betas"
     },
     {
       "relation": "contains",
@@ -40368,9 +40345,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/full.md",
       "source_location": "L52",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_other",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_full_other"
     },
     {
       "relation": "contains",
@@ -40378,9 +40355,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/full.md",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_procedures_functions_beta",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_full_procedures_functions_beta"
     },
     {
       "relation": "contains",
@@ -40388,9 +40365,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/full.md",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_redis_beta",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_full_redis_beta"
     },
     {
       "relation": "contains",
@@ -40398,9 +40375,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/full.md",
       "source_location": "L46",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_settings",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_full_settings"
     },
     {
       "relation": "contains",
@@ -40408,9 +40385,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/full.md",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_under_the_hood",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_full_under_the_hood"
     },
     {
       "relation": "contains",
@@ -40418,9 +40395,9 @@
       "source_file": "docs/release/v1.7.0-beta.1/full.md",
       "source_location": "L70",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_verification_still_needed",
-      "confidence_score": 1.0
+      "target": "v1_7_0_beta_1_full_verification_still_needed"
     },
     {
       "relation": "contains",
@@ -40428,8 +40405,18 @@
       "source_file": "docs/release/v1.7.0-beta.1/short.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "v1_7_0_beta_1_short",
-      "target": "v1_7_0_beta_1_short_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_short_krust_studio_1_7_0_beta_1"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.2/short.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_2_short",
+      "target": "v1_7_0_beta_2_short_krust_studio_1_7_0_beta_2",
       "confidence_score": 1.0
     },
     {
@@ -41663,76 +41650,6 @@
       "target": "krust_studio_app_readme_auto_update"
     },
     {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "krust-studio-app/README.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "krust_studio_app_readme_auto_update",
-      "target": "electron_builder_github_publish"
-    },
-    {
-      "relation": "conceptually_related_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
-      "source_file": "krust-studio-app/README.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "krust_studio_app_readme_nsis_installer",
-      "target": "electron_builder_nsis_config"
-    },
-    {
-      "relation": "shares_data_with",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "krust-studio-app/electron-builder.yml",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "electron_builder_github_publish",
-      "target": "krust_studio_app_readme_release_workflow"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "krust-studio-app/README.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "krust_studio_app_readme_release_workflow",
-      "target": "electron_builder"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "krust-studio-app/electron-builder.yml",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "electron_builder",
-      "target": "electron_builder_github_publish"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "krust-studio-app/electron-builder.yml",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "electron_builder",
-      "target": "electron_builder_nsis_config"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "krust-studio-app/electron-builder.yml",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "electron_builder",
-      "target": "electron_builder_targets"
-    },
-    {
       "relation": "conceptually_related_to",
       "confidence": "INFERRED",
       "confidence_score": 0.85,
@@ -41828,5 +41745,5 @@
       "source_file": "docs/adr/0017-inline-filter-builder-with-raw-where.md"
     }
   ],
-  "built_at_commit": "e27cca2c11eb2ae80421413c86a887323a065110"
+  "built_at_commit": "f468111846ebe4928a0b7df16ac8b33b97775e84"
 }

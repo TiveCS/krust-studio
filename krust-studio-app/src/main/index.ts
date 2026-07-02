@@ -1,10 +1,29 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { autoUpdater } from 'electron-updater'
 import icon from '../../resources/icon.png?asset'
 import { registerIpc } from './ipc'
 import { getBetaUpdates, setBetaUpdates } from './store/prefs'
+
+// Startup guard: keep an unexpected main-process error from becoming Electron's
+// raw fatal crash dialog. Log it and show a readable message; the app stays up
+// so a contained failure (e.g. a driver dependency) doesn't take everything
+// down. Driver loads are lazy + try/caught, so this is the last-resort net.
+process.on('uncaughtException', (err) => {
+  console.error('[main] uncaught exception:', err)
+  try {
+    dialog.showErrorBox(
+      'Krust Studio — unexpected error',
+      err instanceof Error ? (err.stack ?? err.message) : String(err)
+    )
+  } catch {
+    // dialog may be unavailable very early; the log above is the fallback
+  }
+})
+process.on('unhandledRejection', (reason) => {
+  console.error('[main] unhandled rejection:', reason)
+})
 
 let updaterWired = false
 // Set while an in-app update is restarting, so `window-all-closed` doesn't fire

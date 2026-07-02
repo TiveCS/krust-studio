@@ -90,406 +90,6 @@
   },
   "nodes": [
     {
-      "label": "TODO.md",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "docs_todo",
-      "community": 18,
-      "norm_label": "todo.md"
-    },
-    {
-      "label": "Krust Studio \u2014 TODO (gap backlog)",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "docs_todo_krust_studio_todo_gap_backlog",
-      "community": 18,
-      "norm_label": "krust studio \u2014 todo (gap backlog)"
-    },
-    {
-      "label": "1.7.0 beta release \u2014 IN PROGRESS",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L5",
-      "_origin": "ast",
-      "id": "docs_todo_1_7_0_beta_release_in_progress",
-      "community": 18,
-      "norm_label": "1.7.0 beta release \u2014 in progress"
-    },
-    {
-      "label": "P0 \u2014 v1.7.0: Procedures & Functions (Routines) \u2014 beta.1 BUILT (needs live test)",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L24",
-      "_origin": "ast",
-      "id": "docs_todo_p0_v1_7_0_procedures_functions_routines_beta_1_built_needs_live_test",
-      "community": 18,
-      "norm_label": "p0 \u2014 v1.7.0: procedures & functions (routines) \u2014 beta.1 built (needs live test)"
-    },
-    {
-      "label": "beta.1 \u2014 browse / execute / create+drop \u2014 BUILT (2026-07-02, typecheck + build green; not yet live-tested)",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L31",
-      "_origin": "ast",
-      "id": "docs_todo_beta_1_browse_execute_create_drop_built_2026_07_02_typecheck_build_green_not_yet_live_tested",
-      "community": 18,
-      "norm_label": "beta.1 \u2014 browse / execute / create+drop \u2014 built (2026-07-02, typecheck + build green; not yet live-tested)"
-    },
-    {
-      "label": "beta.2 \u2014 MySQL safe replacement",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L107",
-      "_origin": "ast",
-      "id": "docs_todo_beta_2_mysql_safe_replacement",
-      "community": 18,
-      "norm_label": "beta.2 \u2014 mysql safe replacement"
-    },
-    {
-      "label": "P0 \u2014 next: inline filter builder + raw WHERE \u2014 DONE",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L116",
-      "_origin": "ast",
-      "id": "docs_todo_p0_next_inline_filter_builder_raw_where_done",
-      "community": 18,
-      "norm_label": "p0 \u2014 next: inline filter builder + raw where \u2014 done"
-    },
-    {
-      "label": "P0 \u2014 v1.3.4 + v1.4.0: editor/history/backup UX \u2014 PLANNED",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L154",
-      "_origin": "ast",
-      "id": "docs_todo_p0_v1_3_4_v1_4_0_editor_history_backup_ux_planned",
-      "community": 18,
-      "norm_label": "p0 \u2014 v1.3.4 + v1.4.0: editor/history/backup ux \u2014 planned"
-    },
-    {
-      "label": "v1.3.4 \u2014 fix (data-loss feel) \u2014 DONE (merged 69c7791, manually verified)",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L161",
-      "_origin": "ast",
-      "id": "docs_todo_v1_3_4_fix_data_loss_feel_done_merged_69c7791_manually_verified",
-      "community": 18,
-      "norm_label": "v1.3.4 \u2014 fix (data-loss feel) \u2014 done (merged 69c7791, manually verified)"
-    },
-    {
-      "label": "v1.4.0 \u2014 features",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L190",
-      "_origin": "ast",
-      "id": "docs_todo_v1_4_0_features",
-      "community": 18,
-      "norm_label": "v1.4.0 \u2014 features"
-    },
-    {
-      "label": "P0 \u2014 v1.5.0: shortcuts, settings & history UX \u2014 PLANNED",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L246",
-      "_origin": "ast",
-      "id": "docs_todo_p0_v1_5_0_shortcuts_settings_history_ux_planned",
-      "community": 18,
-      "norm_label": "p0 \u2014 v1.5.0: shortcuts, settings & history ux \u2014 planned"
-    },
-    {
-      "label": "P0 \u2014 v1.6.0: pinned columns \u2014 DONE",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L296",
-      "_origin": "ast",
-      "id": "docs_todo_p0_v1_6_0_pinned_columns_done",
-      "community": 18,
-      "norm_label": "p0 \u2014 v1.6.0: pinned columns \u2014 done"
-    },
-    {
-      "label": "P0 \u2014 v1.3.0: workspace & connection resilience \u2014 DONE",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L322",
-      "_origin": "ast",
-      "id": "docs_todo_p0_v1_3_0_workspace_connection_resilience_done",
-      "community": 18,
-      "norm_label": "p0 \u2014 v1.3.0: workspace & connection resilience \u2014 done"
-    },
-    {
-      "label": "P1 \u2014 high value, mostly cheap",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L369",
-      "_origin": "ast",
-      "id": "docs_todo_p1_high_value_mostly_cheap",
-      "community": 18,
-      "norm_label": "p1 \u2014 high value, mostly cheap"
-    },
-    {
-      "label": "P2 \u2014 schema completeness",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L394",
-      "_origin": "ast",
-      "id": "docs_todo_p2_schema_completeness",
-      "community": 18,
-      "norm_label": "p2 \u2014 schema completeness"
-    },
-    {
-      "label": "P3 \u2014 data reader depth",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L435",
-      "_origin": "ast",
-      "id": "docs_todo_p3_data_reader_depth",
-      "community": 18,
-      "norm_label": "p3 \u2014 data reader depth"
-    },
-    {
-      "label": "P4 \u2014 the headline feature (ADR-0002), bigger",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L474",
-      "_origin": "ast",
-      "id": "docs_todo_p4_the_headline_feature_adr_0002_bigger",
-      "community": 18,
-      "norm_label": "p4 \u2014 the headline feature (adr-0002), bigger"
-    },
-    {
-      "label": "P5 \u2014 bigger surfaces (own cycles)",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L499",
-      "_origin": "ast",
-      "id": "docs_todo_p5_bigger_surfaces_own_cycles",
-      "community": 18,
-      "norm_label": "p5 \u2014 bigger surfaces (own cycles)"
-    },
-    {
-      "label": "Resolved",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L522",
-      "_origin": "ast",
-      "id": "docs_todo_resolved",
-      "community": 18,
-      "norm_label": "resolved"
-    },
-    {
-      "label": "Known bugs / sharp edges",
-      "file_type": "document",
-      "source_file": "docs/TODO.md",
-      "source_location": "L661",
-      "_origin": "ast",
-      "id": "docs_todo_known_bugs_sharp_edges",
-      "community": 18,
-      "norm_label": "known bugs / sharp edges"
-    },
-    {
-      "label": "beta-tracking-issue.md",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_beta_tracking_issue",
-      "community": 145,
-      "norm_label": "beta-tracking-issue.md"
-    },
-    {
-      "label": "1.7.0-beta tracking issue",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
-      "community": 145,
-      "norm_label": "1.7.0-beta tracking issue"
-    },
-    {
-      "label": "Redis",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
-      "source_location": "L19",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_beta_tracking_issue_redis",
-      "community": 145,
-      "norm_label": "redis"
-    },
-    {
-      "label": "Procedures & Functions",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
-      "source_location": "L23",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_beta_tracking_issue_procedures_functions",
-      "community": 145,
-      "norm_label": "procedures & functions"
-    },
-    {
-      "label": "SQL prettification",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
-      "source_location": "L28",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_beta_tracking_issue_sql_prettification",
-      "community": 145,
-      "norm_label": "sql prettification"
-    },
-    {
-      "label": "StarRocks (Experimental)",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
-      "source_location": "L31",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_beta_tracking_issue_starrocks_experimental",
-      "community": 145,
-      "norm_label": "starrocks (experimental)"
-    },
-    {
-      "label": "Existing-driver regressions",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
-      "source_location": "L34",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_beta_tracking_issue_existing_driver_regressions",
-      "community": 145,
-      "norm_label": "existing-driver regressions"
-    },
-    {
-      "label": "blurb.md",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/blurb.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_blurb",
-      "community": 148,
-      "norm_label": "blurb.md"
-    },
-    {
-      "label": "full.md",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_full",
-      "community": 136,
-      "norm_label": "full.md"
-    },
-    {
-      "label": "Krust Studio 1.7.0-beta.1",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "community": 136,
-      "norm_label": "krust studio 1.7.0-beta.1"
-    },
-    {
-      "label": "Redis (Beta)",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L9",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_full_redis_beta",
-      "community": 136,
-      "norm_label": "redis (beta)"
-    },
-    {
-      "label": "Procedures & Functions (Beta)",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L22",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_full_procedures_functions_beta",
-      "community": 136,
-      "norm_label": "procedures & functions (beta)"
-    },
-    {
-      "label": "Data grid",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L36",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_full_data_grid",
-      "community": 136,
-      "norm_label": "data grid"
-    },
-    {
-      "label": "Settings",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L46",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_full_settings",
-      "community": 136,
-      "norm_label": "settings"
-    },
-    {
-      "label": "Other",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L52",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_full_other",
-      "community": 136,
-      "norm_label": "other"
-    },
-    {
-      "label": "Under the hood",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L57",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_full_under_the_hood",
-      "community": 136,
-      "norm_label": "under the hood"
-    },
-    {
-      "label": "Not in this beta (planned for later 1.7.0 betas)",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L63",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_full_not_in_this_beta_planned_for_later_1_7_0_betas",
-      "community": 136,
-      "norm_label": "not in this beta (planned for later 1.7.0 betas)"
-    },
-    {
-      "label": "Verification still needed",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L70",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_full_verification_still_needed",
-      "community": 136,
-      "norm_label": "verification still needed"
-    },
-    {
-      "label": "short.md",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/short.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_short",
-      "community": 147,
-      "norm_label": "short.md"
-    },
-    {
-      "label": "Krust Studio 1.7.0-beta.1",
-      "file_type": "document",
-      "source_file": "docs/release/v1.7.0-beta.1/short.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "v1_7_0_beta_1_short_krust_studio_1_7_0_beta_1",
-      "community": 147,
-      "norm_label": "krust studio 1.7.0-beta.1"
-    },
-    {
       "label": "package.json",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
@@ -910,10 +510,20 @@
       "norm_label": "clsx"
     },
     {
-      "label": "cmdk",
+      "label": "cluster-key-slot",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
       "source_location": "L44",
+      "_origin": "ast",
+      "id": "krust_studio_app_package_dependencies_cluster_key_slot",
+      "community": 6,
+      "norm_label": "cluster-key-slot"
+    },
+    {
+      "label": "cmdk",
+      "file_type": "code",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L45",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_cmdk",
       "community": 6,
@@ -923,7 +533,7 @@
       "label": "codemirror",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L45",
+      "source_location": "L46",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_codemirror",
       "community": 6,
@@ -933,7 +543,7 @@
       "label": "electron-updater",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L46",
+      "source_location": "L47",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_electron_updater",
       "community": 6,
@@ -943,7 +553,7 @@
       "label": "lucide-react",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L47",
+      "source_location": "L48",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_lucide_react",
       "community": 6,
@@ -953,7 +563,7 @@
       "label": "mysql2",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L48",
+      "source_location": "L49",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_mysql2",
       "community": 6,
@@ -963,7 +573,7 @@
       "label": "next-themes",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L49",
+      "source_location": "L50",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_next_themes",
       "community": 6,
@@ -973,7 +583,7 @@
       "label": "pg",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L50",
+      "source_location": "L51",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_pg",
       "community": 6,
@@ -983,7 +593,7 @@
       "label": "radix-ui",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L51",
+      "source_location": "L52",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_radix_ui",
       "community": 6,
@@ -993,7 +603,7 @@
       "label": "react-hook-form",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L52",
+      "source_location": "L53",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_react_hook_form",
       "community": 6,
@@ -1003,7 +613,7 @@
       "label": "redis",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L53",
+      "source_location": "L54",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_redis",
       "community": 6,
@@ -1013,7 +623,7 @@
       "label": "sonner",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L54",
+      "source_location": "L55",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_sonner",
       "community": 6,
@@ -1023,7 +633,7 @@
       "label": "sql-formatter",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L55",
+      "source_location": "L56",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_sql_formatter",
       "community": 6,
@@ -1033,7 +643,7 @@
       "label": "tailwind-merge",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L56",
+      "source_location": "L57",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_tailwind_merge",
       "community": 6,
@@ -1043,7 +653,7 @@
       "label": "zod",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L57",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_zod",
       "community": 6,
@@ -1053,7 +663,7 @@
       "label": "zustand",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L58",
+      "source_location": "L59",
       "_origin": "ast",
       "id": "krust_studio_app_package_dependencies_zustand",
       "community": 6,
@@ -1063,7 +673,7 @@
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L60",
+      "source_location": "L61",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies",
       "community": 2,
@@ -1073,7 +683,7 @@
       "label": "@electron-toolkit/eslint-config-prettier",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L61",
+      "source_location": "L62",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_electron_toolkit_eslint_config_prettier",
       "community": 2,
@@ -1083,7 +693,7 @@
       "label": "@electron-toolkit/eslint-config-ts",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L62",
+      "source_location": "L63",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_electron_toolkit_eslint_config_ts",
       "community": 2,
@@ -1093,7 +703,7 @@
       "label": "@electron-toolkit/tsconfig",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L63",
+      "source_location": "L64",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_electron_toolkit_tsconfig",
       "community": 2,
@@ -1103,7 +713,7 @@
       "label": "@tailwindcss/vite",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L64",
+      "source_location": "L65",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_tailwindcss_vite",
       "community": 2,
@@ -1113,7 +723,7 @@
       "label": "@types/node",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L65",
+      "source_location": "L66",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_types_node",
       "community": 2,
@@ -1123,7 +733,7 @@
       "label": "@types/pg",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L66",
+      "source_location": "L67",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_types_pg",
       "community": 2,
@@ -1133,7 +743,7 @@
       "label": "@types/react",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L67",
+      "source_location": "L68",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_types_react",
       "community": 2,
@@ -1143,7 +753,7 @@
       "label": "@types/react-dom",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L68",
+      "source_location": "L69",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_types_react_dom",
       "community": 2,
@@ -1153,7 +763,7 @@
       "label": "@vitejs/plugin-react",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L69",
+      "source_location": "L70",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_vitejs_plugin_react",
       "community": 2,
@@ -1163,7 +773,7 @@
       "label": "electron",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L70",
+      "source_location": "L71",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_electron",
       "community": 2,
@@ -1173,7 +783,7 @@
       "label": "electron-builder",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L71",
+      "source_location": "L72",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_electron_builder",
       "community": 2,
@@ -1183,7 +793,7 @@
       "label": "electron-vite",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L72",
+      "source_location": "L73",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_electron_vite",
       "community": 2,
@@ -1193,7 +803,7 @@
       "label": "eslint",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L73",
+      "source_location": "L74",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_eslint",
       "community": 2,
@@ -1203,7 +813,7 @@
       "label": "eslint-plugin-react",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L74",
+      "source_location": "L75",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_eslint_plugin_react",
       "community": 2,
@@ -1213,7 +823,7 @@
       "label": "eslint-plugin-react-hooks",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L75",
+      "source_location": "L76",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_eslint_plugin_react_hooks",
       "community": 2,
@@ -1223,7 +833,7 @@
       "label": "eslint-plugin-react-refresh",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L76",
+      "source_location": "L77",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_eslint_plugin_react_refresh",
       "community": 2,
@@ -1233,7 +843,7 @@
       "label": "icon-gen",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L77",
+      "source_location": "L78",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_icon_gen",
       "community": 2,
@@ -1243,7 +853,7 @@
       "label": "prettier",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L78",
+      "source_location": "L79",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_prettier",
       "community": 2,
@@ -1253,7 +863,7 @@
       "label": "react",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L79",
+      "source_location": "L80",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_react",
       "community": 2,
@@ -1263,7 +873,7 @@
       "label": "react-dom",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L80",
+      "source_location": "L81",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_react_dom",
       "community": 2,
@@ -1273,7 +883,7 @@
       "label": "sharp",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L81",
+      "source_location": "L82",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_sharp",
       "community": 2,
@@ -1283,7 +893,7 @@
       "label": "tailwindcss",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L82",
+      "source_location": "L83",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_tailwindcss",
       "community": 2,
@@ -1293,7 +903,7 @@
       "label": "tw-animate-css",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L83",
+      "source_location": "L84",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_tw_animate_css",
       "community": 2,
@@ -1303,7 +913,7 @@
       "label": "typescript",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L84",
+      "source_location": "L85",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_typescript",
       "community": 2,
@@ -1313,11 +923,411 @@
       "label": "vite",
       "file_type": "code",
       "source_file": "krust-studio-app/package.json",
-      "source_location": "L85",
+      "source_location": "L86",
       "_origin": "ast",
       "id": "krust_studio_app_package_devdependencies_vite",
       "community": 2,
       "norm_label": "vite"
+    },
+    {
+      "label": "TODO.md",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "todo.md",
+      "id": "docs_todo"
+    },
+    {
+      "label": "Krust Studio \u2014 TODO (gap backlog)",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "krust studio \u2014 todo (gap backlog)",
+      "id": "docs_todo_krust_studio_todo_gap_backlog"
+    },
+    {
+      "label": "1.7.0 beta release \u2014 IN PROGRESS",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "1.7.0 beta release \u2014 in progress",
+      "id": "docs_todo_1_7_0_beta_release_in_progress"
+    },
+    {
+      "label": "P0 \u2014 v1.7.0: Procedures & Functions (Routines) \u2014 beta.1 BUILT (needs live test)",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L24",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "p0 \u2014 v1.7.0: procedures & functions (routines) \u2014 beta.1 built (needs live test)",
+      "id": "docs_todo_p0_v1_7_0_procedures_functions_routines_beta_1_built_needs_live_test"
+    },
+    {
+      "label": "beta.1 \u2014 browse / execute / create+drop \u2014 BUILT (2026-07-02, typecheck + build green; not yet live-tested)",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L31",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "beta.1 \u2014 browse / execute / create+drop \u2014 built (2026-07-02, typecheck + build green; not yet live-tested)",
+      "id": "docs_todo_beta_1_browse_execute_create_drop_built_2026_07_02_typecheck_build_green_not_yet_live_tested"
+    },
+    {
+      "label": "beta.2 \u2014 MySQL safe replacement",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L107",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "beta.2 \u2014 mysql safe replacement",
+      "id": "docs_todo_beta_2_mysql_safe_replacement"
+    },
+    {
+      "label": "P0 \u2014 next: inline filter builder + raw WHERE \u2014 DONE",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L116",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "p0 \u2014 next: inline filter builder + raw where \u2014 done",
+      "id": "docs_todo_p0_next_inline_filter_builder_raw_where_done"
+    },
+    {
+      "label": "P0 \u2014 v1.3.4 + v1.4.0: editor/history/backup UX \u2014 PLANNED",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L154",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "p0 \u2014 v1.3.4 + v1.4.0: editor/history/backup ux \u2014 planned",
+      "id": "docs_todo_p0_v1_3_4_v1_4_0_editor_history_backup_ux_planned"
+    },
+    {
+      "label": "v1.3.4 \u2014 fix (data-loss feel) \u2014 DONE (merged 69c7791, manually verified)",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L161",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "v1.3.4 \u2014 fix (data-loss feel) \u2014 done (merged 69c7791, manually verified)",
+      "id": "docs_todo_v1_3_4_fix_data_loss_feel_done_merged_69c7791_manually_verified"
+    },
+    {
+      "label": "v1.4.0 \u2014 features",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L190",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "v1.4.0 \u2014 features",
+      "id": "docs_todo_v1_4_0_features"
+    },
+    {
+      "label": "P0 \u2014 v1.5.0: shortcuts, settings & history UX \u2014 PLANNED",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L246",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "p0 \u2014 v1.5.0: shortcuts, settings & history ux \u2014 planned",
+      "id": "docs_todo_p0_v1_5_0_shortcuts_settings_history_ux_planned"
+    },
+    {
+      "label": "P0 \u2014 v1.6.0: pinned columns \u2014 DONE",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L296",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "p0 \u2014 v1.6.0: pinned columns \u2014 done",
+      "id": "docs_todo_p0_v1_6_0_pinned_columns_done"
+    },
+    {
+      "label": "P0 \u2014 v1.3.0: workspace & connection resilience \u2014 DONE",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L322",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "p0 \u2014 v1.3.0: workspace & connection resilience \u2014 done",
+      "id": "docs_todo_p0_v1_3_0_workspace_connection_resilience_done"
+    },
+    {
+      "label": "P1 \u2014 high value, mostly cheap",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L369",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "p1 \u2014 high value, mostly cheap",
+      "id": "docs_todo_p1_high_value_mostly_cheap"
+    },
+    {
+      "label": "P2 \u2014 schema completeness",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L394",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "p2 \u2014 schema completeness",
+      "id": "docs_todo_p2_schema_completeness"
+    },
+    {
+      "label": "P3 \u2014 data reader depth",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L435",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "p3 \u2014 data reader depth",
+      "id": "docs_todo_p3_data_reader_depth"
+    },
+    {
+      "label": "P4 \u2014 the headline feature (ADR-0002), bigger",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L474",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "p4 \u2014 the headline feature (adr-0002), bigger",
+      "id": "docs_todo_p4_the_headline_feature_adr_0002_bigger"
+    },
+    {
+      "label": "P5 \u2014 bigger surfaces (own cycles)",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L499",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "p5 \u2014 bigger surfaces (own cycles)",
+      "id": "docs_todo_p5_bigger_surfaces_own_cycles"
+    },
+    {
+      "label": "Resolved",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L522",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "resolved",
+      "id": "docs_todo_resolved"
+    },
+    {
+      "label": "Known bugs / sharp edges",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L661",
+      "_origin": "ast",
+      "community": 18,
+      "norm_label": "known bugs / sharp edges",
+      "id": "docs_todo_known_bugs_sharp_edges"
+    },
+    {
+      "label": "beta-tracking-issue.md",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 145,
+      "norm_label": "beta-tracking-issue.md",
+      "id": "v1_7_0_beta_1_beta_tracking_issue"
+    },
+    {
+      "label": "1.7.0-beta tracking issue",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 145,
+      "norm_label": "1.7.0-beta tracking issue",
+      "id": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue"
+    },
+    {
+      "label": "Redis",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L19",
+      "_origin": "ast",
+      "community": 145,
+      "norm_label": "redis",
+      "id": "v1_7_0_beta_1_beta_tracking_issue_redis"
+    },
+    {
+      "label": "Procedures & Functions",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L23",
+      "_origin": "ast",
+      "community": 145,
+      "norm_label": "procedures & functions",
+      "id": "v1_7_0_beta_1_beta_tracking_issue_procedures_functions"
+    },
+    {
+      "label": "SQL prettification",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L28",
+      "_origin": "ast",
+      "community": 145,
+      "norm_label": "sql prettification",
+      "id": "v1_7_0_beta_1_beta_tracking_issue_sql_prettification"
+    },
+    {
+      "label": "StarRocks (Experimental)",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L31",
+      "_origin": "ast",
+      "community": 145,
+      "norm_label": "starrocks (experimental)",
+      "id": "v1_7_0_beta_1_beta_tracking_issue_starrocks_experimental"
+    },
+    {
+      "label": "Existing-driver regressions",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L34",
+      "_origin": "ast",
+      "community": 145,
+      "norm_label": "existing-driver regressions",
+      "id": "v1_7_0_beta_1_beta_tracking_issue_existing_driver_regressions"
+    },
+    {
+      "label": "blurb.md",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/blurb.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 148,
+      "norm_label": "blurb.md",
+      "id": "v1_7_0_beta_1_blurb"
+    },
+    {
+      "label": "full.md",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 136,
+      "norm_label": "full.md",
+      "id": "v1_7_0_beta_1_full"
+    },
+    {
+      "label": "Krust Studio 1.7.0-beta.1",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 136,
+      "norm_label": "krust studio 1.7.0-beta.1",
+      "id": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1"
+    },
+    {
+      "label": "Redis (Beta)",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "community": 136,
+      "norm_label": "redis (beta)",
+      "id": "v1_7_0_beta_1_full_redis_beta"
+    },
+    {
+      "label": "Procedures & Functions (Beta)",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L22",
+      "_origin": "ast",
+      "community": 136,
+      "norm_label": "procedures & functions (beta)",
+      "id": "v1_7_0_beta_1_full_procedures_functions_beta"
+    },
+    {
+      "label": "Data grid",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L36",
+      "_origin": "ast",
+      "community": 136,
+      "norm_label": "data grid",
+      "id": "v1_7_0_beta_1_full_data_grid"
+    },
+    {
+      "label": "Settings",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L46",
+      "_origin": "ast",
+      "community": 136,
+      "norm_label": "settings",
+      "id": "v1_7_0_beta_1_full_settings"
+    },
+    {
+      "label": "Other",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L52",
+      "_origin": "ast",
+      "community": 136,
+      "norm_label": "other",
+      "id": "v1_7_0_beta_1_full_other"
+    },
+    {
+      "label": "Under the hood",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L57",
+      "_origin": "ast",
+      "community": 136,
+      "norm_label": "under the hood",
+      "id": "v1_7_0_beta_1_full_under_the_hood"
+    },
+    {
+      "label": "Not in this beta (planned for later 1.7.0 betas)",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L63",
+      "_origin": "ast",
+      "community": 136,
+      "norm_label": "not in this beta (planned for later 1.7.0 betas)",
+      "id": "v1_7_0_beta_1_full_not_in_this_beta_planned_for_later_1_7_0_betas"
+    },
+    {
+      "label": "Verification still needed",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L70",
+      "_origin": "ast",
+      "community": 136,
+      "norm_label": "verification still needed",
+      "id": "v1_7_0_beta_1_full_verification_still_needed"
+    },
+    {
+      "label": "short.md",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/short.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 147,
+      "norm_label": "short.md",
+      "id": "v1_7_0_beta_1_short"
+    },
+    {
+      "label": "Krust Studio 1.7.0-beta.1",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/short.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 147,
+      "norm_label": "krust studio 1.7.0-beta.1",
+      "id": "v1_7_0_beta_1_short_krust_studio_1_7_0_beta_1"
     },
     {
       "label": "index.ts",
@@ -1325,9 +1335,9 @@
       "source_file": "krust-studio-app/src/main/index.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "main_index",
       "community": 134,
-      "norm_label": "index.ts"
+      "norm_label": "index.ts",
+      "id": "main_index"
     },
     {
       "label": "setupAutoUpdater()",
@@ -1335,9 +1345,9 @@
       "source_file": "krust-studio-app/src/main/index.ts",
       "source_location": "L14",
       "_origin": "ast",
-      "id": "main_index_setupautoupdater",
       "community": 134,
-      "norm_label": "setupautoupdater()"
+      "norm_label": "setupautoupdater()",
+      "id": "main_index_setupautoupdater"
     },
     {
       "label": "createWindow()",
@@ -1345,9 +1355,9 @@
       "source_file": "krust-studio-app/src/main/index.ts",
       "source_location": "L94",
       "_origin": "ast",
-      "id": "main_index_createwindow",
       "community": 134,
-      "norm_label": "createwindow()"
+      "norm_label": "createwindow()",
+      "id": "main_index_createwindow"
     },
     {
       "label": "prefs.ts",
@@ -1355,9 +1365,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "store_prefs",
       "community": 134,
-      "norm_label": "prefs.ts"
+      "norm_label": "prefs.ts",
+      "id": "store_prefs"
     },
     {
       "label": "Prefs",
@@ -1365,9 +1375,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L11",
       "_origin": "ast",
-      "id": "store_prefs_prefs",
       "community": 134,
-      "norm_label": "prefs"
+      "norm_label": "prefs",
+      "id": "store_prefs_prefs"
     },
     {
       "label": "DEFAULTS",
@@ -1375,9 +1385,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L16",
       "_origin": "ast",
-      "id": "store_prefs_defaults",
       "community": 134,
-      "norm_label": "defaults"
+      "norm_label": "defaults",
+      "id": "store_prefs_defaults"
     },
     {
       "label": "file()",
@@ -1385,9 +1395,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L18",
       "_origin": "ast",
-      "id": "store_prefs_file",
       "community": 134,
-      "norm_label": "file()"
+      "norm_label": "file()",
+      "id": "store_prefs_file"
     },
     {
       "label": "load()",
@@ -1395,9 +1405,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L22",
       "_origin": "ast",
-      "id": "store_prefs_load",
       "community": 134,
-      "norm_label": "load()"
+      "norm_label": "load()",
+      "id": "store_prefs_load"
     },
     {
       "label": "getBetaUpdates()",
@@ -1405,9 +1415,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L32",
       "_origin": "ast",
-      "id": "store_prefs_getbetaupdates",
       "community": 134,
-      "norm_label": "getbetaupdates()"
+      "norm_label": "getbetaupdates()",
+      "id": "store_prefs_getbetaupdates"
     },
     {
       "label": "setBetaUpdates()",
@@ -1415,9 +1425,9 @@
       "source_file": "krust-studio-app/src/main/store/prefs.ts",
       "source_location": "L36",
       "_origin": "ast",
-      "id": "store_prefs_setbetaupdates",
       "community": 134,
-      "norm_label": "setbetaupdates()"
+      "norm_label": "setbetaupdates()",
+      "id": "store_prefs_setbetaupdates"
     },
     {
       "label": "SettingsModal.tsx",
@@ -1425,9 +1435,9 @@
       "source_file": "krust-studio-app/src/renderer/src/components/SettingsModal.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "components_settingsmodal",
       "community": 67,
-      "norm_label": "settingsmodal.tsx"
+      "norm_label": "settingsmodal.tsx",
+      "id": "components_settingsmodal"
     },
     {
       "label": "SCOPE_LABELS",
@@ -1435,9 +1445,9 @@
       "source_file": "krust-studio-app/src/renderer/src/components/SettingsModal.tsx",
       "source_location": "L31",
       "_origin": "ast",
-      "id": "components_settingsmodal_scope_labels",
       "community": 67,
-      "norm_label": "scope_labels"
+      "norm_label": "scope_labels",
+      "id": "components_settingsmodal_scope_labels"
     },
     {
       "label": "SettingsModal()",
@@ -1445,9 +1455,9 @@
       "source_file": "krust-studio-app/src/renderer/src/components/SettingsModal.tsx",
       "source_location": "L38",
       "_origin": "ast",
-      "id": "components_settingsmodal_settingsmodal",
       "community": 67,
-      "norm_label": "settingsmodal()"
+      "norm_label": "settingsmodal()",
+      "id": "components_settingsmodal_settingsmodal"
     },
     {
       "label": "components.json",
@@ -1695,7 +1705,7 @@
       "source_file": "krust-studio-app/scripts/sql-format.test.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 146,
+      "community": 3,
       "norm_label": "sql-format.test.ts",
       "id": "scripts_sql_format_test"
     },
@@ -1705,7 +1715,7 @@
       "source_file": "krust-studio-app/src/main/db/backup.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "backup.ts",
       "id": "db_backup"
     },
@@ -1715,7 +1725,7 @@
       "source_file": "krust-studio-app/src/main/db/backup.ts",
       "source_location": "L18",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "quoteident()",
       "id": "db_backup_quoteident"
     },
@@ -1725,7 +1735,7 @@
       "source_file": "krust-studio-app/src/main/db/backup.ts",
       "source_location": "L26",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "fkguards()",
       "id": "db_backup_fkguards"
     },
@@ -1735,7 +1745,7 @@
       "source_file": "krust-studio-app/src/main/db/backup.ts",
       "source_location": "L48",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "target()",
       "id": "db_backup_target"
     },
@@ -1745,7 +1755,7 @@
       "source_file": "krust-studio-app/src/main/db/backup.ts",
       "source_location": "L58",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "pgarraybody()",
       "id": "db_backup_pgarraybody"
     },
@@ -1755,7 +1765,7 @@
       "source_file": "krust-studio-app/src/main/db/backup.ts",
       "source_location": "L76",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "sqlliteral()",
       "id": "db_backup_sqlliteral"
     },
@@ -1765,7 +1775,7 @@
       "source_file": "krust-studio-app/src/main/db/backup.ts",
       "source_location": "L99",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "backupprogress",
       "id": "db_backup_backupprogress"
     },
@@ -1775,7 +1785,7 @@
       "source_file": "krust-studio-app/src/main/db/backup.ts",
       "source_location": "L106",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "runbackup()",
       "id": "db_backup_runbackup"
     },
@@ -1785,7 +1795,7 @@
       "source_file": "krust-studio-app/src/main/db/backup.ts",
       "source_location": "L191",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "restorepreview()",
       "id": "db_backup_restorepreview"
     },
@@ -1795,7 +1805,7 @@
       "source_file": "krust-studio-app/src/main/db/backup.ts",
       "source_location": "L212",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "restorerun()",
       "id": "db_backup_restorerun"
     },
@@ -1885,7 +1895,7 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L156",
       "_origin": "ast",
-      "community": 0,
+      "community": 5,
       "norm_label": "redisdriver",
       "id": "db_driver_redisdriver"
     },
@@ -1905,7 +1915,7 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L185",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "splitstatements()",
       "id": "db_driver_splitstatements"
     },
@@ -1915,7 +1925,7 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L283",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "classifystatement()",
       "id": "db_driver_classifystatement"
     },
@@ -1975,7 +1985,7 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L387",
       "_origin": "ast",
-      "community": 82,
+      "community": 68,
       "norm_label": "buildorderby()",
       "id": "db_driver_buildorderby"
     },
@@ -2025,7 +2035,7 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L482",
       "_origin": "ast",
-      "community": 82,
+      "community": 68,
       "norm_label": "buildwhere()",
       "id": "db_driver_buildwhere"
     },
@@ -2035,7 +2045,7 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L576",
       "_origin": "ast",
-      "community": 82,
+      "community": 68,
       "norm_label": "buildwhereclause()",
       "id": "db_driver_buildwhereclause"
     },
@@ -2085,7 +2095,7 @@
       "source_file": "krust-studio-app/src/main/db/driver.ts",
       "source_location": "L651",
       "_origin": "ast",
-      "community": 68,
+      "community": 5,
       "norm_label": "driverdeps",
       "id": "db_driver_driverdeps"
     },
@@ -2435,7 +2445,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/postgres.ts",
       "source_location": "L106",
       "_origin": "ast",
-      "community": 68,
+      "community": 5,
       "norm_label": ".constructor()",
       "id": "drivers_postgres_postgresdriver_constructor"
     },
@@ -2515,7 +2525,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/postgres.ts",
       "source_location": "L203",
       "_origin": "ast",
-      "community": 82,
+      "community": 68,
       "norm_label": ".readrows()",
       "id": "drivers_postgres_postgresdriver_readrows"
     },
@@ -2525,7 +2535,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/postgres.ts",
       "source_location": "L285",
       "_origin": "ast",
-      "community": 82,
+      "community": 68,
       "norm_label": ".countrows()",
       "id": "drivers_postgres_postgresdriver_countrows"
     },
@@ -2905,7 +2915,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L45",
       "_origin": "ast",
-      "community": 132,
+      "community": 152,
       "norm_label": "sqliteplannode()",
       "id": "drivers_sqlite_sqliteplannode"
     },
@@ -2925,7 +2935,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L68",
       "_origin": "ast",
-      "community": 68,
+      "community": 5,
       "norm_label": ".constructor()",
       "id": "drivers_sqlite_sqlitedriver_constructor"
     },
@@ -2995,7 +3005,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L115",
       "_origin": "ast",
-      "community": 82,
+      "community": 68,
       "norm_label": ".readrows()",
       "id": "drivers_sqlite_sqlitedriver_readrows"
     },
@@ -3005,7 +3015,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L168",
       "_origin": "ast",
-      "community": 82,
+      "community": 39,
       "norm_label": ".countrows()",
       "id": "drivers_sqlite_sqlitedriver_countrows"
     },
@@ -3015,7 +3025,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L177",
       "_origin": "ast",
-      "community": 5,
+      "community": 39,
       "norm_label": ".searchrows()",
       "id": "drivers_sqlite_sqlitedriver_searchrows"
     },
@@ -3035,7 +3045,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L252",
       "_origin": "ast",
-      "community": 82,
+      "community": 39,
       "norm_label": ".describetable()",
       "id": "drivers_sqlite_sqlitedriver_describetable"
     },
@@ -3175,7 +3185,7 @@
       "source_file": "krust-studio-app/src/main/db/drivers/sqlite.ts",
       "source_location": "L516",
       "_origin": "ast",
-      "community": 132,
+      "community": 152,
       "norm_label": ".explainquery()",
       "id": "drivers_sqlite_sqlitedriver_explainquery"
     },
@@ -3315,7 +3325,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L66",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "rel()",
       "id": "db_session_rel"
     },
@@ -3335,7 +3345,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L90",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "isdestructivestatement()",
       "id": "db_session_isdestructivestatement"
     },
@@ -3345,7 +3355,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L102",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "captureall()",
       "id": "db_session_captureall"
     },
@@ -3355,7 +3365,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L124",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "createdriver()",
       "id": "db_session_createdriver"
     },
@@ -3365,7 +3375,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L140",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "connectsession()",
       "id": "db_session_connectsession"
     },
@@ -3505,7 +3515,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L257",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "createtable()",
       "id": "db_session_createtable"
     },
@@ -3535,7 +3545,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L293",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "dropentity()",
       "id": "db_session_dropentity"
     },
@@ -3545,7 +3555,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L307",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "renametable()",
       "id": "db_session_renametable"
     },
@@ -3555,7 +3565,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L321",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "truncatetable()",
       "id": "db_session_truncatetable"
     },
@@ -3565,7 +3575,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L334",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "createindex()",
       "id": "db_session_createindex"
     },
@@ -3575,7 +3585,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L348",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "dropindex()",
       "id": "db_session_dropindex"
     },
@@ -3585,7 +3595,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L362",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "runscript()",
       "id": "db_session_runscript"
     },
@@ -3605,7 +3615,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L462",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "execrestorestatement()",
       "id": "db_session_execrestorestatement"
     },
@@ -3615,7 +3625,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L485",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "routinecap()",
       "id": "db_session_routinecap"
     },
@@ -3665,7 +3675,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L529",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "createroutine()",
       "id": "db_session_createroutine"
     },
@@ -3675,7 +3685,7 @@
       "source_file": "krust-studio-app/src/main/db/session.ts",
       "source_location": "L542",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "droproutine()",
       "id": "db_session_droproutine"
     },
@@ -3975,7 +3985,7 @@
       "source_file": "krust-studio-app/src/main/store/connections.ts",
       "source_location": "L79",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "getconnectionconfig()",
       "id": "store_connections_getconnectionconfig"
     },
@@ -4005,7 +4015,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "history.ts",
       "id": "store_history"
     },
@@ -4015,7 +4025,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L18",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "getdb()",
       "id": "store_history_getdb"
     },
@@ -4025,7 +4035,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L72",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "activekey()",
       "id": "store_history_activekey"
     },
@@ -4035,7 +4045,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L74",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "getactiveid()",
       "id": "store_history_getactiveid"
     },
@@ -4045,7 +4055,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L86",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "getautoattachdestructivesync()",
       "id": "store_history_getautoattachdestructivesync"
     },
@@ -4055,7 +4065,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L93",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "getautoattachdestructive()",
       "id": "store_history_getautoattachdestructive"
     },
@@ -4065,7 +4075,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L98",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "setautoattachdestructive()",
       "id": "store_history_setautoattachdestructive"
     },
@@ -4075,7 +4085,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L107",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "capture()",
       "id": "store_history_capture"
     },
@@ -4085,7 +4095,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L141",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "listhistory()",
       "id": "store_history_listhistory"
     },
@@ -4095,7 +4105,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L177",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "clearhistory()",
       "id": "store_history_clearhistory"
     },
@@ -4105,7 +4115,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L189",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "listchangesets()",
       "id": "store_history_listchangesets"
     },
@@ -4115,7 +4125,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L207",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "createchangeset()",
       "id": "store_history_createchangeset"
     },
@@ -4125,7 +4135,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L236",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "renamechangeset()",
       "id": "store_history_renamechangeset"
     },
@@ -4135,7 +4145,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L249",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "deletechangeset()",
       "id": "store_history_deletechangeset"
     },
@@ -4145,7 +4155,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L260",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "setactivesync()",
       "id": "store_history_setactivesync"
     },
@@ -4155,7 +4165,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L275",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "setactivechangeset()",
       "id": "store_history_setactivechangeset"
     },
@@ -4165,7 +4175,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L283",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "assignentries()",
       "id": "store_history_assignentries"
     },
@@ -4175,7 +4185,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L297",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "buildchangesetsql()",
       "id": "store_history_buildchangesetsql"
     },
@@ -4185,7 +4195,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L334",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "deleteentries()",
       "id": "store_history_deleteentries"
     },
@@ -4195,7 +4205,7 @@
       "source_file": "krust-studio-app/src/main/store/history.ts",
       "source_location": "L343",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "markexported()",
       "id": "store_history_markexported"
     },
@@ -4305,7 +4315,7 @@
       "source_file": "krust-studio-app/src/main/store/workspace.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 108,
       "norm_label": "workspace.ts",
       "id": "store_workspace"
     },
@@ -4315,7 +4325,7 @@
       "source_file": "krust-studio-app/src/main/store/workspace.ts",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 0,
+      "community": 108,
       "norm_label": "empty",
       "id": "store_workspace_empty"
     },
@@ -4325,7 +4335,7 @@
       "source_file": "krust-studio-app/src/main/store/workspace.ts",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 0,
+      "community": 108,
       "norm_label": "workspacepath()",
       "id": "store_workspace_workspacepath"
     },
@@ -4335,7 +4345,7 @@
       "source_file": "krust-studio-app/src/main/store/workspace.ts",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 0,
+      "community": 108,
       "norm_label": "loadworkspace()",
       "id": "store_workspace_loadworkspace"
     },
@@ -4345,7 +4355,7 @@
       "source_file": "krust-studio-app/src/main/store/workspace.ts",
       "source_location": "L26",
       "_origin": "ast",
-      "community": 0,
+      "community": 108,
       "norm_label": "saveworkspace()",
       "id": "store_workspace_saveworkspace"
     },
@@ -4375,7 +4385,7 @@
       "source_file": "krust-studio-app/src/preload/index.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "index.ts",
       "id": "preload_index"
     },
@@ -4385,7 +4395,7 @@
       "source_file": "krust-studio-app/src/preload/index.ts",
       "source_location": "L26",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "api",
       "id": "preload_index_api"
     },
@@ -4395,7 +4405,7 @@
       "source_file": "krust-studio-app/src/renderer/src/App.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 67,
+      "community": 118,
       "norm_label": "app.tsx",
       "id": "src_app"
     },
@@ -4405,7 +4415,7 @@
       "source_file": "krust-studio-app/src/renderer/src/App.tsx",
       "source_location": "L22",
       "_origin": "ast",
-      "community": 67,
+      "community": 118,
       "norm_label": "app()",
       "id": "src_app_app"
     },
@@ -4415,7 +4425,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/AppSidebar.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 142,
+      "community": 8,
       "norm_label": "appsidebar.tsx",
       "id": "components_appsidebar"
     },
@@ -4425,7 +4435,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/AppSidebar.tsx",
       "source_location": "L76",
       "_origin": "ast",
-      "community": 142,
+      "community": 8,
       "norm_label": "appsidebar()",
       "id": "components_appsidebar_appsidebar"
     },
@@ -4435,7 +4445,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/AppSidebar.tsx",
       "source_location": "L591",
       "_origin": "ast",
-      "community": 142,
+      "community": 8,
       "norm_label": "routinegroup()",
       "id": "components_appsidebar_routinegroup"
     },
@@ -4445,7 +4455,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/AppSidebar.tsx",
       "source_location": "L681",
       "_origin": "ast",
-      "community": 142,
+      "community": 8,
       "norm_label": "entitygroup()",
       "id": "components_appsidebar_entitygroup"
     },
@@ -4455,7 +4465,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/AppSidebar.tsx",
       "source_location": "L799",
       "_origin": "ast",
-      "community": 142,
+      "community": 8,
       "norm_label": "enumgroup()",
       "id": "components_appsidebar_enumgroup"
     },
@@ -4555,7 +4565,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ColumnsEditor.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 120,
+      "community": 27,
       "norm_label": "columnseditor.tsx",
       "id": "components_columnseditor"
     },
@@ -4565,7 +4575,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ColumnsEditor.tsx",
       "source_location": "L31",
       "_origin": "ast",
-      "community": 120,
+      "community": 27,
       "norm_label": "editorcolumn",
       "id": "components_columnseditor_editorcolumn"
     },
@@ -4575,7 +4585,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ColumnsEditor.tsx",
       "source_location": "L40",
       "_origin": "ast",
-      "community": 120,
+      "community": 27,
       "norm_label": "rowchanged()",
       "id": "components_columnseditor_rowchanged"
     },
@@ -4585,7 +4595,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ColumnsEditor.tsx",
       "source_location": "L61",
       "_origin": "ast",
-      "community": 120,
+      "community": 27,
       "norm_label": "fk_actions",
       "id": "components_columnseditor_fk_actions"
     },
@@ -4595,7 +4605,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ColumnsEditor.tsx",
       "source_location": "L65",
       "_origin": "ast",
-      "community": 120,
+      "community": 27,
       "norm_label": "columnseditor()",
       "id": "components_columnseditor_columnseditor"
     },
@@ -4825,7 +4835,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/DataGrid.tsx",
       "source_location": "L114",
       "_origin": "ast",
-      "community": 67,
+      "community": 118,
       "norm_label": "datagrid()",
       "id": "components_datagrid_datagrid"
     },
@@ -4835,7 +4845,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/DatabaseSwitcher.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 118,
       "norm_label": "databaseswitcher.tsx",
       "id": "components_databaseswitcher"
     },
@@ -4845,7 +4855,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/DatabaseSwitcher.tsx",
       "source_location": "L18",
       "_origin": "ast",
-      "community": 1,
+      "community": 118,
       "norm_label": "databaseswitcher()",
       "id": "components_databaseswitcher_databaseswitcher"
     },
@@ -5005,7 +5015,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/FkInlinePicker.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 82,
+      "community": 35,
       "norm_label": "fkinlinepicker.tsx",
       "id": "components_fkinlinepicker"
     },
@@ -5015,7 +5025,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/FkInlinePicker.tsx",
       "source_location": "L27",
       "_origin": "ast",
-      "community": 82,
+      "community": 35,
       "norm_label": "props",
       "id": "components_fkinlinepicker_props"
     },
@@ -5025,7 +5035,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/FkInlinePicker.tsx",
       "source_location": "L45",
       "_origin": "ast",
-      "community": 82,
+      "community": 35,
       "norm_label": "fkinlinepicker()",
       "id": "components_fkinlinepicker_fkinlinepicker"
     },
@@ -5035,7 +5045,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 108,
+      "community": 3,
       "norm_label": "historyview.tsx",
       "id": "components_historyview"
     },
@@ -5045,7 +5055,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L49",
       "_origin": "ast",
-      "community": 108,
+      "community": 3,
       "norm_label": "view",
       "id": "components_historyview_view"
     },
@@ -5055,7 +5065,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L54",
       "_origin": "ast",
-      "community": 108,
+      "community": 3,
       "norm_label": "when()",
       "id": "components_historyview_when"
     },
@@ -5065,7 +5075,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L57",
       "_origin": "ast",
-      "community": 108,
+      "community": 3,
       "norm_label": "withsemi()",
       "id": "components_historyview_withsemi"
     },
@@ -5075,7 +5085,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L61",
       "_origin": "ast",
-      "community": 108,
+      "community": 3,
       "norm_label": "oneline()",
       "id": "components_historyview_oneline"
     },
@@ -5085,7 +5095,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L63",
       "_origin": "ast",
-      "community": 108,
+      "community": 3,
       "norm_label": "fmtlang()",
       "id": "components_historyview_fmtlang"
     },
@@ -5095,7 +5105,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L67",
       "_origin": "ast",
-      "community": 108,
+      "community": 3,
       "norm_label": "tryformat()",
       "id": "components_historyview_tryformat"
     },
@@ -5105,7 +5115,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/HistoryView.tsx",
       "source_location": "L76",
       "_origin": "ast",
-      "community": 108,
+      "community": 3,
       "norm_label": "historyview()",
       "id": "components_historyview_historyview"
     },
@@ -5595,7 +5605,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RoutineView.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 23,
+      "community": 3,
       "norm_label": "routineview.tsx",
       "id": "components_routineview"
     },
@@ -5605,7 +5615,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RoutineView.tsx",
       "source_location": "L31",
       "_origin": "ast",
-      "community": 23,
+      "community": 3,
       "norm_label": "subview",
       "id": "components_routineview_subview"
     },
@@ -5615,7 +5625,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RoutineView.tsx",
       "source_location": "L33",
       "_origin": "ast",
-      "community": 23,
+      "community": 3,
       "norm_label": "routineview()",
       "id": "components_routineview_routineview"
     },
@@ -5625,7 +5635,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RoutineView.tsx",
       "source_location": "L421",
       "_origin": "ast",
-      "community": 23,
+      "community": 3,
       "norm_label": "subtab()",
       "id": "components_routineview_subtab"
     },
@@ -5635,7 +5645,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RoutineView.tsx",
       "source_location": "L443",
       "_origin": "ast",
-      "community": 23,
+      "community": 3,
       "norm_label": "routineresult()",
       "id": "components_routineview_routineresult"
     },
@@ -5645,7 +5655,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RoutineView.tsx",
       "source_location": "L487",
       "_origin": "ast",
-      "community": 23,
+      "community": 3,
       "norm_label": "resulttable()",
       "id": "components_routineview_resulttable"
     },
@@ -5655,7 +5665,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/RoutineView.tsx",
       "source_location": "L524",
       "_origin": "ast",
-      "community": 23,
+      "community": 3,
       "norm_label": "fmtcell()",
       "id": "components_routineview_fmtcell"
     },
@@ -5885,7 +5895,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/StructureView.tsx",
       "source_location": "L112",
       "_origin": "ast",
-      "community": 15,
+      "community": 118,
       "norm_label": "structureview()",
       "id": "components_structureview_structureview"
     },
@@ -5895,7 +5905,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/TabBar.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 120,
       "norm_label": "tabbar.tsx",
       "id": "components_tabbar"
     },
@@ -5905,7 +5915,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/TabBar.tsx",
       "source_location": "L33",
       "_origin": "ast",
-      "community": 1,
+      "community": 120,
       "norm_label": "tabicon()",
       "id": "components_tabbar_tabicon"
     },
@@ -5915,7 +5925,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/TabBar.tsx",
       "source_location": "L41",
       "_origin": "ast",
-      "community": 1,
+      "community": 120,
       "norm_label": "tabbar()",
       "id": "components_tabbar_tabbar"
     },
@@ -5935,7 +5945,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/TableTabView.tsx",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 1,
+      "community": 118,
       "norm_label": "tabletabview()",
       "id": "components_tabletabview_tabletabview"
     },
@@ -6045,7 +6055,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ViewSwitch.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 129,
       "norm_label": "viewswitch.tsx",
       "id": "components_viewswitch"
     },
@@ -6055,7 +6065,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ViewSwitch.tsx",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 1,
+      "community": 129,
       "norm_label": "views",
       "id": "components_viewswitch_views"
     },
@@ -6065,7 +6075,7 @@
       "source_file": "krust-studio-app/src/renderer/src/components/ViewSwitch.tsx",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 1,
+      "community": 129,
       "norm_label": "viewswitch()",
       "id": "components_viewswitch_viewswitch"
     },
@@ -7995,7 +8005,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/sqlFormat.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 146,
+      "community": 3,
       "norm_label": "sqlformat.ts",
       "id": "lib_sqlformat"
     },
@@ -8005,7 +8015,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/sqlFormat.ts",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 146,
+      "community": 3,
       "norm_label": "dialects",
       "id": "lib_sqlformat_dialects"
     },
@@ -8015,7 +8025,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/sqlFormat.ts",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 146,
+      "community": 3,
       "norm_label": "formatsql()",
       "id": "lib_sqlformat_formatsql"
     },
@@ -8025,7 +8035,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/sqlFormat.ts",
       "source_location": "L20",
       "_origin": "ast",
-      "community": 146,
+      "community": 3,
       "norm_label": "displaysql()",
       "id": "lib_sqlformat_displaysql"
     },
@@ -8035,7 +8045,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/sqlHighlight.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 129,
+      "community": 3,
       "norm_label": "sqlhighlight.tsx",
       "id": "lib_sqlhighlight"
     },
@@ -8045,7 +8055,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/sqlHighlight.tsx",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 129,
+      "community": 3,
       "norm_label": "colors",
       "id": "lib_sqlhighlight_colors"
     },
@@ -8055,7 +8065,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/sqlHighlight.tsx",
       "source_location": "L19",
       "_origin": "ast",
-      "community": 129,
+      "community": 3,
       "norm_label": "highlighter",
       "id": "lib_sqlhighlight_highlighter"
     },
@@ -8065,7 +8075,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/sqlHighlight.tsx",
       "source_location": "L29",
       "_origin": "ast",
-      "community": 129,
+      "community": 3,
       "norm_label": "dialectfor()",
       "id": "lib_sqlhighlight_dialectfor"
     },
@@ -8075,7 +8085,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/sqlHighlight.tsx",
       "source_location": "L42",
       "_origin": "ast",
-      "community": 129,
+      "community": 3,
       "norm_label": "stylefor()",
       "id": "lib_sqlhighlight_stylefor"
     },
@@ -8085,7 +8095,7 @@
       "source_file": "krust-studio-app/src/renderer/src/lib/sqlHighlight.tsx",
       "source_location": "L56",
       "_origin": "ast",
-      "community": 129,
+      "community": 3,
       "norm_label": "highlightsql()",
       "id": "lib_sqlhighlight_highlightsql"
     },
@@ -8145,7 +8155,7 @@
       "source_file": "krust-studio-app/src/renderer/src/main.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 67,
+      "community": 118,
       "norm_label": "main.tsx",
       "id": "src_main"
     },
@@ -8155,7 +8165,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "connections.ts",
       "id": "krust_studio_app_src_renderer_src_store_connections_ts_store_connections"
     },
@@ -8165,7 +8175,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L34",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "querystate",
       "id": "store_connections_querystate"
     },
@@ -8175,7 +8185,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L46",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "tabview",
       "id": "store_connections_tabview"
     },
@@ -8185,7 +8195,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L47",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "structuresub",
       "id": "store_connections_structuresub"
     },
@@ -8195,7 +8205,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L51",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "sessionstatus",
       "id": "store_connections_sessionstatus"
     },
@@ -8205,7 +8215,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L53",
       "_origin": "ast",
-      "community": 82,
+      "community": 8,
       "norm_label": "tab",
       "id": "store_connections_tab"
     },
@@ -8215,7 +8225,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L130",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "tabhasdatachanges()",
       "id": "store_connections_tabhasdatachanges"
     },
@@ -8225,7 +8235,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L139",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "tabhasdraftcontent()",
       "id": "store_connections_tabhasdraftcontent"
     },
@@ -8235,7 +8245,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L150",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "tabisdirty()",
       "id": "store_connections_tabisdirty"
     },
@@ -8245,7 +8255,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L154",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "editkey()",
       "id": "store_connections_editkey"
     },
@@ -8255,7 +8265,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L158",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "entitykey()",
       "id": "store_connections_entitykey"
     },
@@ -8265,7 +8275,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L162",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "routinekey()",
       "id": "store_connections_routinekey"
     },
@@ -8275,7 +8285,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L167",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "newroutinetemplate()",
       "id": "store_connections_newroutinetemplate"
     },
@@ -8285,7 +8295,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L173",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "connectionsstate",
       "id": "store_connections_connectionsstate"
     },
@@ -8295,7 +8305,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/connections.ts",
       "source_location": "L319",
       "_origin": "ast",
-      "community": 1,
+      "community": 118,
       "norm_label": "useconnections",
       "id": "store_connections_useconnections"
     },
@@ -8625,7 +8635,7 @@
       "source_file": "krust-studio-app/src/renderer/src/store/settings.ts",
       "source_location": "L144",
       "_origin": "ast",
-      "community": 67,
+      "community": 118,
       "norm_label": "usesettings",
       "id": "store_settings_usesettings"
     },
@@ -8665,7 +8675,7 @@
       "source_file": "krust-studio-app/src/shared/capabilities.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 142,
+      "community": 8,
       "norm_label": "capabilities.ts",
       "id": "shared_capabilities"
     },
@@ -8675,7 +8685,7 @@
       "source_file": "krust-studio-app/src/shared/capabilities.ts",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 142,
+      "community": 8,
       "norm_label": "capabilities",
       "id": "shared_capabilities_capabilities"
     },
@@ -8685,7 +8695,7 @@
       "source_file": "krust-studio-app/src/shared/capabilities.ts",
       "source_location": "L52",
       "_origin": "ast",
-      "community": 142,
+      "community": 8,
       "norm_label": "capabilitiesfor()",
       "id": "shared_capabilities_capabilitiesfor"
     },
@@ -8735,7 +8745,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L27",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "saveconnectioninput",
       "id": "shared_types_saveconnectioninput"
     },
@@ -8745,7 +8755,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L33",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "testconnectioninput",
       "id": "shared_types_testconnectioninput"
     },
@@ -8775,7 +8785,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L59",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "entitytype",
       "id": "shared_types_entitytype"
     },
@@ -8805,7 +8815,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L76",
       "_origin": "ast",
-      "community": 82,
+      "community": 39,
       "norm_label": "entityref",
       "id": "shared_types_entityref"
     },
@@ -8815,7 +8825,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L81",
       "_origin": "ast",
-      "community": 5,
+      "community": 35,
       "norm_label": "columninfo",
       "id": "shared_types_columninfo"
     },
@@ -8825,7 +8835,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L87",
       "_origin": "ast",
-      "community": 5,
+      "community": 40,
       "norm_label": "foreignkey",
       "id": "shared_types_foreignkey"
     },
@@ -8835,7 +8845,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L94",
       "_origin": "ast",
-      "community": 82,
+      "community": 8,
       "norm_label": "sort",
       "id": "shared_types_sort"
     },
@@ -8845,7 +8855,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L99",
       "_origin": "ast",
-      "community": 82,
+      "community": 68,
       "norm_label": "rowsresult",
       "id": "shared_types_rowsresult"
     },
@@ -8855,7 +8865,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L108",
       "_origin": "ast",
-      "community": 5,
+      "community": 35,
       "norm_label": "searchresult",
       "id": "shared_types_searchresult"
     },
@@ -8885,7 +8895,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L122",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "routineref",
       "id": "shared_types_routineref"
     },
@@ -8895,7 +8905,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L131",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "routineinfo",
       "id": "shared_types_routineinfo"
     },
@@ -8915,7 +8925,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L150",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "routinedef",
       "id": "shared_types_routinedef"
     },
@@ -8925,7 +8935,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L166",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "routinearg",
       "id": "shared_types_routinearg"
     },
@@ -8935,7 +8945,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L173",
       "_origin": "ast",
-      "community": 5,
+      "community": 3,
       "norm_label": "routineexecresult",
       "id": "shared_types_routineexecresult"
     },
@@ -8945,7 +8955,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L186",
       "_origin": "ast",
-      "community": 5,
+      "community": 152,
       "norm_label": "plannode",
       "id": "shared_types_plannode"
     },
@@ -8955,7 +8965,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L208",
       "_origin": "ast",
-      "community": 132,
+      "community": 152,
       "norm_label": "queryplan",
       "id": "shared_types_queryplan"
     },
@@ -8965,7 +8975,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L219",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "queryresult",
       "id": "shared_types_queryresult"
     },
@@ -8985,7 +8995,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L238",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "rowedit",
       "id": "shared_types_rowedit"
     },
@@ -9015,7 +9025,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L259",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "historystream",
       "id": "shared_types_historystream"
     },
@@ -9025,7 +9035,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L268",
       "_origin": "ast",
-      "community": 108,
+      "community": 3,
       "norm_label": "historyentry",
       "id": "shared_types_historyentry"
     },
@@ -9035,7 +9045,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L291",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "historyquery",
       "id": "shared_types_historyquery"
     },
@@ -9045,7 +9055,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L318",
       "_origin": "ast",
-      "community": 0,
+      "community": 82,
       "norm_label": "captureinput",
       "id": "shared_types_captureinput"
     },
@@ -9075,7 +9085,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L377",
       "_origin": "ast",
-      "community": 82,
+      "community": 8,
       "norm_label": "filter",
       "id": "shared_types_filter"
     },
@@ -9085,7 +9095,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L391",
       "_origin": "ast",
-      "community": 120,
+      "community": 27,
       "norm_label": "structurecolumn",
       "id": "shared_types_structurecolumn"
     },
@@ -9105,7 +9115,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L415",
       "_origin": "ast",
-      "community": 39,
+      "community": 8,
       "norm_label": "indexspec",
       "id": "shared_types_indexspec"
     },
@@ -9135,7 +9145,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L451",
       "_origin": "ast",
-      "community": 82,
+      "community": 39,
       "norm_label": "tablestructure",
       "id": "shared_types_tablestructure"
     },
@@ -9155,7 +9165,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L477",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "createtablespec",
       "id": "shared_types_createtablespec"
     },
@@ -9165,7 +9175,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L487",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "tabletemplate",
       "id": "shared_types_tabletemplate"
     },
@@ -9175,7 +9185,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L496",
       "_origin": "ast",
-      "community": 39,
+      "community": 8,
       "norm_label": "schemaop",
       "id": "shared_types_schemaop"
     },
@@ -9205,7 +9215,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L643",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "serializedtab",
       "id": "shared_types_serializedtab"
     },
@@ -9215,7 +9225,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L676",
       "_origin": "ast",
-      "community": 132,
+      "community": 8,
       "norm_label": "connectionworkspace",
       "id": "shared_types_connectionworkspace"
     },
@@ -9225,7 +9235,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L681",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "workspacedata",
       "id": "shared_types_workspacedata"
     },
@@ -9265,7 +9275,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L701",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "backupspec",
       "id": "shared_types_backupspec"
     },
@@ -9275,7 +9285,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L707",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "backupresult",
       "id": "shared_types_backupresult"
     },
@@ -9285,7 +9295,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L715",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "restorestatement",
       "id": "shared_types_restorestatement"
     },
@@ -9305,7 +9315,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L730",
       "_origin": "ast",
-      "community": 0,
+      "community": 23,
       "norm_label": "restorerunresult",
       "id": "shared_types_restorerunresult"
     },
@@ -9345,7 +9355,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L773",
       "_origin": "ast",
-      "community": 142,
+      "community": 8,
       "norm_label": "drivercapabilities",
       "id": "shared_types_drivercapabilities"
     },
@@ -9385,7 +9395,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L823",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "readvalueopts",
       "id": "shared_types_readvalueopts"
     },
@@ -9435,7 +9445,7 @@
       "source_file": "krust-studio-app/src/shared/types.ts",
       "source_location": "L887",
       "_origin": "ast",
-      "community": 0,
+      "community": 8,
       "norm_label": "rediscommitbatch",
       "id": "shared_types_rediscommitbatch"
     },
@@ -15135,356 +15145,6 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L1",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo",
-      "target": "docs_todo_krust_studio_todo_gap_backlog"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_1_7_0_beta_release_in_progress"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L476",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_known_bugs_sharp_edges"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_p0_next_inline_filter_builder_raw_where_done"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L173",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_p0_v1_3_0_workspace_connection_resilience_done"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_p0_v1_3_4_v1_4_0_editor_history_backup_ux_planned"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L97",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_p0_v1_5_0_shortcuts_settings_history_ux_planned"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L147",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_p0_v1_6_0_pinned_columns_done"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_p0_v1_7_0_procedures_functions_routines_beta_1_built_needs_live_test"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L220",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_p1_high_value_mostly_cheap"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L245",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_p2_schema_completeness"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L286",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_p3_data_reader_depth"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L325",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_p4_the_headline_feature_adr_0002_bigger"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L350",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_p5_bigger_surfaces_own_cycles"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L373",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_krust_studio_todo_gap_backlog",
-      "target": "docs_todo_resolved"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L12",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_p0_v1_7_0_procedures_functions_routines_beta_1_built_needs_live_test",
-      "target": "docs_todo_beta_1_browse_execute_create_drop_built_2026_07_02_typecheck_build_green_not_yet_live_tested"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L88",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_p0_v1_7_0_procedures_functions_routines_beta_1_built_needs_live_test",
-      "target": "docs_todo_beta_2_mysql_safe_replacement"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L12",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_p0_v1_3_4_v1_4_0_editor_history_backup_ux_planned",
-      "target": "docs_todo_v1_3_4_fix_data_loss_feel_done_merged_69c7791_manually_verified"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/TODO.md",
-      "source_location": "L41",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "docs_todo_p0_v1_3_4_v1_4_0_editor_history_backup_ux_planned",
-      "target": "docs_todo_v1_4_0_features"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
-      "source_location": "L1",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_beta_tracking_issue",
-      "target": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
-      "source_location": "L34",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
-      "target": "v1_7_0_beta_1_beta_tracking_issue_existing_driver_regressions"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
-      "source_location": "L23",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
-      "target": "v1_7_0_beta_1_beta_tracking_issue_procedures_functions"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
-      "source_location": "L19",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
-      "target": "v1_7_0_beta_1_beta_tracking_issue_redis"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
-      "source_location": "L28",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
-      "target": "v1_7_0_beta_1_beta_tracking_issue_sql_prettification"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
-      "source_location": "L31",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
-      "target": "v1_7_0_beta_1_beta_tracking_issue_starrocks_experimental"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L1",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_full",
-      "target": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L36",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_data_grid"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L63",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_not_in_this_beta_planned_for_later_1_7_0_betas"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L52",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_other"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L22",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_procedures_functions_beta"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L9",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_redis_beta"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L46",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_settings"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L57",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_under_the_hood"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/full.md",
-      "source_location": "L70",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
-      "target": "v1_7_0_beta_1_full_verification_still_needed"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/release/v1.7.0-beta.1/short.md",
-      "source_location": "L1",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "v1_7_0_beta_1_short",
-      "target": "v1_7_0_beta_1_short_krust_studio_1_7_0_beta_1"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
       "source_file": "krust-studio-app/package.json",
       "source_location": "L7",
       "weight": 1.0,
@@ -15751,6 +15411,16 @@
       "confidence_score": 1.0,
       "source": "krust_studio_app_package_dependencies",
       "target": "krust_studio_app_package_dependencies_clsx"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/package.json",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "krust_studio_app_package_dependencies",
+      "target": "krust_studio_app_package_dependencies_cluster_key_slot",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -16301,6 +15971,356 @@
       "confidence_score": 1.0,
       "source": "krust_studio_app_package_devdependencies",
       "target": "krust_studio_app_package_devdependencies_vitejs_plugin_react"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo",
+      "target": "docs_todo_krust_studio_todo_gap_backlog"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_1_7_0_beta_release_in_progress"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L476",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_known_bugs_sharp_edges"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_p0_next_inline_filter_builder_raw_where_done"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L173",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_p0_v1_3_0_workspace_connection_resilience_done"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_p0_v1_3_4_v1_4_0_editor_history_backup_ux_planned"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L97",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_p0_v1_5_0_shortcuts_settings_history_ux_planned"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L147",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_p0_v1_6_0_pinned_columns_done"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_p0_v1_7_0_procedures_functions_routines_beta_1_built_needs_live_test"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L220",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_p1_high_value_mostly_cheap"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L245",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_p2_schema_completeness"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L286",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_p3_data_reader_depth"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L325",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_p4_the_headline_feature_adr_0002_bigger"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L350",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_p5_bigger_surfaces_own_cycles"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L373",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_resolved"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_p0_v1_7_0_procedures_functions_routines_beta_1_built_needs_live_test",
+      "target": "docs_todo_beta_1_browse_execute_create_drop_built_2026_07_02_typecheck_build_green_not_yet_live_tested"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L88",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_p0_v1_7_0_procedures_functions_routines_beta_1_built_needs_live_test",
+      "target": "docs_todo_beta_2_mysql_safe_replacement"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_p0_v1_3_4_v1_4_0_editor_history_backup_ux_planned",
+      "target": "docs_todo_v1_3_4_fix_data_loss_feel_done_merged_69c7791_manually_verified"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
+      "source_location": "L41",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_todo_p0_v1_3_4_v1_4_0_editor_history_backup_ux_planned",
+      "target": "docs_todo_v1_4_0_features"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_beta_tracking_issue",
+      "target": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L34",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
+      "target": "v1_7_0_beta_1_beta_tracking_issue_existing_driver_regressions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L23",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
+      "target": "v1_7_0_beta_1_beta_tracking_issue_procedures_functions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L19",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
+      "target": "v1_7_0_beta_1_beta_tracking_issue_redis"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L28",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
+      "target": "v1_7_0_beta_1_beta_tracking_issue_sql_prettification"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L31",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
+      "target": "v1_7_0_beta_1_beta_tracking_issue_starrocks_experimental"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_full",
+      "target": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L36",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_data_grid"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L63",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_not_in_this_beta_planned_for_later_1_7_0_betas"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L52",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_other"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L22",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_procedures_functions_beta"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_redis_beta"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L46",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_settings"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L57",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_under_the_hood"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L70",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_verification_still_needed"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/short.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "v1_7_0_beta_1_short",
+      "target": "v1_7_0_beta_1_short_krust_studio_1_7_0_beta_1"
     },
     {
       "relation": "contains",
@@ -41695,5 +41715,5 @@
       "source_file": "docs/adr/0017-inline-filter-builder-with-raw-where.md"
     }
   ],
-  "built_at_commit": "dbcee39bed96a6613907f5343a5759e435fbfe41"
+  "built_at_commit": "f468111846ebe4928a0b7df16ac8b33b97775e84"
 }

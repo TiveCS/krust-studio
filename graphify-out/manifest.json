@@ -40,8 +40,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/index.ts": {
-    "mtime": 1783007007.399942,
-    "ast_hash": "26037a793a28182078b5b8ccbe61ebfb",
+    "mtime": 1783030459.7502375,
+    "ast_hash": "4847f81de80717c5f3de5454a62a7a03",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/ipc.ts": {
@@ -440,8 +440,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/package.json": {
-    "mtime": 1783007027.7545338,
-    "ast_hash": "47bd22be31cf573e1786127e71140b7f",
+    "mtime": 1783030194.0985153,
+    "ast_hash": "5991b061f771467cadbae50d25b38244",
     "semantic_hash": ""
   },
   "krust-studio-app/tsconfig.json": {
@@ -830,8 +830,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/drivers/redis.ts": {
-    "mtime": 1782994747.777183,
-    "ast_hash": "813c5521ff02b66d7619da7a2b803d53",
+    "mtime": 1783030438.1773336,
+    "ast_hash": "b38b0c7655ade55773ecd1f4cf4212ab",
     "semantic_hash": ""
   },
   "krust-studio-app/src/shared/capabilities.ts": {
@@ -927,6 +927,11 @@
   "docs/release/v1.7.0-beta.1/short.md": {
     "mtime": 1783007141.1816156,
     "ast_hash": "4b4de3372bf7b486aadf5398e0d37f30",
+    "semantic_hash": ""
+  },
+  "docs/release/v1.7.0-beta.2/short.md": {
+    "mtime": 1783030497.0439825,
+    "ast_hash": "4906f0e39ed898e2b7ced9a90a32950d",
     "semantic_hash": ""
   }
 }
