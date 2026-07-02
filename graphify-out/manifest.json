@@ -40,8 +40,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/index.ts": {
-    "mtime": 1782259727.3230023,
-    "ast_hash": "f6bab37bb225e9cef6c2b8ad138250db",
+    "mtime": 1783007007.399942,
+    "ast_hash": "26037a793a28182078b5b8ccbe61ebfb",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/ipc.ts": {
@@ -175,8 +175,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/SettingsModal.tsx": {
-    "mtime": 1783006148.0759768,
-    "ast_hash": "4f2bf5cf34408063157845827ade247c",
+    "mtime": 1783007084.1948905,
+    "ast_hash": "d66adc36a8f17bc0716c37c5ec344acb",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/SqlDisplay.tsx": {
@@ -440,8 +440,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/package.json": {
-    "mtime": 1782744520.6180418,
-    "ast_hash": "d3be29fe3fac1b65e62cba4a607321d6",
+    "mtime": 1783007027.7545338,
+    "ast_hash": "47bd22be31cf573e1786127e71140b7f",
     "semantic_hash": ""
   },
   "krust-studio-app/tsconfig.json": {
@@ -490,8 +490,8 @@
     "semantic_hash": "8453e4e9363dec88cec0240f77c01901"
   },
   "docs/TODO.md": {
-    "mtime": 1783002290.0460615,
-    "ast_hash": "a0792c721c0bcb41b8da6b1ce1a30b9f",
+    "mtime": 1783007212.794288,
+    "ast_hash": "909315d7097edda4b2d9a9b107cf56c8",
     "semantic_hash": ""
   },
   "docs/adr/0001-electron-over-tauri.md": {
@@ -685,8 +685,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/electron-builder.yml": {
-    "mtime": 1782259022.7188983,
-    "ast_hash": "3b8315af8fe81b35e21a9700d1c4e827",
+    "mtime": 1783007201.218028,
+    "ast_hash": "c7275e3a0cc781995ed2cb1ab9201a3f",
     "semantic_hash": ""
   },
   "krust-studio-app/pnpm-workspace.yaml": {
@@ -902,6 +902,31 @@
   "docs/adr/0021-capability-based-routines.md": {
     "mtime": 1783000635.1241136,
     "ast_hash": "14d4abf7598129de98efeb930af16f65",
+    "semantic_hash": ""
+  },
+  "krust-studio-app/src/main/store/prefs.ts": {
+    "mtime": 1783006966.3852808,
+    "ast_hash": "a6e7e1aee825243739c74a87906d8240",
+    "semantic_hash": ""
+  },
+  "docs/release/v1.7.0-beta.1/beta-tracking-issue.md": {
+    "mtime": 1783007185.3426685,
+    "ast_hash": "ab0ca1585d86acd775d7c4d0b11fec0a",
+    "semantic_hash": ""
+  },
+  "docs/release/v1.7.0-beta.1/blurb.md": {
+    "mtime": 1783007172.2893772,
+    "ast_hash": "d1256577140b231bb8b4a9b0117f9fea",
+    "semantic_hash": ""
+  },
+  "docs/release/v1.7.0-beta.1/full.md": {
+    "mtime": 1783007163.8547018,
+    "ast_hash": "1bb921ad78824c4308af1e918a883a52",
+    "semantic_hash": ""
+  },
+  "docs/release/v1.7.0-beta.1/short.md": {
+    "mtime": 1783007141.1816156,
+    "ast_hash": "4b4de3372bf7b486aadf5398e0d37f30",
     "semantic_hash": ""
   }
 }

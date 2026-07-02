@@ -1176,7 +1176,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "db_backup",
-      "community": 0,
+      "community": 68,
       "norm_label": "backup.ts"
     },
     {
@@ -1186,7 +1186,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "db_backup_quoteident",
-      "community": 0,
+      "community": 68,
       "norm_label": "quoteident()"
     },
     {
@@ -1196,7 +1196,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "db_backup_fkguards",
-      "community": 0,
+      "community": 68,
       "norm_label": "fkguards()"
     },
     {
@@ -1206,7 +1206,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "db_backup_target",
-      "community": 0,
+      "community": 68,
       "norm_label": "target()"
     },
     {
@@ -1216,7 +1216,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "db_backup_pgarraybody",
-      "community": 0,
+      "community": 68,
       "norm_label": "pgarraybody()"
     },
     {
@@ -1226,7 +1226,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "db_backup_sqlliteral",
-      "community": 0,
+      "community": 68,
       "norm_label": "sqlliteral()"
     },
     {
@@ -1236,7 +1236,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "db_backup_backupprogress",
-      "community": 0,
+      "community": 68,
       "norm_label": "backupprogress"
     },
     {
@@ -1246,7 +1246,7 @@
       "source_location": "L106",
       "_origin": "ast",
       "id": "db_backup_runbackup",
-      "community": 0,
+      "community": 68,
       "norm_label": "runbackup()"
     },
     {
@@ -1256,7 +1256,7 @@
       "source_location": "L191",
       "_origin": "ast",
       "id": "db_backup_restorepreview",
-      "community": 0,
+      "community": 68,
       "norm_label": "restorepreview()"
     },
     {
@@ -1266,7 +1266,7 @@
       "source_location": "L212",
       "_origin": "ast",
       "id": "db_backup_restorerun",
-      "community": 0,
+      "community": 68,
       "norm_label": "restorerun()"
     },
     {
@@ -1286,7 +1286,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "db_driver_drivercore",
-      "community": 119,
+      "community": 5,
       "norm_label": "drivercore"
     },
     {
@@ -1336,7 +1336,7 @@
       "source_location": "L130",
       "_origin": "ast",
       "id": "db_driver_dbdriver",
-      "community": 134,
+      "community": 39,
       "norm_label": "dbdriver"
     },
     {
@@ -1346,7 +1346,7 @@
       "source_location": "L137",
       "_origin": "ast",
       "id": "db_driver_keyvaluecapable",
-      "community": 110,
+      "community": 119,
       "norm_label": "keyvaluecapable"
     },
     {
@@ -1356,7 +1356,7 @@
       "source_location": "L156",
       "_origin": "ast",
       "id": "db_driver_redisdriver",
-      "community": 0,
+      "community": 5,
       "norm_label": "redisdriver"
     },
     {
@@ -1366,7 +1366,7 @@
       "source_location": "L163",
       "_origin": "ast",
       "id": "db_driver_routinecapable",
-      "community": 134,
+      "community": 5,
       "norm_label": "routinecapable"
     },
     {
@@ -1376,7 +1376,7 @@
       "source_location": "L185",
       "_origin": "ast",
       "id": "db_driver_splitstatements",
-      "community": 0,
+      "community": 68,
       "norm_label": "splitstatements()"
     },
     {
@@ -1396,7 +1396,7 @@
       "source_location": "L303",
       "_origin": "ast",
       "id": "db_driver_routineargliteral",
-      "community": 5,
+      "community": 76,
       "norm_label": "routineargliteral()"
     },
     {
@@ -1446,7 +1446,7 @@
       "source_location": "L387",
       "_origin": "ast",
       "id": "db_driver_buildorderby",
-      "community": 82,
+      "community": 76,
       "norm_label": "buildorderby()"
     },
     {
@@ -1546,7 +1546,7 @@
       "source_location": "L641",
       "_origin": "ast",
       "id": "db_driver_safepaging",
-      "community": 82,
+      "community": 76,
       "norm_label": "safepaging()"
     },
     {
@@ -1556,7 +1556,7 @@
       "source_location": "L651",
       "_origin": "ast",
       "id": "db_driver_driverdeps",
-      "community": 39,
+      "community": 5,
       "norm_label": "driverdeps"
     },
     {
@@ -1716,7 +1716,7 @@
       "source_location": "L237",
       "_origin": "ast",
       "id": "drivers_mysql_readrows",
-      "community": 82,
+      "community": 76,
       "norm_label": "readrows()"
     },
     {
@@ -1836,7 +1836,7 @@
       "source_location": "L899",
       "_origin": "ast",
       "id": "drivers_mysql_if",
-      "community": 5,
+      "community": 76,
       "norm_label": "if()"
     },
     {
@@ -1876,7 +1876,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "drivers_postgres_quoteident",
-      "community": 134,
+      "community": 82,
       "norm_label": "quoteident()"
     },
     {
@@ -1896,7 +1896,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver",
-      "community": 134,
+      "community": 82,
       "norm_label": "postgresdriver"
     },
     {
@@ -1906,7 +1906,7 @@
       "source_location": "L106",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_constructor",
-      "community": 39,
+      "community": 5,
       "norm_label": ".constructor()"
     },
     {
@@ -1916,7 +1916,7 @@
       "source_location": "L110",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_connect",
-      "community": 134,
+      "community": 82,
       "norm_label": ".connect()"
     },
     {
@@ -1926,7 +1926,7 @@
       "source_location": "L140",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_ensure",
-      "community": 134,
+      "community": 82,
       "norm_label": ".ensure()"
     },
     {
@@ -1936,7 +1936,7 @@
       "source_location": "L145",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_currentdatabase",
-      "community": 134,
+      "community": 82,
       "norm_label": ".currentdatabase()"
     },
     {
@@ -1946,7 +1946,7 @@
       "source_location": "L149",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_listdatabases",
-      "community": 134,
+      "community": 82,
       "norm_label": ".listdatabases()"
     },
     {
@@ -1956,7 +1956,7 @@
       "source_location": "L158",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_usedatabase",
-      "community": 134,
+      "community": 82,
       "norm_label": ".usedatabase()"
     },
     {
@@ -1966,7 +1966,7 @@
       "source_location": "L166",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_listentities",
-      "community": 134,
+      "community": 82,
       "norm_label": ".listentities()"
     },
     {
@@ -1976,7 +1976,7 @@
       "source_location": "L180",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_listenums",
-      "community": 134,
+      "community": 82,
       "norm_label": ".listenums()"
     },
     {
@@ -2006,7 +2006,7 @@
       "source_location": "L298",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_searchrows",
-      "community": 134,
+      "community": 82,
       "norm_label": ".searchrows()"
     },
     {
@@ -2026,7 +2026,7 @@
       "source_location": "L384",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_describetable",
-      "community": 134,
+      "community": 82,
       "norm_label": ".describetable()"
     },
     {
@@ -2036,7 +2036,7 @@
       "source_location": "L506",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_listreferencingtables",
-      "community": 134,
+      "community": 82,
       "norm_label": ".listreferencingtables()"
     },
     {
@@ -2046,7 +2046,7 @@
       "source_location": "L556",
       "_origin": "ast",
       "id": "drivers_postgres_postgresdriver_getcreatesql",
-      "community": 134,
+      "community": 82,
       "norm_label": ".getcreatesql()"
     },
     {
@@ -2256,7 +2256,7 @@
       "source_location": "L203",
       "_origin": "ast",
       "id": "drivers_redis_redisdriver_cardinality",
-      "community": 110,
+      "community": 141,
       "norm_label": ".cardinality()"
     },
     {
@@ -2356,7 +2356,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "drivers_sqlite",
-      "community": 82,
+      "community": 5,
       "norm_label": "sqlite.ts"
     },
     {
@@ -2366,7 +2366,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "drivers_sqlite_quoteident",
-      "community": 82,
+      "community": 39,
       "norm_label": "quoteident()"
     },
     {
@@ -2376,7 +2376,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "drivers_sqlite_sqliteplannode",
-      "community": 132,
+      "community": 5,
       "norm_label": "sqliteplannode()"
     },
     {
@@ -2396,7 +2396,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_constructor",
-      "community": 39,
+      "community": 5,
       "norm_label": ".constructor()"
     },
     {
@@ -2446,7 +2446,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_listentities",
-      "community": 134,
+      "community": 132,
       "norm_label": ".listentities()"
     },
     {
@@ -2456,7 +2456,7 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_listenums",
-      "community": 134,
+      "community": 132,
       "norm_label": ".listenums()"
     },
     {
@@ -2486,7 +2486,7 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_searchrows",
-      "community": 35,
+      "community": 76,
       "norm_label": ".searchrows()"
     },
     {
@@ -2506,7 +2506,7 @@
       "source_location": "L252",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_describetable",
-      "community": 132,
+      "community": 5,
       "norm_label": ".describetable()"
     },
     {
@@ -2556,7 +2556,7 @@
       "source_location": "L398",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_altertable",
-      "community": 82,
+      "community": 39,
       "norm_label": ".altertable()"
     },
     {
@@ -2576,7 +2576,7 @@
       "source_location": "L457",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_renametable",
-      "community": 82,
+      "community": 39,
       "norm_label": ".renametable()"
     },
     {
@@ -2586,7 +2586,7 @@
       "source_location": "L467",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_truncatetable",
-      "community": 82,
+      "community": 39,
       "norm_label": ".truncatetable()"
     },
     {
@@ -2646,7 +2646,7 @@
       "source_location": "L516",
       "_origin": "ast",
       "id": "drivers_sqlite_sqlitedriver_explainquery",
-      "community": 132,
+      "community": 5,
       "norm_label": ".explainquery()"
     },
     {
@@ -2676,7 +2676,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "db_mysql_coldef",
-      "community": 76,
+      "community": 144,
       "norm_label": "mysql-coldef.ts"
     },
     {
@@ -2686,7 +2686,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "db_mysql_coldef_extractcolumndef",
-      "community": 76,
+      "community": 144,
       "norm_label": "extractcolumndef()"
     },
     {
@@ -2696,7 +2696,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "db_mysql_coldef_splicetype",
-      "community": 76,
+      "community": 144,
       "norm_label": "splicetype()"
     },
     {
@@ -2706,7 +2706,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "db_mysql_coldef_insertbefore",
-      "community": 76,
+      "community": 144,
       "norm_label": "insertbefore()"
     },
     {
@@ -2716,7 +2716,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "db_mysql_coldef_splicenullable",
-      "community": 76,
+      "community": 144,
       "norm_label": "splicenullable()"
     },
     {
@@ -2726,7 +2726,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "db_mysql_coldef_splicedefault",
-      "community": 76,
+      "community": 144,
       "norm_label": "splicedefault()"
     },
     {
@@ -2736,7 +2736,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "db_mysql_coldef_dropdefault",
-      "community": 76,
+      "community": 144,
       "norm_label": "dropdefault()"
     },
     {
@@ -2786,7 +2786,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "db_session_rel",
-      "community": 0,
+      "community": 68,
       "norm_label": "rel()"
     },
     {
@@ -2806,7 +2806,7 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "db_session_isdestructivestatement",
-      "community": 0,
+      "community": 68,
       "norm_label": "isdestructivestatement()"
     },
     {
@@ -2816,7 +2816,7 @@
       "source_location": "L102",
       "_origin": "ast",
       "id": "db_session_captureall",
-      "community": 0,
+      "community": 68,
       "norm_label": "captureall()"
     },
     {
@@ -2826,7 +2826,7 @@
       "source_location": "L124",
       "_origin": "ast",
       "id": "db_session_createdriver",
-      "community": 0,
+      "community": 68,
       "norm_label": "createdriver()"
     },
     {
@@ -2836,7 +2836,7 @@
       "source_location": "L140",
       "_origin": "ast",
       "id": "db_session_connectsession",
-      "community": 0,
+      "community": 68,
       "norm_label": "connectsession()"
     },
     {
@@ -2976,7 +2976,7 @@
       "source_location": "L257",
       "_origin": "ast",
       "id": "db_session_createtable",
-      "community": 0,
+      "community": 68,
       "norm_label": "createtable()"
     },
     {
@@ -3006,7 +3006,7 @@
       "source_location": "L293",
       "_origin": "ast",
       "id": "db_session_dropentity",
-      "community": 0,
+      "community": 68,
       "norm_label": "dropentity()"
     },
     {
@@ -3016,7 +3016,7 @@
       "source_location": "L307",
       "_origin": "ast",
       "id": "db_session_renametable",
-      "community": 0,
+      "community": 68,
       "norm_label": "renametable()"
     },
     {
@@ -3026,7 +3026,7 @@
       "source_location": "L321",
       "_origin": "ast",
       "id": "db_session_truncatetable",
-      "community": 0,
+      "community": 68,
       "norm_label": "truncatetable()"
     },
     {
@@ -3036,7 +3036,7 @@
       "source_location": "L334",
       "_origin": "ast",
       "id": "db_session_createindex",
-      "community": 0,
+      "community": 68,
       "norm_label": "createindex()"
     },
     {
@@ -3046,7 +3046,7 @@
       "source_location": "L348",
       "_origin": "ast",
       "id": "db_session_dropindex",
-      "community": 0,
+      "community": 68,
       "norm_label": "dropindex()"
     },
     {
@@ -3056,7 +3056,7 @@
       "source_location": "L362",
       "_origin": "ast",
       "id": "db_session_runscript",
-      "community": 0,
+      "community": 68,
       "norm_label": "runscript()"
     },
     {
@@ -3076,7 +3076,7 @@
       "source_location": "L462",
       "_origin": "ast",
       "id": "db_session_execrestorestatement",
-      "community": 0,
+      "community": 68,
       "norm_label": "execrestorestatement()"
     },
     {
@@ -3086,7 +3086,7 @@
       "source_location": "L485",
       "_origin": "ast",
       "id": "db_session_routinecap",
-      "community": 0,
+      "community": 68,
       "norm_label": "routinecap()"
     },
     {
@@ -3136,7 +3136,7 @@
       "source_location": "L529",
       "_origin": "ast",
       "id": "db_session_createroutine",
-      "community": 0,
+      "community": 68,
       "norm_label": "createroutine()"
     },
     {
@@ -3146,7 +3146,7 @@
       "source_location": "L542",
       "_origin": "ast",
       "id": "db_session_droproutine",
-      "community": 0,
+      "community": 68,
       "norm_label": "droproutine()"
     },
     {
@@ -3326,27 +3326,27 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "main_index",
-      "community": 0,
+      "community": 134,
       "norm_label": "index.ts"
     },
     {
       "label": "setupAutoUpdater()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/index.ts",
-      "source_location": "L13",
+      "source_location": "L14",
       "_origin": "ast",
       "id": "main_index_setupautoupdater",
-      "community": 0,
+      "community": 134,
       "norm_label": "setupautoupdater()"
     },
     {
       "label": "createWindow()",
       "file_type": "code",
       "source_file": "krust-studio-app/src/main/index.ts",
-      "source_location": "L70",
+      "source_location": "L94",
       "_origin": "ast",
       "id": "main_index_createwindow",
-      "community": 0,
+      "community": 134,
       "norm_label": "createwindow()"
     },
     {
@@ -3366,7 +3366,7 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "main_ipc_registeripc",
-      "community": 0,
+      "community": 134,
       "norm_label": "registeripc()"
     },
     {
@@ -3476,7 +3476,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "store_connections_getconnectionconfig",
-      "community": 0,
+      "community": 68,
       "norm_label": "getconnectionconfig()"
     },
     {
@@ -3506,7 +3506,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "store_history",
-      "community": 0,
+      "community": 108,
       "norm_label": "history.ts"
     },
     {
@@ -3516,7 +3516,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "store_history_getdb",
-      "community": 0,
+      "community": 108,
       "norm_label": "getdb()"
     },
     {
@@ -3526,7 +3526,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "store_history_activekey",
-      "community": 0,
+      "community": 108,
       "norm_label": "activekey()"
     },
     {
@@ -3536,7 +3536,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "store_history_getactiveid",
-      "community": 0,
+      "community": 108,
       "norm_label": "getactiveid()"
     },
     {
@@ -3546,7 +3546,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "store_history_getautoattachdestructivesync",
-      "community": 0,
+      "community": 108,
       "norm_label": "getautoattachdestructivesync()"
     },
     {
@@ -3556,7 +3556,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "store_history_getautoattachdestructive",
-      "community": 0,
+      "community": 108,
       "norm_label": "getautoattachdestructive()"
     },
     {
@@ -3566,7 +3566,7 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "store_history_setautoattachdestructive",
-      "community": 0,
+      "community": 108,
       "norm_label": "setautoattachdestructive()"
     },
     {
@@ -3576,7 +3576,7 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "store_history_capture",
-      "community": 0,
+      "community": 108,
       "norm_label": "capture()"
     },
     {
@@ -3586,7 +3586,7 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "store_history_listhistory",
-      "community": 0,
+      "community": 108,
       "norm_label": "listhistory()"
     },
     {
@@ -3596,7 +3596,7 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "store_history_clearhistory",
-      "community": 0,
+      "community": 108,
       "norm_label": "clearhistory()"
     },
     {
@@ -3606,7 +3606,7 @@
       "source_location": "L189",
       "_origin": "ast",
       "id": "store_history_listchangesets",
-      "community": 0,
+      "community": 108,
       "norm_label": "listchangesets()"
     },
     {
@@ -3616,7 +3616,7 @@
       "source_location": "L207",
       "_origin": "ast",
       "id": "store_history_createchangeset",
-      "community": 0,
+      "community": 108,
       "norm_label": "createchangeset()"
     },
     {
@@ -3626,7 +3626,7 @@
       "source_location": "L236",
       "_origin": "ast",
       "id": "store_history_renamechangeset",
-      "community": 0,
+      "community": 108,
       "norm_label": "renamechangeset()"
     },
     {
@@ -3636,7 +3636,7 @@
       "source_location": "L249",
       "_origin": "ast",
       "id": "store_history_deletechangeset",
-      "community": 0,
+      "community": 108,
       "norm_label": "deletechangeset()"
     },
     {
@@ -3646,7 +3646,7 @@
       "source_location": "L260",
       "_origin": "ast",
       "id": "store_history_setactivesync",
-      "community": 0,
+      "community": 108,
       "norm_label": "setactivesync()"
     },
     {
@@ -3656,7 +3656,7 @@
       "source_location": "L275",
       "_origin": "ast",
       "id": "store_history_setactivechangeset",
-      "community": 0,
+      "community": 108,
       "norm_label": "setactivechangeset()"
     },
     {
@@ -3666,7 +3666,7 @@
       "source_location": "L283",
       "_origin": "ast",
       "id": "store_history_assignentries",
-      "community": 0,
+      "community": 108,
       "norm_label": "assignentries()"
     },
     {
@@ -3676,7 +3676,7 @@
       "source_location": "L297",
       "_origin": "ast",
       "id": "store_history_buildchangesetsql",
-      "community": 0,
+      "community": 108,
       "norm_label": "buildchangesetsql()"
     },
     {
@@ -3686,7 +3686,7 @@
       "source_location": "L334",
       "_origin": "ast",
       "id": "store_history_deleteentries",
-      "community": 0,
+      "community": 108,
       "norm_label": "deleteentries()"
     },
     {
@@ -3696,7 +3696,7 @@
       "source_location": "L343",
       "_origin": "ast",
       "id": "store_history_markexported",
-      "community": 0,
+      "community": 108,
       "norm_label": "markexported()"
     },
     {
@@ -3706,7 +3706,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "store_paths",
-      "community": 117,
+      "community": 108,
       "norm_label": "paths.ts"
     },
     {
@@ -3716,7 +3716,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "store_paths_getdatadir",
-      "community": 117,
+      "community": 108,
       "norm_label": "getdatadir()"
     },
     {
@@ -3736,8 +3736,78 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "store_paths_templatesfile",
-      "community": 117,
+      "community": 108,
       "norm_label": "templatesfile()"
+    },
+    {
+      "label": "prefs.ts",
+      "file_type": "code",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "store_prefs",
+      "community": 134,
+      "norm_label": "prefs.ts"
+    },
+    {
+      "label": "Prefs",
+      "file_type": "code",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "store_prefs_prefs",
+      "community": 134,
+      "norm_label": "prefs"
+    },
+    {
+      "label": "DEFAULTS",
+      "file_type": "code",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "store_prefs_defaults",
+      "community": 134,
+      "norm_label": "defaults"
+    },
+    {
+      "label": "file()",
+      "file_type": "code",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "store_prefs_file",
+      "community": 134,
+      "norm_label": "file()"
+    },
+    {
+      "label": "load()",
+      "file_type": "code",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "store_prefs_load",
+      "community": 134,
+      "norm_label": "load()"
+    },
+    {
+      "label": "getBetaUpdates()",
+      "file_type": "code",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "store_prefs_getbetaupdates",
+      "community": 134,
+      "norm_label": "getbetaupdates()"
+    },
+    {
+      "label": "setBetaUpdates()",
+      "file_type": "code",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "store_prefs_setbetaupdates",
+      "community": 134,
+      "norm_label": "setbetaupdates()"
     },
     {
       "label": "templates.ts",
@@ -3746,7 +3816,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "store_templates",
-      "community": 117,
+      "community": 108,
       "norm_label": "templates.ts"
     },
     {
@@ -3756,7 +3826,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "store_templates_readstore",
-      "community": 117,
+      "community": 108,
       "norm_label": "readstore()"
     },
     {
@@ -3766,7 +3836,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "store_templates_writestore",
-      "community": 117,
+      "community": 108,
       "norm_label": "writestore()"
     },
     {
@@ -3776,7 +3846,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "store_templates_listtemplates",
-      "community": 117,
+      "community": 108,
       "norm_label": "listtemplates()"
     },
     {
@@ -3786,7 +3856,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "store_templates_savetemplate",
-      "community": 117,
+      "community": 108,
       "norm_label": "savetemplate()"
     },
     {
@@ -3796,7 +3866,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "store_templates_removetemplate",
-      "community": 117,
+      "community": 108,
       "norm_label": "removetemplate()"
     },
     {
@@ -3806,7 +3876,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "store_workspace",
-      "community": 0,
+      "community": 146,
       "norm_label": "workspace.ts"
     },
     {
@@ -3816,7 +3886,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "store_workspace_empty",
-      "community": 0,
+      "community": 146,
       "norm_label": "empty"
     },
     {
@@ -3826,7 +3896,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "store_workspace_workspacepath",
-      "community": 0,
+      "community": 146,
       "norm_label": "workspacepath()"
     },
     {
@@ -3836,7 +3906,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "store_workspace_loadworkspace",
-      "community": 0,
+      "community": 146,
       "norm_label": "loadworkspace()"
     },
     {
@@ -3846,7 +3916,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "store_workspace_saveworkspace",
-      "community": 0,
+      "community": 146,
       "norm_label": "saveworkspace()"
     },
     {
@@ -3856,7 +3926,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "preload_index_d",
-      "community": 146,
+      "community": 132,
       "norm_label": "index.d.ts"
     },
     {
@@ -3866,7 +3936,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "preload_index_d_window",
-      "community": 146,
+      "community": 132,
       "norm_label": "window"
     },
     {
@@ -3876,7 +3946,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "preload_index",
-      "community": 0,
+      "community": 132,
       "norm_label": "index.ts"
     },
     {
@@ -3886,7 +3956,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "preload_index_api",
-      "community": 0,
+      "community": 132,
       "norm_label": "api"
     },
     {
@@ -3896,7 +3966,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app",
-      "community": 1,
+      "community": 67,
       "norm_label": "app.tsx"
     },
     {
@@ -3906,7 +3976,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "src_app_app",
-      "community": 1,
+      "community": 67,
       "norm_label": "app()"
     },
     {
@@ -3916,7 +3986,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_appsidebar",
-      "community": 132,
+      "community": 142,
       "norm_label": "appsidebar.tsx"
     },
     {
@@ -3926,7 +3996,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "components_appsidebar_appsidebar",
-      "community": 132,
+      "community": 142,
       "norm_label": "appsidebar()"
     },
     {
@@ -3936,7 +4006,7 @@
       "source_location": "L591",
       "_origin": "ast",
       "id": "components_appsidebar_routinegroup",
-      "community": 132,
+      "community": 142,
       "norm_label": "routinegroup()"
     },
     {
@@ -3946,7 +4016,7 @@
       "source_location": "L681",
       "_origin": "ast",
       "id": "components_appsidebar_entitygroup",
-      "community": 132,
+      "community": 142,
       "norm_label": "entitygroup()"
     },
     {
@@ -3956,7 +4026,7 @@
       "source_location": "L799",
       "_origin": "ast",
       "id": "components_appsidebar_enumgroup",
-      "community": 132,
+      "community": 142,
       "norm_label": "enumgroup()"
     },
     {
@@ -4326,7 +4396,7 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "components_datagrid_datagrid",
-      "community": 1,
+      "community": 67,
       "norm_label": "datagrid()"
     },
     {
@@ -4916,7 +4986,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "components_rediskeyview_formatttl",
-      "community": 122,
+      "community": 141,
       "norm_label": "formatttl()"
     },
     {
@@ -4936,7 +5006,7 @@
       "source_location": "L184",
       "_origin": "ast",
       "id": "components_rediskeyview_header",
-      "community": 122,
+      "community": 141,
       "norm_label": "header()"
     },
     {
@@ -5056,7 +5126,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_redissidebar",
-      "community": 142,
+      "community": 141,
       "norm_label": "redissidebar.tsx"
     },
     {
@@ -5066,7 +5136,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "components_redissidebar_ttllabel",
-      "community": 142,
+      "community": 141,
       "norm_label": "ttllabel()"
     },
     {
@@ -5076,7 +5146,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "components_redissidebar_type_badge",
-      "community": 142,
+      "community": 141,
       "norm_label": "type_badge"
     },
     {
@@ -5086,7 +5156,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "components_redissidebar_redissidebar",
-      "community": 142,
+      "community": 141,
       "norm_label": "redissidebar()"
     },
     {
@@ -5166,7 +5236,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_settingsmodal",
-      "community": 144,
+      "community": 67,
       "norm_label": "settingsmodal.tsx"
     },
     {
@@ -5176,7 +5246,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "components_settingsmodal_scope_labels",
-      "community": 144,
+      "community": 67,
       "norm_label": "scope_labels"
     },
     {
@@ -5186,7 +5256,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "components_settingsmodal_settingsmodal",
-      "community": 144,
+      "community": 67,
       "norm_label": "settingsmodal()"
     },
     {
@@ -5416,7 +5486,7 @@
       "source_location": "L112",
       "_origin": "ast",
       "id": "components_structureview_structureview",
-      "community": 1,
+      "community": 15,
       "norm_label": "structureview()"
     },
     {
@@ -5426,7 +5496,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_tabbar",
-      "community": 145,
+      "community": 1,
       "norm_label": "tabbar.tsx"
     },
     {
@@ -5436,7 +5506,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "components_tabbar_tabicon",
-      "community": 145,
+      "community": 1,
       "norm_label": "tabicon()"
     },
     {
@@ -5446,7 +5516,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "components_tabbar_tabbar",
-      "community": 145,
+      "community": 1,
       "norm_label": "tabbar()"
     },
     {
@@ -5576,7 +5646,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_viewswitch",
-      "community": 136,
+      "community": 1,
       "norm_label": "viewswitch.tsx"
     },
     {
@@ -5586,7 +5656,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "components_viewswitch_views",
-      "community": 136,
+      "community": 1,
       "norm_label": "views"
     },
     {
@@ -5596,7 +5666,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_viewswitch_viewswitch",
-      "community": 136,
+      "community": 1,
       "norm_label": "viewswitch()"
     },
     {
@@ -7396,7 +7466,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_export",
-      "community": 68,
+      "community": 35,
       "norm_label": "export.ts"
     },
     {
@@ -7406,7 +7476,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_export_row",
-      "community": 68,
+      "community": 35,
       "norm_label": "row"
     },
     {
@@ -7416,7 +7486,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_export_scalar",
-      "community": 68,
+      "community": 35,
       "norm_label": "scalar()"
     },
     {
@@ -7426,7 +7496,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "lib_export_tocsv",
-      "community": 68,
+      "community": 35,
       "norm_label": "tocsv()"
     },
     {
@@ -7436,7 +7506,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "lib_export_tojson",
-      "community": 68,
+      "community": 35,
       "norm_label": "tojson()"
     },
     {
@@ -7446,7 +7516,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "lib_export_formatrows",
-      "community": 68,
+      "community": 35,
       "norm_label": "formatrows()"
     },
     {
@@ -7676,7 +7746,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_main",
-      "community": 1,
+      "community": 67,
       "norm_label": "main.tsx"
     },
     {
@@ -7936,7 +8006,7 @@
       "source_location": "L136",
       "_origin": "ast",
       "id": "store_redis_useredis",
-      "community": 122,
+      "community": 141,
       "norm_label": "useredis"
     },
     {
@@ -8156,7 +8226,7 @@
       "source_location": "L144",
       "_origin": "ast",
       "id": "store_settings_usesettings",
-      "community": 1,
+      "community": 67,
       "norm_label": "usesettings"
     },
     {
@@ -8196,7 +8266,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "shared_capabilities",
-      "community": 132,
+      "community": 142,
       "norm_label": "capabilities.ts"
     },
     {
@@ -8206,7 +8276,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "shared_capabilities_capabilities",
-      "community": 132,
+      "community": 142,
       "norm_label": "capabilities"
     },
     {
@@ -8216,7 +8286,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "shared_capabilities_capabilitiesfor",
-      "community": 132,
+      "community": 142,
       "norm_label": "capabilitiesfor()"
     },
     {
@@ -8266,7 +8336,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "shared_types_saveconnectioninput",
-      "community": 0,
+      "community": 132,
       "norm_label": "saveconnectioninput"
     },
     {
@@ -8276,7 +8346,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "shared_types_testconnectioninput",
-      "community": 0,
+      "community": 132,
       "norm_label": "testconnectioninput"
     },
     {
@@ -8316,7 +8386,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "shared_types_enumtype",
-      "community": 134,
+      "community": 132,
       "norm_label": "enumtype"
     },
     {
@@ -8326,7 +8396,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "shared_types_entityinfo",
-      "community": 134,
+      "community": 132,
       "norm_label": "entityinfo"
     },
     {
@@ -8346,7 +8416,7 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "shared_types_columninfo",
-      "community": 35,
+      "community": 82,
       "norm_label": "columninfo"
     },
     {
@@ -8386,7 +8456,7 @@
       "source_location": "L108",
       "_origin": "ast",
       "id": "shared_types_searchresult",
-      "community": 35,
+      "community": 76,
       "norm_label": "searchresult"
     },
     {
@@ -8456,7 +8526,7 @@
       "source_location": "L166",
       "_origin": "ast",
       "id": "shared_types_routinearg",
-      "community": 0,
+      "community": 132,
       "norm_label": "routinearg"
     },
     {
@@ -8486,7 +8556,7 @@
       "source_location": "L208",
       "_origin": "ast",
       "id": "shared_types_queryplan",
-      "community": 132,
+      "community": 5,
       "norm_label": "queryplan"
     },
     {
@@ -8566,7 +8636,7 @@
       "source_location": "L291",
       "_origin": "ast",
       "id": "shared_types_historyquery",
-      "community": 0,
+      "community": 132,
       "norm_label": "historyquery"
     },
     {
@@ -8576,7 +8646,7 @@
       "source_location": "L318",
       "_origin": "ast",
       "id": "shared_types_captureinput",
-      "community": 0,
+      "community": 108,
       "norm_label": "captureinput"
     },
     {
@@ -8656,7 +8726,7 @@
       "source_location": "L436",
       "_origin": "ast",
       "id": "shared_types_referencingtable",
-      "community": 134,
+      "community": 39,
       "norm_label": "referencingtable"
     },
     {
@@ -8666,7 +8736,7 @@
       "source_location": "L451",
       "_origin": "ast",
       "id": "shared_types_tablestructure",
-      "community": 132,
+      "community": 5,
       "norm_label": "tablestructure"
     },
     {
@@ -8696,7 +8766,7 @@
       "source_location": "L487",
       "_origin": "ast",
       "id": "shared_types_tabletemplate",
-      "community": 0,
+      "community": 132,
       "norm_label": "tabletemplate"
     },
     {
@@ -8706,7 +8776,7 @@
       "source_location": "L496",
       "_origin": "ast",
       "id": "shared_types_schemaop",
-      "community": 82,
+      "community": 39,
       "norm_label": "schemaop"
     },
     {
@@ -8756,7 +8826,7 @@
       "source_location": "L681",
       "_origin": "ast",
       "id": "shared_types_workspacedata",
-      "community": 0,
+      "community": 132,
       "norm_label": "workspacedata"
     },
     {
@@ -8796,7 +8866,7 @@
       "source_location": "L701",
       "_origin": "ast",
       "id": "shared_types_backupspec",
-      "community": 0,
+      "community": 132,
       "norm_label": "backupspec"
     },
     {
@@ -8806,7 +8876,7 @@
       "source_location": "L707",
       "_origin": "ast",
       "id": "shared_types_backupresult",
-      "community": 0,
+      "community": 68,
       "norm_label": "backupresult"
     },
     {
@@ -8816,7 +8886,7 @@
       "source_location": "L715",
       "_origin": "ast",
       "id": "shared_types_restorestatement",
-      "community": 0,
+      "community": 68,
       "norm_label": "restorestatement"
     },
     {
@@ -8836,7 +8906,7 @@
       "source_location": "L730",
       "_origin": "ast",
       "id": "shared_types_restorerunresult",
-      "community": 0,
+      "community": 68,
       "norm_label": "restorerunresult"
     },
     {
@@ -8876,7 +8946,7 @@
       "source_location": "L773",
       "_origin": "ast",
       "id": "shared_types_drivercapabilities",
-      "community": 132,
+      "community": 142,
       "norm_label": "drivercapabilities"
     },
     {
@@ -8886,7 +8956,7 @@
       "source_location": "L794",
       "_origin": "ast",
       "id": "shared_types_rediskeytype",
-      "community": 132,
+      "community": 141,
       "norm_label": "rediskeytype"
     },
     {
@@ -9026,7 +9096,7 @@
       "source_location": "L974",
       "_origin": "ast",
       "id": "shared_types_krustapi",
-      "community": 146,
+      "community": 132,
       "norm_label": "krustapi"
     },
     {
@@ -10550,10 +10620,20 @@
       "norm_label": "krust studio \u2014 todo (gap backlog)"
     },
     {
-      "label": "P0 \u2014 v1.7.0: Procedures & Functions (Routines) \u2014 beta.1 BUILT (needs live test)",
+      "label": "1.7.0 beta release \u2014 IN PROGRESS",
       "file_type": "document",
       "source_file": "docs/TODO.md",
       "source_location": "L5",
+      "_origin": "ast",
+      "id": "docs_todo_1_7_0_beta_release_in_progress",
+      "community": 18,
+      "norm_label": "1.7.0 beta release \u2014 in progress"
+    },
+    {
+      "label": "P0 \u2014 v1.7.0: Procedures & Functions (Routines) \u2014 beta.1 BUILT (needs live test)",
+      "file_type": "document",
+      "source_file": "docs/TODO.md",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "docs_todo_p0_v1_7_0_procedures_functions_routines_beta_1_built_needs_live_test",
       "community": 18,
@@ -10563,7 +10643,7 @@
       "label": "beta.1 \u2014 browse / execute / create+drop \u2014 BUILT (2026-07-02, typecheck + build green; not yet live-tested)",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L12",
+      "source_location": "L31",
       "_origin": "ast",
       "id": "docs_todo_beta_1_browse_execute_create_drop_built_2026_07_02_typecheck_build_green_not_yet_live_tested",
       "community": 18,
@@ -10573,7 +10653,7 @@
       "label": "beta.2 \u2014 MySQL safe replacement",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L88",
+      "source_location": "L107",
       "_origin": "ast",
       "id": "docs_todo_beta_2_mysql_safe_replacement",
       "community": 18,
@@ -10583,7 +10663,7 @@
       "label": "P0 \u2014 next: inline filter builder + raw WHERE \u2014 DONE",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L97",
+      "source_location": "L116",
       "_origin": "ast",
       "id": "docs_todo_p0_next_inline_filter_builder_raw_where_done",
       "community": 18,
@@ -10593,7 +10673,7 @@
       "label": "P0 \u2014 v1.3.4 + v1.4.0: editor/history/backup UX \u2014 PLANNED",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L135",
+      "source_location": "L154",
       "_origin": "ast",
       "id": "docs_todo_p0_v1_3_4_v1_4_0_editor_history_backup_ux_planned",
       "community": 18,
@@ -10603,7 +10683,7 @@
       "label": "v1.3.4 \u2014 fix (data-loss feel) \u2014 DONE (merged 69c7791, manually verified)",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L142",
+      "source_location": "L161",
       "_origin": "ast",
       "id": "docs_todo_v1_3_4_fix_data_loss_feel_done_merged_69c7791_manually_verified",
       "community": 18,
@@ -10613,7 +10693,7 @@
       "label": "v1.4.0 \u2014 features",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L171",
+      "source_location": "L190",
       "_origin": "ast",
       "id": "docs_todo_v1_4_0_features",
       "community": 18,
@@ -10623,7 +10703,7 @@
       "label": "P0 \u2014 v1.5.0: shortcuts, settings & history UX \u2014 PLANNED",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L227",
+      "source_location": "L246",
       "_origin": "ast",
       "id": "docs_todo_p0_v1_5_0_shortcuts_settings_history_ux_planned",
       "community": 18,
@@ -10633,7 +10713,7 @@
       "label": "P0 \u2014 v1.6.0: pinned columns \u2014 DONE",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L277",
+      "source_location": "L296",
       "_origin": "ast",
       "id": "docs_todo_p0_v1_6_0_pinned_columns_done",
       "community": 18,
@@ -10643,7 +10723,7 @@
       "label": "P0 \u2014 v1.3.0: workspace & connection resilience \u2014 DONE",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L303",
+      "source_location": "L322",
       "_origin": "ast",
       "id": "docs_todo_p0_v1_3_0_workspace_connection_resilience_done",
       "community": 18,
@@ -10653,7 +10733,7 @@
       "label": "P1 \u2014 high value, mostly cheap",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L350",
+      "source_location": "L369",
       "_origin": "ast",
       "id": "docs_todo_p1_high_value_mostly_cheap",
       "community": 18,
@@ -10663,7 +10743,7 @@
       "label": "P2 \u2014 schema completeness",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L375",
+      "source_location": "L394",
       "_origin": "ast",
       "id": "docs_todo_p2_schema_completeness",
       "community": 18,
@@ -10673,7 +10753,7 @@
       "label": "P3 \u2014 data reader depth",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L416",
+      "source_location": "L435",
       "_origin": "ast",
       "id": "docs_todo_p3_data_reader_depth",
       "community": 18,
@@ -10683,7 +10763,7 @@
       "label": "P4 \u2014 the headline feature (ADR-0002), bigger",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L455",
+      "source_location": "L474",
       "_origin": "ast",
       "id": "docs_todo_p4_the_headline_feature_adr_0002_bigger",
       "community": 18,
@@ -10693,7 +10773,7 @@
       "label": "P5 \u2014 bigger surfaces (own cycles)",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L480",
+      "source_location": "L499",
       "_origin": "ast",
       "id": "docs_todo_p5_bigger_surfaces_own_cycles",
       "community": 18,
@@ -10703,7 +10783,7 @@
       "label": "Resolved",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L503",
+      "source_location": "L522",
       "_origin": "ast",
       "id": "docs_todo_resolved",
       "community": 18,
@@ -10713,7 +10793,7 @@
       "label": "Known bugs / sharp edges",
       "file_type": "document",
       "source_file": "docs/TODO.md",
-      "source_location": "L642",
+      "source_location": "L661",
       "_origin": "ast",
       "id": "docs_todo_known_bugs_sharp_edges",
       "community": 18,
@@ -13308,6 +13388,206 @@
       "id": "v1_6_6_short_install",
       "community": 139,
       "norm_label": "install"
+    },
+    {
+      "label": "beta-tracking-issue.md",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_beta_tracking_issue",
+      "community": 145,
+      "norm_label": "beta-tracking-issue.md"
+    },
+    {
+      "label": "1.7.0-beta tracking issue",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
+      "community": 145,
+      "norm_label": "1.7.0-beta tracking issue"
+    },
+    {
+      "label": "Redis",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_beta_tracking_issue_redis",
+      "community": 145,
+      "norm_label": "redis"
+    },
+    {
+      "label": "Procedures & Functions",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_beta_tracking_issue_procedures_functions",
+      "community": 145,
+      "norm_label": "procedures & functions"
+    },
+    {
+      "label": "SQL prettification",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L28",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_beta_tracking_issue_sql_prettification",
+      "community": 145,
+      "norm_label": "sql prettification"
+    },
+    {
+      "label": "StarRocks (Experimental)",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_beta_tracking_issue_starrocks_experimental",
+      "community": 145,
+      "norm_label": "starrocks (experimental)"
+    },
+    {
+      "label": "Existing-driver regressions",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_beta_tracking_issue_existing_driver_regressions",
+      "community": 145,
+      "norm_label": "existing-driver regressions"
+    },
+    {
+      "label": "blurb.md",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/blurb.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_blurb",
+      "community": 148,
+      "norm_label": "blurb.md"
+    },
+    {
+      "label": "full.md",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_full",
+      "community": 136,
+      "norm_label": "full.md"
+    },
+    {
+      "label": "Krust Studio 1.7.0-beta.1",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "community": 136,
+      "norm_label": "krust studio 1.7.0-beta.1"
+    },
+    {
+      "label": "Redis (Beta)",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_full_redis_beta",
+      "community": 136,
+      "norm_label": "redis (beta)"
+    },
+    {
+      "label": "Procedures & Functions (Beta)",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_full_procedures_functions_beta",
+      "community": 136,
+      "norm_label": "procedures & functions (beta)"
+    },
+    {
+      "label": "Data grid",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_full_data_grid",
+      "community": 136,
+      "norm_label": "data grid"
+    },
+    {
+      "label": "Settings",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L46",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_full_settings",
+      "community": 136,
+      "norm_label": "settings"
+    },
+    {
+      "label": "Other",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L52",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_full_other",
+      "community": 136,
+      "norm_label": "other"
+    },
+    {
+      "label": "Under the hood",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L57",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_full_under_the_hood",
+      "community": 136,
+      "norm_label": "under the hood"
+    },
+    {
+      "label": "Not in this beta (planned for later 1.7.0 betas)",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L63",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_full_not_in_this_beta_planned_for_later_1_7_0_betas",
+      "community": 136,
+      "norm_label": "not in this beta (planned for later 1.7.0 betas)"
+    },
+    {
+      "label": "Verification still needed",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L70",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_full_verification_still_needed",
+      "community": 136,
+      "norm_label": "verification still needed"
+    },
+    {
+      "label": "short.md",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/short.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_short",
+      "community": 147,
+      "norm_label": "short.md"
+    },
+    {
+      "label": "Krust Studio 1.7.0-beta.1",
+      "file_type": "document",
+      "source_file": "docs/release/v1.7.0-beta.1/short.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "v1_7_0_beta_1_short_krust_studio_1_7_0_beta_1",
+      "community": 147,
+      "norm_label": "krust studio 1.7.0-beta.1"
     },
     {
       "label": "plan.md",
@@ -24638,6 +24918,61 @@
       "target": "main_ipc_registeripc"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/index.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "main_index",
+      "target": "store_prefs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/index.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "main_index",
+      "target": "store_prefs_getbetaupdates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/index.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "main_index",
+      "target": "store_prefs_setbetaupdates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/index.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "main_index_setupautoupdater",
+      "target": "store_prefs_getbetaupdates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/index.ts",
+      "source_location": "L77",
+      "weight": 1.0,
+      "source": "main_index_setupautoupdater",
+      "target": "store_prefs_setbetaupdates",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "krust-studio-app/src/main/ipc.ts",
@@ -26141,6 +26476,110 @@
       "confidence_score": 1.0,
       "source": "store_templates_writestore",
       "target": "store_paths_templatesfile"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "store_prefs",
+      "target": "store_prefs_defaults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "store_prefs",
+      "target": "store_prefs_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "store_prefs",
+      "target": "store_prefs_getbetaupdates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "store_prefs",
+      "target": "store_prefs_load",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "store_prefs",
+      "target": "store_prefs_prefs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "store_prefs",
+      "target": "store_prefs_setbetaupdates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "store_prefs_load",
+      "target": "store_prefs_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L39",
+      "weight": 1.0,
+      "source": "store_prefs_setbetaupdates",
+      "target": "store_prefs_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "store_prefs_getbetaupdates",
+      "target": "store_prefs_load",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "krust-studio-app/src/main/store/prefs.ts",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "store_prefs_setbetaupdates",
+      "target": "store_prefs_load",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -34095,9 +34534,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/settings.ts",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_settings",
-      "target": "store_settings_loadtoastposition",
-      "confidence_score": 1.0
+      "target": "store_settings_loadtoastposition"
     },
     {
       "relation": "contains",
@@ -34175,9 +34614,9 @@
       "source_file": "krust-studio-app/src/renderer/src/store/settings.ts",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_settings",
-      "target": "store_settings_toastposition",
-      "confidence_score": 1.0
+      "target": "store_settings_toastposition"
     },
     {
       "relation": "contains",
@@ -37197,6 +37636,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/TODO.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "docs_todo_krust_studio_todo_gap_backlog",
+      "target": "docs_todo_1_7_0_beta_release_in_progress",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TODO.md",
       "source_location": "L476",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -39826,6 +40275,166 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_beta_tracking_issue",
+      "target": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
+      "target": "v1_7_0_beta_1_beta_tracking_issue_existing_driver_regressions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
+      "target": "v1_7_0_beta_1_beta_tracking_issue_procedures_functions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
+      "target": "v1_7_0_beta_1_beta_tracking_issue_redis",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
+      "target": "v1_7_0_beta_1_beta_tracking_issue_sql_prettification",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/beta-tracking-issue.md",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_beta_tracking_issue_1_7_0_beta_tracking_issue",
+      "target": "v1_7_0_beta_1_beta_tracking_issue_starrocks_experimental",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_full",
+      "target": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_data_grid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_not_in_this_beta_planned_for_later_1_7_0_betas",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L52",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_other",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_procedures_functions_beta",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_redis_beta",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_under_the_hood",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/full.md",
+      "source_location": "L70",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_full_krust_studio_1_7_0_beta_1",
+      "target": "v1_7_0_beta_1_full_verification_still_needed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/release/v1.7.0-beta.1/short.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "v1_7_0_beta_1_short",
+      "target": "v1_7_0_beta_1_short_krust_studio_1_7_0_beta_1",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "docs/release/v1.7.0/plan.md",
       "source_location": "L1",
       "weight": 1.0,
@@ -41219,5 +41828,5 @@
       "source_file": "docs/adr/0017-inline-filter-builder-with-raw-where.md"
     }
   ],
-  "built_at_commit": "2c55a6ebb06113e9bcf137ef8828136982b240c2"
+  "built_at_commit": "e27cca2c11eb2ae80421413c86a887323a065110"
 }

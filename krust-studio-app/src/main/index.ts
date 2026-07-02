@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { autoUpdater } from 'electron-updater'
 import icon from '../../resources/icon.png?asset'
 import { registerIpc } from './ipc'
+import { getBetaUpdates, setBetaUpdates } from './store/prefs'
 
 let updaterWired = false
 // Set while an in-app update is restarting, so `window-all-closed` doesn't fire
@@ -16,6 +17,10 @@ function setupAutoUpdater(win: BrowserWindow): void {
 
   autoUpdater.autoDownload = true
   autoUpdater.autoInstallOnAppQuit = true
+  // Opt-in beta channel: when on, the updater also offers GitHub pre-releases
+  // (releases must be flagged "pre-release"). Stable users skip them. The pref
+  // lives main-side (prefs.json) so it's known before the renderer loads.
+  autoUpdater.allowPrerelease = getBetaUpdates()
 
   autoUpdater.on('update-available', (info) => {
     win.webContents.send('update:available', info.version)
@@ -61,6 +66,25 @@ function setupAutoUpdater(win: BrowserWindow): void {
         current
       }
     }
+  })
+
+  // Update channel opt-in (beta / stable). Renderer Settings reads + toggles it.
+  ipcMain.handle('update:getChannel', () => ({
+    beta: getBetaUpdates(),
+    version: app.getVersion()
+  }))
+  ipcMain.handle('update:setChannel', async (_e, beta: boolean) => {
+    setBetaUpdates(beta)
+    autoUpdater.allowPrerelease = beta
+    // re-check against the newly-selected channel (packaged only)
+    if (!is.dev) {
+      try {
+        await autoUpdater.checkForUpdates()
+      } catch {
+        // feed error surfaces via the 'error' handler; ignore here
+      }
+    }
+    return { beta }
   })
 
   // Auto-check shortly after launch (packaged only — dev has no feed)

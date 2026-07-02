@@ -2,6 +2,25 @@
 
 Prioritized. Top group = highest value (matches CONTEXT.md + Beekeeper parity).
 
+## 1.7.0 beta release — IN PROGRESS
+
+- [x] **Beta update channel.** Opt-in `autoUpdater.allowPrerelease`, persisted
+      main-side (`store/prefs.ts` → `prefs.json`), toggled in Settings → Updates
+      (+ Check for updates). Version bumped to `1.7.0-beta.1`. GitHub pre-releases
+      must be flagged "pre-release" on publish (see electron-builder.yml note) so
+      stable users skip them by semver. Release notes in
+      `docs/release/v1.7.0-beta.1/`.
+- [ ] **Publish `1.7.0-beta.1`.** Tag/build → publish the draft as a GitHub
+      **pre-release**; open the beta tracking issue
+      (`docs/release/v1.7.0-beta.1/beta-tracking-issue.md`).
+- [ ] **Live verification** before promoting to stable: Redis (ACL/TLS/expiry/
+      concurrency/binary/large collections) + routine CRUD/execute/OUT on real
+      MySQL, MariaDB, PostgreSQL.
+- [ ] **Remaining 1.7.0 goals** (later betas): StarRocks Experimental; MySQL safe
+      routine replacement (Recovery Copy + grants); routine autocomplete + typed
+      param helpers + viewer Pretty toggle.
+
+
 ## P0 — v1.7.0: Procedures & Functions (Routines) — beta.1 BUILT (needs live test)
 
 Design resolved via `/grill-with-docs` (2026-07-02). See

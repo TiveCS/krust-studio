@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { RotateCcw, Keyboard, Pin, X, History, Table2, AlignLeft, Bell } from 'lucide-react'
+import { RotateCcw, Keyboard, Pin, X, History, Table2, AlignLeft, Bell, Download } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -60,19 +60,29 @@ export function SettingsModal({
   const [recording, setRecording] = useState<CommandId | null>(null)
   const [search, setSearch] = useState('')
   const [section, setSection] = useState<
-    'keybindings' | 'pinned' | 'history' | 'grid' | 'sql' | 'notifications'
+    'keybindings' | 'pinned' | 'history' | 'grid' | 'sql' | 'notifications' | 'updates'
   >('keybindings')
   const [pinName, setPinName] = useState('')
   // History settings live in history.db meta (main process), not localStorage.
   const [autoAttachDestructive, setAutoAttachDestructive] = useState<
     boolean | null
   >(null)
+  // Update channel lives main-side (prefs.json); read/toggle over IPC.
+  const [betaUpdates, setBetaUpdates] = useState<boolean | null>(null)
+  const [appVersion, setAppVersion] = useState('')
+  const [checkMsg, setCheckMsg] = useState<string | null>(null)
 
   useEffect(() => {
     if (!open) return
     void window.api.history
       .getAutoAttachDestructive()
       .then(setAutoAttachDestructive)
+    void window.electron.ipcRenderer
+      .invoke('update:getChannel')
+      .then((r: { beta: boolean; version: string }) => {
+        setBetaUpdates(r.beta)
+        setAppVersion(r.version)
+      })
   }, [open])
 
   useEffect(() => {
@@ -195,6 +205,18 @@ export function SettingsModal({
               <Bell className="size-3.5" />
               Notifications
             </button>
+            <button
+              onClick={() => setSection('updates')}
+              className={cn(
+                'flex w-full items-center gap-2 rounded px-2 py-1.5 text-xs font-medium',
+                section === 'updates'
+                  ? 'bg-accent text-foreground'
+                  : 'text-muted-foreground hover:bg-accent/40'
+              )}
+            >
+              <Download className="size-3.5" />
+              Updates
+            </button>
           </div>
 
           {/* grid content */}
@@ -282,6 +304,72 @@ export function SettingsModal({
                 <p className="text-[11px] text-muted-foreground/70">
                   Default bottom right.
                 </p>
+              </div>
+            </div>
+          )}
+
+          {/* updates content */}
+          {section === 'updates' && (
+            <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-auto p-4">
+              <div className="space-y-1">
+                <div className="text-xs font-medium">Current version</div>
+                <div className="font-mono text-xs text-muted-foreground">
+                  {appVersion || '—'}
+                </div>
+              </div>
+              <div className="space-y-2 border-t pt-4">
+                <label className="flex items-center gap-2 text-xs font-medium">
+                  <Checkbox
+                    checked={betaUpdates ?? false}
+                    disabled={betaUpdates === null}
+                    onCheckedChange={(c) => {
+                      const on = c === true
+                      setBetaUpdates(on)
+                      void window.electron.ipcRenderer.invoke('update:setChannel', on)
+                    }}
+                  />
+                  Receive beta (pre-release) updates
+                </label>
+                <p className="text-[11px] text-muted-foreground">
+                  When on, the app also installs pre-release builds
+                  (e.g. <span className="font-mono">1.7.0-beta.1</span>). Beta users
+                  keep receiving newer betas and then the stable release; turning it
+                  off stops future betas but does not downgrade a beta you already
+                  have. Stable users never receive betas.
+                </p>
+              </div>
+              <div className="space-y-2 border-t pt-4">
+                <button
+                  onClick={() => {
+                    setCheckMsg('Checking…')
+                    void window.electron.ipcRenderer
+                      .invoke('update:check')
+                      .then(
+                        (r: {
+                          status: string
+                          version?: string
+                          current?: string
+                          error?: string
+                        }) => {
+                          if (r.status === 'available')
+                            setCheckMsg(`Update ${r.version} found — downloading…`)
+                          else if (r.status === 'up-to-date')
+                            setCheckMsg('You are on the latest version.')
+                          else if (r.status === 'dev')
+                            setCheckMsg('No update feed in dev.')
+                          else if (r.status === 'error')
+                            setCheckMsg(`Check failed: ${r.error}`)
+                          else setCheckMsg('Could not determine the latest version.')
+                        }
+                      )
+                  }}
+                  className="rounded border border-border px-3 py-1 text-xs hover:border-primary/40"
+                >
+                  Check for updates
+                </button>
+                {checkMsg && (
+                  <p className="text-[11px] text-muted-foreground">{checkMsg}</p>
+                )}
               </div>
             </div>
           )}

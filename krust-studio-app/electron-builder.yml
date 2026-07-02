@@ -51,5 +51,9 @@ publish:
   owner: TiveCS
   repo: krust-studio
   # tag builds create a DRAFT release — review + publish manually so a failed or
-  # partial build never goes public (and never reaches auto-update clients)
+  # partial build never goes public (and never reaches auto-update clients).
+  # For pre-releases (versions like 1.7.0-beta.1): when publishing the draft,
+  # tick GitHub's "Set as a pre-release" box so only beta-channel clients
+  # (autoUpdater.allowPrerelease, Settings → Updates) pick it up — stable users
+  # skip it by semver.
   releaseType: draft
