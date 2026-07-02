@@ -125,8 +125,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/DataGrid.tsx": {
-    "mtime": 1782259022.7269025,
-    "ast_hash": "a44f613317950e53a6e149c24a3e17a0",
+    "mtime": 1783002870.413909,
+    "ast_hash": "946d445508604a0c6d26c42bd3750fcd",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/DatabaseSwitcher.tsx": {
@@ -490,8 +490,8 @@
     "semantic_hash": "8453e4e9363dec88cec0240f77c01901"
   },
   "docs/TODO.md": {
-    "mtime": 1783000734.2310133,
-    "ast_hash": "c14579d4df834deca7100c1bf4992c3e",
+    "mtime": 1783002290.0460615,
+    "ast_hash": "a0792c721c0bcb41b8da6b1ce1a30b9f",
     "semantic_hash": ""
   },
   "docs/adr/0001-electron-over-tauri.md": {

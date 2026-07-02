@@ -263,6 +263,18 @@ export function DataGrid(): React.JSX.Element | null {
     setEditing(null)
   }, [activeTabId])
 
+  // auto-focus the grid when a tab's rows load so keyboard nav works without a
+  // click first — but never steal focus from an input the user is typing in
+  // (e.g. the FilterBar).
+  useEffect(() => {
+    if (!tab?.data) return
+    const ae = document.activeElement as HTMLElement | null
+    const typing =
+      ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable)
+    if (!typing) containerRef.current?.focus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab?.data])
+
   // adding OR removing an insert row shifts the insert/real-row boundary, so the
   // index-based FK target would re-attach to a different row. Close the picker on
   // any change to the insert count.
@@ -549,6 +561,77 @@ export function DataGrid(): React.JSX.Element | null {
     setEditing(null)
   }
 
+  // start editing seeded with a typed character (type-to-edit), replacing the
+  // current value the way Excel does.
+  const startEditWithChar = (r: number, c: number, ch: string): void => {
+    if (!cellEditable(r)) return
+    setSel({ ar: r, ac: c, fr: r, fc: c })
+    setEditing({ r, c })
+    setDraft(ch)
+  }
+
+  // data-row index → virtual index (inverse of virtRowToDataRow; the FK-picker
+  // virtual row sits at fkTarget.r + 1 and shifts everything after it down one)
+  const dataRowToVirt = (r: number): number =>
+    fkTarget === null || r <= fkTarget.r ? r : r + 1
+
+  // keep the active cell visible: vertical via the row virtualizer (rows may be
+  // off-DOM), horizontal via the rendered cell element (sticky pinned cols stay
+  // put, so a plain scrollIntoView is enough for the scrollable columns).
+  const scrollActiveIntoView = (r: number, c: number): void => {
+    if (virtualize) rowVirtualizer.scrollToIndex(dataRowToVirt(r), { align: 'auto' })
+    requestAnimationFrame(() => {
+      containerRef.current
+        ?.querySelector<HTMLElement>(`td[data-r="${r}"][data-c="${c}"]`)
+        ?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+    })
+  }
+
+  // move the active cell by (dr, dc). extend = keep the anchor and move only the
+  // focus (Shift+arrow range select); else collapse the selection to one cell.
+  const moveActive = (dr: number, dc: number, extend: boolean): void => {
+    if (total === 0 || cols.length === 0) return
+    if (!sel) {
+      setSel({ ar: 0, ac: 0, fr: 0, fc: 0 })
+      scrollActiveIntoView(0, 0)
+      return
+    }
+    const curR = extend ? sel.fr : sel.ar
+    const curC = extend ? sel.fc : sel.ac
+    const nr = Math.max(0, Math.min(total - 1, curR + dr))
+    const nc = Math.max(0, Math.min(cols.length - 1, curC + dc))
+    if (extend) setSel({ ...sel, fr: nr, fc: nc })
+    else setSel({ ar: nr, ac: nc, fr: nr, fc: nc })
+    scrollActiveIntoView(nr, nc)
+  }
+
+  // move to an absolute column in the active row (Home/End)
+  const moveActiveToCol = (nc: number): void => {
+    if (total === 0 || !sel) {
+      moveActive(0, 0, false)
+      return
+    }
+    const c = Math.max(0, Math.min(cols.length - 1, nc))
+    setSel({ ar: sel.ar, ac: c, fr: sel.ar, fc: c })
+    scrollActiveIntoView(sel.ar, c)
+  }
+
+  // stage the current draft (commitDraft) then move the active cell + refocus the
+  // grid so keyboard nav continues. "commit" here = stage the edit (amber), NOT a
+  // DB write — that stays behind the explicit Commit button.
+  const commitDraftAndMove = (dr: number, dc: number): void => {
+    const cur = editing
+    commitDraft()
+    if (!cur) return
+    const nr = Math.max(0, Math.min(total - 1, cur.r + dr))
+    const nc = Math.max(0, Math.min(cols.length - 1, cur.c + dc))
+    setSel({ ar: nr, ac: nc, fr: nr, fc: nc })
+    requestAnimationFrame(() => {
+      containerRef.current?.focus()
+      scrollActiveIntoView(nr, nc)
+    })
+  }
+
   const selectedRows = (): number[] => {
     if (!rect) return []
     const out: number[] = []
@@ -639,22 +722,86 @@ export function DataGrid(): React.JSX.Element | null {
     if (mod && e.key.toLowerCase() === 'c') {
       copySelection()
       e.preventDefault()
-    } else if (mod && e.key.toLowerCase() === 'v') {
+      return
+    }
+    if (mod && e.key.toLowerCase() === 'v') {
       void pasteSelection()
       e.preventDefault()
-    } else if (e.key === 'Delete') {
+      return
+    }
+    // ── keyboard navigation (Excel-style) ──
+    const pageRows = Math.max(
+      1,
+      Math.floor((containerRef.current?.clientHeight ?? 330) / 33) - 1
+    )
+    switch (e.key) {
+      case 'ArrowUp':
+        moveActive(-1, 0, e.shiftKey)
+        e.preventDefault()
+        return
+      case 'ArrowDown':
+        moveActive(1, 0, e.shiftKey)
+        e.preventDefault()
+        return
+      case 'ArrowLeft':
+        moveActive(0, -1, e.shiftKey)
+        e.preventDefault()
+        return
+      case 'ArrowRight':
+        moveActive(0, 1, e.shiftKey)
+        e.preventDefault()
+        return
+      case 'Tab':
+        moveActive(0, e.shiftKey ? -1 : 1, false)
+        e.preventDefault()
+        return
+      case 'Home':
+        moveActiveToCol(0)
+        e.preventDefault()
+        return
+      case 'End':
+        moveActiveToCol(cols.length - 1)
+        e.preventDefault()
+        return
+      case 'PageDown':
+        moveActive(pageRows, 0, e.shiftKey)
+        e.preventDefault()
+        return
+      case 'PageUp':
+        moveActive(-pageRows, 0, e.shiftKey)
+        e.preventDefault()
+        return
+      case 'Enter':
+      case 'F2':
+        // start editing the active cell (no-op on read-only / no-PK cells)
+        if (sel) startEdit(sel.ar, sel.ac)
+        e.preventDefault()
+        return
+    }
+    if (e.key === 'Delete') {
       if (rect) {
         deleteSelected()
         e.preventDefault()
       }
-    } else if (e.key === ' ') {
+      return
+    }
+    if (e.key === ' ') {
       if (sel) {
         setJsonOpen((o) => !o)
         e.preventDefault()
       }
-    } else if (e.key === 'Escape') {
+      return
+    }
+    if (e.key === 'Escape') {
       if (jsonOpen) setJsonOpen(false)
       else setSel(null)
+      return
+    }
+    // ── type-to-edit: a printable key starts editing seeded with that char
+    // (space is reserved for the JSON viewer, above) ──
+    if (e.key.length === 1 && !mod && !e.altKey && sel) {
+      startEditWithChar(sel.ar, sel.ac, e.key)
+      e.preventDefault()
     }
   }
 
@@ -1010,7 +1157,10 @@ export function DataGrid(): React.JSX.Element | null {
                                         }
                                         onBlur={commitDraft}
                                         onKeyDown={(e) => {
-                                          if (e.key === 'Enter') commitDraft()
+                                          if (e.key === 'Enter') {
+                                            e.preventDefault()
+                                            commitDraftAndMove(1, 0)
+                                          }
                                           if (e.key === 'Escape') setEditing(null)
                                         }}
                                         className="w-full bg-transparent outline-none"
@@ -1022,7 +1172,10 @@ export function DataGrid(): React.JSX.Element | null {
                                         onChange={(e) => setDraft(e.target.value)}
                                         onBlur={commitDraft}
                                         onKeyDown={(e) => {
-                                          if (e.key === 'Enter') commitDraft()
+                                          if (e.key === 'Enter') {
+                                            e.preventDefault()
+                                            commitDraftAndMove(1, 0)
+                                          }
                                           if (e.key === 'Escape') setEditing(null)
                                         }}
                                         className="w-full bg-transparent outline-none"
