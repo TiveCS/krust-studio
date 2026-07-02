@@ -12,7 +12,7 @@ const CAPABILITIES: Record<DriverType, DriverCapabilities> = {
     tabular: true,
     schemaMut: true,
     tabularMut: true,
-    routines: false, // 1.7 routines land later
+    routines: true, // procedures & functions (ADR-0021)
     plan: true,
     keys: false,
     switchDatabase: true
@@ -22,7 +22,7 @@ const CAPABILITIES: Record<DriverType, DriverCapabilities> = {
     tabular: true,
     schemaMut: true,
     tabularMut: true,
-    routines: false,
+    routines: true,
     plan: true,
     keys: false,
     switchDatabase: true

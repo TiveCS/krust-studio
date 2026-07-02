@@ -8,7 +8,8 @@ import {
   Plug,
   Pin,
   PinOff,
-  FolderOpen
+  FolderOpen,
+  FunctionSquare
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useConnections, tabIsDirty, type Tab } from '@/store/connections'
@@ -32,6 +33,7 @@ import { Button } from '@/components/ui/button'
 function TabIcon({ tab }: { tab: { kind?: string; query: unknown; draft: unknown } }): React.JSX.Element {
   if (tab.kind === 'history') return <History className="size-3.5 opacity-60" />
   if (tab.kind === 'connection-editor') return <Plug className="size-3.5 opacity-60" />
+  if (tab.kind === 'routine') return <FunctionSquare className="size-3.5 opacity-60" />
   if (tab.query) return <SquareTerminal className="size-3.5 opacity-60" />
   return <Table2 className="size-3.5 opacity-60" />
 }

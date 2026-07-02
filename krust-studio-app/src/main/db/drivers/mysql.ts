@@ -7,6 +7,7 @@ import type {
 import {
   type DbDriver,
   type DriverDeps,
+  type RoutineCapable,
   safePaging,
   buildWhereClause,
   buildSearch,
@@ -17,7 +18,8 @@ import {
   buildCreateTable,
   fkActionClause,
   defaultIndexName,
-  renderSql
+  renderSql,
+  routineArgLiteral
 } from '../driver'
 import {
   extractColumnDef,
@@ -46,11 +48,42 @@ import type {
   SchemaOp,
   SearchResult,
   Sort,
-  TableStructure
+  TableStructure,
+  RoutineInfo,
+  RoutineDef,
+  RoutineRef,
+  RoutineArg,
+  RoutineExecResult,
+  RoutineParam,
+  ColumnInfo
 } from '../../../shared/types'
 
 function quoteIdent(name: string): string {
   return '`' + name.replace(/`/g, '``') + '`'
+}
+
+/** rows (mysql2 RowDataPacket[]) → a result set with columns from the row keys */
+function mysqlRowsToSet(rows: unknown): {
+  columns: ColumnInfo[]
+  rows: Record<string, unknown>[]
+} {
+  const list = (Array.isArray(rows) ? rows : []) as Record<string, unknown>[]
+  const columns = list.length ? Object.keys(list[0]).map((name) => ({ name })) : []
+  return { columns, rows: list }
+}
+
+/** a CALL result (array of result sets + trailing OK packet) → result sets */
+function mysqlCallResultSets(res: unknown): {
+  columns: ColumnInfo[]
+  rows: Record<string, unknown>[]
+}[] {
+  if (!Array.isArray(res)) return []
+  // multiple result sets → array of arrays; a plain single set → array of rows
+  const nested = res.length > 0 && Array.isArray(res[0])
+  if (!nested) return [mysqlRowsToSet(res)]
+  const sets: { columns: ColumnInfo[]; rows: Record<string, unknown>[] }[] = []
+  for (const el of res) if (Array.isArray(el) && el.length) sets.push(mysqlRowsToSet(el))
+  return sets
 }
 
 const MYSQL_INDEX_METHODS = new Set(['BTREE', 'HASH'])
@@ -118,7 +151,7 @@ function parseMysqlAnalyzeTree(text: string): PlanNode[] {
   return roots
 }
 
-export class MysqlDriver implements DbDriver {
+export class MysqlDriver implements DbDriver, RoutineCapable {
   private conn: Connection | null = null
   private connectionId: number | null = null
   // active database; survives reconnects (idle-drop) via `USE` in connect()
@@ -759,6 +792,196 @@ export class MysqlDriver implements DbDriver {
     } finally {
       await c.end()
     }
+  }
+
+  // ── Routines: procedures & functions (ADR-0021) ─────────────────────────
+
+  async listRoutines(): Promise<RoutineInfo[]> {
+    if (!this.activeDb) return []
+    const [rows] = (await (await this.ensure()).query(
+      `SELECT ROUTINE_NAME AS name, ROUTINE_TYPE AS kind, DTD_IDENTIFIER AS \`returns\`
+         FROM information_schema.ROUTINES
+        WHERE ROUTINE_SCHEMA = DATABASE()
+        ORDER BY ROUTINE_TYPE, ROUTINE_NAME`
+    )) as [RowDataPacket[], FieldPacket[]]
+    return (rows as Array<{ name: string; kind: string; returns: string | null }>).map(
+      (r) => ({
+        name: r.name,
+        kind: r.kind === 'FUNCTION' ? 'function' : 'procedure',
+        label: r.name,
+        returns: r.kind === 'FUNCTION' ? r.returns : null
+      })
+    )
+  }
+
+  async getRoutine(ref: RoutineRef): Promise<RoutineDef> {
+    const conn = await this.ensure()
+    const kindKw = ref.kind === 'function' ? 'FUNCTION' : 'PROCEDURE'
+    const [createRows] = (await conn.query(
+      `SHOW CREATE ${kindKw} ${quoteIdent(ref.name)}`
+    )) as [RowDataPacket[], FieldPacket[]]
+    const createRow = (createRows[0] ?? {}) as Record<string, string>
+    const defKey = ref.kind === 'function' ? 'Create Function' : 'Create Procedure'
+    const definition = createRow[defKey] ?? ''
+    const [paramRows] = (await conn.query(
+      `SELECT PARAMETER_NAME AS name, DTD_IDENTIFIER AS type, PARAMETER_MODE AS mode
+         FROM information_schema.PARAMETERS
+        WHERE SPECIFIC_SCHEMA = DATABASE() AND SPECIFIC_NAME = ?
+          AND ORDINAL_POSITION > 0
+        ORDER BY ORDINAL_POSITION`,
+      [ref.name]
+    )) as [RowDataPacket[], FieldPacket[]]
+    const params: RoutineParam[] = (
+      paramRows as Array<{ name: string; type: string; mode: string | null }>
+    ).map((p) => ({
+      name: p.name,
+      type: p.type,
+      mode: (p.mode ?? 'IN').toLowerCase() as RoutineParam['mode']
+    }))
+    const [metaRows] = (await conn.query(
+      `SELECT SECURITY_TYPE AS security, DEFINER AS owner, DTD_IDENTIFIER AS \`returns\`
+         FROM information_schema.ROUTINES
+        WHERE ROUTINE_SCHEMA = DATABASE() AND ROUTINE_NAME = ? AND ROUTINE_TYPE = ?`,
+      [ref.name, kindKw]
+    )) as [RowDataPacket[], FieldPacket[]]
+    const meta = (metaRows[0] ?? {}) as {
+      security?: string
+      owner?: string
+      returns?: string
+    }
+    return {
+      ref,
+      definition,
+      params,
+      returns: ref.kind === 'function' ? (meta.returns ?? null) : null,
+      returnsSet: false,
+      owner: meta.owner ?? null,
+      security: meta.security ?? null
+    }
+  }
+
+  /** Build the SET/CALL/SELECT (or SELECT for functions) plan for an execution.
+   *  `steps` bind IN values; `statements` are the inlined display form. */
+  private planCall(
+    ref: RoutineRef,
+    def: RoutineDef,
+    args: RoutineArg[]
+  ): {
+    steps: { sql: string; params: unknown[]; kind: 'set' | 'call' | 'select' }[]
+    statements: string[]
+    outNames: string[]
+  } {
+    const argByName = new Map(args.map((a) => [a.name, a]))
+    const name = quoteIdent(ref.name)
+    if (ref.kind === 'function') {
+      const sqlArgs: string[] = []
+      const inlined: string[] = []
+      const params: unknown[] = []
+      for (const p of def.params) {
+        const a = argByName.get(p.name)
+        const value = a?.value ?? null
+        sqlArgs.push('?')
+        params.push(value)
+        inlined.push(routineArgLiteral({ value, type: p.type }))
+      }
+      const sql = `SELECT ${name}(${sqlArgs.join(', ')}) AS ${name}`
+      const inlinedSql = `SELECT ${name}(${inlined.join(', ')}) AS ${name}`
+      return {
+        steps: [{ sql, params, kind: 'select' }],
+        statements: [inlinedSql],
+        outNames: []
+      }
+    }
+    const steps: { sql: string; params: unknown[]; kind: 'set' | 'call' | 'select' }[] = []
+    const statements: string[] = []
+    const outNames: string[] = []
+    for (const p of def.params) {
+      if (p.mode === 'inout') {
+        const value = argByName.get(p.name)?.value ?? null
+        steps.push({ sql: `SET @krust_${p.name} = ?`, params: [value], kind: 'set' })
+        statements.push(
+          `SET @${p.name} = ${routineArgLiteral({ value, type: p.type })}`
+        )
+      }
+    }
+    const callSqlArgs: string[] = []
+    const callInlined: string[] = []
+    const callParams: unknown[] = []
+    for (const p of def.params) {
+      if (p.mode === 'in') {
+        const value = argByName.get(p.name)?.value ?? null
+        callSqlArgs.push('?')
+        callParams.push(value)
+        callInlined.push(routineArgLiteral({ value, type: p.type }))
+      } else {
+        callSqlArgs.push(`@krust_${p.name}`)
+        callInlined.push(`@${p.name}`)
+        outNames.push(p.name)
+      }
+    }
+    steps.push({
+      sql: `CALL ${name}(${callSqlArgs.join(', ')})`,
+      params: callParams,
+      kind: 'call'
+    })
+    statements.push(`CALL ${name}(${callInlined.join(', ')})`)
+    if (outNames.length) {
+      const sel = outNames.map((nm) => `@krust_${nm} AS ${quoteIdent(nm)}`).join(', ')
+      steps.push({ sql: `SELECT ${sel}`, params: [], kind: 'select' })
+      statements.push(
+        'SELECT ' + outNames.map((nm) => `@${nm} AS ${quoteIdent(nm)}`).join(', ')
+      )
+    }
+    return { steps, statements, outNames }
+  }
+
+  async previewRoutineCall(
+    ref: RoutineRef,
+    args: RoutineArg[]
+  ): Promise<{ statements: string[] }> {
+    const def = await this.getRoutine(ref)
+    return { statements: this.planCall(ref, def, args).statements }
+  }
+
+  async executeRoutine(
+    ref: RoutineRef,
+    args: RoutineArg[]
+  ): Promise<RoutineExecResult> {
+    const def = await this.getRoutine(ref)
+    const conn = await this.ensure()
+    const { steps, statements, outNames } = this.planCall(ref, def, args)
+    const resultSets: RoutineExecResult['resultSets'] = []
+    let outValues: Record<string, unknown> | null = null
+    let affected: number | null = null
+    for (const step of steps) {
+      const [res] = await conn.query(step.sql, step.params)
+      if (step.kind === 'call') {
+        resultSets.push(...mysqlCallResultSets(res))
+      } else if (step.kind === 'select') {
+        if (outNames.length) {
+          outValues = ((res as Record<string, unknown>[])[0] ?? null) as
+            | Record<string, unknown>
+            | null
+        } else {
+          resultSets.push(mysqlRowsToSet(res))
+        }
+      }
+    }
+    if (!resultSets.length && outValues === null) affected = 0
+    return { statements, resultSets, outValues, affected }
+  }
+
+  async createRoutine(definition: string): Promise<{ statements: string[] }> {
+    // one statement — DELIMITER is a client directive, never sent to the server
+    await (await this.ensure()).query(definition)
+    return { statements: [definition] }
+  }
+
+  async dropRoutine(ref: RoutineRef): Promise<{ statements: string[] }> {
+    const kindKw = ref.kind === 'function' ? 'FUNCTION' : 'PROCEDURE'
+    const sql = `DROP ${kindKw} IF EXISTS ${quoteIdent(ref.name)}`
+    await (await this.ensure()).query(sql)
+    return { statements: [sql] }
   }
 
   async close(): Promise<void> {

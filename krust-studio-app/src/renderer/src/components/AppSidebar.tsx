@@ -17,7 +17,10 @@ import {
   History as HistoryIcon,
   DatabaseBackup,
   TableProperties,
-  Unplug
+  Unplug,
+  FunctionSquare,
+  Cog,
+  FileCode
 } from 'lucide-react'
 import {
   Sidebar,
@@ -61,7 +64,14 @@ import { RedisSidebar } from '@/components/RedisSidebar'
 import { ConnectionSwitcher } from '@/components/ConnectionSwitcher'
 import { TemplateManager } from '@/components/TemplateManager'
 import { useConnections } from '@/store/connections'
-import type { EntityRef, EntityType, EnumType } from '../../../shared/types'
+import { capabilitiesFor } from '../../../shared/capabilities'
+import type {
+  EntityRef,
+  EntityType,
+  EnumType,
+  RoutineInfo,
+  RoutineRef
+} from '../../../shared/types'
 
 export function AppSidebar(): React.JSX.Element {
   const {
@@ -71,12 +81,16 @@ export function AppSidebar(): React.JSX.Element {
     sessionError,
     entities,
     enums,
+    routines,
     open,
     refreshEntities,
     openTable,
     openNewTable,
     openHistoryTab,
     openBackupTab,
+    openRoutine,
+    openNewRoutine,
+    dropRoutine,
     dropEntity,
     renameTable,
     truncateTable,
@@ -99,11 +113,34 @@ export function AppSidebar(): React.JSX.Element {
   } | null>(null)
   const [confirmText, setConfirmText] = useState('')
   const [busy, setBusy] = useState(false)
+  const [routineDrop, setRoutineDrop] = useState<RoutineInfo | null>(null)
+  const [routineConfirm, setRoutineConfirm] = useState('')
 
 
   const current = connections.find((c) => c.id === openConnectionId)
   const readOnly = current?.readOnly ?? false
   const isRedis = current?.driver === 'redis'
+  const hasRoutines = current ? capabilitiesFor(current.driver).routines : false
+
+  const doDropRoutine = async (): Promise<void> => {
+    if (!routineDrop) return
+    setBusy(true)
+    try {
+      const ref: RoutineRef = {
+        schema: routineDrop.schema,
+        kind: routineDrop.kind,
+        name: routineDrop.name,
+        signature: routineDrop.signature
+      }
+      const [sql] = await dropRoutine(ref)
+      toast.success(`Dropped ${routineDrop.kind}`, { description: sql })
+      setRoutineDrop(null)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err))
+    } finally {
+      setBusy(false)
+    }
+  }
 
   const startRename = (entity: EntityRef): void => {
     setRenameTarget(entity)
@@ -171,9 +208,15 @@ export function AppSidebar(): React.JSX.Element {
     return {
       tables: entities.filter((e) => e.type === 'table' && match(e.name) && matchSchema(e.schema)),
       views: entities.filter((e) => e.type === 'view' && match(e.name) && matchSchema(e.schema)),
-      enums: enums.filter((e) => match(e.name) && matchSchema(e.schema))
+      enums: enums.filter((e) => match(e.name) && matchSchema(e.schema)),
+      procedures: routines.filter(
+        (r) => r.kind === 'procedure' && match(r.name) && matchSchema(r.schema)
+      ),
+      functions: routines.filter(
+        (r) => r.kind === 'function' && match(r.name) && matchSchema(r.schema)
+      )
     }
-  }, [entities, enums, filter, schemaFilter])
+  }, [entities, enums, routines, filter, schemaFilter])
 
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const toggleSection = (k: string): void =>
@@ -263,6 +306,15 @@ export function AppSidebar(): React.JSX.Element {
               >
                 <Plus className="size-3.5" />
               </button>
+              {hasRoutines && (
+                <button
+                  onClick={() => openNewRoutine()}
+                  title="New routine"
+                  className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+                >
+                  <FileCode className="size-3.5" />
+                </button>
+              )}
               <button
                 onClick={() => openHistoryTab()}
                 title="Query history"
@@ -343,6 +395,32 @@ export function AppSidebar(): React.JSX.Element {
               collapsed={collapsed.has('enums')}
               onToggle={() => toggleSection('enums')}
             />
+            {hasRoutines && (
+              <>
+                <RoutineGroup
+                  label="Procedures"
+                  icon={Cog}
+                  items={grouped.procedures}
+                  activeName={activeName}
+                  readOnly={readOnly}
+                  collapsed={collapsed.has('procedures')}
+                  onToggle={() => toggleSection('procedures')}
+                  onOpen={openRoutine}
+                  onDrop={setRoutineDrop}
+                />
+                <RoutineGroup
+                  label="Functions"
+                  icon={FunctionSquare}
+                  items={grouped.functions}
+                  activeName={activeName}
+                  readOnly={readOnly}
+                  collapsed={collapsed.has('functions')}
+                  onToggle={() => toggleSection('functions')}
+                  onOpen={openRoutine}
+                  onDrop={setRoutineDrop}
+                />
+              </>
+            )}
           </>
         )}
       </SidebarContent>
@@ -455,7 +533,144 @@ export function AppSidebar(): React.JSX.Element {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Drop routine (typed confirmation) */}
+      <Dialog open={!!routineDrop} onOpenChange={(o) => !o && setRoutineDrop(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="size-4" />
+              Drop {routineDrop?.kind}
+            </DialogTitle>
+            <DialogDescription>
+              This permanently drops{' '}
+              <span className="font-mono">{routineDrop?.name}</span>. This cannot be
+              undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-1.5">
+            <p className="text-xs text-muted-foreground">
+              Type{' '}
+              <span className="font-mono text-foreground">{routineDrop?.name}</span> to
+              confirm.
+            </p>
+            <Input
+              autoFocus
+              value={routineConfirm}
+              onChange={(e) => setRoutineConfirm(e.target.value)}
+              onKeyDown={(e) =>
+                e.key === 'Enter' &&
+                routineConfirm === routineDrop?.name &&
+                void doDropRoutine()
+              }
+              placeholder={routineDrop?.name}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setRoutineDrop(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => void doDropRoutine()}
+              disabled={busy || routineConfirm !== routineDrop?.name}
+            >
+              Drop
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Sidebar>
+  )
+}
+
+function RoutineGroup({
+  label,
+  icon: Icon,
+  items,
+  activeName,
+  readOnly,
+  collapsed,
+  onToggle,
+  onOpen,
+  onDrop
+}: {
+  label: string
+  icon: typeof Table2
+  items: RoutineInfo[]
+  activeName?: string
+  readOnly?: boolean
+  collapsed?: boolean
+  onToggle?: () => void
+  onOpen: (ref: RoutineRef, label?: string) => void
+  onDrop: (r: RoutineInfo) => void
+}): React.JSX.Element | null {
+  if (items.length === 0) return null
+  const refOf = (r: RoutineInfo): RoutineRef => ({
+    schema: r.schema,
+    kind: r.kind,
+    name: r.name,
+    signature: r.signature
+  })
+  return (
+    <SidebarGroup>
+      <SidebarGroupLabel asChild>
+        <button
+          onClick={onToggle}
+          className="flex w-full items-center gap-1 hover:text-foreground"
+        >
+          {collapsed ? (
+            <ChevronRight className="size-3" />
+          ) : (
+            <ChevronDown className="size-3" />
+          )}
+          {label} ({items.length})
+        </button>
+      </SidebarGroupLabel>
+      {collapsed ? null : (
+        <SidebarMenu>
+          {items.map((r) => (
+            <SidebarMenuItem key={`${r.schema ?? ''}.${r.name}.${r.signature ?? ''}`}>
+              <ContextMenu>
+                <ContextMenuTrigger asChild>
+                  <SidebarMenuButton
+                    isActive={activeName === r.name}
+                    className="font-mono text-xs"
+                    onDoubleClick={() => onOpen(refOf(r), r.name)}
+                    title={r.label}
+                  >
+                    <Icon />
+                    <span className="flex-1 truncate">{r.name}</span>
+                    {r.schema && r.schema !== 'public' && (
+                      <span className="text-[10px] text-muted-foreground">{r.schema}</span>
+                    )}
+                  </SidebarMenuButton>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                  <ContextMenuItem onSelect={() => onOpen(refOf(r), r.name)}>
+                    Open
+                  </ContextMenuItem>
+                  <ContextMenuItem
+                    onSelect={() => void navigator.clipboard.writeText(r.name)}
+                  >
+                    Copy name
+                  </ContextMenuItem>
+                  <ContextMenuSeparator />
+                  <ContextMenuItem
+                    variant="destructive"
+                    disabled={readOnly}
+                    onSelect={() => onDrop(r)}
+                  >
+                    <Trash2 />
+                    Drop {r.kind}…
+                  </ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      )}
+    </SidebarGroup>
   )
 }
 

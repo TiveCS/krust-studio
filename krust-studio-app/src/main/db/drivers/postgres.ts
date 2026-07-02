@@ -2,6 +2,7 @@ import type { Client } from 'pg'
 import {
   type DbDriver,
   type DriverDeps,
+  type RoutineCapable,
   safePaging,
   buildWhereClause,
   buildSearch,
@@ -12,11 +13,13 @@ import {
   buildCreateTable,
   fkActionClause,
   defaultIndexName,
-  renderSql
+  renderSql,
+  routineArgLiteral
 } from '../driver'
 import type {
   ApplyResult,
   ChangeSet,
+  ColumnInfo,
   CreateTableSpec,
   EntityInfo,
   EntityRef,
@@ -33,8 +36,22 @@ import type {
   SchemaOp,
   SearchResult,
   Sort,
-  TableStructure
+  TableStructure,
+  RoutineInfo,
+  RoutineDef,
+  RoutineRef,
+  RoutineArg,
+  RoutineExecResult,
+  RoutineParam
 } from '../../../shared/types'
+
+/** a `::type` cast for a bound routine arg, omitted for types not safely
+ *  castable from a text parameter (arrays, composites) — beta best-effort. */
+function pgCast(type: string): string {
+  const t = (type ?? '').toLowerCase().trim()
+  if (!t || t === 'array' || t === 'user-defined' || t.includes('"')) return ''
+  return `::${type}`
+}
 
 /** parse one node of a Postgres `EXPLAIN (FORMAT JSON)` plan into a PlanNode. */
 function pgPlanNode(p: Record<string, unknown>): PlanNode {
@@ -79,7 +96,7 @@ const PG_INDEX_METHODS = new Set([
   'brin'
 ])
 
-export class PostgresDriver implements DbDriver {
+export class PostgresDriver implements DbDriver, RoutineCapable {
   private client: Client | null = null
   private backendPid: number | null = null
   // a pg connection is bound to one db; switching reconnects with this override.
@@ -785,6 +802,216 @@ export class PostgresDriver implements DbDriver {
     } finally {
       await c.end()
     }
+  }
+
+  // ── Routines: procedures & functions (ADR-0021) ─────────────────────────
+
+  async listRoutines(): Promise<RoutineInfo[]> {
+    const res = await (await this.ensure()).query(
+      `SELECT n.nspname AS schema, p.proname AS name,
+              CASE p.prokind WHEN 'p' THEN 'procedure' ELSE 'function' END AS kind,
+              pg_get_function_identity_arguments(p.oid) AS signature,
+              pg_get_function_arguments(p.oid) AS args,
+              CASE WHEN p.prokind = 'f' THEN pg_get_function_result(p.oid) END AS returns
+         FROM pg_proc p
+         JOIN pg_namespace n ON n.oid = p.pronamespace
+        WHERE p.prokind IN ('p', 'f')
+          AND n.nspname NOT IN ('pg_catalog', 'information_schema')
+        ORDER BY n.nspname, p.proname`
+    )
+    return (
+      res.rows as Array<{
+        schema: string
+        name: string
+        kind: string
+        signature: string
+        args: string
+        returns: string | null
+      }>
+    ).map((r) => ({
+      schema: r.schema,
+      name: r.name,
+      kind: r.kind === 'procedure' ? 'procedure' : 'function',
+      signature: r.signature,
+      label: `${r.name}(${r.args ?? ''})`,
+      returns: r.returns
+    }))
+  }
+
+  async getRoutine(ref: RoutineRef): Promise<RoutineDef> {
+    const client = await this.ensure()
+    const sigMatch = ref.signature != null
+    const head = await client.query(
+      `SELECT p.oid,
+              pg_get_functiondef(p.oid) AS def,
+              CASE p.prokind WHEN 'p' THEN 'procedure' ELSE 'function' END AS kind,
+              p.proretset AS retset,
+              CASE WHEN p.prokind = 'f' THEN pg_get_function_result(p.oid) END AS returns,
+              l.lanname AS language,
+              pg_get_userbyid(p.proowner) AS owner,
+              CASE p.provolatile WHEN 'i' THEN 'immutable'
+                                 WHEN 's' THEN 'stable' ELSE 'volatile' END AS volatility,
+              p.prosecdef AS secdef,
+              p.proname AS name
+         FROM pg_proc p
+         JOIN pg_namespace n ON n.oid = p.pronamespace
+         JOIN pg_language l ON l.oid = p.prolang
+        WHERE n.nspname = $1 AND p.proname = $2
+          ${sigMatch ? 'AND pg_get_function_identity_arguments(p.oid) = $3' : ''}
+        LIMIT 1`,
+      sigMatch
+        ? [ref.schema ?? 'public', ref.name, ref.signature]
+        : [ref.schema ?? 'public', ref.name]
+    )
+    const row = head.rows[0] as
+      | {
+          oid: number
+          def: string
+          kind: string
+          retset: boolean
+          returns: string | null
+          language: string | null
+          owner: string | null
+          volatility: string | null
+          secdef: boolean
+          name: string
+        }
+      | undefined
+    if (!row) throw new Error(`Routine not found: ${ref.name}`)
+    const specificName = `${row.name}_${row.oid}`
+    const paramsRes = await client.query(
+      `SELECT parameter_name AS name, data_type AS type,
+              COALESCE(parameter_mode, 'IN') AS mode, ordinal_position AS pos
+         FROM information_schema.parameters
+        WHERE specific_schema = $1 AND specific_name = $2
+        ORDER BY ordinal_position`,
+      [ref.schema ?? 'public', specificName]
+    )
+    const params: RoutineParam[] = (
+      paramsRes.rows as Array<{
+        name: string | null
+        type: string
+        mode: string
+        pos: number
+      }>
+    ).map((p) => ({
+      name: p.name ?? `p${p.pos}`,
+      type: p.type,
+      mode: p.mode.toLowerCase() as RoutineParam['mode']
+    }))
+    return {
+      ref: { ...ref, kind: row.kind === 'procedure' ? 'procedure' : 'function' },
+      definition: row.def,
+      params,
+      returns: row.returns,
+      returnsSet: !!row.retset,
+      language: row.language,
+      owner: row.owner,
+      security: `${row.volatility ?? ''}${row.secdef ? ' · security definer' : ''}`.trim()
+    }
+  }
+
+  /** Build the CALL/SELECT for an execution. IN/INOUT bound (cast when safe),
+   *  OUT slots passed NULL on procedures; functions call with IN args only. */
+  private buildPgCall(
+    ref: RoutineRef,
+    def: RoutineDef,
+    args: RoutineArg[]
+  ): { mode: 'call' | 'scalar' | 'set'; sql: string; params: unknown[]; inlined: string } {
+    const argByName = new Map(args.map((a) => [a.name, a]))
+    const target = ref.schema
+      ? `${quoteIdent(ref.schema)}.${quoteIdent(ref.name)}`
+      : quoteIdent(ref.name)
+    const isProc = ref.kind === 'procedure'
+    const params: unknown[] = []
+    const ph: string[] = []
+    const inlined: string[] = []
+    for (const p of def.params) {
+      if (p.mode === 'out') {
+        if (isProc) {
+          params.push(null)
+          ph.push(`$${params.length}`)
+          inlined.push('NULL')
+        }
+        continue // functions don't pass OUT args
+      }
+      const value = argByName.get(p.name)?.value ?? null
+      params.push(value)
+      ph.push(`$${params.length}${value === null ? '' : pgCast(p.type)}`)
+      inlined.push(routineArgLiteral({ value, type: p.type }))
+    }
+    if (isProc)
+      return {
+        mode: 'call',
+        sql: `CALL ${target}(${ph.join(', ')})`,
+        params,
+        inlined: `CALL ${target}(${inlined.join(', ')})`
+      }
+    if (def.returnsSet)
+      return {
+        mode: 'set',
+        sql: `SELECT * FROM ${target}(${ph.join(', ')})`,
+        params,
+        inlined: `SELECT * FROM ${target}(${inlined.join(', ')})`
+      }
+    return {
+      mode: 'scalar',
+      sql: `SELECT ${target}(${ph.join(', ')}) AS ${quoteIdent(ref.name)}`,
+      params,
+      inlined: `SELECT ${target}(${inlined.join(', ')}) AS ${quoteIdent(ref.name)}`
+    }
+  }
+
+  async previewRoutineCall(
+    ref: RoutineRef,
+    args: RoutineArg[]
+  ): Promise<{ statements: string[] }> {
+    const def = await this.getRoutine(ref)
+    return { statements: [this.buildPgCall(ref, def, args).inlined] }
+  }
+
+  async executeRoutine(
+    ref: RoutineRef,
+    args: RoutineArg[]
+  ): Promise<RoutineExecResult> {
+    const def = await this.getRoutine(ref)
+    const plan = this.buildPgCall(ref, def, args)
+    const res = await (await this.ensure()).query(plan.sql, plan.params)
+    const rows = (res.rows ?? []) as Record<string, unknown>[]
+    const columns: ColumnInfo[] = (res.fields ?? []).map((f: { name: string }) => ({
+      name: f.name
+    }))
+    if (plan.mode === 'call') {
+      // OUT/INOUT values come back as the single result row (if any)
+      return {
+        statements: [plan.inlined],
+        resultSets: [],
+        outValues: rows[0] ?? null,
+        affected: res.rowCount ?? null
+      }
+    }
+    return {
+      statements: [plan.inlined],
+      resultSets: rows.length || columns.length ? [{ columns, rows }] : [],
+      outValues: null,
+      affected: rows.length ? null : (res.rowCount ?? null)
+    }
+  }
+
+  async createRoutine(definition: string): Promise<{ statements: string[] }> {
+    await (await this.ensure()).query(definition)
+    return { statements: [definition] }
+  }
+
+  async dropRoutine(ref: RoutineRef): Promise<{ statements: string[] }> {
+    const kindKw = ref.kind === 'function' ? 'FUNCTION' : 'PROCEDURE'
+    const target = ref.schema
+      ? `${quoteIdent(ref.schema)}.${quoteIdent(ref.name)}`
+      : quoteIdent(ref.name)
+    const sig = ref.signature != null ? `(${ref.signature})` : ''
+    const sql = `DROP ${kindKw} IF EXISTS ${target}${sig}`
+    await (await this.ensure()).query(sql)
+    return { statements: [sql] }
   }
 
   async close(): Promise<void> {

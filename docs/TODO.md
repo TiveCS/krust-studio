@@ -2,6 +2,98 @@
 
 Prioritized. Top group = highest value (matches CONTEXT.md + Beekeeper parity).
 
+## P0 — v1.7.0: Procedures & Functions (Routines) — beta.1 BUILT (needs live test)
+
+Design resolved via `/grill-with-docs` (2026-07-02). See
+[ADR-0021](adr/0021-capability-based-routines.md), CONTEXT.md **Routine** /
+**Routine Recovery Copy**, and [plan.md](release/v1.7.0/plan.md) (goal 2).
+Split across betas — beta.1 below; beta.2 is the MySQL Recovery Copy machine.
+
+### beta.1 — browse / execute / create+drop — BUILT (2026-07-02, typecheck + build green; not yet live-tested)
+
+- [x] **`RoutineCapable` driver capability.** New sub-interface (continues
+      ADR-0020, mirrors Redis `KeyValueCapable`): `listRoutines`, `getRoutine`,
+      `executeRoutine`, `createOrReplaceRoutine`, `dropRoutine`. Dedicated
+      `RoutineRef { schema?, kind, name, argTypes? }` / `RoutineInfo` /
+      `RoutineDef` types — **not** `EntityType` (routines have no rows/PK; PG
+      identity carries an overload signature). Compose into mysql/pg drivers
+      only (MySQL 8.0+, MariaDB 10.5+, PostgreSQL 12+); sqlite/redis/starrocks
+      omit it. Flip `capabilities.routines` on for mysql/postgres. Thread
+      `routine:*` IPC → preload → `RoutineApi`.
+- [x] **Sidebar: Procedures + Functions sections.** Separate collapsible groups
+      (like Enums), lazy-listed. Each row shows name (+ overload signature on
+      PG). Read from the catalog per engine (mysql `information_schema.ROUTINES`
+      + `.PARAMETERS`; pg `pg_proc`/`pg_namespace`, `prokind` p/f).
+- [x] **`routine` tab kind.** Definition viewer (read-only, `SqlDisplay`, DDL via
+      `getRoutine` — mysql `SHOW CREATE PROCEDURE/FUNCTION`, pg `pg_get_functiondef`)
+      + metadata (params w/ modes+types, security context, owner/DEFINER, grants,
+      overloads) + an **Execute** panel. Read-only viewer gets a display-only
+      **Pretty** toggle (per-tab override of the global Pretty pref).
+- [x] **Execute panel (unified, kind-aware).** Procedure → `CALL` (typed confirm,
+      blocked on read-only, captured to **Routine Execution** stream). Scalar
+      function → `SELECT f(…)`; table-returning → `SELECT * FROM f(…)` → Data
+      Retrieval, no confirm. Each `IN`/`INOUT` param = free-text SQL-literal
+      field + explicit **NULL** toggle, with typed helpers for common scalars
+      (number/bool/date/enum combobox); exotic types (array/composite/JSON) fall
+      back to raw literal (DB validates). `OUT` fields display-only. Run
+      **parameter-bound**; preview + history show the **inlined** command
+      (reuse `renderSql`/`formatLiteral`).
+- [x] **MySQL `OUT`/`INOUT` capture.** A bare `CALL` can't return them — generate
+      `SET @p := <in>; CALL proc(@p, …); SELECT @p AS p` as one batch, show the
+      full sequence verbatim in the preview, render the trailing `SELECT` as the
+      OUT panel. PG returns `INOUT` in its result row directly.
+- [x] **Result rendering.** Multiple result sets, affected-row counts,
+      notices/warnings, and `OUT`/`INOUT` values. Results and execution param
+      values are **never persisted**.
+- [x] **Routine Execution history stream.** Add to `HistoryStream` +
+      `classifyStatement` (`CALL` → routine_execution). Never auto-purged. Never
+      enters a Changeset. Function-via-`SELECT` stays Data Retrieval.
+- [x] **Create / replace / drop (DDL → Schema Mutation, active Changeset).**
+      PG: `CREATE OR REPLACE` (preserves owner/grants natively) + `DROP` (exact
+      overload signature). MySQL/MariaDB: **create + drop only** — editing an
+      existing routine is **blocked** with a "safe replace lands in a later beta"
+      banner (no atomic replace; Recovery Copy is beta.2). Drop = typed-name
+      confirm + exact-DDL preview; no cascade. All executed DDL captured.
+- [x] **Raw definition editor + durable draft.** CodeMirror editor (no form
+      designer). Explicit user-triggered **Format** action (never automatic,
+      never on save). Draft is **durable across restart** keyed by routine
+      identity, with a captured server-definition **baseline** — external drift
+      is flagged and never silently overwrites the local draft (aligns ADR-0018;
+      deliberate exception to ADR-0012). New-routine draft keyed by tab id.
+- [ ] **Routine-aware autocomplete.** Procedures after `CALL`; functions in
+      expressions. **Not built in this pass** (SQL-editor autocomplete
+      unchanged — deferred).
+- [x] **MySQL `DELIMITER` statement splitting.** Teach `splitStatements` to
+      consume `DELIMITER x` lines (switch terminator, strip before send) so
+      pasted MySQL routine scripts run correctly in the SQL editor. PG
+      dollar-quoting already handled. Defer BEGIN/END heuristic detection.
+
+**Simplified in this pass (follow-ups):**
+
+- Execute param input is text + explicit NULL toggle only — the typed scalar
+  helpers (number/bool/date/enum combobox) are **not** built yet; every value is
+  a free-text SQL literal (DB validates).
+- Routine tab metadata shows params (name/mode/type), owner/DEFINER and a
+  volatility/security label; **grants and explicit overload listing are not
+  surfaced** yet.
+- No display-only **Pretty toggle** on the read-only definition viewer yet (the
+  editable draft has an explicit **Format** action).
+- PG param types come from `information_schema.parameters` (`data_type`), so
+  array/composite params bind without a `::type` cast (best-effort).
+
+**Known sharp edge (accepted):** a PG `VOLATILE` function run via `SELECT` is
+classified Data Retrieval → allowed on read-only connections even though it can
+mutate. Plan accepts this; gate volatile functions later if it bites.
+
+### beta.2 — MySQL safe replacement
+
+- [ ] **Routine Recovery Copy + grant preservation.** 30-day local snapshot of
+      the original definition/identity/grants before a non-atomic MySQL/MariaDB
+      replacement; preview `DROP`+`CREATE`+grant-restore (state clearly that
+      replacement is non-atomic); reviewed **Restore original** after partial
+      failure; block replacement when the connected user can't preserve required
+      ownership/security context. Unblocks MySQL edit-of-existing.
+
 ## P0 — next: inline filter builder + raw WHERE — DONE
 
 Design resolved via `/grill-with-docs` (2026-06-14). See

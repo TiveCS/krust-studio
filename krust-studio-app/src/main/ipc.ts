@@ -47,7 +47,13 @@ import {
   redisReadValue,
   redisCommit,
   redisRenameKey,
-  redisDeleteKey
+  redisDeleteKey,
+  listRoutines,
+  getRoutine,
+  previewRoutineCall,
+  executeRoutine,
+  createRoutine,
+  dropRoutine
 } from './db/session'
 import {
   listHistory,
@@ -78,7 +84,9 @@ import type {
   WorkspaceData,
   BackupSpec,
   ReadValueOpts,
-  RedisCommitBatch
+  RedisCommitBatch,
+  RoutineRef,
+  RoutineArg
 } from '../shared/types'
 import type {
   SaveConnectionInput,
@@ -310,6 +318,28 @@ export function registerIpc(): void {
   )
   ipcMain.handle('redis:deleteKey', (_e, id: string, key: string) =>
     redisDeleteKey(id, key)
+  )
+
+  // ── Routines: procedures & functions (ADR-0021) ──
+  ipcMain.handle('routine:list', (_e, id: string) => listRoutines(id))
+  ipcMain.handle('routine:get', (_e, id: string, ref: RoutineRef) =>
+    getRoutine(id, ref)
+  )
+  ipcMain.handle(
+    'routine:previewCall',
+    (_e, id: string, ref: RoutineRef, args: RoutineArg[]) =>
+      previewRoutineCall(id, ref, args)
+  )
+  ipcMain.handle(
+    'routine:execute',
+    (_e, id: string, ref: RoutineRef, args: RoutineArg[]) =>
+      executeRoutine(id, ref, args)
+  )
+  ipcMain.handle('routine:create', (_e, id: string, definition: string) =>
+    createRoutine(id, definition)
+  )
+  ipcMain.handle('routine:drop', (_e, id: string, ref: RoutineRef) =>
+    dropRoutine(id, ref)
   )
 
   ipcMain.handle('workspace:load', () => loadWorkspace())

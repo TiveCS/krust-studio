@@ -18,7 +18,9 @@ import type {
   BackupSpec,
   TableTemplate,
   ReadValueOpts,
-  RedisCommitBatch
+  RedisCommitBatch,
+  RoutineRef,
+  RoutineArg
 } from '../shared/types'
 
 const api: KrustApi = {
@@ -123,6 +125,17 @@ const api: KrustApi = {
       ipcRenderer.invoke('redis:renameKey', id, from, to, overwrite),
     deleteKey: (id: string, key: string) =>
       ipcRenderer.invoke('redis:deleteKey', id, key)
+  },
+  routines: {
+    list: (id: string) => ipcRenderer.invoke('routine:list', id),
+    get: (id: string, ref: RoutineRef) => ipcRenderer.invoke('routine:get', id, ref),
+    previewCall: (id: string, ref: RoutineRef, args: RoutineArg[]) =>
+      ipcRenderer.invoke('routine:previewCall', id, ref, args),
+    execute: (id: string, ref: RoutineRef, args: RoutineArg[]) =>
+      ipcRenderer.invoke('routine:execute', id, ref, args),
+    create: (id: string, definition: string) =>
+      ipcRenderer.invoke('routine:create', id, definition),
+    drop: (id: string, ref: RoutineRef) => ipcRenderer.invoke('routine:drop', id, ref)
   },
   workspace: {
     load: () => ipcRenderer.invoke('workspace:load'),

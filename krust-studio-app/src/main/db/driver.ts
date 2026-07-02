@@ -24,7 +24,12 @@ import type {
   RedisValuePage,
   ReadValueOpts,
   RedisCommitBatch,
-  RedisCommitResult
+  RedisCommitResult,
+  RoutineInfo,
+  RoutineDef,
+  RoutineRef,
+  RoutineArg,
+  RoutineExecResult
 } from '../../shared/types'
 
 /**
@@ -151,9 +156,31 @@ export interface KeyValueCapable {
 export type RedisDriver = DriverCore & KeyValueCapable
 
 /**
- * Split a SQL script into statements on top-level `;`, skipping semicolons
- * inside '…' "…" `…` strings, -- line and /* *\/ block comments, and pg $tag$
- * dollar-quoted bodies. Good enough for the editor's run-script.
+ * Stored procedures & functions (ADR-0021). Composed by mysql/postgres only —
+ * NOT part of `DbDriver` (sqlite has no routines). Product code selects this via
+ * the `routines` capability flag; session.ts casts a session to `RoutineCapable`.
+ */
+export interface RoutineCapable {
+  listRoutines(): Promise<RoutineInfo[]>
+  getRoutine(ref: RoutineRef): Promise<RoutineDef>
+  /** build the exact command(s) an execution would run, without executing */
+  previewRoutineCall(
+    ref: RoutineRef,
+    args: RoutineArg[]
+  ): Promise<{ statements: string[] }>
+  executeRoutine(ref: RoutineRef, args: RoutineArg[]): Promise<RoutineExecResult>
+  /** run a raw CREATE [OR REPLACE] definition as one statement */
+  createRoutine(definition: string): Promise<{ statements: string[] }>
+  dropRoutine(ref: RoutineRef): Promise<{ statements: string[] }>
+}
+
+/**
+ * Split a SQL script into statements on the active delimiter (default `;`),
+ * skipping delimiters inside '…' "…" `…` strings, -- line and /* *\/ block
+ * comments, and pg $tag$ dollar-quoted bodies. Recognises mysql-client
+ * `DELIMITER x` directives (ADR-0021): the directive switches the active
+ * terminator and is stripped — never emitted or sent to the server — so a
+ * pasted `CREATE PROCEDURE … BEGIN …; …; END$$` splits as one statement.
  */
 export function splitStatements(sql: string): string[] {
   const out: string[] = []
@@ -162,6 +189,18 @@ export function splitStatements(sql: string): string[] {
   const n = sql.length
   let quote: string | null = null // ' " `
   let dollarTag: string | null = null // $tag$
+  let delim = ';' // active statement terminator (mutable via DELIMITER)
+  // true when the current position begins a fresh line (only whitespace in buf
+  // since the last newline / start) — where a DELIMITER directive may appear.
+  const atLineStart = (): boolean => {
+    for (let j = buf.length - 1; j >= 0; j--) {
+      const ch = buf[j]
+      if (ch === '\n') return true
+      if (ch === ' ' || ch === '\t' || ch === '\r') continue
+      return false
+    }
+    return true
+  }
   while (i < n) {
     const c = sql[i]
     const c2 = sql[i + 1]
@@ -203,6 +242,15 @@ export function splitStatements(sql: string): string[] {
       i = end
       continue
     }
+    // DELIMITER directive — mysql-client only; line-leading, outside quotes.
+    if ((c === 'D' || c === 'd') && atLineStart()) {
+      const m = /^DELIMITER[ \t]+(\S+)[ \t]*(\r?\n|$)/i.exec(sql.slice(i))
+      if (m) {
+        delim = m[1]
+        i += m[0].length
+        continue
+      }
+    }
     if (c === "'" || c === '"' || c === '`') {
       quote = c
       buf += c
@@ -218,10 +266,10 @@ export function splitStatements(sql: string): string[] {
         continue
       }
     }
-    if (c === ';') {
+    if (sql.startsWith(delim, i)) {
       if (buf.trim()) out.push(buf.trim())
       buf = ''
-      i++
+      i += delim.length
       continue
     }
     buf += c
@@ -233,16 +281,36 @@ export function splitStatements(sql: string): string[] {
 
 /** classify a statement by leading keyword → history stream + result kind */
 export function classifyStatement(sql: string): {
-  stream: 'data_retrieval' | 'data_mutation' | 'table_mutation'
+  stream: 'data_retrieval' | 'data_mutation' | 'table_mutation' | 'routine_execution'
   reads: boolean
 } {
   const kw = sql.replace(/^\s*(\/\*[\s\S]*?\*\/|--[^\n]*\n)*\s*/, '').trimStart()
   const head = kw.slice(0, 12).toUpperCase()
   if (/^(SELECT|WITH|SHOW|EXPLAIN|PRAGMA|DESCRIBE|DESC|VALUES|TABLE)\b/.test(head))
     return { stream: 'data_retrieval', reads: true }
+  // CALL is a stored-procedure execution — potentially mutating (ADR-0021)
+  if (/^CALL\b/.test(head)) return { stream: 'routine_execution', reads: false }
   if (/^(CREATE|ALTER|DROP|RENAME|COMMENT|GRANT|REVOKE)\b/.test(head))
     return { stream: 'table_mutation', reads: false }
   return { stream: 'data_mutation', reads: false }
+}
+
+/**
+ * Render one routine argument as an inlined SQL literal — **display only**, for
+ * the exec preview + Routine Execution history (execution itself binds params).
+ * Numeric/boolean values pass through; everything else is single-quoted.
+ */
+export function routineArgLiteral(arg: {
+  value: string | null
+  type: string
+}): string {
+  if (arg.value === null) return 'NULL'
+  const t = (arg.type ?? '').toLowerCase()
+  const v = arg.value.trim()
+  const numeric = /\b(int|integer|bigint|smallint|tinyint|numeric|decimal|real|double|float|serial)\b/.test(t)
+  if (numeric && v !== '' && !Number.isNaN(Number(v))) return v
+  if (/\bbool/.test(t) && /^(true|false|0|1)$/i.test(v)) return v.toUpperCase()
+  return `'${arg.value.replace(/'/g, "''")}'`
 }
 
 /** Default index name when the user leaves it blank: `idx_<table>_<cols>`. */

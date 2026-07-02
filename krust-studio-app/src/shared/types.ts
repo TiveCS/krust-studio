@@ -110,6 +110,77 @@ export interface SearchResult {
   rows: Record<string, unknown>[]
 }
 
+// ─────────────────── Routines: procedures & functions (ADR-0021) ───────────
+// A Routine is not tabular (no rows/PK); on PG its identity carries an overload
+// signature. Modelled via its own driver capability (RoutineCapable) + tab kind.
+
+export type RoutineKind = 'procedure' | 'function'
+export type RoutineParamMode = 'in' | 'out' | 'inout'
+
+/** identifies one routine. On PG `signature` (identity-arg list, e.g.
+ *  "integer, text") disambiguates overloads and targets DROP; empty on mysql. */
+export interface RoutineRef {
+  schema?: string
+  kind: RoutineKind
+  name: string
+  /** PG identity-argument list for overloads + exact DROP targeting */
+  signature?: string
+}
+
+/** one routine row in the sidebar (Procedures / Functions sections) */
+export interface RoutineInfo {
+  schema?: string
+  kind: RoutineKind
+  name: string
+  /** PG identity-arg list (overload key); undefined on mysql */
+  signature?: string
+  /** display label incl. args, e.g. "add(integer, integer)" */
+  label: string
+  /** function return type (display only) */
+  returns?: string | null
+}
+
+export interface RoutineParam {
+  name: string
+  type: string
+  mode: RoutineParamMode
+}
+
+/** full routine metadata + definition for the Routine tab */
+export interface RoutineDef {
+  ref: RoutineRef
+  /** the server's CREATE definition text (preserved faithfully) */
+  definition: string
+  params: RoutineParam[]
+  returns?: string | null
+  /** function returns a set/table → executed as SELECT * FROM f(...) */
+  returnsSet?: boolean
+  language?: string | null
+  /** owner (pg) / DEFINER (mysql) */
+  owner?: string | null
+  /** SQL security / volatility label */
+  security?: string | null
+}
+
+/** one user-supplied argument for a routine execution (IN/INOUT params) */
+export interface RoutineArg {
+  name: string
+  type: string
+  /** SQL-literal value as typed by the user; null when the NULL toggle is on */
+  value: string | null
+}
+
+export interface RoutineExecResult {
+  /** the exact command(s) executed, literals inlined — preview + history */
+  statements: string[]
+  /** result sets returned (procedure SELECTs / function rows) */
+  resultSets: { columns: ColumnInfo[]; rows: Record<string, unknown>[] }[]
+  /** OUT/INOUT values by name (mysql via trailing SELECT; pg via result row) */
+  outValues?: Record<string, unknown> | null
+  /** affected rows when there is no result set */
+  affected?: number | null
+}
+
 /** one node in a parsed query plan tree (ADR-0014). `scan` drives the badge:
  *  'full' = full table scan (the thing the user is hunting for). */
 export interface PlanNode {
@@ -191,6 +262,8 @@ export type HistoryStream =
   | 'data_retrieval'
   /** Redis key mutations — a distinct command class, never changeset-eligible */
   | 'redis_mutation'
+  /** an explicitly-confirmed stored-procedure CALL (ADR-0021) */
+  | 'routine_execution'
 
 export interface HistoryEntry {
   id: number
@@ -571,10 +644,15 @@ export interface SerializedTab {
   id: string
   entity: EntityRef
   /** undefined = regular table tab */
-  kind?: 'history' | 'connection-editor' | 'redis-key'
+  kind?: 'history' | 'connection-editor' | 'redis-key' | 'routine'
   connectionEditor?: { connectionId: string | null }
   /** redis-key tabs: the key identity (value/staged state is transient, not saved) */
   redisKey?: { dbIndex: number; key: string; type: RedisKeyType }
+  /** routine tabs: identity (absent on a new-routine draft) */
+  routineRef?: RoutineRef
+  /** routine tabs: durable definition draft + server baseline (ADR-0021) */
+  routineDraft?: string
+  routineBaseline?: string
   view: 'data' | 'structure'
   /** which Structure sub-tab was open (survives restore) */
   structureSub?: 'columns' | 'indexes' | 'relations' | 'referencedBy' | 'ddl'
@@ -870,6 +948,29 @@ export interface RedisApi {
   deleteKey: (id: string, key: string) => Promise<RedisCommitResult>
 }
 
+/** Procedures & functions (ADR-0021). Only mysql/postgres connections. */
+export interface RoutineApi {
+  list: (id: string) => Promise<RoutineInfo[]>
+  get: (id: string, ref: RoutineRef) => Promise<RoutineDef>
+  /** build the exact command(s) an execution would run, without running (preview) */
+  previewCall: (
+    id: string,
+    ref: RoutineRef,
+    args: RoutineArg[]
+  ) => Promise<{ statements: string[] }>
+  /** execute a routine. Procedures blocked on read-only + captured as Routine
+   *  Execution; function-via-SELECT stays a read. */
+  execute: (
+    id: string,
+    ref: RoutineRef,
+    args: RoutineArg[]
+  ) => Promise<RoutineExecResult>
+  /** run a raw CREATE [OR REPLACE] definition (captured as Schema Mutation DDL) */
+  create: (id: string, definition: string) => Promise<{ statements: string[] }>
+  /** DROP the routine (exact signature on pg). Typed-confirm in the UI. */
+  drop: (id: string, ref: RoutineRef) => Promise<{ statements: string[] }>
+}
+
 export interface KrustApi {
   connections: ConnectionsApi
   sessions: SessionApi
@@ -880,4 +981,5 @@ export interface KrustApi {
   templates: TemplatesApi
   window: WindowControlApi
   redis: RedisApi
+  routines: RoutineApi
 }

@@ -18,7 +18,7 @@ import type {
   Sort,
   TableStructure
 } from '../../shared/types'
-import type { DbDriver, DriverCore, RedisDriver } from './driver'
+import type { DbDriver, DriverCore, RedisDriver, RoutineCapable } from './driver'
 import { splitStatements, classifyStatement, isConnectionFatal } from './driver'
 import { MysqlDriver } from './drivers/mysql'
 import { PostgresDriver } from './drivers/postgres'
@@ -34,7 +34,12 @@ import type {
   RedisDbInfo,
   RedisKeyMeta,
   RedisScanResult,
-  RedisValuePage
+  RedisValuePage,
+  RoutineInfo,
+  RoutineDef,
+  RoutineRef,
+  RoutineArg,
+  RoutineExecResult
 } from '../../shared/types'
 
 const sessions = new Map<string, DriverCore>()
@@ -470,6 +475,81 @@ export async function execRestoreStatement(id: string, sql: string): Promise<voi
       status: 'success'
     })
   }
+}
+
+// ─────────────────── Routines: procedures & functions (ADR-0021) ──────────
+// mysql/postgres only (gated by the `routines` capability). Relational sessions
+// implement RoutineCapable; sqlite does not (never reached — UI hides it).
+
+/** cast a live relational session to its routine capability */
+const routineCap = (d: DbDriver): RoutineCapable => d as unknown as RoutineCapable
+
+export async function listRoutines(id: string): Promise<RoutineInfo[]> {
+  return withRetry(id, (d) => routineCap(d).listRoutines())
+}
+
+export async function getRoutine(id: string, ref: RoutineRef): Promise<RoutineDef> {
+  return withRetry(id, (d) => routineCap(d).getRoutine(ref))
+}
+
+export async function previewRoutineCall(
+  id: string,
+  ref: RoutineRef,
+  args: RoutineArg[]
+): Promise<{ statements: string[] }> {
+  return withRetry(id, (d) => routineCap(d).previewRoutineCall(ref, args))
+}
+
+export async function executeRoutine(
+  id: string,
+  ref: RoutineRef,
+  args: RoutineArg[]
+): Promise<RoutineExecResult> {
+  const config = getConnectionConfig(id)
+  // A procedure is potentially mutating (CALL) → blocked on read-only + captured
+  // as Routine Execution. A function runs via SELECT (a read) — neither applies.
+  if (ref.kind === 'procedure' && config?.readOnly)
+    throw new Error('Connection is read-only; procedure execution is blocked')
+  const res = await withRetry(id, (d) => routineCap(d).executeRoutine(ref, args))
+  if (ref.kind === 'procedure') {
+    for (const statement of res.statements) {
+      await capture({
+        connectionId: id,
+        stream: 'routine_execution',
+        source: 'gui',
+        statement,
+        status: 'success',
+        entity: ref.name
+      })
+    }
+  }
+  return res
+}
+
+export async function createRoutine(
+  id: string,
+  definition: string
+): Promise<{ statements: string[] }> {
+  const config = getConnectionConfig(id)
+  if (config?.readOnly)
+    throw new Error('Connection is read-only; schema changes blocked')
+  if (!sessions.has(id)) await connectSession(id)
+  const res = await routineCap(rel(id)).createRoutine(definition)
+  await captureAll(id, 'table_mutation', res.statements, null)
+  return res
+}
+
+export async function dropRoutine(
+  id: string,
+  ref: RoutineRef
+): Promise<{ statements: string[] }> {
+  const config = getConnectionConfig(id)
+  if (config?.readOnly)
+    throw new Error('Connection is read-only; schema changes blocked')
+  if (!sessions.has(id)) await connectSession(id)
+  const res = await routineCap(rel(id)).dropRoutine(ref)
+  await captureAll(id, 'table_mutation', res.statements, ref.name, null, true)
+  return res
 }
 
 export async function cancelQuery(id: string): Promise<void> {

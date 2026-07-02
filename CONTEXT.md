@@ -142,12 +142,55 @@ executed, created, and edited; every definition mutation surfaces and captures
 its exact DDL. In PostgreSQL, a Routine's identity includes its schema, kind,
 name, and input argument types; routines with the same name but different input
 signatures are distinct overloads.
+
+A Routine is **not a table** — no rows, no primary key, and (on PG) an overload
+signature — so it is modelled by its own driver capability (`RoutineCapable`,
+continuing the ADR-0020 capability split) rather than the tabular
+`EntityType`/`EntityRef` path, and opens in its own **Routine tab** with a
+definition viewer + an **Execute** panel. Only relational engines that support
+routines compose the capability (MySQL 8.0+, MariaDB 10.5+, PostgreSQL 12+);
+SQLite, Redis, and StarRocks do not.
+
+**Execution.** The Execute panel serves both kinds, engine-aware. Each `IN`/
+`INOUT` parameter is a free-text SQL-literal field with an explicit NULL toggle,
+plus typed helpers for common scalars (number/bool/date/enum); exotic types
+(array, composite, JSON) fall back to a raw literal and the database validates on
+run (the *automate for convenience, never force trust* stance). Calls run
+**parameter-bound** but preview and history record the **inlined** command (the
+no-silent-mutation principle, reusing the DML render path). A **procedure** runs
+as `CALL` — treated as potentially mutating, so it requires confirmation, is
+blocked on read-only connections, and is captured to **Routine Execution**
+history. A **function** runs as `SELECT f(…)` (scalar) or `SELECT * FROM f(…)`
+(table-returning) and stays **Data Retrieval** (no confirm). MySQL/MariaDB
+`OUT`/`INOUT` values, which a bare `CALL` cannot return, are surfaced by
+generating the `SET @p := …; CALL …(@p); SELECT @p` sequence — shown verbatim in
+the preview — and rendering the trailing `SELECT` as the OUT panel; PG returns
+`INOUT` in its result row directly. Result sets, notices, and OUT values are
+displayed but **never persisted** (nor are execution parameter values).
+
+**Authoring** is a raw SQL definition editor (never a form designer). The server
+definition is preserved faithfully — automatic formatting never rewrites saved
+text; a **Format** action is explicit and user-triggered, and the read-only
+viewer's **Pretty** toggle is display-only. An in-progress routine draft is
+**durable across restart** keyed by routine identity (aligned with ADR-0018
+editor-draft durability, a deliberate exception to ADR-0012's transient-schema-
+draft rule), with a captured server-definition **baseline** so external drift is
+flagged and never silently overwrites the local draft. Beta scope is split:
+**beta.1** ships browse, execute, PG `CREATE OR REPLACE`/`DROP`, and MySQL/
+MariaDB **create + drop** — MySQL editing of an *existing* routine is **blocked**
+(a "safe replace lands in a later beta" banner) because MySQL has no atomic
+replace and the **Routine Recovery Copy** safety net is deferred to **beta.2**.
+Drop requires a typed-name confirmation and exact-DDL preview; PG drops target
+the exact overload signature; no cascade in the beta.
 _Avoid_: Query, script
 
 ### Routine Recovery Copy
 A temporary local copy of a Routine's original definition, identity, and grants,
 created before a non-atomic MySQL/MariaDB replacement. It supports an explicit,
-reviewed restoration after partial failure and expires after 30 days.
+reviewed restoration after partial failure and expires after 30 days. **Deferred
+to 1.7.0-beta.2** together with MySQL grant/`DEFINER` preservation and
+restoration; beta.1 blocks MySQL edit-of-existing rather than shipping an
+unguarded DROP+CREATE.
 _Avoid_: Backup, draft
 
 ### Query History

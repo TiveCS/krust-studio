@@ -11,6 +11,7 @@ import { TableTabView } from '@/components/TableTabView'
 import { HistoryView } from '@/components/HistoryView'
 import { BackupView } from '@/components/BackupView'
 import { RedisKeyView } from '@/components/RedisKeyView'
+import { RoutineView } from '@/components/RoutineView'
 import { CommandPalette } from '@/components/CommandPalette'
 import { Toaster } from '@/components/ui/sonner'
 import { useConnections } from '@/store/connections'
@@ -166,6 +167,8 @@ function App(): React.JSX.Element {
     content = <BackupView />
   } else if (activeTab?.kind === 'redis-key') {
     content = <RedisKeyView />
+  } else if (activeTab?.kind === 'routine') {
+    content = <RoutineView key={activeTab.id} />
   } else if (activeTab) {
     content = <TableTabView />
   } else {

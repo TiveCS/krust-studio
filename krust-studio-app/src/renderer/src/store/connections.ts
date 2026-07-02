@@ -24,8 +24,12 @@ import type {
   Sort,
   TableStructure,
   TableTemplate,
-  RedisKeyType
+  RedisKeyType,
+  RoutineInfo,
+  RoutineRef,
+  RoutineDef
 } from '../../../shared/types'
+import { capabilitiesFor } from '../../../shared/capabilities'
 
 export interface QueryState {
   sql: string
@@ -50,10 +54,19 @@ export interface Tab {
   id: string
   entity: EntityRef
   /** undefined / absent = regular table/query/new-table tab */
-  kind?: 'history' | 'connection-editor' | 'backup' | 'redis-key'
+  kind?: 'history' | 'connection-editor' | 'backup' | 'redis-key' | 'routine'
   /** redis-key tab identity; value + staged-edit state live in the useRedis
    *  store keyed by tab id (decision 3: fat-Tab marker, heavy state external) */
   redisKey?: { dbIndex: number; key: string; type: RedisKeyType }
+  /** routine tab identity (absent on a new-routine draft, ADR-0021) */
+  routineRef?: RoutineRef
+  /** loaded routine metadata — transient (re-fetched on mount) */
+  routineDef?: RoutineDef | null
+  routineDefLoading?: boolean
+  /** editable definition draft — DURABLE across restart (ADR-0021 / ADR-0018) */
+  routineDraft?: string
+  /** server definition captured at load — drift detection + persisted baseline */
+  routineBaseline?: string
   /** pinned tabs stay at the left edge + survive bulk-close (persisted) */
   pinned?: boolean
   /** set on connection-editor tabs: which connection to edit (null = new) */
@@ -146,6 +159,17 @@ function entityKey(e: EntityRef): string {
   return `${e.schema ?? ''}.${e.name}`
 }
 
+function routineKey(r: RoutineRef): string {
+  return `${r.schema ?? ''}.${r.kind}.${r.name}.${r.signature ?? ''}`
+}
+
+/** engine-specific starter template for a brand-new routine draft */
+function newRoutineTemplate(driver?: string): string {
+  if (driver === 'postgres')
+    return `CREATE OR REPLACE FUNCTION my_function(a integer)\nRETURNS integer\nLANGUAGE plpgsql\nAS $$\nBEGIN\n  RETURN a;\nEND;\n$$;`
+  return `DELIMITER $$\nCREATE PROCEDURE my_procedure(IN a INT)\nBEGIN\n  SELECT a;\nEND$$\nDELIMITER ;`
+}
+
 interface ConnectionsState {
   connections: ConnectionSummary[]
   loading: boolean
@@ -171,10 +195,26 @@ interface ConnectionsState {
   sessionError: string | null
   entities: EntityInfo[]
   enums: EnumType[]
+  /** stored procedures & functions (mysql/pg; ADR-0021) */
+  routines: RoutineInfo[]
   databases: string[]
   currentDb: string | null
   open: (id: string) => Promise<void>
   refreshEntities: () => Promise<void>
+  /** re-list routines for the current connection (mysql/pg only) */
+  refreshRoutines: () => Promise<void>
+  /** open/focus a routine tab + load its definition */
+  openRoutine: (ref: RoutineRef, label?: string) => void
+  /** open a blank new-routine draft tab */
+  openNewRoutine: () => void
+  /** load a routine tab's definition (seeds the draft once; captures baseline) */
+  loadRoutineDef: (tabId: string) => Promise<void>
+  /** set a routine tab's durable definition draft */
+  setRoutineDraft: (tabId: string, text: string) => void
+  /** run CREATE [OR REPLACE] for the active routine tab's draft */
+  createRoutineFromDraft: () => Promise<string[]>
+  /** drop a routine + close its tab + refresh the list */
+  dropRoutine: (ref: RoutineRef) => Promise<string[]>
   switchDatabase: (name: string) => Promise<void>
   createTable: (spec: CreateTableSpec) => Promise<string>
   dropEntity: (entity: EntityRef, type: EntityType) => Promise<string[]>
@@ -327,6 +367,15 @@ export const useConnections = create<ConnectionsState>((set, get) => {
             entity: tab.entity,
             kind: tab.kind,
             ...(tab.kind === 'redis-key' && tab.redisKey ? { redisKey: tab.redisKey } : {}),
+            ...(tab.kind === 'routine'
+              ? {
+                  ...(tab.routineRef ? { routineRef: tab.routineRef } : {}),
+                  ...(tab.routineDraft !== undefined ? { routineDraft: tab.routineDraft } : {}),
+                  ...(tab.routineBaseline !== undefined
+                    ? { routineBaseline: tab.routineBaseline }
+                    : {})
+                }
+              : {}),
             connectionEditor: tab.connectionEditor,
             view: tab.view,
             structureSub: tab.structureSub,
@@ -352,6 +401,10 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       entity: t.entity,
       kind: t.kind,
       redisKey: t.redisKey,
+      routineRef: t.routineRef,
+      routineDef: null,
+      routineDraft: t.routineDraft,
+      routineBaseline: t.routineBaseline,
       pinned: t.pinned,
       connectionEditor: t.connectionEditor,
       data: null,
@@ -442,6 +495,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     const restoredTabs = saved.tabs
       .filter((t) => {
         if (t.kind === 'history') return true
+        if (t.kind === 'routine') return true // fail-soft: load surfaces if gone
         if (t.draft != null) return true
         if (t.sqlDraft !== undefined) return true
         return entitySet.has(`${t.entity.schema ?? ''}\x00${t.entity.name}`)
@@ -524,6 +578,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
     sessionError: null,
     entities: [],
     enums: [],
+    routines: [],
     databases: [],
     currentDb: null,
 
@@ -540,6 +595,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         sessionError: null,
         entities: [],
         enums: [],
+        routines: [],
         databases: [],
         currentDb: null,
         tabs: [],
@@ -563,6 +619,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         let currentDb: string | null = null
         try { currentDb = await window.api.sessions.currentDatabase(id) } catch { /* ignore */ }
         set({ sessionStatus: 'connected', entities, enums, currentDb })
+        void get().refreshRoutines()
         restoreWorkspaceTabs(id, currentDb, entities)
 
         // databases list loads lazily/non-blocking
@@ -583,6 +640,23 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       const entities = await window.api.sessions.listEntities(id)
       const enums = await window.api.sessions.listEnums(id)
       set({ entities, enums })
+      void get().refreshRoutines()
+    },
+
+    refreshRoutines: async () => {
+      const id = get().openConnectionId
+      if (!id) return
+      const driver = get().connections.find((c) => c.id === id)?.driver
+      if (!driver || !capabilitiesFor(driver).routines) {
+        set({ routines: [] })
+        return
+      }
+      try {
+        const routines = await window.api.routines.list(id)
+        if (get().openConnectionId === id) set({ routines })
+      } catch {
+        set({ routines: [] }) // permission / unsupported — degrade quietly
+      }
     },
 
     switchDatabase: async (name) => {
@@ -604,6 +678,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
           tabs: [],
           activeTabId: null
         })
+        void get().refreshRoutines()
         restoreWorkspaceTabs(id, name, entities)
       } catch (err) {
         set({
@@ -689,6 +764,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         sessionError: null,
         entities: [],
         enums: [],
+        routines: [],
         tabs: [],
         activeTabId: null
       })
@@ -720,6 +796,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         let currentDb: string | null = null
         try { currentDb = await window.api.sessions.currentDatabase(id) } catch { /* ignore */ }
         set({ sessionStatus: 'connected', entities, enums, currentDb })
+        void get().refreshRoutines()
         restoreWorkspaceTabs(id, currentDb, entities)
 
         window.api.sessions.listDatabases(id)
@@ -800,6 +877,117 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         structure: null, structureLoading: false, draft: null, query: null
       }
       set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
+    },
+
+    openRoutine: (ref, label) => {
+      const existing = get().tabs.find(
+        (t) => t.kind === 'routine' && t.routineRef && routineKey(t.routineRef) === routineKey(ref)
+      )
+      if (existing) {
+        set({ activeTabId: existing.id })
+        scheduleWorkspaceSave()
+        return
+      }
+      const tab: Tab = {
+        id: crypto.randomUUID(),
+        kind: 'routine',
+        routineRef: ref,
+        routineDef: null,
+        entity: { name: label ?? ref.name, schema: ref.schema },
+        data: null, loading: false, error: null, pageIndex: 0, total: null,
+        counting: false, filters: [], filterMode: 'builder', rawWhere: '',
+        filterError: null, orderBy: [], edits: {}, deletes: [],
+        inserts: [], colWidths: {}, committing: false, view: 'data',
+        structureSub: 'columns', referencedBy: null, referencedByLoading: false,
+        structure: null, structureLoading: false, draft: null, query: null
+      }
+      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
+      scheduleWorkspaceSave()
+      void get().loadRoutineDef(tab.id)
+    },
+
+    openNewRoutine: () => {
+      const driver = get().connections.find((c) => c.id === get().openConnectionId)?.driver
+      const tab: Tab = {
+        id: crypto.randomUUID(),
+        kind: 'routine',
+        routineRef: undefined,
+        routineDef: null,
+        routineDraft: newRoutineTemplate(driver),
+        routineBaseline: '',
+        entity: { name: 'New routine' },
+        data: null, loading: false, error: null, pageIndex: 0, total: null,
+        counting: false, filters: [], filterMode: 'builder', rawWhere: '',
+        filterError: null, orderBy: [], edits: {}, deletes: [],
+        inserts: [], colWidths: {}, committing: false, view: 'data',
+        structureSub: 'columns', referencedBy: null, referencedByLoading: false,
+        structure: null, structureLoading: false, draft: null, query: null
+      }
+      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
+      scheduleWorkspaceSave()
+    },
+
+    loadRoutineDef: async (tabId) => {
+      const { openConnectionId, tabs } = get()
+      const tab = tabs.find((t) => t.id === tabId)
+      if (!openConnectionId || !tab || tab.kind !== 'routine' || !tab.routineRef) return
+      patchTab(tabId, { routineDefLoading: true, error: null })
+      try {
+        const def = await window.api.routines.get(openConnectionId, tab.routineRef)
+        const cur = get().tabs.find((t) => t.id === tabId)
+        // seed the durable draft only once (never clobber in-progress edits); the
+        // baseline is refreshed so external drift is detectable (ADR-0021)
+        const seedDraft = cur?.routineDraft === undefined
+        patchTab(tabId, {
+          routineDef: def,
+          routineDefLoading: false,
+          routineBaseline: def.definition,
+          ...(seedDraft ? { routineDraft: def.definition } : {})
+        })
+        scheduleWorkspaceSave()
+      } catch (err) {
+        patchTab(tabId, {
+          routineDefLoading: false,
+          error: err instanceof Error ? err.message : String(err)
+        })
+      }
+    },
+
+    setRoutineDraft: (tabId, text) => {
+      const tab = get().tabs.find((t) => t.id === tabId)
+      if (tab?.kind === 'routine') {
+        patchTab(tabId, { routineDraft: text })
+        scheduleWorkspaceSave()
+      }
+    },
+
+    createRoutineFromDraft: async () => {
+      const { openConnectionId, activeTabId, tabs } = get()
+      const tab = tabs.find((t) => t.id === activeTabId)
+      if (!openConnectionId || !tab || tab.kind !== 'routine') return []
+      const def = tab.routineDraft ?? ''
+      const { statements } = await window.api.routines.create(openConnectionId, def)
+      await get().refreshRoutines()
+      // a fresh create resets the baseline to the just-saved text
+      patchTab(tab.id, { routineBaseline: def })
+      return statements
+    },
+
+    dropRoutine: async (ref) => {
+      const id = get().openConnectionId
+      if (!id) throw new Error('No active connection')
+      const { statements } = await window.api.routines.drop(id, ref)
+      set((s) => {
+        const tabs = s.tabs.filter(
+          (t) => !(t.kind === 'routine' && t.routineRef && routineKey(t.routineRef) === routineKey(ref))
+        )
+        const activeTabId = tabs.some((t) => t.id === s.activeTabId)
+          ? s.activeTabId
+          : (tabs[tabs.length - 1]?.id ?? null)
+        return { tabs, activeTabId }
+      })
+      await get().refreshRoutines()
+      return statements
     },
 
     openConnectionEditorTab: (connectionId) => {

@@ -373,6 +373,12 @@ export function HistoryView(): React.JSX.Element {
         >
           Data Retrieval (all)
         </button>
+        <button
+          onClick={() => setView({ kind: 'stream', stream: 'routine_execution' })}
+          className={railItem(view.kind === 'stream' && view.stream === 'routine_execution')}
+        >
+          Routine Execution (all)
+        </button>
       </aside>
 
       {/* right pane */}
@@ -387,7 +393,9 @@ export function HistoryView(): React.JSX.Element {
                   ? 'Schema Mutation'
                   : view.stream === 'data_mutation'
                     ? 'Data Mutation'
-                    : 'Data Retrieval'}
+                    : view.stream === 'routine_execution'
+                      ? 'Routine Execution'
+                      : 'Data Retrieval'}
           </span>
           <span className="text-xs text-muted-foreground">
             {conn?.name ?? 'No connection'}
