@@ -5,6 +5,7 @@ export type CommandId =
   | 'table.refresh'
   | 'table.toggleView'
   | 'filter.add'
+  | 'find.open'
   | 'sidebar.toggle'
 
 export type KeybindingScope = 'global' | 'table-tab' | 'data-view' | 'structure-view'
@@ -58,6 +59,13 @@ export const COMMANDS: CommandDef[] = [
     label: 'Add Filter',
     description: 'Expand the filter bar and add a condition',
     defaultKey: 'ctrl+shift+f',
+    scope: 'data-view'
+  },
+  {
+    id: 'find.open',
+    label: 'Find in Page',
+    description: 'Client-side search over the loaded rows (no SQL)',
+    defaultKey: 'ctrl+f',
     scope: 'data-view'
   },
   {

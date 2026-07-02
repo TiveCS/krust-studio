@@ -285,20 +285,24 @@ export function AppSidebar(): React.JSX.Element {
 
         {sessionStatus === 'connected' && !isRedis && (
           <>
+            {/* filter row (refresh sits at its right); actions move to their own
+                row below so the filter input isn't cramped */}
             <div className="flex items-center gap-1 px-2 pt-2">
               <SidebarInput
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
                 placeholder="Filter tables…"
-                className="h-7"
+                className="h-7 flex-1"
               />
               <button
                 onClick={() => refreshEntities()}
                 title="Refresh schema"
-                className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+                className="shrink-0 rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
               >
                 <RefreshCw className="size-3.5" />
               </button>
+            </div>
+            <div className="flex items-center gap-1 px-2 pt-1.5">
               <button
                 onClick={() => openNewTable()}
                 title="New table"

@@ -32,6 +32,7 @@ function App(): React.JSX.Element {
     loadTemplates,
     autoOpenLast
   } = useConnections()
+  const toastPosition = useSettings((s) => s.toastPosition)
 
   useEffect(() => {
     void (async () => {
@@ -133,6 +134,9 @@ function App(): React.JSX.Element {
           case 'filter.add':
             useUi.getState().requestAddFilter()
             break
+          case 'find.open':
+            useUi.getState().requestFind()
+            break
           case 'sidebar.toggle':
             // handled by SidebarProvider's own listener; preventDefault here so
             // the binding is still claimed/listed in the command registry
@@ -206,7 +210,7 @@ function App(): React.JSX.Element {
         </div>
       </div>
       <CommandPalette />
-      <Toaster position="bottom-right" />
+      <Toaster position={toastPosition} />
     </TooltipProvider>
   )
 }

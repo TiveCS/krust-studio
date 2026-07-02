@@ -56,6 +56,7 @@ import { cellText, display } from '@/lib/cellDisplay'
 import { cn } from '@/lib/utils'
 import { useConnections, editKey } from '@/store/connections'
 import { useSettings } from '@/store/settings'
+import { useUi } from '@/store/ui'
 
 const ROWNUM_W = 48
 const DEFAULT_COL_W = 180
@@ -271,6 +272,16 @@ export function DataGrid(): React.JSX.Element | null {
     setFindIndex(0)
   }, [activeTabId])
 
+  // the find.open command (default Ctrl/⌘+F, rebindable in Settings) bumps this
+  // nonce; open the Find bar + select its input when it changes.
+  const findNonce = useUi((s) => s.findNonce)
+  useEffect(() => {
+    if (findNonce > 0) {
+      setFindOpen(true)
+      requestAnimationFrame(() => findInputRef.current?.select())
+    }
+  }, [findNonce])
+
   // auto-focus the grid when a tab's rows load so keyboard nav works without a
   // click first — but never steal focus from an input the user is typing in
   // (e.g. the FilterBar).
@@ -480,10 +491,6 @@ export function DataGrid(): React.JSX.Element | null {
     const ni = (findIndex + dir + findMatches.length) % findMatches.length
     setFindIndex(ni)
     jumpToMatch(findMatches[ni])
-  }
-  const openFind = (): void => {
-    setFindOpen(true)
-    requestAnimationFrame(() => findInputRef.current?.select())
   }
   const closeFind = (): void => {
     setFindOpen(false)
@@ -813,11 +820,8 @@ export function DataGrid(): React.JSX.Element | null {
       e.preventDefault()
       return
     }
-    if (mod && e.key.toLowerCase() === 'f') {
-      openFind()
-      e.preventDefault()
-      return
-    }
+    // find.open (Ctrl/⌘+F by default) is handled by the global command
+    // dispatcher (rebindable in Settings) → bumps useUi.findNonce → opens Find.
     // ── keyboard navigation (Excel-style) ──
     const pageRows = Math.max(
       1,

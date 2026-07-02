@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { RotateCcw, Keyboard, Pin, X, History, Table2, AlignLeft } from 'lucide-react'
+import { RotateCcw, Keyboard, Pin, X, History, Table2, AlignLeft, Bell } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -10,8 +10,16 @@ import {
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { useSettings } from '@/store/settings'
+import type { ToastPosition } from '@/store/settings'
 import {
   COMMANDS,
   formatBinding,
@@ -45,13 +53,15 @@ export function SettingsModal({
     virtualizeThreshold,
     setVirtualizeThreshold,
     prettySql,
-    setPrettySql
+    setPrettySql,
+    toastPosition,
+    setToastPosition
   } = useSettings()
   const [recording, setRecording] = useState<CommandId | null>(null)
   const [search, setSearch] = useState('')
-  const [section, setSection] = useState<'keybindings' | 'pinned' | 'history' | 'grid' | 'sql'>(
-    'keybindings'
-  )
+  const [section, setSection] = useState<
+    'keybindings' | 'pinned' | 'history' | 'grid' | 'sql' | 'notifications'
+  >('keybindings')
   const [pinName, setPinName] = useState('')
   // History settings live in history.db meta (main process), not localStorage.
   const [autoAttachDestructive, setAutoAttachDestructive] = useState<
@@ -173,6 +183,18 @@ export function SettingsModal({
               <AlignLeft className="size-3.5" />
               SQL
             </button>
+            <button
+              onClick={() => setSection('notifications')}
+              className={cn(
+                'flex w-full items-center gap-2 rounded px-2 py-1.5 text-xs font-medium',
+                section === 'notifications'
+                  ? 'bg-accent text-foreground'
+                  : 'text-muted-foreground hover:bg-accent/40'
+              )}
+            >
+              <Bell className="size-3.5" />
+              Notifications
+            </button>
           </div>
 
           {/* grid content */}
@@ -221,6 +243,45 @@ export function SettingsModal({
                   exported SQL is never reformatted — only the on-screen display changes.
                 </p>
                 <p className="text-[11px] text-muted-foreground/70">Default off.</p>
+              </div>
+            </div>
+          )}
+
+          {/* notifications content */}
+          {section === 'notifications' && (
+            <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-auto p-4">
+              <div className="space-y-2">
+                <label className="text-xs font-medium">Toast position</label>
+                <p className="text-[11px] text-muted-foreground">
+                  Which corner toast notifications appear in.
+                </p>
+                <Select
+                  value={toastPosition}
+                  onValueChange={(v) => setToastPosition(v as ToastPosition)}
+                >
+                  <SelectTrigger className="h-7 w-48 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(
+                      [
+                        ['top-left', 'Top left'],
+                        ['top-center', 'Top center'],
+                        ['top-right', 'Top right'],
+                        ['bottom-left', 'Bottom left'],
+                        ['bottom-center', 'Bottom center'],
+                        ['bottom-right', 'Bottom right']
+                      ] as const
+                    ).map(([value, label]) => (
+                      <SelectItem key={value} value={value} className="text-xs">
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[11px] text-muted-foreground/70">
+                  Default bottom right.
+                </p>
               </div>
             </div>
           )}

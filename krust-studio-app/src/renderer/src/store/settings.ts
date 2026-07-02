@@ -4,6 +4,37 @@ const STORAGE_KEY = 'krust-settings-keybindings'
 const STORAGE_KEY_PINS = 'krust-settings-pinned-columns'
 const STORAGE_KEY_GRID = 'krust-settings-grid'
 const STORAGE_KEY_PRETTY = 'krust-settings-pretty-sql'
+const STORAGE_KEY_TOAST = 'krust-settings-toast-position'
+
+/** where toast notifications appear (sonner positions) */
+export type ToastPosition =
+  | 'top-left'
+  | 'top-center'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-center'
+  | 'bottom-right'
+
+const DEFAULT_TOAST_POSITION: ToastPosition = 'bottom-right'
+
+function loadToastPosition(): ToastPosition {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_TOAST)
+    const valid: ToastPosition[] = [
+      'top-left',
+      'top-center',
+      'top-right',
+      'bottom-left',
+      'bottom-center',
+      'bottom-right'
+    ]
+    return raw && (valid as string[]).includes(raw)
+      ? (raw as ToastPosition)
+      : DEFAULT_TOAST_POSITION
+  } catch {
+    return DEFAULT_TOAST_POSITION
+  }
+}
 
 /** global default for the display-only "Pretty" SQL toggle on object tabs.
  *  Each tab seeds its toggle from this; a per-tab flip is a temporary override
@@ -99,6 +130,11 @@ interface SettingsState {
   /** global default for the per-tab display-only Pretty SQL toggle */
   prettySql: boolean
   setPrettySql: (v: boolean) => void
+
+  // ── notifications ──
+  /** corner where toast notifications appear */
+  toastPosition: ToastPosition
+  setToastPosition: (p: ToastPosition) => void
 }
 
 function savePins(s: PinSettings): void {
@@ -180,5 +216,12 @@ export const useSettings = create<SettingsState>((set) => ({
     set(() => {
       localStorage.setItem(STORAGE_KEY_PRETTY, String(prettySql))
       return { prettySql }
+    }),
+
+  toastPosition: loadToastPosition(),
+  setToastPosition: (toastPosition) =>
+    set(() => {
+      localStorage.setItem(STORAGE_KEY_TOAST, toastPosition)
+      return { toastPosition }
     })
 }))
