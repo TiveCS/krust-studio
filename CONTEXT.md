@@ -623,6 +623,17 @@ Krust cannot enumerate every engine's full type space, so the database remains
 the source of truth and validates the type on apply (no client-side rejection of
 unknown types).
 
+**Table rename is a separate, immediate action — outside the staged commit.**
+Renaming the table is not a column/index op and never joins the staged batch:
+it applies at once through its own guarded dialog (reachable from both the
+sidebar and the Structure footer), surfaces its exact DDL in a hideable
+server-generated preview *before* it runs, and is captured to **Schema Mutation**
+history like any other DDL. It is **disabled while column/index edits are
+pending**, so the immediate rename never overlaps a not-yet-committed batch built
+against the old name. This mirrors the **Redis Key** decision where key rename
+stays a separate guarded action outside the value-commit — the same "identity
+changes are their own reviewed step" instinct, applied to tables.
+
 **Column Order** is editable, but its reach depends on context. When *creating a
 new table*, columns reorder freely on any engine (it is only the order of a
 not-yet-run `CREATE`). On an *existing table*, reordering physically moves the
