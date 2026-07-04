@@ -8,6 +8,7 @@ import {
   Trash2,
   RefreshCw,
   Sparkles,
+  AlignLeft,
   AlertTriangle,
   Loader2
 } from 'lucide-react'
@@ -24,9 +25,12 @@ import {
 } from '@/components/ui/dialog'
 import { SqlDisplay } from '@/components/SqlDisplay'
 import { SqlEditor, type SqlEditorHandle } from '@/components/SqlEditor'
+import { Combobox } from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
+import { enumValues } from '@/lib/enums'
 import { useConnections } from '@/store/connections'
-import type { DriverType, RoutineArg, RoutineExecResult } from '../../../shared/types'
+import { useSettings } from '@/store/settings'
+import type { DriverType, EnumType, RoutineArg, RoutineExecResult } from '../../../shared/types'
 
 type SubView = 'definition' | 'execute'
 
@@ -36,6 +40,7 @@ export function RoutineView(): React.JSX.Element | null {
     openConnectionId,
     tabs,
     activeTabId,
+    enums,
     loadRoutineDef,
     setRoutineDraft,
     createRoutineFromDraft,
@@ -47,6 +52,13 @@ export function RoutineView(): React.JSX.Element | null {
     | DriverType
     | undefined
   const readOnly = connections.find((c) => c.id === openConnectionId)?.readOnly ?? false
+
+  // Global default seeds the read-only viewer's Pretty toggle; `null` follows
+  // the global pref, a non-null value is a temporary per-tab override (not
+  // persisted). Display-only — the routine's stored/copied SQL stays exact.
+  const prettySqlDefault = useSettings((s) => s.prettySql)
+  const [prettyDefOverride, setPrettyDefOverride] = useState<boolean | null>(null)
+  const prettyDef = prettyDefOverride ?? prettySqlDefault
 
   const editorRef = useRef<SqlEditorHandle>(null)
   const [sub, setSub] = useState<SubView>('definition')
@@ -124,7 +136,8 @@ export function RoutineView(): React.JSX.Element | null {
     }
   }
 
-  const argList = (): RoutineArg[] => execParams.map((p) => args[p.name] ?? { name: p.name, type: p.type, value: '' })
+  const argList = (): RoutineArg[] =>
+    execParams.map((p) => args[p.name] ?? { name: p.name, type: p.type, value: '' })
 
   const doPreview = async (): Promise<void> => {
     if (!openConnectionId || !ref) return
@@ -153,7 +166,8 @@ export function RoutineView(): React.JSX.Element | null {
     }
   }
 
-  const KindIcon = ref?.kind === 'function' || (isNew && driver === 'postgres') ? FunctionSquare : Cog
+  const KindIcon =
+    ref?.kind === 'function' || (isNew && driver === 'postgres') ? FunctionSquare : Cog
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -176,6 +190,17 @@ export function RoutineView(): React.JSX.Element | null {
               title="Reload from server"
             >
               <RefreshCw />
+            </Button>
+          )}
+          {mysqlEditBlocked && sub === 'definition' && (
+            <Button
+              size="xs"
+              variant={prettyDef ? 'secondary' : 'ghost'}
+              onClick={() => setPrettyDefOverride(!prettyDef)}
+              title="Display formatted SQL; the stored definition remains exact"
+            >
+              <AlignLeft />
+              Pretty
             </Button>
           )}
           {!mysqlEditBlocked && (
@@ -243,9 +268,8 @@ export function RoutineView(): React.JSX.Element | null {
               <div className="m-3 flex items-start gap-2 rounded border border-amber-500/40 bg-amber-500/5 p-2 text-xs text-amber-600 dark:text-amber-400">
                 <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
                 <span>
-                  Editing an existing MySQL/MariaDB routine lands in a later beta
-                  (safe replace). You can view the definition, execute it, drop it,
-                  or create a new routine.
+                  Editing an existing MySQL/MariaDB routine lands in a later beta (safe replace).
+                  You can view the definition, execute it, drop it, or create a new routine.
                 </span>
               </div>
             )}
@@ -253,6 +277,7 @@ export function RoutineView(): React.JSX.Element | null {
               <SqlDisplay
                 value={def?.definition ?? ''}
                 driver={driver}
+                pretty={prettyDef}
                 className="p-3 text-xs"
               />
             ) : (
@@ -274,8 +299,7 @@ export function RoutineView(): React.JSX.Element | null {
               <div className="text-[11px] text-muted-foreground">
                 {def.params.map((p) => (
                   <span key={p.name} className="mr-3 font-mono">
-                    {p.name}{' '}
-                    <span className="uppercase text-muted-foreground/70">{p.mode}</span>{' '}
+                    {p.name} <span className="uppercase text-muted-foreground/70">{p.mode}</span>{' '}
                     {p.type}
                   </span>
                 ))}
@@ -293,18 +317,20 @@ export function RoutineView(): React.JSX.Element | null {
                     {p.name}
                     <span className="ml-1 text-muted-foreground">{p.type}</span>
                   </label>
-                  <Input
-                    className="h-7 flex-1 font-mono text-xs"
-                    disabled={isNull}
-                    value={a.value ?? ''}
-                    placeholder={isNull ? 'NULL' : 'value…'}
-                    onChange={(e) =>
-                      setArgs((prev) => ({
-                        ...prev,
-                        [p.name]: { name: p.name, type: p.type, value: e.target.value }
-                      }))
-                    }
-                  />
+                  <div className="flex-1">
+                    <ParamField
+                      type={p.type}
+                      value={a.value}
+                      disabled={isNull}
+                      enums={enums}
+                      onChange={(value) =>
+                        setArgs((prev) => ({
+                          ...prev,
+                          [p.name]: { name: p.name, type: p.type, value }
+                        }))
+                      }
+                    />
+                  </div>
                   <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
                     <Checkbox
                       checked={isNull}
@@ -325,14 +351,21 @@ export function RoutineView(): React.JSX.Element | null {
               <Button
                 size="sm"
                 onClick={() => void doPreview()}
-                disabled={running || (ref.kind === 'procedure' && readOnly)}
+                disabled={
+                  running || (readOnly && (ref.kind === 'procedure' || (def?.volatile ?? false)))
+                }
               >
                 <Play />
                 {ref.kind === 'procedure' ? 'Preview & run…' : 'Run'}
               </Button>
-              {ref.kind === 'procedure' && readOnly && (
+              {readOnly && ref.kind === 'procedure' && (
                 <span className="text-[11px] text-amber-500">
                   Read-only connection — procedure execution is blocked.
+                </span>
+              )}
+              {readOnly && ref.kind === 'function' && def?.volatile && (
+                <span className="text-[11px] text-amber-500">
+                  Read-only connection — this function may modify data and is blocked.
                 </span>
               )}
             </div>
@@ -359,7 +392,11 @@ export function RoutineView(): React.JSX.Element | null {
             </DialogDescription>
           </DialogHeader>
           <div className="max-h-72 overflow-auto rounded border">
-            <SqlDisplay value={(preview ?? []).join('\n')} driver={driver} className="p-2 text-xs" />
+            <SqlDisplay
+              value={(preview ?? []).join('\n')}
+              driver={driver}
+              className="p-2 text-xs"
+            />
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setConfirmOpen(false)}>
@@ -382,8 +419,8 @@ export function RoutineView(): React.JSX.Element | null {
               Drop {ref?.kind}
             </DialogTitle>
             <DialogDescription>
-              This permanently drops{' '}
-              <span className="font-mono">{ref?.name}</span>. This cannot be undone.
+              This permanently drops <span className="font-mono">{ref?.name}</span>. This cannot be
+              undone.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
@@ -394,9 +431,7 @@ export function RoutineView(): React.JSX.Element | null {
               autoFocus
               value={dropConfirm}
               onChange={(e) => setDropConfirm(e.target.value)}
-              onKeyDown={(e) =>
-                e.key === 'Enter' && dropConfirm === ref?.name && void doDrop()
-              }
+              onKeyDown={(e) => e.key === 'Enter' && dropConfirm === ref?.name && void doDrop()}
               placeholder={ref?.name}
             />
           </div>
@@ -415,6 +450,92 @@ export function RoutineView(): React.JSX.Element | null {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+type ParamCtl =
+  | { kind: 'enum'; values: string[] }
+  | { kind: 'bool' }
+  | { kind: 'number' }
+  | { kind: 'date' }
+  | { kind: 'datetime' }
+  | { kind: 'time' }
+  | { kind: 'text' }
+
+/** Pick a typed input control for an IN/INOUT parameter from its declared type.
+ *  Common scalars get a helper; exotic types (arrays/composite/JSON) fall back
+ *  to a raw literal field that the DB validates. The value is always sent as a
+ *  bound parameter, so the control only needs to produce the right string. */
+function classifyParam(type: string, enums: EnumType[]): ParamCtl {
+  const vals = enumValues(type, enums)
+  if (vals && vals.length) return { kind: 'enum', values: vals }
+  const t = type.toLowerCase().trim()
+  if (t === 'boolean' || t === 'bool' || t.startsWith('tinyint(1)')) return { kind: 'bool' }
+  if (/^(timestamp|datetime)/.test(t)) return { kind: 'datetime' }
+  if (t === 'date') return { kind: 'date' }
+  if (/^time\b/.test(t)) return { kind: 'time' }
+  if (/int|serial|numeric|decimal|double|real|float|money|fixed/.test(t)) return { kind: 'number' }
+  return { kind: 'text' }
+}
+
+function ParamField({
+  type,
+  value,
+  disabled,
+  enums,
+  onChange
+}: {
+  type: string
+  value: string | null
+  disabled: boolean
+  enums: EnumType[]
+  onChange: (value: string) => void
+}): React.JSX.Element {
+  const ctl = classifyParam(type, enums)
+  const v = value ?? ''
+  if (ctl.kind === 'enum' || ctl.kind === 'bool') {
+    const options = ctl.kind === 'bool' ? ['true', 'false'] : ctl.values
+    return (
+      <Combobox
+        value={v}
+        onChange={onChange}
+        options={options}
+        creatable={ctl.kind === 'enum'}
+        disabled={disabled}
+        placeholder={disabled ? 'NULL' : 'value…'}
+        className="h-7 w-full font-mono text-xs"
+      />
+    )
+  }
+  // datetime-local yields `YYYY-MM-DDTHH:mm`; store the SQL-friendly space form.
+  if (ctl.kind === 'datetime') {
+    return (
+      <Input
+        type="datetime-local"
+        className="h-7 w-full font-mono text-xs"
+        disabled={disabled}
+        value={v.replace(' ', 'T')}
+        onChange={(e) => onChange(e.target.value.replace('T', ' '))}
+      />
+    )
+  }
+  const inputType =
+    ctl.kind === 'number'
+      ? 'number'
+      : ctl.kind === 'date'
+        ? 'date'
+        : ctl.kind === 'time'
+          ? 'time'
+          : 'text'
+  return (
+    <Input
+      type={inputType}
+      className="h-7 w-full font-mono text-xs"
+      disabled={disabled}
+      value={v}
+      placeholder={disabled ? 'NULL' : 'value…'}
+      onChange={(e) => onChange(e.target.value)}
+    />
   )
 }
 
@@ -451,7 +572,11 @@ function RoutineResult({
     <div className="space-y-3">
       {result.statements.length > 0 && (
         <div className="rounded border">
-          <SqlDisplay value={result.statements.join('\n')} driver={driver} className="p-2 text-xs" />
+          <SqlDisplay
+            value={result.statements.join('\n')}
+            driver={driver}
+            className="p-2 text-xs"
+          />
         </div>
       )}
       {result.outValues && (
@@ -466,20 +591,16 @@ function RoutineResult({
       {result.resultSets.map((rs, i) => (
         <div key={i}>
           {result.resultSets.length > 1 && (
-            <p className="mb-1 text-[11px] font-medium text-muted-foreground">
-              Result set {i + 1}
-            </p>
+            <p className="mb-1 text-[11px] font-medium text-muted-foreground">Result set {i + 1}</p>
           )}
           <ResultTable columns={rs.columns} rows={rs.rows} />
         </div>
       ))}
-      {!result.outValues &&
-        result.resultSets.length === 0 &&
-        result.affected != null && (
-          <p className="text-xs text-muted-foreground">
-            {result.affected} row{result.affected === 1 ? '' : 's'} affected.
-          </p>
-        )}
+      {!result.outValues && result.resultSets.length === 0 && result.affected != null && (
+        <p className="text-xs text-muted-foreground">
+          {result.affected} row{result.affected === 1 ? '' : 's'} affected.
+        </p>
+      )}
     </div>
   )
 }

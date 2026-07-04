@@ -1,6 +1,13 @@
 # Plan — Rename table from the Structure footer
 
-**Status:** planned (not implemented). Target branch: `feat/v1.7.0`.
+**Status:** ✅ implemented on `feat/v1.7.0`. All 4 steps landed; typecheck green.
+`renameTable` gained `dryRun?` end-to-end (driver contract + mysql/pg/sqlite →
+session → ipc → preload → `SessionApi` → store); dry-run skips the read-only
+throw + history capture + tab retarget. Shared `RenameTableDialog` (name input +
+hideable, debounced dry-run SQL preview via `SqlDisplay`) replaced the inline
+sidebar dialog and is also wired into the Structure footer as a soft-amber
+**Rename** button — shown on every sub-tab, `!readOnly`, disabled while
+`ops.length > 0` with the "Commit or discard pending changes first" tooltip.
 
 ## Problem
 

@@ -218,7 +218,7 @@ interface ConnectionsState {
   switchDatabase: (name: string) => Promise<void>
   createTable: (spec: CreateTableSpec) => Promise<string>
   dropEntity: (entity: EntityRef, type: EntityType) => Promise<string[]>
-  renameTable: (entity: EntityRef, newName: string) => Promise<string[]>
+  renameTable: (entity: EntityRef, newName: string, dryRun?: boolean) => Promise<string[]>
   truncateTable: (entity: EntityRef) => Promise<string[]>
   closeSession: () => Promise<void>
   /** Close socket, keep tabs/workspace. Status → 'disconnected'. */
@@ -714,14 +714,17 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       return statements
     },
 
-    renameTable: async (entity, newName) => {
+    renameTable: async (entity, newName, dryRun) => {
       const id = get().openConnectionId
       if (!id) throw new Error('No active connection')
       const { statements } = await window.api.sessions.renameTable(
         id,
         entity,
-        newName
+        newName,
+        dryRun
       )
+      // a dry-run only returns the preview SQL — no retarget, no refresh
+      if (dryRun) return statements
       // retarget any open tab for the renamed table
       set((s) => ({
         tabs: s.tabs.map((t) =>

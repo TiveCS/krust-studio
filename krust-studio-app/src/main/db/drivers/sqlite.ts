@@ -456,10 +456,12 @@ export class SqliteDriver implements DbDriver {
 
   async renameTable(
     entity: EntityRef,
-    newName: string
+    newName: string,
+    dryRun?: boolean
   ): Promise<{ statements: string[] }> {
     if (!this.db) throw new Error('Not connected')
     const sql = `ALTER TABLE ${quoteIdent(entity.name)} RENAME TO ${quoteIdent(newName)}`
+    if (dryRun) return { statements: [sql] }
     this.db.exec(sql)
     return { statements: [sql] }
   }

@@ -708,9 +708,11 @@ export class PostgresDriver implements DbDriver, RoutineCapable {
 
   async renameTable(
     entity: EntityRef,
-    newName: string
+    newName: string,
+    dryRun?: boolean
   ): Promise<{ statements: string[] }> {
     const sql = `ALTER TABLE ${this.target(entity)} RENAME TO ${quoteIdent(newName)}`
+    if (dryRun) return { statements: [sql] }
     await (await this.ensure()).query(sql)
     return { statements: [sql] }
   }
@@ -907,7 +909,10 @@ export class PostgresDriver implements DbDriver, RoutineCapable {
       returnsSet: !!row.retset,
       language: row.language,
       owner: row.owner,
-      security: `${row.volatility ?? ''}${row.secdef ? ' · security definer' : ''}`.trim()
+      security: `${row.volatility ?? ''}${row.secdef ? ' · security definer' : ''}`.trim(),
+      // A VOLATILE function may write; gate it on read-only even though it runs
+      // via SELECT. Procedures always mutate-capable and gate separately.
+      volatile: row.kind === 'function' && row.volatility === 'volatile'
     }
   }
 

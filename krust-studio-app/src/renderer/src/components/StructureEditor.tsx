@@ -90,6 +90,7 @@ export function StructureEditor({
           types={types}
           tables={tableNames}
           enums={enums}
+          engine={driver}
           allowFk={canAlter}
           canAlterExisting={canAlter}
           reorderable={canReorder}

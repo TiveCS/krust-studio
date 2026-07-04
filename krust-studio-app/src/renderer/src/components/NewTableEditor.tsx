@@ -10,22 +10,63 @@ import type { DriverType } from '../../../shared/types'
 
 const TYPES: Partial<Record<DriverType, string[]>> = {
   sqlite: ['INTEGER', 'TEXT', 'REAL', 'BLOB', 'NUMERIC'],
-  mysql: ['INT', 'BIGINT', 'VARCHAR(255)', 'TEXT', 'DATETIME', 'DATE', 'DECIMAL(10,2)', 'BOOLEAN', 'FLOAT'],
-  postgres: ['integer', 'bigint', 'serial', 'text', 'varchar(255)', 'boolean', 'timestamp', 'date', 'numeric', 'real']
+  mysql: [
+    'INT',
+    'BIGINT',
+    'VARCHAR(255)',
+    'TEXT',
+    'DATETIME',
+    'DATE',
+    'DECIMAL(10,2)',
+    'BOOLEAN',
+    'FLOAT'
+  ],
+  postgres: [
+    'integer',
+    'bigint',
+    'serial',
+    'text',
+    'varchar(255)',
+    'boolean',
+    'timestamp',
+    'date',
+    'numeric',
+    'real'
+  ]
 }
 
 export function NewTableEditor({ tab }: { tab: Tab }): React.JSX.Element {
-  const { connections, openConnectionId, entities, enums, patchDraft, createTable, closeTab, openTable } =
-    useConnections()
+  const {
+    connections,
+    openConnectionId,
+    entities,
+    enums,
+    patchDraft,
+    createTable,
+    closeTab,
+    openTable
+  } = useConnections()
   const driver = connections.find((c) => c.id === openConnectionId)?.driver
-  const types = [...(driver ? TYPES[driver] ?? [] : []), ...enums.map((e) => e.name)]
+  const types = [...(driver ? (TYPES[driver] ?? []) : []), ...enums.map((e) => e.name)]
   const tables = entities.filter((e) => e.type === 'table').map((e) => e.name)
   const [busy, setBusy] = useState(false)
   const [tmplOpen, setTmplOpen] = useState(false)
   const draft = tab.draft!
 
   const create = async (): Promise<void> => {
-    const valid = draft.columns.filter((c) => c.name.trim() && c.type.trim())
+    // Normalize before validating: trim names, and treat a whitespace-only
+    // default as "no default" so a typed-then-cleared value never emits
+    // `DEFAULT ''`. A SQLite auto-increment PK becomes `INTEGER PRIMARY KEY
+    // AUTOINCREMENT` regardless of the typed type, so it stays valid even when
+    // its type cell was cleared — don't drop it for a blank type (the bug: the
+    // seed `id` PK got filtered out, losing the key or erroring on commit).
+    const valid = draft.columns
+      .map((c) => ({
+        ...c,
+        name: c.name.trim(),
+        default: c.default && c.default.trim() ? c.default : undefined
+      }))
+      .filter((c) => c.name && (c.type.trim() || (driver === 'sqlite' && c.pk)))
     if (!draft.name.trim() || valid.length === 0) {
       toast.error('Table name and at least one named column required')
       return
@@ -48,9 +89,7 @@ export function NewTableEditor({ tab }: { tab: Tab }): React.JSX.Element {
       <div className="min-h-0 flex-1 overflow-auto p-4">
         <div className="mx-auto max-w-3xl space-y-4">
           <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground">
-              Table name
-            </label>
+            <label className="text-xs font-medium text-muted-foreground">Table name</label>
             <Input
               value={draft.name}
               onChange={(e) => patchDraft({ name: e.target.value })}
@@ -64,6 +103,7 @@ export function NewTableEditor({ tab }: { tab: Tab }): React.JSX.Element {
             types={types}
             tables={tables}
             enums={enums}
+            engine={driver}
             allowFk
             reorderable
           />

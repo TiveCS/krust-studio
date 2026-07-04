@@ -63,6 +63,7 @@ import { DatabaseSwitcher } from '@/components/DatabaseSwitcher'
 import { RedisSidebar } from '@/components/RedisSidebar'
 import { ConnectionSwitcher } from '@/components/ConnectionSwitcher'
 import { TemplateManager } from '@/components/TemplateManager'
+import { RenameTableDialog } from '@/components/RenameTableDialog'
 import { useConnections } from '@/store/connections'
 import { capabilitiesFor } from '../../../shared/capabilities'
 import type {
@@ -92,7 +93,6 @@ export function AppSidebar(): React.JSX.Element {
     openNewRoutine,
     dropRoutine,
     dropEntity,
-    renameTable,
     truncateTable,
     reconnect,
     tabs,
@@ -105,7 +105,6 @@ export function AppSidebar(): React.JSX.Element {
   const [schemaFilter, setSchemaFilter] = useState('all')
   const [templatesOpen, setTemplatesOpen] = useState(false)
   const [renameTarget, setRenameTarget] = useState<EntityRef | null>(null)
-  const [renameValue, setRenameValue] = useState('')
   const [destructive, setDestructive] = useState<{
     entity: EntityRef
     type: EntityType
@@ -115,7 +114,6 @@ export function AppSidebar(): React.JSX.Element {
   const [busy, setBusy] = useState(false)
   const [routineDrop, setRoutineDrop] = useState<RoutineInfo | null>(null)
   const [routineConfirm, setRoutineConfirm] = useState('')
-
 
   const current = connections.find((c) => c.id === openConnectionId)
   const readOnly = current?.readOnly ?? false
@@ -142,34 +140,9 @@ export function AppSidebar(): React.JSX.Element {
     }
   }
 
-  const startRename = (entity: EntityRef): void => {
-    setRenameTarget(entity)
-    setRenameValue(entity.name)
-  }
-  const doRename = async (): Promise<void> => {
-    if (!renameTarget) return
-    const next = renameValue.trim()
-    if (!next || next === renameTarget.name) {
-      setRenameTarget(null)
-      return
-    }
-    setBusy(true)
-    try {
-      const [sql] = await renameTable(renameTarget, next)
-      toast.success('Renamed table', { description: sql })
-      setRenameTarget(null)
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : String(err))
-    } finally {
-      setBusy(false)
-    }
-  }
+  const startRename = (entity: EntityRef): void => setRenameTarget(entity)
 
-  const startDestructive = (
-    entity: EntityRef,
-    type: EntityType,
-    op: 'drop' | 'truncate'
-  ): void => {
+  const startDestructive = (entity: EntityRef, type: EntityType, op: 'drop' | 'truncate'): void => {
     setDestructive({ entity, type, op })
     setConfirmText('')
   }
@@ -178,10 +151,7 @@ export function AppSidebar(): React.JSX.Element {
     const { entity, type, op } = destructive
     setBusy(true)
     try {
-      const [sql] =
-        op === 'drop'
-          ? await dropEntity(entity, type)
-          : await truncateTable(entity)
+      const [sql] = op === 'drop' ? await dropEntity(entity, type) : await truncateTable(entity)
       toast.success(op === 'drop' ? `Dropped ${type}` : 'Truncated table', {
         description: sql
       })
@@ -437,79 +407,37 @@ export function AppSidebar(): React.JSX.Element {
       {/* Table templates */}
       <TemplateManager open={templatesOpen} onOpenChange={setTemplatesOpen} />
 
-      {/* Rename table */}
-      <Dialog
-        open={!!renameTarget}
-        onOpenChange={(o) => !o && setRenameTarget(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Rename table</DialogTitle>
-            <DialogDescription>
-              Rename <span className="font-mono">{renameTarget?.name}</span>.
-            </DialogDescription>
-          </DialogHeader>
-          <Input
-            autoFocus
-            value={renameValue}
-            onChange={(e) => setRenameValue(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && void doRename()}
-            placeholder="New table name"
-          />
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setRenameTarget(null)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={() => void doRename()}
-              disabled={
-                busy ||
-                !renameValue.trim() ||
-                renameValue.trim() === renameTarget?.name
-              }
-            >
-              Rename
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Rename table (shared dialog with hideable SQL preview) */}
+      <RenameTableDialog entity={renameTarget} onClose={() => setRenameTarget(null)} />
 
       {/* Destructive: drop / truncate (typed confirmation) */}
-      <Dialog
-        open={!!destructive}
-        onOpenChange={(o) => !o && setDestructive(null)}
-      >
+      <Dialog open={!!destructive} onOpenChange={(o) => !o && setDestructive(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="size-4" />
-              {destructive?.op === 'drop'
-                ? `Drop ${destructive?.type}`
-                : 'Truncate table'}
+              {destructive?.op === 'drop' ? `Drop ${destructive?.type}` : 'Truncate table'}
             </DialogTitle>
             <DialogDescription>
               {destructive?.op === 'drop' ? (
                 <>
                   This permanently drops{' '}
-                  <span className="font-mono">{destructive?.entity.name}</span>{' '}
-                  and all its data. This cannot be undone.
+                  <span className="font-mono">{destructive?.entity.name}</span> and all its data.
+                  This cannot be undone.
                 </>
               ) : (
                 <>
                   This permanently deletes all rows in{' '}
-                  <span className="font-mono">{destructive?.entity.name}</span>.
-                  This cannot be undone.
+                  <span className="font-mono">{destructive?.entity.name}</span>. This cannot be
+                  undone.
                 </>
               )}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
             <p className="text-xs text-muted-foreground">
-              Type{' '}
-              <span className="font-mono text-foreground">
-                {destructive?.entity.name}
-              </span>{' '}
-              to confirm.
+              Type <span className="font-mono text-foreground">{destructive?.entity.name}</span> to
+              confirm.
             </p>
             <Input
               autoFocus
@@ -547,15 +475,13 @@ export function AppSidebar(): React.JSX.Element {
               Drop {routineDrop?.kind}
             </DialogTitle>
             <DialogDescription>
-              This permanently drops{' '}
-              <span className="font-mono">{routineDrop?.name}</span>. This cannot be
-              undone.
+              This permanently drops <span className="font-mono">{routineDrop?.name}</span>. This
+              cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
             <p className="text-xs text-muted-foreground">
-              Type{' '}
-              <span className="font-mono text-foreground">{routineDrop?.name}</span> to
+              Type <span className="font-mono text-foreground">{routineDrop?.name}</span> to
               confirm.
             </p>
             <Input
@@ -563,9 +489,7 @@ export function AppSidebar(): React.JSX.Element {
               value={routineConfirm}
               onChange={(e) => setRoutineConfirm(e.target.value)}
               onKeyDown={(e) =>
-                e.key === 'Enter' &&
-                routineConfirm === routineDrop?.name &&
-                void doDropRoutine()
+                e.key === 'Enter' && routineConfirm === routineDrop?.name && void doDropRoutine()
               }
               placeholder={routineDrop?.name}
             />
@@ -619,15 +543,8 @@ function RoutineGroup({
   return (
     <SidebarGroup>
       <SidebarGroupLabel asChild>
-        <button
-          onClick={onToggle}
-          className="flex w-full items-center gap-1 hover:text-foreground"
-        >
-          {collapsed ? (
-            <ChevronRight className="size-3" />
-          ) : (
-            <ChevronDown className="size-3" />
-          )}
+        <button onClick={onToggle} className="flex w-full items-center gap-1 hover:text-foreground">
+          {collapsed ? <ChevronRight className="size-3" /> : <ChevronDown className="size-3" />}
           {label} ({items.length})
         </button>
       </SidebarGroupLabel>
@@ -651,12 +568,8 @@ function RoutineGroup({
                   </SidebarMenuButton>
                 </ContextMenuTrigger>
                 <ContextMenuContent>
-                  <ContextMenuItem onSelect={() => onOpen(refOf(r), r.name)}>
-                    Open
-                  </ContextMenuItem>
-                  <ContextMenuItem
-                    onSelect={() => void navigator.clipboard.writeText(r.name)}
-                  >
+                  <ContextMenuItem onSelect={() => onOpen(refOf(r), r.name)}>Open</ContextMenuItem>
+                  <ContextMenuItem onSelect={() => void navigator.clipboard.writeText(r.name)}>
                     Copy name
                   </ContextMenuItem>
                   <ContextMenuSeparator />
@@ -711,86 +624,70 @@ function EntityGroup({
   return (
     <SidebarGroup>
       <SidebarGroupLabel asChild>
-        <button
-          onClick={onToggle}
-          className="flex w-full items-center gap-1 hover:text-foreground"
-        >
-          {collapsed ? (
-            <ChevronRight className="size-3" />
-          ) : (
-            <ChevronDown className="size-3" />
-          )}
+        <button onClick={onToggle} className="flex w-full items-center gap-1 hover:text-foreground">
+          {collapsed ? <ChevronRight className="size-3" /> : <ChevronDown className="size-3" />}
           {label} ({count})
         </button>
       </SidebarGroupLabel>
       {collapsed ? null : (
-      <SidebarMenu>
-        {items.map((e) => {
-          const ref: EntityRef = { name: e.name, schema: e.schema }
-          return (
-            <SidebarMenuItem key={`${e.schema ?? ''}.${e.name}`}>
-              <ContextMenu>
-                <ContextMenuTrigger asChild>
-                  <SidebarMenuButton
-                    isActive={activeName === e.name}
-                    className="font-mono text-xs"
-                    onDoubleClick={() => onOpen(ref)}
-                  >
-                    <Icon />
-                    <span className="flex-1 truncate">{e.name}</span>
-                    {e.schema && e.schema !== 'public' && (
-                      <span className="text-[10px] text-muted-foreground">
-                        {e.schema}
-                      </span>
-                    )}
-                  </SidebarMenuButton>
-                </ContextMenuTrigger>
-                <ContextMenuContent>
-                  <ContextMenuItem onSelect={() => onOpen(ref)}>
-                    Show Data
-                  </ContextMenuItem>
-                  <ContextMenuItem
-                    onSelect={() => void navigator.clipboard.writeText(e.name)}
-                  >
-                    Copy name
-                  </ContextMenuItem>
-                  {type === 'table' && onRename && (
-                    <>
-                      <ContextMenuSeparator />
-                      <ContextMenuItem
-                        disabled={readOnly}
-                        onSelect={() => onRename(ref)}
-                      >
-                        <Pencil />
-                        Rename…
-                      </ContextMenuItem>
-                      {onTruncate && (
-                        <ContextMenuItem
-                          variant="destructive"
-                          disabled={readOnly}
-                          onSelect={() => onTruncate(ref)}
-                        >
-                          <Eraser />
-                          Truncate…
-                        </ContextMenuItem>
+        <SidebarMenu>
+          {items.map((e) => {
+            const ref: EntityRef = { name: e.name, schema: e.schema }
+            return (
+              <SidebarMenuItem key={`${e.schema ?? ''}.${e.name}`}>
+                <ContextMenu>
+                  <ContextMenuTrigger asChild>
+                    <SidebarMenuButton
+                      isActive={activeName === e.name}
+                      className="font-mono text-xs"
+                      onDoubleClick={() => onOpen(ref)}
+                    >
+                      <Icon />
+                      <span className="flex-1 truncate">{e.name}</span>
+                      {e.schema && e.schema !== 'public' && (
+                        <span className="text-[10px] text-muted-foreground">{e.schema}</span>
                       )}
-                    </>
-                  )}
-                  <ContextMenuSeparator />
-                  <ContextMenuItem
-                    variant="destructive"
-                    disabled={readOnly}
-                    onSelect={() => onDrop(ref)}
-                  >
-                    <Trash2 />
-                    Drop {type}…
-                  </ContextMenuItem>
-                </ContextMenuContent>
-              </ContextMenu>
-            </SidebarMenuItem>
-          )
-        })}
-      </SidebarMenu>
+                    </SidebarMenuButton>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent>
+                    <ContextMenuItem onSelect={() => onOpen(ref)}>Show Data</ContextMenuItem>
+                    <ContextMenuItem onSelect={() => void navigator.clipboard.writeText(e.name)}>
+                      Copy name
+                    </ContextMenuItem>
+                    {type === 'table' && onRename && (
+                      <>
+                        <ContextMenuSeparator />
+                        <ContextMenuItem disabled={readOnly} onSelect={() => onRename(ref)}>
+                          <Pencil />
+                          Rename…
+                        </ContextMenuItem>
+                        {onTruncate && (
+                          <ContextMenuItem
+                            variant="destructive"
+                            disabled={readOnly}
+                            onSelect={() => onTruncate(ref)}
+                          >
+                            <Eraser />
+                            Truncate…
+                          </ContextMenuItem>
+                        )}
+                      </>
+                    )}
+                    <ContextMenuSeparator />
+                    <ContextMenuItem
+                      variant="destructive"
+                      disabled={readOnly}
+                      onSelect={() => onDrop(ref)}
+                    >
+                      <Trash2 />
+                      Drop {type}…
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
+              </SidebarMenuItem>
+            )
+          })}
+        </SidebarMenu>
       )}
     </SidebarGroup>
   )
@@ -816,15 +713,8 @@ function EnumGroup({
   return (
     <SidebarGroup>
       <SidebarGroupLabel asChild>
-        <button
-          onClick={onToggle}
-          className="flex w-full items-center gap-1 hover:text-foreground"
-        >
-          {collapsed ? (
-            <ChevronRight className="size-3" />
-          ) : (
-            <ChevronDown className="size-3" />
-          )}
+        <button onClick={onToggle} className="flex w-full items-center gap-1 hover:text-foreground">
+          {collapsed ? <ChevronRight className="size-3" /> : <ChevronDown className="size-3" />}
           Enums ({items.length})
         </button>
       </SidebarGroupLabel>
@@ -846,9 +736,7 @@ function EnumGroup({
                   )}
                   <Tags className="size-3.5" />
                   <span className="flex-1 truncate">{en.name}</span>
-                  <span className="text-[10px] text-muted-foreground">
-                    {en.values.length}
-                  </span>
+                  <span className="text-[10px] text-muted-foreground">{en.values.length}</span>
                 </SidebarMenuButton>
                 {isOpen && (
                   <div className="ml-7 flex flex-col gap-0.5 py-1">

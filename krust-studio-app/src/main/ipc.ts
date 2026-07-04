@@ -258,8 +258,8 @@ export function registerIpc(): void {
   )
   ipcMain.handle(
     'session:renameTable',
-    (_e, id: string, entity: EntityRef, newName: string) =>
-      renameTable(id, entity, newName)
+    (_e, id: string, entity: EntityRef, newName: string, dryRun?: boolean) =>
+      renameTable(id, entity, newName, dryRun)
   )
   ipcMain.handle(
     'session:truncateTable',

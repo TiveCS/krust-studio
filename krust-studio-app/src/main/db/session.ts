@@ -307,13 +307,17 @@ export async function dropEntity(
 export async function renameTable(
   id: string,
   entity: EntityRef,
-  newName: string
+  newName: string,
+  dryRun?: boolean
 ): Promise<{ statements: string[] }> {
   const config = getConnectionConfig(id)
-  if (config?.readOnly)
+  // A dry-run only builds the SQL for the preview — no execution, no capture, so
+  // it is allowed even on read-only. A real rename is read-only blocked.
+  if (!dryRun && config?.readOnly)
     throw new Error('Connection is read-only; schema changes blocked')
   if (!sessions.has(id)) await connectSession(id)
-  const res = await rel(id).renameTable(entity, newName)
+  const res = await rel(id).renameTable(entity, newName, dryRun)
+  if (dryRun) return res
   await captureAll(id, 'table_mutation', res.statements, entity.name)
   return res
 }
@@ -507,9 +511,18 @@ export async function executeRoutine(
 ): Promise<RoutineExecResult> {
   const config = getConnectionConfig(id)
   // A procedure is potentially mutating (CALL) → blocked on read-only + captured
-  // as Routine Execution. A function runs via SELECT (a read) — neither applies.
-  if (ref.kind === 'procedure' && config?.readOnly)
-    throw new Error('Connection is read-only; procedure execution is blocked')
+  // as Routine Execution. A function runs via SELECT (a read) — normally neither
+  // applies, but a VOLATILE / MODIFIES-SQL-DATA function can still write, so it
+  // is blocked on read-only too (server-side enforcement, not just the UI).
+  if (config?.readOnly) {
+    if (ref.kind === 'procedure')
+      throw new Error('Connection is read-only; procedure execution is blocked')
+    const def = await withRetry(id, (d) => routineCap(d).getRoutine(ref))
+    if (def.volatile)
+      throw new Error(
+        'Connection is read-only; this function may modify data and is blocked'
+      )
+  }
   const res = await withRetry(id, (d) => routineCap(d).executeRoutine(ref, args))
   if (ref.kind === 'procedure') {
     for (const statement of res.statements) {

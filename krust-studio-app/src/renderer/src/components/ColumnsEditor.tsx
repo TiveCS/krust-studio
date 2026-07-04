@@ -1,13 +1,5 @@
 import { useState } from 'react'
-import {
-  Plus,
-  X,
-  Link2,
-  ChevronRight,
-  ChevronDown,
-  GripVertical,
-  Undo2
-} from 'lucide-react'
+import { Plus, X, Link2, ChevronRight, ChevronDown, GripVertical, Undo2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,11 +13,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import type {
-  EnumType,
-  NewColumnSpec,
-  StructureColumn
-} from '../../../shared/types'
+import type { DriverType, EnumType, NewColumnSpec, StructureColumn } from '../../../shared/types'
 
 /** a column row; `_orig` set => existing column (its original name) */
 export type EditorColumn = NewColumnSpec & {
@@ -75,7 +63,8 @@ export function ColumnsEditor({
   original,
   movedNames,
   nameFilter = '',
-  hideAddButton = false
+  hideAddButton = false,
+  engine
 }: {
   columns: EditorColumn[]
   onChange: (cols: EditorColumn[]) => void
@@ -103,6 +92,8 @@ export function ColumnsEditor({
   /** hide the built-in "Add column" button (when the host renders its own,
    *  e.g. in the structure-editor footer) */
   hideAddButton?: boolean
+  /** connection engine — gates MySQL-only column attributes (UNSIGNED) */
+  engine?: DriverType
 }): React.JSX.Element {
   const origByName = new Map((original ?? []).map((o) => [o.name, o]))
   const filtering = nameFilter.trim().length > 0
@@ -150,10 +141,7 @@ export function ColumnsEditor({
   return (
     <div className="space-y-1.5">
       <div
-        className={cn(
-          BASE_GRID,
-          'px-1 text-[10px] font-medium uppercase text-muted-foreground'
-        )}
+        className={cn(BASE_GRID, 'px-1 text-[10px] font-medium uppercase text-muted-foreground')}
         style={{ gridTemplateColumns: gridTemplate }}
       >
         {reorderable && <span />}
@@ -290,7 +278,7 @@ export function ColumnsEditor({
                   title="More (default, auto-increment)"
                   className={cn(
                     'rounded p-1 hover:bg-accent',
-                    c.default || c.autoInc || colEnum
+                    c.default || c.autoInc || c.unsigned || colEnum
                       ? 'text-primary'
                       : 'text-muted-foreground'
                   )}
@@ -315,11 +303,7 @@ export function ColumnsEditor({
                         : 'text-muted-foreground hover:text-destructive'
                     )}
                   >
-                    {dropped ? (
-                      <Undo2 className="size-3.5" />
-                    ) : (
-                      <X className="size-3.5" />
-                    )}
+                    {dropped ? <Undo2 className="size-3.5" /> : <X className="size-3.5" />}
                   </button>
                 )}
               </div>
@@ -327,9 +311,7 @@ export function ColumnsEditor({
 
             {c.fk && (
               <div className="ml-4 grid grid-cols-[auto_1fr_1fr_1fr_1fr] items-center gap-2 rounded-md border border-border/60 bg-muted/20 p-2">
-                <span className="text-[10px] uppercase text-muted-foreground">
-                  references
-                </span>
+                <span className="text-[10px] uppercase text-muted-foreground">references</span>
                 <Combobox
                   value={c.fk.refTable}
                   onChange={(v) => update(i, { fk: { ...c.fk!, refTable: v } })}
@@ -393,9 +375,7 @@ export function ColumnsEditor({
                     </span>
                   </span>
                 )}
-                <span className="text-[10px] uppercase text-muted-foreground">
-                  default
-                </span>
+                <span className="text-[10px] uppercase text-muted-foreground">default</span>
                 <Input
                   value={c.default ?? ''}
                   onChange={(e) => update(i, { default: e.target.value })}
@@ -417,6 +397,19 @@ export function ColumnsEditor({
                     auto-increment is set at create time
                   </span>
                 )}
+                {engine === 'mysql' && !existing && (
+                  <label
+                    className="flex cursor-pointer items-center gap-2"
+                    title="MySQL/MariaDB UNSIGNED numeric modifier"
+                  >
+                    <Checkbox
+                      checked={!!c.unsigned}
+                      onCheckedChange={(v) => update(i, { unsigned: !!v })}
+                      disabled={readOnly}
+                    />
+                    Unsigned
+                  </label>
+                )}
               </div>
             )}
           </div>
@@ -427,10 +420,7 @@ export function ColumnsEditor({
           size="xs"
           variant="ghost"
           onClick={() =>
-            onChange([
-              ...columns,
-              { name: '', type: types[0] ?? '', nullable: true, pk: false }
-            ])
+            onChange([...columns, { name: '', type: types[0] ?? '', nullable: true, pk: false }])
           }
         >
           <Plus />

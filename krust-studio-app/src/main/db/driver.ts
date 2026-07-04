@@ -114,8 +114,13 @@ export interface SchemaMutCapable {
   ): Promise<{ statements: string[] }>
   /** DROP TABLE/VIEW. Destructive — guarded by read-only + typed confirm (UI). */
   dropEntity(entity: EntityRef, type: EntityType): Promise<{ statements: string[] }>
-  /** ALTER/RENAME table to a new name (same schema). */
-  renameTable(entity: EntityRef, newName: string): Promise<{ statements: string[] }>
+  /** ALTER/RENAME table to a new name (same schema). `dryRun` builds + returns
+   *  the SQL without executing it (drives the Structure-footer rename preview). */
+  renameTable(
+    entity: EntityRef,
+    newName: string,
+    dryRun?: boolean
+  ): Promise<{ statements: string[] }>
   /** Empty a table's rows. Destructive — guarded like dropEntity. */
   truncateTable(entity: EntityRef): Promise<{ statements: string[] }>
   createIndex(entity: EntityRef, spec: IndexSpec): Promise<{ statements: string[] }>
@@ -335,6 +340,9 @@ export function buildCreateTable(
     const sqliteAutoPk =
       opts.dialect === 'sqlite' && !!c.autoInc && singleInlinePk && c.pk
     let d = `${quote(c.name)} ${sqliteAutoPk ? 'INTEGER' : c.type}`
+    // UNSIGNED must sit right after the type (before NOT NULL/AUTO_INCREMENT);
+    // MySQL/MariaDB only, and not on the sqlite auto-PK rewrite.
+    if (c.unsigned && opts.dialect === 'mysql' && !sqliteAutoPk) d += ' UNSIGNED'
     if (sqliteAutoPk) {
       d += ' PRIMARY KEY AUTOINCREMENT'
     } else {

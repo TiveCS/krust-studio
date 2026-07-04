@@ -142,6 +142,7 @@ export function TemplateManager({ open, onOpenChange, initialColumns }: Props): 
                 types={types}
                 tables={[]}
                 enums={enums}
+                engine={driver}
                 allowFk={false}
                 reorderable
               />

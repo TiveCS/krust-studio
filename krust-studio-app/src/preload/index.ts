@@ -56,8 +56,8 @@ const api: KrustApi = {
       ipcRenderer.invoke('session:previewAlter', id, entity, ops),
     dropEntity: (id: string, entity: EntityRef, type: EntityType) =>
       ipcRenderer.invoke('session:dropEntity', id, entity, type),
-    renameTable: (id: string, entity: EntityRef, newName: string) =>
-      ipcRenderer.invoke('session:renameTable', id, entity, newName),
+    renameTable: (id: string, entity: EntityRef, newName: string, dryRun?: boolean) =>
+      ipcRenderer.invoke('session:renameTable', id, entity, newName, dryRun),
     truncateTable: (id: string, entity: EntityRef) =>
       ipcRenderer.invoke('session:truncateTable', id, entity),
     createIndex: (id: string, entity: EntityRef, spec: IndexSpec) =>

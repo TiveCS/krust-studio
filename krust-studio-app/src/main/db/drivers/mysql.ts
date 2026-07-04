@@ -580,8 +580,9 @@ export class MysqlDriver implements DbDriver, RoutineCapable {
           const c = op.column
           const def = c.default && c.default.trim() ? ` DEFAULT ${c.default}` : ''
           const pos = positionClause(op.after, quoteIdent)
+          const unsigned = c.unsigned ? ' UNSIGNED' : ''
           structural.push(
-            `ALTER TABLE ${t} ADD COLUMN ${quoteIdent(c.name)} ${c.type}${def}${c.nullable ? '' : ' NOT NULL'}${pos}`
+            `ALTER TABLE ${t} ADD COLUMN ${quoteIdent(c.name)} ${c.type}${unsigned}${def}${c.nullable ? '' : ' NOT NULL'}${pos}`
           )
           break
         }
@@ -697,9 +698,11 @@ export class MysqlDriver implements DbDriver, RoutineCapable {
 
   async renameTable(
     entity: EntityRef,
-    newName: string
+    newName: string,
+    dryRun?: boolean
   ): Promise<{ statements: string[] }> {
     const sql = `RENAME TABLE ${quoteIdent(entity.name)} TO ${quoteIdent(newName)}`
+    if (dryRun) return { statements: [sql] }
     await (await this.ensure()).query(sql)
     return { statements: [sql] }
   }
@@ -839,7 +842,8 @@ export class MysqlDriver implements DbDriver, RoutineCapable {
       mode: (p.mode ?? 'IN').toLowerCase() as RoutineParam['mode']
     }))
     const [metaRows] = (await conn.query(
-      `SELECT SECURITY_TYPE AS security, DEFINER AS owner, DTD_IDENTIFIER AS \`returns\`
+      `SELECT SECURITY_TYPE AS security, DEFINER AS owner, DTD_IDENTIFIER AS \`returns\`,
+              SQL_DATA_ACCESS AS dataAccess
          FROM information_schema.ROUTINES
         WHERE ROUTINE_SCHEMA = DATABASE() AND ROUTINE_NAME = ? AND ROUTINE_TYPE = ?`,
       [ref.name, kindKw]
@@ -848,6 +852,7 @@ export class MysqlDriver implements DbDriver, RoutineCapable {
       security?: string
       owner?: string
       returns?: string
+      dataAccess?: string
     }
     return {
       ref,
@@ -856,7 +861,9 @@ export class MysqlDriver implements DbDriver, RoutineCapable {
       returns: ref.kind === 'function' ? (meta.returns ?? null) : null,
       returnsSet: false,
       owner: meta.owner ?? null,
-      security: meta.security ?? null
+      security: meta.security ?? null,
+      // A function declared MODIFIES SQL DATA may write; gate it on read-only.
+      volatile: ref.kind === 'function' && meta.dataAccess === 'MODIFIES SQL DATA'
     }
   }
 

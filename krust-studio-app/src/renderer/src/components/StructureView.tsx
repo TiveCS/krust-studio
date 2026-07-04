@@ -25,12 +25,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
 import {
   Sheet,
   SheetContent,
@@ -50,6 +45,7 @@ import { StructureEditor } from '@/components/StructureEditor'
 import { ViewSwitch } from '@/components/ViewSwitch'
 import { SqlDisplay } from '@/components/SqlDisplay'
 import { TemplateManager } from '@/components/TemplateManager'
+import { RenameTableDialog } from '@/components/RenameTableDialog'
 import { type EditorColumn } from '@/components/ColumnsEditor'
 import { seed, diff } from '@/lib/columnDiff'
 import { insertTemplateColumns } from '@/lib/templates'
@@ -150,6 +146,7 @@ export function StructureView(): React.JSX.Element | null {
   const fkDrops = useMemo(() => new Set(tab?.fkDrops ?? []), [tab?.fkDrops])
   const [colFilter, setColFilter] = useState('')
   const [tmplOpen, setTmplOpen] = useState(false)
+  const [renameOpen, setRenameOpen] = useState(false)
 
   // FK-backing index alert: shown when user drops an index that backs a FK
   const [fkBackingAlert, setFkBackingAlert] = useState<{
@@ -264,11 +261,7 @@ export function StructureView(): React.JSX.Element | null {
   // walkable relations: open the target table at the sub-tab that keeps walking
   // the same direction — Relations click (outbound) → land on Referenced by;
   // Referenced-by click (inbound) → land on Relations.
-  const walkTo = (
-    table: string,
-    sub: 'relations' | 'referencedBy',
-    schema?: string
-  ): void => {
+  const walkTo = (table: string, sub: 'relations' | 'referencedBy', schema?: string): void => {
     const ref: EntityRef = { name: table, schema }
     void openTable(ref, undefined, { view: 'structure', structureSub: sub })
   }
@@ -278,9 +271,7 @@ export function StructureView(): React.JSX.Element | null {
   const methods = INDEX_METHODS[connRow?.driver ?? ''] ?? []
 
   const toggleCol = (name: string): void =>
-    setIxCols((prev) =>
-      prev.includes(name) ? prev.filter((c) => c !== name) : [...prev, name]
-    )
+    setIxCols((prev) => (prev.includes(name) ? prev.filter((c) => c !== name) : [...prev, name]))
 
   const resetIxForm = (): void => {
     setIxName('')
@@ -314,9 +305,7 @@ export function StructureView(): React.JSX.Element | null {
       method: ixMethod || undefined
     }
     setIdxAdds(
-      editIdx === null
-        ? [...idxAdds, spec]
-        : idxAdds.map((s, i) => (i === editIdx ? spec : s))
+      editIdx === null ? [...idxAdds, spec] : idxAdds.map((s, i) => (i === editIdx ? spec : s))
     )
     setAddOpen(false)
     resetIxForm()
@@ -382,8 +371,7 @@ export function StructureView(): React.JSX.Element | null {
     setStructDraft(next)
     setColFilter('')
     setStructureSub('columns')
-    if (added.length === 0)
-      toast.error(`No columns added — all ${skipped.length} already exist`)
+    if (added.length === 0) toast.error(`No columns added — all ${skipped.length} already exist`)
     else
       toast.success(
         `Added ${added.length} column(s)` +
@@ -427,11 +415,7 @@ export function StructureView(): React.JSX.Element | null {
     if (!openConnectionId || ops.length === 0) return
     setBusy(true)
     try {
-      const { statements } = await window.api.sessions.alterTable(
-        openConnectionId,
-        tab.entity,
-        ops
-      )
+      const { statements } = await window.api.sessions.alterTable(openConnectionId, tab.entity, ops)
       toast.success('Structure updated', { description: statements.join(';\n') })
       setPreviewSql(null)
       await refreshStructure()
@@ -452,9 +436,7 @@ export function StructureView(): React.JSX.Element | null {
             onClick={() => setSub(s)}
             className={cn(
               'rounded px-2 py-1',
-              sub === s
-                ? 'bg-accent text-foreground'
-                : 'text-muted-foreground hover:bg-accent/50'
+              sub === s ? 'bg-accent text-foreground' : 'text-muted-foreground hover:bg-accent/50'
             )}
           >
             {SUB_LABEL[s]}
@@ -464,9 +446,7 @@ export function StructureView(): React.JSX.Element | null {
               </span>
             )}
             {s === 'referencedBy' && tab.referencedBy && (
-              <span className="ml-1 text-muted-foreground/50">
-                {tab.referencedBy.length}
-              </span>
+              <span className="ml-1 text-muted-foreground/50">{tab.referencedBy.length}</span>
             )}
           </button>
         ))}
@@ -539,12 +519,7 @@ export function StructureView(): React.JSX.Element | null {
         ) : sub === 'indexes' ? (
           <div className="flex h-full flex-col">
             <div className="flex shrink-0 items-center border-b border-border/60 px-3 py-1.5">
-              <Button
-                size="xs"
-                variant="ghost"
-                disabled={readOnly}
-                onClick={openAddIndex}
-              >
+              <Button size="xs" variant="ghost" disabled={readOnly} onClick={openAddIndex}>
                 <Plus />
                 Add index
               </Button>
@@ -612,9 +587,7 @@ export function StructureView(): React.JSX.Element | null {
                     {idxAdds.map((ix, i) => (
                       <tr key={`new-${i}`} className="group border-b border-border/30 bg-new-row">
                         <td className="px-3 py-1 font-mono">
-                          {ix.name || (
-                            <span className="text-muted-foreground/60">(auto)</span>
-                          )}
+                          {ix.name || <span className="text-muted-foreground/60">(auto)</span>}
                         </td>
                         <td className="px-3 py-1">
                           <Checkbox checked={ix.unique} disabled />
@@ -635,9 +608,7 @@ export function StructureView(): React.JSX.Element | null {
                               <Pencil className="size-3.5" />
                             </button>
                             <button
-                              onClick={() =>
-                                setIdxAdds(idxAdds.filter((_, idx) => idx !== i))
-                              }
+                              onClick={() => setIdxAdds(idxAdds.filter((_, idx) => idx !== i))}
                               title="Remove staged index"
                               className="text-muted-foreground hover:text-destructive"
                             >
@@ -694,12 +665,8 @@ export function StructureView(): React.JSX.Element | null {
                               {r.refTable}.{r.refColumn}
                             </button>
                           </td>
-                          <td className="px-3 py-1 text-muted-foreground">
-                            {r.onUpdate || '—'}
-                          </td>
-                          <td className="px-3 py-1 text-muted-foreground">
-                            {r.onDelete || '—'}
-                          </td>
+                          <td className="px-3 py-1 text-muted-foreground">{r.onUpdate || '—'}</td>
+                          <td className="px-3 py-1 text-muted-foreground">{r.onDelete || '—'}</td>
                           {!readOnly && canAlter && (
                             <td className="px-3 py-1">
                               {r.constraint && firstFkRow.get(r.constraint) === i && (
@@ -739,9 +706,7 @@ export function StructureView(): React.JSX.Element | null {
                 Loading…
               </div>
             ) : !tab.referencedBy || tab.referencedBy.length === 0 ? (
-              <div className="px-3 py-3 text-muted-foreground">
-                Nothing references this table.
-              </div>
+              <div className="px-3 py-3 text-muted-foreground">Nothing references this table.</div>
             ) : (
               <table className="w-full border-collapse">
                 <thead className="sticky top-0 bg-background text-muted-foreground">
@@ -765,18 +730,10 @@ export function StructureView(): React.JSX.Element | null {
                           {r.table}
                         </button>
                       </td>
-                      <td className="px-3 py-1 font-mono text-muted-foreground">
-                        {r.column}
-                      </td>
-                      <td className="px-3 py-1 font-mono text-muted-foreground">
-                        {r.refColumn}
-                      </td>
-                      <td className="px-3 py-1 text-muted-foreground">
-                        {r.onUpdate || '—'}
-                      </td>
-                      <td className="px-3 py-1 text-muted-foreground">
-                        {r.onDelete || '—'}
-                      </td>
+                      <td className="px-3 py-1 font-mono text-muted-foreground">{r.column}</td>
+                      <td className="px-3 py-1 font-mono text-muted-foreground">{r.refColumn}</td>
+                      <td className="px-3 py-1 text-muted-foreground">{r.onUpdate || '—'}</td>
+                      <td className="px-3 py-1 text-muted-foreground">{r.onDelete || '—'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -791,54 +748,65 @@ export function StructureView(): React.JSX.Element | null {
         <ViewSwitch view="structure" />
         {st && !readOnly && (
           <>
-            {sub === 'columns' && (
-            <>
-              <Button size="xs" variant="ghost" onClick={addColumn} title="Add a column">
-                <Plus />
-                Add column
-              </Button>
-              {canAlter && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button size="xs" variant="ghost" title="Table templates">
-                      <TableProperties />
-                      Templates
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start">
-                    <DropdownMenuItem onSelect={() => setTmplOpen(true)}>
-                      <TableProperties />
-                      Save table as template…
-                    </DropdownMenuItem>
-                    {engineTemplates.length > 0 && <DropdownMenuSeparator />}
-                    {engineTemplates.map((t) => (
-                      <DropdownMenuItem key={t.id} onSelect={() => insertTemplate(t.id)}>
-                        <Plus />
-                        Insert “{t.name}” ({t.columns.length})
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </>
-          )}
-          <span>{ops.length} pending change(s)</span>
-          <div className="flex-1" />
-          <Button
-            size="xs"
-            onClick={() => void preview()}
-            disabled={previewing || busy || ops.length === 0}
-            title="Review the DDL, then commit"
-          >
-            {previewing ? <Loader2 className="animate-spin" /> : <Check />}
-            Commit…
-          </Button>
+            {/* Rename is table-level → shown on every sub-tab. Immediate (not
+                staged); blocked while column/index edits are pending so it can't
+                overlap a batch built against the old name. */}
             <Button
               size="xs"
               variant="ghost"
-              onClick={discard}
-              disabled={busy || ops.length === 0}
+              onClick={() => setRenameOpen(true)}
+              disabled={ops.length > 0}
+              title={
+                ops.length > 0 ? 'Commit or discard pending changes first' : 'Rename this table'
+              }
+              className="bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-400"
             >
+              <Pencil />
+              Rename
+            </Button>
+            {sub === 'columns' && (
+              <>
+                <Button size="xs" variant="ghost" onClick={addColumn} title="Add a column">
+                  <Plus />
+                  Add column
+                </Button>
+                {canAlter && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button size="xs" variant="ghost" title="Table templates">
+                        <TableProperties />
+                        Templates
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      <DropdownMenuItem onSelect={() => setTmplOpen(true)}>
+                        <TableProperties />
+                        Save table as template…
+                      </DropdownMenuItem>
+                      {engineTemplates.length > 0 && <DropdownMenuSeparator />}
+                      {engineTemplates.map((t) => (
+                        <DropdownMenuItem key={t.id} onSelect={() => insertTemplate(t.id)}>
+                          <Plus />
+                          Insert “{t.name}” ({t.columns.length})
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </>
+            )}
+            <span>{ops.length} pending change(s)</span>
+            <div className="flex-1" />
+            <Button
+              size="xs"
+              onClick={() => void preview()}
+              disabled={previewing || busy || ops.length === 0}
+              title="Review the DDL, then commit"
+            >
+              {previewing ? <Loader2 className="animate-spin" /> : <Check />}
+              Commit…
+            </Button>
+            <Button size="xs" variant="ghost" onClick={discard} disabled={busy || ops.length === 0}>
               <Undo2 />
               Discard
             </Button>
@@ -860,8 +828,7 @@ export function StructureView(): React.JSX.Element | null {
           <DialogHeader>
             <DialogTitle>{editIdx === null ? 'Add index' : 'Edit index'}</DialogTitle>
             <DialogDescription>
-              on <span className="font-mono">{tab.entity.name}</span> — staged until
-              you commit
+              on <span className="font-mono">{tab.entity.name}</span> — staged until you commit
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
@@ -892,10 +859,7 @@ export function StructureView(): React.JSX.Element | null {
             </div>
             <div className="flex items-center justify-between gap-3">
               <label className="flex cursor-pointer items-center gap-2 text-xs">
-                <Checkbox
-                  checked={ixUnique}
-                  onCheckedChange={(v) => setIxUnique(v === true)}
-                />
+                <Checkbox checked={ixUnique} onCheckedChange={(v) => setIxUnique(v === true)} />
                 Unique
               </label>
               {methods.length > 0 && (
@@ -910,11 +874,7 @@ export function StructureView(): React.JSX.Element | null {
                     </SelectTrigger>
                     <SelectContent className="w-[22rem]">
                       {['default', ...methods].map((m) => {
-                        const reason = methodDisabledReason(
-                          connRow?.driver,
-                          m,
-                          st?.engine
-                        )
+                        const reason = methodDisabledReason(connRow?.driver, m, st?.engine)
                         return (
                           <SelectItem
                             key={m}
@@ -968,17 +928,13 @@ export function StructureView(): React.JSX.Element | null {
       </Dialog>
 
       {/* FK-backing index alert — drop the relation first or together */}
-      <Dialog
-        open={fkBackingAlert !== null}
-        onOpenChange={(o) => !o && setFkBackingAlert(null)}
-      >
+      <Dialog open={fkBackingAlert !== null} onOpenChange={(o) => !o && setFkBackingAlert(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Index backs a foreign key</DialogTitle>
             <DialogDescription>
-              Index <span className="font-mono">{fkBackingAlert?.indexName}</span> is
-              required by FK constraint{' '}
-              <span className="font-mono">{fkBackingAlert?.constraint}</span>. The
+              Index <span className="font-mono">{fkBackingAlert?.indexName}</span> is required by FK
+              constraint <span className="font-mono">{fkBackingAlert?.constraint}</span>. The
               relation must be dropped first. Stage both?
             </DialogDescription>
           </DialogHeader>
@@ -1024,12 +980,15 @@ export function StructureView(): React.JSX.Element | null {
         initialColumns={structureAsColumns()}
       />
 
+      {/* Rename table (shared dialog + hideable SQL preview) */}
+      <RenameTableDialog
+        entity={renameOpen ? tab.entity : null}
+        onClose={() => setRenameOpen(false)}
+      />
+
       {/* DDL review sheet (shared with column commit) */}
       <Sheet open={previewSql !== null} onOpenChange={(o) => !o && setPreviewSql(null)}>
-        <SheetContent
-          side="right"
-          className="w-[52vw] min-w-[34rem] gap-0 sm:max-w-[52vw]"
-        >
+        <SheetContent side="right" className="w-[52vw] min-w-[34rem] gap-0 sm:max-w-[52vw]">
           <SheetHeader className="border-b border-border">
             <div className="flex items-center gap-2">
               <SheetTitle>Review generated DDL</SheetTitle>
@@ -1045,8 +1004,7 @@ export function StructureView(): React.JSX.Element | null {
               </Button>
             </div>
             <SheetDescription>
-              Exactly what will run on{' '}
-              <span className="font-mono">{tab.entity.name}</span>, in one
+              Exactly what will run on <span className="font-mono">{tab.entity.name}</span>, in one
               transaction. Nothing has run yet — review, then commit.
             </SheetDescription>
           </SheetHeader>

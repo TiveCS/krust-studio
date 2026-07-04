@@ -160,6 +160,10 @@ export interface RoutineDef {
   owner?: string | null
   /** SQL security / volatility label */
   security?: string | null
+  /** function that may mutate (pg VOLATILE / mysql MODIFIES SQL DATA). Runs via
+   *  SELECT so it is classified Data Retrieval, but is still blocked on
+   *  read-only connections because it can write. Procedures gate separately. */
+  volatile?: boolean
 }
 
 /** one user-supplied argument for a routine execution (IN/INOUT params) */
@@ -465,6 +469,9 @@ export interface NewColumnSpec {
   default?: string
   /** auto-increment / identity (create-time; engine-specific emission) */
   autoInc?: boolean
+  /** MySQL/MariaDB `UNSIGNED` numeric modifier (ignored on pg/sqlite). Emitted
+   *  right after the type on CREATE + ADD COLUMN; the DB validates fitness. */
+  unsigned?: boolean
   fk?: {
     refTable: string
     refColumn: string
@@ -557,7 +564,8 @@ export interface SessionApi {
   renameTable: (
     id: string,
     entity: EntityRef,
-    newName: string
+    newName: string,
+    dryRun?: boolean
   ) => Promise<{ statements: string[] }>
   truncateTable: (
     id: string,
