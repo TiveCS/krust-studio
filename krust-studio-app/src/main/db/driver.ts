@@ -104,7 +104,8 @@ export interface TabularMutCapable {
 
 /** schema mutation / DDL (relational engines). */
 export interface SchemaMutCapable {
-  createTable(spec: CreateTableSpec): Promise<{ ddl: string }>
+  /** `dryRun` builds + returns the DDL without executing (pre-commit preview). */
+  createTable(spec: CreateTableSpec, dryRun?: boolean): Promise<{ ddl: string }>
   /** apply schema ops. `dryRun` builds + returns the statements without
    *  executing them (for the pre-commit DDL preview). */
   alterTable(

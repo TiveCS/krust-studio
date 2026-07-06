@@ -54,7 +54,7 @@ export interface Tab {
   id: string
   entity: EntityRef
   /** undefined / absent = regular table/query/new-table tab */
-  kind?: 'history' | 'connection-editor' | 'backup' | 'redis-key' | 'routine'
+  kind?: 'history' | 'connection-editor' | 'backup' | 'redis-key' | 'routine' | 'schema-sync'
   /** redis-key tab identity; value + staged-edit state live in the useRedis
    *  store keyed by tab id (decision 3: fat-Tab marker, heavy state external) */
   redisKey?: {
@@ -242,6 +242,8 @@ interface ConnectionsState {
   openHistoryTab: () => void
   /** Open/focus the Backup & Restore tab for the current connection (singleton). */
   openBackupTab: () => void
+  /** Open/focus the Schema Sync tab (singleton) — MCP proposal review. */
+  openSchemaSyncTab: () => void
   /** Open/focus a Redis Key tab (one per key+db); value state lives in useRedis. */
   openRedisKey: (
     key: string,
@@ -374,7 +376,12 @@ export const useConnections = create<ConnectionsState>((set, get) => {
           // connection-editor + backup tabs are session-only; everything else,
           // including redis-key tabs (identity only — value state stays transient
           // in useRedis and reloads on restore), is persisted.
-          if (tab.kind === 'connection-editor' || tab.kind === 'backup') return null
+          if (
+            tab.kind === 'connection-editor' ||
+            tab.kind === 'backup' ||
+            tab.kind === 'schema-sync'
+          )
+            return null
           return {
             id: tab.id,
             entity: tab.entity,
@@ -862,6 +869,26 @@ export const useConnections = create<ConnectionsState>((set, get) => {
         id: crypto.randomUUID(),
         kind: 'backup',
         entity: { name: 'Backup & Restore' },
+        data: null, loading: false, error: null, pageIndex: 0, total: null,
+        counting: false, filters: [], filterMode: 'builder', rawWhere: '',
+        filterError: null, orderBy: [], edits: {}, deletes: [],
+        inserts: [], colWidths: {}, committing: false, view: 'data',
+        structureSub: 'columns', referencedBy: null, referencedByLoading: false,
+        structure: null, structureLoading: false, draft: null, query: null
+      }
+      set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
+    },
+
+    openSchemaSyncTab: () => {
+      const existing = get().tabs.find((t) => t.kind === 'schema-sync')
+      if (existing) {
+        set({ activeTabId: existing.id })
+        return
+      }
+      const tab: Tab = {
+        id: crypto.randomUUID(),
+        kind: 'schema-sync',
+        entity: { name: 'Schema Sync' },
         data: null, loading: false, error: null, pageIndex: 0, total: null,
         counting: false, filters: [], filterMode: 'builder', rawWhere: '',
         filterError: null, orderBy: [], edits: {}, deletes: [],

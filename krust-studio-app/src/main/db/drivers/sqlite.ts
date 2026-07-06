@@ -385,12 +385,13 @@ export class SqliteDriver implements DbDriver {
     return [main, ...idxSql].join('\n')
   }
 
-  async createTable(spec: CreateTableSpec): Promise<{ ddl: string }> {
+  async createTable(spec: CreateTableSpec, dryRun = false): Promise<{ ddl: string }> {
     if (!this.db) throw new Error('Not connected')
     const ddl = buildCreateTable(spec, quoteIdent, {
       singleIntPkInline: true,
       dialect: 'sqlite'
     })
+    if (dryRun) return { ddl }
     this.db.exec(ddl)
     return { ddl }
   }

@@ -530,8 +530,9 @@ export class MysqlDriver implements DbDriver, RoutineCapable {
     return ddl ? ddl.trim() + ';' : `-- no DDL found for ${entity.name}`
   }
 
-  async createTable(spec: CreateTableSpec): Promise<{ ddl: string }> {
+  async createTable(spec: CreateTableSpec, dryRun = false): Promise<{ ddl: string }> {
     const ddl = buildCreateTable(spec, quoteIdent, { dialect: 'mysql' })
+    if (dryRun) return { ddl }
     await (await this.ensure()).query(ddl)
     return { ddl }
   }

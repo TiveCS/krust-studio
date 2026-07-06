@@ -40,13 +40,13 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/index.ts": {
-    "mtime": 1783030459.7502375,
-    "ast_hash": "4847f81de80717c5f3de5454a62a7a03",
+    "mtime": 1783360429.8150177,
+    "ast_hash": "55d80ce3d9d042f64a23ca2b64febbb3",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/ipc.ts": {
-    "mtime": 1783343764.7712502,
-    "ast_hash": "f2b8ae50716dd3587fd0169d11373f16",
+    "mtime": 1783360400.6689134,
+    "ast_hash": "135cbf6c0dfd5fe2af958fbd874f6988",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/store/connections.ts": {
@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/preload/index.ts": {
-    "mtime": 1783343783.458537,
-    "ast_hash": "8e55bafca1e9305d4fc9d609b4764e35",
+    "mtime": 1783360452.8375213,
+    "ast_hash": "e32357566d68a33c2f9f95d426eae0d4",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/App.tsx": {
@@ -175,8 +175,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/SettingsModal.tsx": {
-    "mtime": 1783007084.1948905,
-    "ast_hash": "d66adc36a8f17bc0716c37c5ec344acb",
+    "mtime": 1783360547.2111976,
+    "ast_hash": "2538844e3291289776701fb100e97ec6",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/SqlDisplay.tsx": {
@@ -385,8 +385,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/shared/types.ts": {
-    "mtime": 1783343566.8564875,
-    "ast_hash": "54dbf6873ae44734eb79ba458317ba27",
+    "mtime": 1783360245.7310038,
+    "ast_hash": "46e4aed66477621ed53fd619bc43ee6c",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/index.html": {
@@ -440,8 +440,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/package.json": {
-    "mtime": 1783030194.0985153,
-    "ast_hash": "5991b061f771467cadbae50d25b38244",
+    "mtime": 1783360133.5000644,
+    "ast_hash": "73d403cf71c912010e279b9336a17df8",
     "semantic_hash": ""
   },
   "krust-studio-app/tsconfig.json": {
@@ -947,6 +947,31 @@
   "docs/adr/0022-mcp-schema-sync-proposed-ops.md": {
     "mtime": 1783352183.8664355,
     "ast_hash": "ae546b5889aac7c96fa5d8f647d4b2db",
+    "semantic_hash": ""
+  },
+  "krust-studio-app/src/main/mcp/introspect.ts": {
+    "mtime": 1783360282.729438,
+    "ast_hash": "800f50d21324920f4a15f718040aa0c7",
+    "semantic_hash": ""
+  },
+  "krust-studio-app/src/main/mcp/server.ts": {
+    "mtime": 1783360491.5646937,
+    "ast_hash": "e47f193cacf0fd29d09a0e3e6e7ec947",
+    "semantic_hash": ""
+  },
+  "krust-studio-app/src/main/mcp/tools.ts": {
+    "mtime": 1783360351.277896,
+    "ast_hash": "f7a801ce139d166d2b69a3e31ead268b",
+    "semantic_hash": ""
+  },
+  "krust-studio-app/src/main/store/mcp.ts": {
+    "mtime": 1783360262.137958,
+    "ast_hash": "1104504301fd080fe3074e6d3129740c",
+    "semantic_hash": ""
+  },
+  "krust-studio-app/src/renderer/src/components/McpSettings.tsx": {
+    "mtime": 1783360597.4778545,
+    "ast_hash": "b016f50ccf5f8a5c3182a431cb18966c",
     "semantic_hash": ""
   }
 }

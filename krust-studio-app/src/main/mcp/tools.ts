@@ -3,6 +3,41 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { listConnections } from '../store/connections'
 import { getMcpGrant } from '../store/mcp'
 import { introspectSchema } from './introspect'
+import { addProposal, type ProposeInput } from './proposals'
+import type { CreateTableSpec, SchemaOp } from '../../shared/types'
+
+const zColumn = z.object({
+  name: z.string(),
+  type: z.string().describe('SQL type in the target dialect, e.g. "int", "varchar(256)"'),
+  nullable: z.boolean().default(true),
+  pk: z.boolean().default(false),
+  default: z.string().optional(),
+  autoInc: z.boolean().optional(),
+  unsigned: z.boolean().optional(),
+  fk: z
+    .object({
+      refTable: z.string(),
+      refColumn: z.string(),
+      onUpdate: z.string().optional(),
+      onDelete: z.string().optional()
+    })
+    .optional()
+})
+const zCreateTable = z.object({ name: z.string(), columns: z.array(zColumn) })
+/** ops match Krust's SchemaOp — additive: addColumn/addIndex/addForeignKey */
+const zOp = z.object({ kind: z.string() }).passthrough()
+const zAlter = z.object({
+  table: z.string(),
+  schema: z.string().optional(),
+  ops: z.array(zOp)
+})
+const zReport = z.object({
+  table: z.string(),
+  kind: z.string(),
+  detail: z.string(),
+  codeSpec: z.string().optional(),
+  dbSpec: z.string().optional()
+})
 
 /** wrap a JSON payload as an MCP text-content tool result */
 function json(payload: unknown): { content: { type: 'text'; text: string }[] } {
@@ -77,4 +112,66 @@ export function registerMcpTools(server: McpServer): void {
       }
     }
   )
+
+  // ── propose_schema_ops ────────────────────────────────────────────────────
+  server.registerTool(
+    'propose_schema_ops',
+    {
+      title: 'Propose schema ops',
+      description:
+        'Propose ADDITIVE schema fixes for a connection after diffing a code model ' +
+        'against introspect_schema. These are STAGED into Krust for a human to review ' +
+        'and commit — they are NEVER applied to the database by this call. Send only ' +
+        'additive ops (createTables / addColumn / addIndex / addForeignKey). Put ' +
+        'non-additive findings (type mismatches, columns to drop, nullability changes) ' +
+        'in reportOnly so the human can decide. Requires the connection propose grant.',
+      inputSchema: {
+        connectionId: z.string(),
+        changesetName: z.string().optional().describe('ticket/feature name for the changeset'),
+        createTables: z.array(zCreateTable).optional().describe('tables missing from the DB'),
+        alters: z
+          .array(zAlter)
+          .optional()
+          .describe('per-table additive ops (SchemaOp: addColumn/addIndex/addForeignKey)'),
+        reportOnly: z
+          .array(zReport)
+          .optional()
+          .describe('non-additive findings — reported, never auto-staged')
+      }
+    },
+    async (args, extra) => {
+      const grant = getMcpGrant(args.connectionId)
+      if (!grant.propose) {
+        return fail('This connection does not accept schema-op proposals')
+      }
+      const input: ProposeInput = {
+        connectionId: args.connectionId,
+        changesetName: args.changesetName,
+        createTables: (args.createTables as CreateTableSpec[] | undefined) ?? [],
+        alters: (args.alters as { table: string; schema?: string; ops: SchemaOp[] }[] | undefined) ?? [],
+        reportOnly: args.reportOnly ?? []
+      }
+      const client = clientName(extra)
+      try {
+        const res = await addProposal(input, client)
+        return json({
+          staged: true,
+          message:
+            'Proposal staged in Krust Studio → Schema Sync. A human will review and commit ' +
+            'it; nothing was applied to the database.',
+          ...res
+        })
+      } catch (err) {
+        return fail(err instanceof Error ? err.message : String(err))
+      }
+    }
+  )
+}
+
+/** best-effort MCP client label from the request (stateless — headers only) */
+function clientName(extra: unknown): string {
+  const e = extra as { requestInfo?: { headers?: Record<string, unknown> } }
+  const ua = e?.requestInfo?.headers?.['user-agent']
+  if (typeof ua === 'string' && ua.trim()) return ua.slice(0, 60)
+  return 'AI agent'
 }

@@ -21,7 +21,8 @@ import type {
   RedisCommitBatch,
   RoutineRef,
   RoutineArg,
-  McpGrant
+  McpGrant,
+  SchemaSyncProposal
 } from '../shared/types'
 
 const api: KrustApi = {
@@ -150,6 +151,18 @@ const api: KrustApi = {
     getGrant: (connectionId: string) => ipcRenderer.invoke('mcp:getGrant', connectionId),
     setGrant: (connectionId: string, grant: McpGrant) =>
       ipcRenderer.invoke('mcp:setGrant', connectionId, grant)
+  },
+  schemaSync: {
+    list: () => ipcRenderer.invoke('schemaSync:list'),
+    commit: (id: string, opts: { changesetName?: string; excludeKeys?: string[] }) =>
+      ipcRenderer.invoke('schemaSync:commit', id, opts),
+    exportSql: (id: string) => ipcRenderer.invoke('schemaSync:export', id),
+    dismiss: (id: string) => ipcRenderer.invoke('schemaSync:dismiss', id),
+    onProposal: (cb: (p: SchemaSyncProposal) => void) => {
+      const handler = (_: unknown, p: SchemaSyncProposal): void => cb(p)
+      ipcRenderer.on('mcp:proposal', handler)
+      return () => ipcRenderer.removeListener('mcp:proposal', handler)
+    }
   },
   workspace: {
     load: () => ipcRenderer.invoke('workspace:load'),

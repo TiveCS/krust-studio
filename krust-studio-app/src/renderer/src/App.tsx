@@ -12,7 +12,9 @@ import { HistoryView } from '@/components/HistoryView'
 import { BackupView } from '@/components/BackupView'
 import { RedisKeyView } from '@/components/RedisKeyView'
 import { RoutineView } from '@/components/RoutineView'
+import { SchemaSyncView } from '@/components/SchemaSyncView'
 import { CommandPalette } from '@/components/CommandPalette'
+import { useSchemaSync } from '@/store/schemaSync'
 import { Toaster } from '@/components/ui/sonner'
 import { useConnections } from '@/store/connections'
 import { useSettings } from '@/store/settings'
@@ -42,6 +44,11 @@ function App(): React.JSX.Element {
       autoOpenLast() // land back on the last-used connection
     })()
   }, [load, loadWorkspace, loadTemplates, autoOpenLast])
+
+  // subscribe to MCP schema-sync proposals app-wide (badge + toast, ADR-0022)
+  useEffect(() => {
+    useSchemaSync.getState().start()
+  }, [])
 
   // Flush the workspace to disk on quit so an abrupt close doesn't drop the last
   // <800ms of edits sitting in the save debounce (ADR-0018). The editor's own
@@ -173,6 +180,8 @@ function App(): React.JSX.Element {
     content = <RedisKeyView />
   } else if (activeTab?.kind === 'routine') {
     content = <RoutineView key={activeTab.id} />
+  } else if (activeTab?.kind === 'schema-sync') {
+    content = <SchemaSyncView />
   } else if (activeTab) {
     content = <TableTabView />
   } else {

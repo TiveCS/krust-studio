@@ -20,6 +20,12 @@ import {
   setMcpGrant
 } from './store/mcp'
 import { startMcpServer, mcpServerStatus } from './mcp/server'
+import {
+  listProposals,
+  commitProposal,
+  exportProposalSql,
+  dismissProposal
+} from './mcp/proposals'
 import type { McpGrant } from '../shared/types'
 import { runBackup, restorePreview, restoreRun } from './db/backup'
 import { testConnection } from './db/test-connection'
@@ -373,6 +379,15 @@ export function registerIpc(): void {
   ipcMain.handle('mcp:setNotifyOnProposal', (_e, on: boolean) => setNotifyOnProposal(on))
   ipcMain.handle('mcp:getGrant', (_e, id: string) => getMcpGrant(id))
   ipcMain.handle('mcp:setGrant', (_e, id: string, grant: McpGrant) => setMcpGrant(id, grant))
+
+  ipcMain.handle('schemaSync:list', () => listProposals())
+  ipcMain.handle(
+    'schemaSync:commit',
+    (_e, id: string, opts: { changesetName?: string; excludeKeys?: string[] }) =>
+      commitProposal(id, opts)
+  )
+  ipcMain.handle('schemaSync:export', (_e, id: string) => exportProposalSql(id))
+  ipcMain.handle('schemaSync:dismiss', (_e, id: string) => dismissProposal(id))
 
   ipcMain.handle('workspace:load', () => loadWorkspace())
   ipcMain.handle('workspace:save', (_e, data: WorkspaceData) => saveWorkspace(data))

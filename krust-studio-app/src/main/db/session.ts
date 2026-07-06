@@ -256,9 +256,16 @@ export async function getCreateSql(
 
 export async function createTable(
   id: string,
-  spec: CreateTableSpec
+  spec: CreateTableSpec,
+  dryRun?: boolean
 ): Promise<{ ddl: string }> {
   const config = getConnectionConfig(id)
+  // A dry-run only builds the DDL for the preview — no execution, no capture, so
+  // it is allowed on read-only. A real create is read-only blocked.
+  if (dryRun) {
+    if (!sessions.has(id)) await connectSession(id)
+    return rel(id).createTable(spec, true)
+  }
   if (config?.readOnly)
     throw new Error('Connection is read-only; schema changes blocked')
   if (!sessions.has(id)) await connectSession(id)

@@ -20,7 +20,8 @@ import {
   Unplug,
   FunctionSquare,
   Cog,
-  FileCode
+  FileCode,
+  Bot
 } from 'lucide-react'
 import {
   Sidebar,
@@ -65,6 +66,7 @@ import { ConnectionSwitcher } from '@/components/ConnectionSwitcher'
 import { TemplateManager } from '@/components/TemplateManager'
 import { RenameTableDialog } from '@/components/RenameTableDialog'
 import { useConnections } from '@/store/connections'
+import { useSchemaSync } from '@/store/schemaSync'
 import { capabilitiesFor } from '../../../shared/capabilities'
 import type {
   EntityRef,
@@ -89,6 +91,7 @@ export function AppSidebar(): React.JSX.Element {
     openNewTable,
     openHistoryTab,
     openBackupTab,
+    openSchemaSyncTab,
     openRoutine,
     openNewRoutine,
     dropRoutine,
@@ -101,6 +104,8 @@ export function AppSidebar(): React.JSX.Element {
   const activeTabKind = tabs.find((t) => t.id === activeTabId)?.kind
   const historyActive = activeTabKind === 'history'
   const backupActive = activeTabKind === 'backup'
+  const schemaSyncActive = activeTabKind === 'schema-sync'
+  const proposalCount = useSchemaSync((s) => s.proposals.length)
   const [filter, setFilter] = useState('')
   const [schemaFilter, setSchemaFilter] = useState('all')
   const [templatesOpen, setTemplatesOpen] = useState(false)
@@ -315,6 +320,21 @@ export function AppSidebar(): React.JSX.Element {
                 className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
               >
                 <TableProperties className="size-3.5" />
+              </button>
+              <button
+                onClick={() => openSchemaSyncTab()}
+                title="Schema Sync (AI proposals)"
+                className={cn(
+                  'relative rounded p-1 hover:bg-accent hover:text-foreground',
+                  schemaSyncActive ? 'text-primary' : 'text-muted-foreground'
+                )}
+              >
+                <Bot className="size-3.5" />
+                {proposalCount > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 flex size-3.5 items-center justify-center rounded-full bg-primary text-[8px] font-medium text-primary-foreground">
+                    {proposalCount}
+                  </span>
+                )}
               </button>
             </div>
             {schemas.length > 1 && (

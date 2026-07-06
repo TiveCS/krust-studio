@@ -604,8 +604,9 @@ export class PostgresDriver implements DbDriver, RoutineCapable {
     return sql
   }
 
-  async createTable(spec: CreateTableSpec): Promise<{ ddl: string }> {
+  async createTable(spec: CreateTableSpec, dryRun = false): Promise<{ ddl: string }> {
     const ddl = buildCreateTable(spec, quoteIdent, { dialect: 'postgres' })
+    if (dryRun) return { ddl }
     await (await this.ensure()).query(ddl)
     return { ddl }
   }

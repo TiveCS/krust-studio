@@ -1099,6 +1099,67 @@ export interface IntrospectResult {
   tables: IntrospectedTable[]
 }
 
+// ── Schema Sync proposals (ADR-0022) ────────────────────────────────────────
+
+/** one proposed CREATE TABLE + its generated DDL (best-effort, dialect-correct) */
+export interface ProposedCreateTable {
+  spec: CreateTableSpec
+  ddl?: string
+}
+
+/** proposed ALTER ops for one table + their generated DDL */
+export interface ProposedAlter {
+  table: string
+  schema?: string
+  ops: SchemaOp[]
+  statements?: string[]
+}
+
+/** a non-additive finding the AI surfaces but never auto-stages (human decides) */
+export interface SchemaSyncReportItem {
+  table: string
+  /** short kind, e.g. "type-mismatch", "extra-db-column", "nullability" */
+  kind: string
+  detail: string
+  /** what the code model implies vs what the live DB has (side-by-side) */
+  codeSpec?: string
+  dbSpec?: string
+}
+
+/** a staged Schema Sync proposal from an MCP client — never auto-committed */
+export interface SchemaSyncProposal {
+  id: string
+  connectionId: string
+  connectionName: string
+  /** MCP client that proposed (from the initialize handshake), e.g. "claude-code" */
+  client: string
+  receivedAt: number
+  changesetName?: string
+  createTables: ProposedCreateTable[]
+  alters: ProposedAlter[]
+  reportOnly: SchemaSyncReportItem[]
+}
+
+/** outcome of committing a proposal after re-introspection reconcile */
+export interface SchemaSyncCommitResult {
+  ran: string[]
+  skipped: string[]
+  conflicts: string[]
+  changesetName?: string
+}
+
+export interface SchemaSyncApi {
+  list: () => Promise<SchemaSyncProposal[]>
+  commit: (
+    id: string,
+    opts: { changesetName?: string; excludeKeys?: string[] }
+  ) => Promise<SchemaSyncCommitResult>
+  exportSql: (id: string) => Promise<string>
+  dismiss: (id: string) => Promise<void>
+  /** subscribe to new proposals pushed from the MCP server; returns an unsubscribe */
+  onProposal: (cb: (p: SchemaSyncProposal) => void) => () => void
+}
+
 export interface McpApi {
   status: () => Promise<McpStatus>
   getConfig: () => Promise<McpConfig>
@@ -1122,4 +1183,5 @@ export interface KrustApi {
   redis: RedisApi
   routines: RoutineApi
   mcp: McpApi
+  schemaSync: SchemaSyncApi
 }
