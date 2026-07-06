@@ -85,6 +85,7 @@ export function QueryView(): React.JSX.Element | null {
     openConnectionId,
     entities,
     connections,
+    routines,
     setQuerySql,
     setQueryAutoLimit,
     runQuery,
@@ -372,6 +373,7 @@ export function QueryView(): React.JSX.Element | null {
           onBlur={flushSqlNow}
           onRun={run}
           schema={schema}
+          routines={routines}
           driver={driver}
           onFormatError={(message) => toast.error('Could not format SQL', { description: message })}
         />

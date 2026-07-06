@@ -1,12 +1,18 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { EditorView, basicSetup } from 'codemirror'
 import { keymap } from '@codemirror/view'
-import { EditorState, Compartment, Prec } from '@codemirror/state'
+import { EditorState, Compartment, Prec, type Extension } from '@codemirror/state'
 import { sql, MySQL, PostgreSQL, SQLite, type SQLDialect } from '@codemirror/lang-sql'
 import { syntaxHighlighting } from '@codemirror/language'
+import type {
+  Completion,
+  CompletionContext,
+  CompletionResult,
+  CompletionSource
+} from '@codemirror/autocomplete'
 import { krustHighlight, krustTheme } from '@/lib/cm-theme'
 import { formatSql } from '@/lib/sqlFormat'
-import type { DriverType } from '../../../shared/types'
+import type { DriverType, RoutineInfo } from '../../../shared/types'
 
 // Per-engine dialect → correct identifier quoting (MySQL backtick vs ANSI "..."),
 // keyword set, and string-escape rules.
@@ -14,6 +20,58 @@ const DIALECTS: Partial<Record<DriverType, SQLDialect>> = {
   mysql: MySQL,
   postgres: PostgreSQL,
   sqlite: SQLite
+}
+
+/** Insert `name()` and drop the cursor between the parens (ready for args). */
+function applyRoutine(name: string): Completion['apply'] {
+  return (view, _completion, from, to) => {
+    const insert = `${name}()`
+    view.dispatch({
+      changes: { from, to, insert },
+      selection: { anchor: from + name.length + 1 }
+    })
+  }
+}
+
+/** Routine-aware completion source (ADR-0021): procedures after `CALL`,
+ *  functions anywhere else in an expression. Reads the current routine list
+ *  through a ref so the editor never re-configures when it changes. */
+function makeRoutineSource(routinesRef: { current: RoutineInfo[] }): CompletionSource {
+  return (ctx: CompletionContext): CompletionResult | null => {
+    const routines = routinesRef.current
+    if (routines.length === 0) return null
+    const word = ctx.matchBefore(/[\w$]*/)
+    if (!word) return null
+    if (word.from === word.to && !ctx.explicit) return null
+    // look just behind the word for a `CALL ` lead-in (procedures only there)
+    const before = ctx.state.sliceDoc(Math.max(0, word.from - 40), word.from)
+    const afterCall = /\bcall\s+$/i.test(before)
+    const options: Completion[] = []
+    for (const r of routines) {
+      const isProc = r.kind === 'procedure'
+      // after CALL → procedures only; elsewhere → functions only
+      if (afterCall ? !isProc : isProc) continue
+      options.push({
+        label: r.name,
+        type: isProc ? 'keyword' : 'function',
+        detail: r.signature ? `${r.kind}(${r.signature})` : r.kind,
+        info: r.returns ? `returns ${r.returns}` : undefined,
+        apply: applyRoutine(r.name)
+      })
+    }
+    return options.length ? { from: word.from, options, validFor: /^[\w$]*$/ } : null
+  }
+}
+
+/** the SQL language support plus the routine completion source as extra
+ *  language-data (queried alongside the built-in schema/keyword completion) */
+function sqlExtension(
+  dialect: SQLDialect,
+  schema: Record<string, string[]> | undefined,
+  routineSource: CompletionSource
+): Extension {
+  const support = sql({ dialect, schema, upperCaseKeywords: true })
+  return [support, support.language.data.of({ autocomplete: routineSource })]
 }
 
 interface Props {
@@ -25,6 +83,8 @@ interface Props {
   onRun: (sql: string) => void
   /** table -> columns, for autocomplete; updates dynamically via Compartment */
   schema?: Record<string, string[]>
+  /** routines for CALL/expression autocomplete (mysql/pg); read via a ref */
+  routines?: RoutineInfo[]
   /** connection engine — picks the SQL dialect (quoting/keywords) */
   driver?: DriverType
   onFormatError?: (message: string) => void
@@ -35,7 +95,7 @@ export interface SqlEditorHandle {
 }
 
 export const SqlEditor = forwardRef<SqlEditorHandle, Props>(function SqlEditor(
-  { value, onChange, onBlur, onRun, schema, driver, onFormatError },
+  { value, onChange, onBlur, onRun, schema, routines, driver, onFormatError },
   ref
 ): React.JSX.Element {
   const host = useRef<HTMLDivElement>(null)
@@ -49,6 +109,12 @@ export const SqlEditor = forwardRef<SqlEditorHandle, Props>(function SqlEditor(
   onBlurRef.current = onBlur
   onRunRef.current = onRun
   onFormatErrorRef.current = onFormatError
+
+  // routine list read through a ref → the completion source is stable and the
+  // editor never re-configures just because the routine list changed
+  const routinesRef = useRef<RoutineInfo[]>(routines ?? [])
+  routinesRef.current = routines ?? []
+  const routineSource = useRef<CompletionSource>(makeRoutineSource(routinesRef))
 
   const dialect = (driver && DIALECTS[driver]) || MySQL
   const driverRef = useRef(driver)
@@ -106,7 +172,7 @@ export const SqlEditor = forwardRef<SqlEditorHandle, Props>(function SqlEditor(
         basicSetup,
         // Wrapped in a Compartment so schema/dialect can update without remounting
         sqlCompartment.current.of(
-          sql({ dialect, schema, upperCaseKeywords: true })
+          sqlExtension(dialect, schema, routineSource.current)
         ),
         syntaxHighlighting(krustHighlight),
         krustTheme,
@@ -136,7 +202,7 @@ export const SqlEditor = forwardRef<SqlEditorHandle, Props>(function SqlEditor(
     if (!v) return
     v.dispatch({
       effects: sqlCompartment.current.reconfigure(
-        sql({ dialect, schema, upperCaseKeywords: true })
+        sqlExtension(dialect, schema, routineSource.current)
       )
     })
   }, [schema, dialect])

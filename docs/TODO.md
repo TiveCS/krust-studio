@@ -79,9 +79,13 @@ Split across betas — beta.1 below; beta.2 is the MySQL Recovery Copy machine.
       identity, with a captured server-definition **baseline** — external drift
       is flagged and never silently overwrites the local draft (aligns ADR-0018;
       deliberate exception to ADR-0012). New-routine draft keyed by tab id.
-- [ ] **Routine-aware autocomplete.** Procedures after `CALL`; functions in
-      expressions. **Not built in this pass** (SQL-editor autocomplete
-      unchanged — deferred).
+- [x] **Routine-aware autocomplete.** Done (beta.3). `SqlEditor` adds a routine
+      `CompletionSource` as extra SQL language-data (alongside the built-in
+      schema/keyword completion): procedures complete right after `CALL`,
+      functions anywhere else in an expression. Reads the store `routines` list
+      through a ref (no editor re-config on change); `apply` inserts `name()` and
+      drops the cursor between the parens. Threaded `routines` QueryView →
+      SqlEditor.
 - [x] **MySQL `DELIMITER` statement splitting.** Teach `splitStatements` to
       consume `DELIMITER x` lines (switch terminator, strip before send) so
       pasted MySQL routine scripts run correctly in the SQL editor. PG
