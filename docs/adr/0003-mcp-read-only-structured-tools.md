@@ -8,6 +8,14 @@ Accepted — but **post-MVP / nice-to-have**, explicitly not a main feature.
 Build only after the core DB tool and the Captured-DDL/Changeset workflow are
 solid. Recorded now so the design is captured; not prioritized.
 
+**Amended by [ADR-0022](0022-mcp-schema-sync-proposed-ops.md):** two refinements.
+(1) The "AI can never write" guarantee below is now narrower — the AI can
+*propose* staged schema ops (Schema Sync) but still never commits to the DB;
+read-only holds for the database, not the whole MCP surface. (2) The in-app
+HTTP/SSE transport gains a thin **stdio bridge** (no secrets/state) so stdio-first
+agents (Codex CLI) reach the same server — this does *not* reopen the rejection of
+a *stateful* standalone binary below; the bridge is a dumb pipe.
+
 ## Context
 
 A recurring pain: the author is pulled onto projects mid-stream and has to figure

@@ -713,35 +713,125 @@ See [ADR-0014](docs/adr/0014-query-plan-visual-tree.md) for the trade-off
 between visual tree and raw-table output.
 
 ### MCP Server
-**Priority: post-MVP, nice-to-have — not a main feature.** Design is captured but
-build it only after the core tool + Captured-DDL/Changeset workflow are solid.
+A Model Context Protocol server hosted **inside** the running Krust app (local
+HTTP/SSE on `127.0.0.1`, per-install auth token, user-toggleable). Lets an AI
+client inspect schema and sampled data — the "joined a project mid-way, what is
+this table for?" problem — and, via **Schema Sync**, propose additive schema fixes.
 
-A read-only Model Context Protocol server hosted **inside** the running Krust app
-(local HTTP/SSE on `127.0.0.1`, per-install auth token, user-toggleable). Lets an
-AI client (Claude Code / Claude Desktop) inspect schema and sampled data so it can
-explain unfamiliar tables — the "joined a project mid-way, what is this table
-for?" problem — and cross-reference against code.
+**Client-agnostic.** The tools are plain MCP (no Claude-only features), so any
+spec-compliant agent works — Claude Code, Codex CLI, Cursor, etc. HTTP-native
+clients connect to the endpoint directly; stdio-first clients spawn the **MCP
+stdio bridge** (a dumb pipe holding no secrets, forwarding stdio ↔ the local
+endpoint with the token). The in-app server stays the single enforcement point;
+the token pastes into each client's own config. The **AI Access Audit** records
+the calling client's identity (from the MCP `initialize` handshake) so it's clear
+*which* agent read or proposed.
 
-Access is governed by the **AI Read Allowlist** and exposed only through fixed
-**structured tools** (`list_allowed_tables`, `describe_table`,
-`read_rows(table, filter, limit)`). No arbitrary SQL — the allowlist, column
-masks, and read-only guarantee are enforced server-side on every call, so the AI
-cannot escape scope. Because the server lives in the running app, it reuses the
-same live connections and enforcement (no second path to secrets).
+Exposed only through fixed **structured tools**, never arbitrary SQL. Three tool
+families, three separate gates:
+- **Data reads** (`list_allowed_tables`, `describe_table`,
+  `read_rows(table, filter, limit)`) — governed by the **AI Read Allowlist**.
+- **Schema introspection** (`introspect_schema`) — governed by the separate
+  **Schema Introspection** scope (see below).
+- **Schema-op proposal** (`propose_schema_ops`) — stages **Proposed Schema Ops**
+  into a **Schema Sync** review; **never commits to the DB**.
+
+The server lives in the running app, so it reuses the same live connections and
+enforcement (no second path to secrets). **The AI can never write to the
+database**: MCP can only *propose* staged schema ops — a human reviews and
+commits them through the normal path.
 
 ### AI Read Allowlist
-Default-deny permission set governing what the **MCP Server** may read. Granularity
-is per (connection → table); each allowed table is marked schema-only or
-schema+data, with per-table **column exclusions** to mask sensitive fields
+Default-deny permission set governing what **data** the **MCP Server** may read.
+Granularity is per (connection → table); each allowed table is marked schema-only
+or schema+data, with per-table **column exclusions** to mask sensitive fields
 (password hashes, emails, tokens). Nothing is readable unless explicitly allowed.
-The AI can never write — MCP is read-only by construction.
+This gate covers row **data** only — whole-schema *structure* visibility is the
+separate **Schema Introspection** scope.
+
+### Schema Introspection
+A connection-level scope (one on/off toggle, **distinct** from the per-table
+**AI Read Allowlist**) that lets the MCP server enumerate and describe the whole
+connection's **structure** — tables, columns, types, PK/FK, indexes — with **no
+row data**. Kept separate because structure is not the sensitive asset (data is),
+and a per-table default-deny allowlist makes drift detection impossible: you
+can't see what's *missing*. Feeds **Schema Sync**.
+
+### Schema Sync
+A workflow (and its own tab, like Backup) that reconciles a live DB against an
+external code model — the motivating case is **.NET EF Core entity classes** whose
+tables are applied by hand (no migration tooling, per ADR-0002). The AI reads the
+entities (in the repo, via its own file access) and the DB **structure** (via
+**Schema Introspection**), computes the drift and the SQL-type mapping **itself**,
+and hands Krust **Proposed Schema Ops**. Krust never parses .NET/EF and stores no
+"expected schema" — each run is **stateless**, recomputed from current code +
+current DB.
+
+- **Target.** The AI picks the connection conversationally (`list_connections`,
+  names/engines only) — there is no stored code↔connection binding.
+- **Run surface.** The tab lists proposed **additive** ops (dependency-ordered —
+  parent tables before FK-bearing children — each with its generated DDL preview)
+  plus a **report-only** section (§ **Proposed Schema Op**). Each report-only
+  finding shows the code-inferred spec vs the live DB spec side-by-side and can be
+  **promoted** to an op behind the existing destructive/typed confirm (ADR-0005);
+  a promoted drop lands in the **Unassigned** inbox (ADR-0002 destructive rule).
+- **Changeset.** A run is bound to one **Changeset** (the active one, or a named
+  new one — usually the ticket). Both the draft export and any committed DDL use
+  that changeset, so "this sync" stays self-contained.
+- **Export.** The `.sql` handoff exports from the panel's **draft** ops — it does
+  not require execution, so it works on a **read-only** connection.
+- **Commit.** On a writable connection, Commit first **re-introspects** and
+  reconciles against the live DB: ops already satisfied are **skipped**
+  (idempotent — no duplicate-column error), ops that now conflict are pulled out
+  and **re-reported**, and only genuinely-missing ops run (one transaction where
+  the engine allows; MySQL DDL is non-atomic). Executed DDL captures to history as
+  normal. On a **read-only** connection the Commit is blocked (main-process guard);
+  diff + export still work — the "verify Prod drift + script the fix" handoff case.
+
+_Avoid_: migration, schema diff tool. Krust is not a migration tool (ADR-0002);
+Schema Sync is capture-and-handoff, not versioned up/down migrations.
+
+### Proposed Schema Op
+A single structured, engine-agnostic schema operation the AI hands Krust through
+`propose_schema_ops` — it **reuses Krust's existing `SchemaOp` / `CreateTableSpec`
+vocabulary** (`addColumn`, `createTable`, `addIndex`, `addForeignKey`, and the
+`alterColumn`/`dropColumn`/`dropIndex`/`dropForeignKey` promotions), keyed by
+table. Krust turns it into dialect-correct DDL via its existing generator (Krust
+owns dialect, ADR-0002) and stages it into **Schema Sync** for review — it is
+**never** raw AI-authored SQL and **never** auto-committed. Only **additive** ops
+(`createTable`/`addColumn`/`addIndex`/`addForeignKey`) are auto-staged; type/
+nullability changes, drops of DB objects absent from code, and default/constraint
+diffs are **report-only** (fuzzy inference + data-loss risk — the human decides,
+via promotion).
+
+### MCP Configuration
+The MCP surface is configured across three tiers, following the default-deny +
+`readOnly` precedents:
+
+- **Global** (Settings → **AI / MCP**): master MCP server on/off, bound port,
+  auth token (view/regenerate), `read_rows` default sample size + hard-max
+  ceiling, and the **notify-on-proposal** toast (on/off, default on).
+- **Per-connection** (default-deny — a fresh connection exposes nothing): three
+  independent capability grants — **AI data reads** (→ **AI Read Allowlist**,
+  per-table + column masks), **Schema Introspection** (on/off + an exclusion-glob
+  list, seeded `__EFMigrationsHistory`, to hide internal tables/schemas from the
+  diff), and **accept schema-op proposals** (on/off). Persisted with the
+  connection, like `readOnly`.
+- **Locked** (never configurable — safety invariants): audit is always on and
+  never auto-purged; the AI never auto-commits; no raw SQL; `readOnly` enforcement
+  stands. There is deliberately **no "auto-approve trusted agent"** setting — it
+  would erode the human-commit guarantee.
+
+When an agent proposes, the ops land in the **Schema Sync** tab with a badge; a
+toast (if enabled) names the agent + connection. Arrival never steals focus.
 
 ### AI Access Audit
-Every MCP read is logged to a dedicated audit stream: timestamp, tool called,
-connection, table, row count, and which columns were masked. Never auto-purged.
-A live indicator shows when the AI is actively reading and what it is reading.
-Same no-silent / control-everything instinct as **Schema Mutation** history,
-applied to the AI's access.
+Every MCP call — data read, **schema introspection**, and **schema-op proposal**
+— is logged to a dedicated audit stream: timestamp, tool called, connection,
+table/op, row count, and which columns were masked. Never auto-purged. A live
+indicator shows when the AI is actively reading or proposing. Same no-silent /
+control-everything instinct as **Schema Mutation** history, applied to the AI's
+access.
 
 ## Decisions
 

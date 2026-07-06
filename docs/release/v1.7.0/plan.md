@@ -11,8 +11,15 @@ the release gates pass. Existing 1.6.x hotfixes continue from `main`.
 3. Extend 1.6.6 SQL prettification to routines and StarRocks.
 4. Expose StarRocks as a distinct Experimental, read/query-focused engine.
 5. Replace the assumed-relational driver boundary with capability-based drivers.
+6. Ship the MCP server + **AI Schema Sync** (propose staged schema ops from an
+   EF Core drift diff). See [ADR-0022](../../adr/0022-mcp-schema-sync-proposed-ops.md).
 
 Lakekeeper/Trino is deferred for separate design.
+
+> **Scope risk (goal 6, author-accepted).** The base MCP server (ADR-0003) is
+> still unbuilt, so goal 6 is really "build the MCP server" + the propose side +
+> the Schema Sync UI — a full cycle landing on a beta-3 tail. Recorded here so the
+> late-release risk is visible; revisit splitting it to 1.8.0 if 1.7.0 stalls.
 
 ## Engine capability matrix
 
