@@ -4,9 +4,12 @@ Date: 2026-07-06
 
 ## Status
 
-Accepted. Amends [ADR-0003](0003-mcp-read-only-structured-tools.md) — the MCP
-server is no longer strictly read-only; it gains a **write-proposal** path that
-stages schema changes but still **never commits to the database**.
+Accepted — **implemented in 1.7.0** (see
+[mcp-status.md](../release/v1.7.0/mcp-status.md); typecheck + build green, live
+agent/DB verification pending). Amends
+[ADR-0003](0003-mcp-read-only-structured-tools.md) — the MCP server is no longer
+strictly read-only; it gains a **write-proposal** path that stages schema changes
+but still **never commits to the database**.
 
 ## Context
 

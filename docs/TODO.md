@@ -538,8 +538,13 @@ CONTEXT.md **Session** + **Workspace & Tabs** + **Referenced By (Reverse FK)**.
       Backup/Restore tabs, two-step destructive confirm. **Deferred:** restore
       create-target DB (the "duplicate database" use case); CSV/JSON-into-table
       import.
-- [ ] **MCP server** (post-MVP nice-to-have, ADR-0003) — read-only structured
-      tools + AI Read Allowlist + audit. Explicitly low priority.
+- [x] **MCP server + AI Schema Sync** — built in 1.7.0 (ADR-0022, amends
+      ADR-0003). In-app HTTP server (+ stdio bridge for Codex), default-deny
+      per-connection grants, tools: list_connections / introspect_schema /
+      propose_schema_ops / list_allowed_tables / describe_table / read_rows;
+      Schema Sync tab (reconcile-commit + export), AI Read Allowlist + masks,
+      AI Access Audit. See [mcp-status.md](release/v1.7.0/mcp-status.md).
+      **Remaining:** live agent/DB verification.
 
 ## Resolved
 
