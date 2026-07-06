@@ -30,7 +30,13 @@ import { cn } from '@/lib/utils'
 import { enumValues } from '@/lib/enums'
 import { useConnections } from '@/store/connections'
 import { useSettings } from '@/store/settings'
-import type { DriverType, EnumType, RoutineArg, RoutineExecResult } from '../../../shared/types'
+import type {
+  DriverType,
+  EnumType,
+  RoutineArg,
+  RoutineDef,
+  RoutineExecResult
+} from '../../../shared/types'
 
 type SubView = 'definition' | 'execute'
 
@@ -264,6 +270,7 @@ export function RoutineView(): React.JSX.Element | null {
 
         {(sub === 'definition' || isNew) && !tab.routineDefLoading && (
           <div className="flex h-full min-h-0 flex-col">
+            {ref && def && <RoutineMeta def={def} />}
             {mysqlEditBlocked && (
               <div className="m-3 flex items-start gap-2 rounded border border-amber-500/40 bg-amber-500/5 p-2 text-xs text-amber-600 dark:text-amber-400">
                 <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
@@ -558,6 +565,80 @@ function SubTab({
     >
       {children}
     </button>
+  )
+}
+
+/** display-only metadata block above the definition editor: owner/security,
+ *  params, grants, and (PG) overload signatures. */
+function RoutineMeta({ def }: { def: RoutineDef }): React.JSX.Element {
+  const overloads = def.overloads ?? []
+  const grants = def.grants
+  return (
+    <div className="m-3 mb-0 space-y-2 rounded border bg-muted/20 p-2 text-[11px]">
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        {def.owner && (
+          <MetaItem label="Owner / definer" value={def.owner} />
+        )}
+        {def.security && <MetaItem label="Security" value={def.security} />}
+        {def.language && <MetaItem label="Language" value={def.language} />}
+        {def.returns && <MetaItem label="Returns" value={def.returns} />}
+      </div>
+
+      {def.params.length > 0 && (
+        <div>
+          <p className="mb-0.5 font-medium text-muted-foreground">Parameters</p>
+          <div className="flex flex-wrap gap-x-3 gap-y-0.5 font-mono">
+            {def.params.map((p) => (
+              <span key={p.name}>
+                {p.name} <span className="uppercase text-muted-foreground/70">{p.mode}</span>{' '}
+                <span className="text-muted-foreground">{p.type}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div>
+        <p className="mb-0.5 font-medium text-muted-foreground">Grants</p>
+        {grants === undefined ? (
+          <p className="text-muted-foreground/70">Not readable (insufficient privilege).</p>
+        ) : grants.length === 0 ? (
+          <p className="text-muted-foreground/70">Default (owner only).</p>
+        ) : (
+          <div className="flex flex-wrap gap-x-3 gap-y-0.5 font-mono">
+            {grants.map((g) => (
+              <span key={g.grantee}>
+                <span className="text-muted-foreground">{g.grantee}</span>: {g.privileges}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {overloads.length > 1 && (
+        <div>
+          <p className="mb-0.5 font-medium text-muted-foreground">
+            Overloads ({overloads.length})
+          </p>
+          <div className="flex flex-col gap-0.5 font-mono">
+            {overloads.map((o) => (
+              <span key={o.signature} className="truncate text-muted-foreground">
+                {o.label}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function MetaItem({ label, value }: { label: string; value: string }): React.JSX.Element {
+  return (
+    <span>
+      <span className="text-muted-foreground/70">{label}:</span>{' '}
+      <span className="font-mono text-foreground">{value}</span>
+    </span>
   )
 }
 

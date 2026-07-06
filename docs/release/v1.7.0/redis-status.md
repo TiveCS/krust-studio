@@ -116,14 +116,24 @@ rename, large-string gate, ACL-denied `CONFIG GET databases`.
 - **disposeTab on close** — `closeTab` now calls `useRedis.disposeTab(tabId)` for
   redis-key tabs, freeing their value/staged state.
 
+## beta.3 pass (compiles + builds, not live-tested)
+
+- **Binary collection members** — hash/set/zset/list now read through the buffer
+  view (`this.b`); each member decodes via `decodeMember` (valid UTF-8 → text,
+  else spaced-hex + `binary:true`). `RedisValuePage` member shapes carry an
+  optional `binary` flag; the renderer shows a `bin` badge and makes binary rows
+  read-only (a mangled UTF-8 member can't be safely addressed by HDEL/SREM/LSET).
+  UTF-8 members keep full inline edit/remove. Binary member *creation/editing*
+  stays out of scope (same stance as binary key names).
+- **Stream `XRANGE` shape hardening** — `streamFields()` normalises the entry
+  message whatever node-redis hands back (flat map object, `[field,value]` tuple
+  array, or flat `[f,v,…]` array) and preserves field order/duplicates.
+
 ## Known gaps / deliberate simplifications (remaining beta follow-ups)
 
 - **Binary key names read/delete** — flagged + blocked, not yet read/delete-only
   (needs a base64-keyed identity through scan/readValue/deleteKey).
-- **Binary collection members** — hash/set/zset/list values are still UTF-8
-  decoded; only string values get the binary path.
-- Stream entry field rendering assumes a flat message map; verify against real
-  `XRANGE` shape.
+- **Binary collection members** — read/display only; no binary member editing.
 - TTL countdown drifts on external `PERSIST`/re-`EXPIRE` until the next rescan
   (no periodic `pTTL` re-sync of loaded keys yet).
 

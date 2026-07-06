@@ -854,6 +854,23 @@ export class MysqlDriver implements DbDriver, RoutineCapable {
       returns?: string
       dataAccess?: string
     }
+    // routine-level grants live in mysql.procs_priv; readable only with privilege
+    // on the mysql schema — leave grants undefined (not []) when denied.
+    let grants: { grantee: string; privileges: string }[] | undefined
+    try {
+      const [grantRows] = (await conn.query(
+        `SELECT CONCAT(User, '@', Host) AS grantee, Proc_priv AS privs
+           FROM mysql.procs_priv
+          WHERE Db = DATABASE() AND Routine_name = ? AND Routine_type = ?`,
+        [ref.name, kindKw]
+      )) as [RowDataPacket[], FieldPacket[]]
+      grants = (grantRows as Array<{ grantee: string; privs: string }>).map((g) => ({
+        grantee: g.grantee,
+        privileges: g.privs || ''
+      }))
+    } catch {
+      // no SELECT on mysql.procs_priv — grants unknown
+    }
     return {
       ref,
       definition,
@@ -863,7 +880,10 @@ export class MysqlDriver implements DbDriver, RoutineCapable {
       owner: meta.owner ?? null,
       security: meta.security ?? null,
       // A function declared MODIFIES SQL DATA may write; gate it on read-only.
-      volatile: ref.kind === 'function' && meta.dataAccess === 'MODIFIES SQL DATA'
+      volatile: ref.kind === 'function' && meta.dataAccess === 'MODIFIES SQL DATA',
+      grants,
+      // MySQL/MariaDB routine names are unique per schema+type — no overloading.
+      overloads: []
     }
   }
 

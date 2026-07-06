@@ -41,6 +41,51 @@ function toClientArg(a: RedisArg): string | Buffer {
   return typeof a === 'string' ? a : Buffer.from(a.b64, 'base64')
 }
 
+/** coerce a node-redis reply element (Buffer under the buffer view, or string) to a Buffer */
+function asBuf(v: unknown): Buffer {
+  if (Buffer.isBuffer(v)) return v
+  return Buffer.from(String(v))
+}
+
+/** decode a collection member for display. Valid UTF-8 → the text; otherwise a
+ *  spaced-hex rendering flagged `binary` (the renderer marks it read-only, since
+ *  a mangled UTF-8 member can't be safely addressed by HDEL/SREM/etc.). */
+function decodeMember(v: unknown): { text: string; binary: boolean } {
+  const buf = asBuf(v)
+  if (isValidUtf8(buf)) return { text: buf.toString('utf8'), binary: false }
+  const hex = Array.from(buf, (b) => b.toString(16).padStart(2, '0')).join(' ')
+  return { text: hex, binary: true }
+}
+
+/** normalise a node-redis XRANGE/XREVRANGE entry's message into ordered
+ *  field/value tuples. node-redis may hand back a flat map object, an array of
+ *  [field, value] tuples, or a flat [f, v, f, v] array — handle all, and
+ *  preserve order (real streams allow duplicate + ordered fields). */
+function streamFields(message: unknown): [string, string][] {
+  if (message == null) return []
+  if (Array.isArray(message)) {
+    // array of [field, value] tuples
+    if (message.length > 0 && Array.isArray(message[0])) {
+      return (message as unknown[][]).map((pair) => [String(pair[0]), String(pair[1])])
+    }
+    // flat [field, value, field, value, …]
+    const out: [string, string][] = []
+    for (let i = 0; i + 1 < message.length; i += 2) {
+      out.push([String(message[i]), String(message[i + 1])])
+    }
+    return out
+  }
+  if (message instanceof Map) {
+    return Array.from(message.entries()).map(([k, v]) => [String(k), String(v)] as [string, string])
+  }
+  if (typeof message === 'object') {
+    return Object.entries(message as Record<string, unknown>).map(
+      ([k, v]) => [String(k), String(v)] as [string, string]
+    )
+  }
+  return []
+}
+
 /** strings larger than this require an explicit load (decision 11) */
 const LARGE_STRING_BYTES = 1024 * 1024
 
@@ -260,22 +305,37 @@ export class RedisDriver implements DriverCore, KeyValueCapable {
         }
       }
       case 'hash': {
-        const r = await this.c.hScan(key, cursor, { COUNT: count })
+        // buffer view so non-UTF-8 field names/values surface as binary, not mangled
+        const r = await this.b.hScan(key, cursor, { COUNT: count })
         return {
           type: 'hash',
-          fields: r.entries.map((e) => ({ field: String(e.field), value: String(e.value) })),
+          fields: r.entries.map((e) => {
+            const f = decodeMember(e.field)
+            const v = decodeMember(e.value)
+            return { field: f.text, value: v.text, binary: f.binary || v.binary }
+          }),
           cursor: String(r.cursor)
         }
       }
       case 'set': {
-        const r = await this.c.sScan(key, cursor, { COUNT: count })
-        return { type: 'set', members: r.members.map((m) => String(m)), cursor: String(r.cursor) }
+        const r = await this.b.sScan(key, cursor, { COUNT: count })
+        return {
+          type: 'set',
+          members: r.members.map((m) => {
+            const d = decodeMember(m)
+            return { value: d.text, binary: d.binary }
+          }),
+          cursor: String(r.cursor)
+        }
       }
       case 'zset': {
-        const r = await this.c.zScan(key, cursor, { COUNT: count })
+        const r = await this.b.zScan(key, cursor, { COUNT: count })
         return {
           type: 'zset',
-          members: r.members.map((m) => ({ member: String(m.value), score: Number(m.score) })),
+          members: r.members.map((m) => {
+            const d = decodeMember(m.value)
+            return { member: d.text, score: Number(m.score), binary: d.binary }
+          }),
           cursor: String(r.cursor)
         }
       }
@@ -283,8 +343,17 @@ export class RedisDriver implements DriverCore, KeyValueCapable {
         const length = Number(await this.c.lLen(key))
         const start = opts.start ?? 0
         const end = Math.min(start + count - 1, length - 1)
-        const items = end >= start ? await this.c.lRange(key, start, end) : []
-        return { type: 'list', items: items.map((i) => String(i)), start, end, length }
+        const items = end >= start ? await this.b.lRange(key, start, end) : []
+        return {
+          type: 'list',
+          items: items.map((i) => {
+            const d = decodeMember(i)
+            return { value: d.text, binary: d.binary }
+          }),
+          start,
+          end,
+          length
+        }
       }
       case 'stream': {
         const entries = await this.c.xRevRange(key, '+', '-', { COUNT: count })
@@ -292,7 +361,7 @@ export class RedisDriver implements DriverCore, KeyValueCapable {
           type: 'stream',
           entries: entries.map((e) => ({
             id: String(e.id),
-            fields: Object.entries(e.message).map(([k, v]) => [String(k), String(v)] as [string, string])
+            fields: streamFields(e.message)
           })),
           lastId: entries.length ? String(entries[entries.length - 1].id) : '0-0'
         }

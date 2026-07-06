@@ -95,9 +95,12 @@ Split across betas — beta.1 below; beta.2 is the MySQL Recovery Copy machine.
   native date/datetime-local/time inputs, everything else → raw literal fallback.
   The NULL toggle still overrides. Values remain **bound parameters** (the value
   is just the produced string), so no driver/IPC change was needed.
-- Routine tab metadata shows params (name/mode/type), owner/DEFINER and a
-  volatility/security label; **grants and explicit overload listing are not
-  surfaced** yet.
+- ~~Routine tab metadata shows params (name/mode/type), owner/DEFINER and a
+  volatility/security label; grants and explicit overload listing are not
+  surfaced yet.~~ — done (beta.3). `RoutineMeta` block above the definition
+  surfaces owner/security/language/returns, params, **grants** (pg `aclexplode`
+  of `proacl`; mysql `mysql.procs_priv`, `undefined` when the catalog is
+  unreadable), and **overloads** (pg sibling signatures; shown when >1).
 - ~~No display-only **Pretty toggle** on the read-only definition viewer yet~~ —
   done. The MySQL/MariaDB read-only routine viewer (the `mysqlEditBlocked`
   `SqlDisplay` path in `RoutineView`) gains an **AlignLeft · Pretty** header

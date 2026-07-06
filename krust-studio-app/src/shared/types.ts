@@ -164,6 +164,28 @@ export interface RoutineDef {
    *  SELECT so it is classified Data Retrieval, but is still blocked on
    *  read-only connections because it can write. Procedures gate separately. */
   volatile?: boolean
+  /** privilege grants on this routine (pg proacl / mysql procs_priv); empty or
+   *  undefined when none exist or the catalog is unreadable (ACL) */
+  grants?: RoutineGrant[]
+  /** sibling routines that share this name — PG overloads (differ by signature).
+   *  Empty/undefined on engines without overloading (mysql/mariadb). */
+  overloads?: RoutineOverload[]
+}
+
+/** one privilege grant on a routine (display-only) */
+export interface RoutineGrant {
+  /** grantee role, or "PUBLIC" */
+  grantee: string
+  /** comma-joined privileges, e.g. "EXECUTE" */
+  privileges: string
+}
+
+/** one overload of a routine name (PG) — a distinct argument signature */
+export interface RoutineOverload {
+  /** identity-arg list, e.g. "integer, text" */
+  signature: string
+  /** display label incl. args */
+  label: string
 }
 
 /** one user-supplied argument for a routine execution (IN/INOUT params) */
@@ -855,10 +877,25 @@ export type RedisValuePage =
       /** true when the size-gate blocked the load (>1MB, not yet forced) */
       tooLarge?: boolean
     }
-  | { type: 'hash'; fields: { field: string; value: string }[]; cursor: string }
-  | { type: 'list'; items: string[]; start: number; end: number; length: number }
-  | { type: 'set'; members: string[]; cursor: string }
-  | { type: 'zset'; members: { member: string; score: number }[]; cursor: string }
+  | {
+      type: 'hash'
+      /** `binary` true when the field name or value held non-UTF-8 bytes (read-only) */
+      fields: { field: string; value: string; binary?: boolean }[]
+      cursor: string
+    }
+  | {
+      type: 'list'
+      items: { value: string; binary?: boolean }[]
+      start: number
+      end: number
+      length: number
+    }
+  | { type: 'set'; members: { value: string; binary?: boolean }[]; cursor: string }
+  | {
+      type: 'zset'
+      members: { member: string; score: number; binary?: boolean }[]
+      cursor: string
+    }
   | {
       type: 'stream'
       entries: { id: string; fields: [string, string][] }[]

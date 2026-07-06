@@ -901,6 +901,34 @@ export class PostgresDriver implements DbDriver, RoutineCapable {
       type: p.type,
       mode: p.mode.toLowerCase() as RoutineParam['mode']
     }))
+    // grants: explode proacl (empty → default privileges, i.e. owner + PUBLIC EXECUTE)
+    let grants: { grantee: string; privileges: string }[] = []
+    try {
+      const grantRes = await client.query(
+        `SELECT CASE WHEN a.grantee = 0 THEN 'PUBLIC'
+                     ELSE pg_get_userbyid(a.grantee) END AS grantee,
+                string_agg(a.privilege_type, ', ' ORDER BY a.privilege_type) AS privileges
+           FROM pg_proc p, aclexplode(p.proacl) a
+          WHERE p.oid = $1
+          GROUP BY grantee
+          ORDER BY grantee`,
+        [row.oid]
+      )
+      grants = grantRes.rows as { grantee: string; privileges: string }[]
+    } catch {
+      // unreadable — leave empty
+    }
+    // overloads: sibling routines sharing this name in the same schema
+    const overRes = await client.query(
+      `SELECT pg_get_function_identity_arguments(p.oid) AS signature,
+              p.proname || '(' || pg_get_function_arguments(p.oid) || ')' AS label
+         FROM pg_proc p
+         JOIN pg_namespace n ON n.oid = p.pronamespace
+        WHERE p.proname = $1 AND n.nspname = $2
+        ORDER BY 1`,
+      [row.name, ref.schema ?? 'public']
+    )
+    const overloads = overRes.rows as { signature: string; label: string }[]
     return {
       ref: { ...ref, kind: row.kind === 'procedure' ? 'procedure' : 'function' },
       definition: row.def,
@@ -912,7 +940,9 @@ export class PostgresDriver implements DbDriver, RoutineCapable {
       security: `${row.volatility ?? ''}${row.secdef ? ' · security definer' : ''}`.trim(),
       // A VOLATILE function may write; gate it on read-only even though it runs
       // via SELECT. Procedures always mutate-capable and gate separately.
-      volatile: row.kind === 'function' && row.volatility === 'volatile'
+      volatile: row.kind === 'function' && row.volatility === 'volatile',
+      grants,
+      overloads
     }
   }
 

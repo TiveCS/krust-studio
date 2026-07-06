@@ -423,6 +423,7 @@ function ValueBody({
         <MemberGrid
           columns={['field', 'value']}
           rows={page.fields.map((f) => [f.field, f.value])}
+          rowBinary={page.fields.map((f) => f.binary ?? false)}
           cursor={page.cursor}
           onMore={(c) => loadMore({ cursor: c })}
           onAdd={(vals) => stage({ kind: 'hash-set', field: vals[0], value: vals[1] })}
@@ -434,7 +435,8 @@ function ValueBody({
       return (
         <MemberGrid
           columns={['member']}
-          rows={page.members.map((m) => [m])}
+          rows={page.members.map((m) => [m.value])}
+          rowBinary={page.members.map((m) => m.binary ?? false)}
           cursor={page.cursor}
           onMore={(c) => loadMore({ cursor: c })}
           onAdd={(vals) => stage({ kind: 'set-add', member: vals[0] })}
@@ -446,6 +448,7 @@ function ValueBody({
         <MemberGrid
           columns={['member', 'score']}
           rows={page.members.map((m) => [m.member, String(m.score)])}
+          rowBinary={page.members.map((m) => m.binary ?? false)}
           cursor={page.cursor}
           onMore={(c) => loadMore({ cursor: c })}
           onAdd={(vals) => stage({ kind: 'zset-set', member: vals[0], score: Number(vals[1]) || 0 })}
@@ -684,6 +687,7 @@ function StringEditor({
 function MemberGrid({
   columns,
   rows,
+  rowBinary,
   cursor,
   onMore,
   onAdd,
@@ -692,6 +696,8 @@ function MemberGrid({
 }: {
   columns: string[]
   rows: string[][]
+  /** per-row flag: the field/member held non-UTF-8 bytes — read-only (shown as hex) */
+  rowBinary?: boolean[]
   cursor: string
   onMore: (cursor: string) => void
   onAdd: (vals: string[]) => void
@@ -713,28 +719,40 @@ function MemberGrid({
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, i) => (
+          {rows.map((row, i) => {
+            const binary = rowBinary?.[i] ?? false
+            return (
             <tr key={i} className="border-t border-border/50">
               {row.map((cell, ci) => (
                 <td key={ci} className="px-2 py-1 font-mono">
-                  {ci === row.length - 1 && onEditValue ? (
+                  {ci === row.length - 1 && onEditValue && !binary ? (
                     <input
                       defaultValue={cell}
                       onBlur={(e) => e.target.value !== cell && onEditValue(row, e.target.value)}
                       className="w-full rounded border border-transparent bg-transparent px-1 hover:border-border focus:border-ring"
                     />
                   ) : (
-                    <span className="truncate">{cell}</span>
+                    <span className="flex items-center gap-1 truncate">
+                      {ci === 0 && binary && (
+                        <span className="rounded bg-amber-500/15 px-1 text-[9px] uppercase text-amber-400">
+                          bin
+                        </span>
+                      )}
+                      {cell}
+                    </span>
                   )}
                 </td>
               ))}
               <td className="px-1">
-                <button onClick={() => onRemove(row)} title="Stage remove">
-                  <Trash2 className="size-3.5 text-muted-foreground hover:text-destructive" />
-                </button>
+                {!binary && (
+                  <button onClick={() => onRemove(row)} title="Stage remove">
+                    <Trash2 className="size-3.5 text-muted-foreground hover:text-destructive" />
+                  </button>
+                )}
               </td>
             </tr>
-          ))}
+            )
+          })}
           {/* add-member row */}
           <tr className="border-t border-border/50">
             {columns.map((c, ci) => (
@@ -782,7 +800,7 @@ function ListEditor({
   onPush,
   onRemove
 }: {
-  items: string[]
+  items: { value: string; binary?: boolean }[]
   start: number
   end: number
   length: number
@@ -812,20 +830,32 @@ function ListEditor({
         <tbody>
           {items.map((it, i) => {
             const index = start + i
+            const binary = it.binary ?? false
             return (
               <tr key={index} className="border-t border-border/50">
                 <td className="w-12 px-2 py-1 text-muted-foreground">{index}</td>
                 <td className="px-2 py-1 font-mono">
-                  <input
-                    defaultValue={it}
-                    onBlur={(e) => e.target.value !== it && onSet(index, e.target.value)}
-                    className="w-full rounded border border-transparent bg-transparent px-1 hover:border-border focus:border-ring"
-                  />
+                  {binary ? (
+                    <span className="flex items-center gap-1 truncate">
+                      <span className="rounded bg-amber-500/15 px-1 text-[9px] uppercase text-amber-400">
+                        bin
+                      </span>
+                      {it.value}
+                    </span>
+                  ) : (
+                    <input
+                      defaultValue={it.value}
+                      onBlur={(e) => e.target.value !== it.value && onSet(index, e.target.value)}
+                      className="w-full rounded border border-transparent bg-transparent px-1 hover:border-border focus:border-ring"
+                    />
+                  )}
                 </td>
                 <td className="px-1">
-                  <button onClick={() => onRemove(it)} title="Stage remove (LREM)">
-                    <Trash2 className="size-3.5 text-muted-foreground hover:text-destructive" />
-                  </button>
+                  {!binary && (
+                    <button onClick={() => onRemove(it.value)} title="Stage remove (LREM)">
+                      <Trash2 className="size-3.5 text-muted-foreground hover:text-destructive" />
+                    </button>
+                  )}
                 </td>
               </tr>
             )
