@@ -1034,10 +1034,22 @@ export interface RoutineApi {
 // sampled data) and proposes ADDITIVE schema ops that stage into Schema Sync for
 // human review — never auto-writes the DB. Default-deny per connection.
 
+/** one allowlisted table for data reads (default-deny — only listed tables) */
+export interface McpAllowEntry {
+  table: string
+  schema?: string
+  /** false = schema-only (describe but not read rows); true = rows readable */
+  data: boolean
+  /** column names masked out of describe_table + read_rows (secrets) */
+  maskColumns?: string[]
+}
+
 /** per-connection MCP capability grants (default-deny — absent = nothing granted) */
 export interface McpGrant {
-  /** structured DATA reads via the AI Read Allowlist (phase 3) */
+  /** master switch for structured DATA reads (per-table via `allowlist`) */
   dataReads?: boolean
+  /** the AI Read Allowlist — which tables the AI may describe/read, with masks */
+  allowlist?: McpAllowEntry[]
   /** whole-connection STRUCTURE introspection (no rows) — feeds Schema Sync */
   introspection?: boolean
   /** accept staged schema-op proposals (never commits) */

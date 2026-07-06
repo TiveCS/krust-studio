@@ -5,12 +5,18 @@ import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import type { McpConfig, McpStatus, McpGrant, ConnectionSummary } from '../../../shared/types'
+import type {
+  McpConfig,
+  McpStatus,
+  McpGrant,
+  McpAllowEntry,
+  ConnectionSummary
+} from '../../../shared/types'
 
 /**
  * Settings → AI / MCP (ADR-0022). Global master toggle + port + token, and
- * per-connection capability grants (default-deny). Data reads are wired here but
- * gated "coming soon" until the allowlist (phase 3) lands.
+ * per-connection capability grants (default-deny): schema introspection (+ exclude
+ * globs), accept-proposals, and data reads (+ the AI Read Allowlist with masks).
  */
 export function McpSettings({ open }: { open: boolean }): React.JSX.Element {
   const [status, setStatus] = useState<McpStatus | null>(null)
@@ -274,11 +280,15 @@ function ConnectionGrant({ conn }: { conn: ConnectionSummary }): React.JSX.Eleme
           />
           Accept schema proposals
         </label>
-        <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground/60">
-          <Checkbox checked={false} disabled />
-          Data reads (soon)
+        <label className="flex items-center gap-1.5 text-[11px]">
+          <Checkbox
+            checked={!!grant.dataReads}
+            onCheckedChange={(c) => set({ dataReads: c === true })}
+          />
+          Data reads
         </label>
       </div>
+      {grant.dataReads && <AllowlistEditor grant={grant} onChange={(a) => set({ allowlist: a })} />}
       {grant.introspection && (
         <div className="mt-1.5 space-y-1">
           <label className="text-[10px] text-muted-foreground">
@@ -302,6 +312,86 @@ function ConnectionGrant({ conn }: { conn: ConnectionSummary }): React.JSX.Eleme
           />
         </div>
       )}
+    </div>
+  )
+}
+
+function AllowlistEditor({
+  grant,
+  onChange
+}: {
+  grant: McpGrant
+  onChange: (a: McpAllowEntry[]) => void
+}): React.JSX.Element {
+  const list = grant.allowlist ?? []
+  const [name, setName] = useState('')
+
+  const update = (i: number, patch: Partial<McpAllowEntry>): void =>
+    onChange(list.map((e, j) => (j === i ? { ...e, ...patch } : e)))
+  const remove = (i: number): void => onChange(list.filter((_, j) => j !== i))
+  const add = (): void => {
+    const t = name.trim()
+    if (!t) return
+    onChange([...list, { table: t, data: false }])
+    setName('')
+  }
+
+  return (
+    <div className="mt-2 space-y-1.5 rounded border border-border/60 p-2">
+      <div className="text-[10px] font-medium text-muted-foreground">
+        AI Read Allowlist — only these tables are readable (default-deny)
+      </div>
+      {list.length === 0 && (
+        <div className="text-[10px] text-muted-foreground/60">
+          No tables allowed yet — the AI can read nothing on this connection.
+        </div>
+      )}
+      {list.map((e, i) => (
+        <div key={i} className="flex flex-wrap items-center gap-1.5">
+          <span className="w-40 truncate font-mono text-[11px]">{e.table}</span>
+          <label className="flex items-center gap-1 text-[10px]">
+            <Checkbox checked={e.data} onCheckedChange={(c) => update(i, { data: c === true })} />
+            rows
+          </label>
+          <Input
+            value={(e.maskColumns ?? []).join(', ')}
+            onChange={(ev) =>
+              update(i, {
+                maskColumns: ev.target.value
+                  .split(',')
+                  .map((s) => s.trim())
+                  .filter(Boolean)
+              })
+            }
+            placeholder="mask columns (comma)"
+            className="h-6 flex-1 text-[11px]"
+          />
+          <button
+            onClick={() => remove(i)}
+            className="text-muted-foreground hover:text-destructive"
+            title="Remove"
+          >
+            <span className="text-xs">×</span>
+          </button>
+        </div>
+      ))}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          add()
+        }}
+        className="flex gap-1.5 pt-0.5"
+      >
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="table name to allow…"
+          className="h-6 flex-1 text-[11px]"
+        />
+        <Button type="submit" size="xs" variant="secondary" disabled={!name.trim()}>
+          Add
+        </Button>
+      </form>
     </div>
   )
 }

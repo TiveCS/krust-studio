@@ -4,6 +4,7 @@ import { listConnections } from '../store/connections'
 import { getMcpGrant } from '../store/mcp'
 import { introspectSchema } from './introspect'
 import { addProposal, type ProposeInput } from './proposals'
+import { listAllowedTables, describeAllowedTable, readAllowedRows } from './reads'
 import type { CreateTableSpec, SchemaOp } from '../../shared/types'
 
 const zColumn = z.object({
@@ -161,6 +162,72 @@ export function registerMcpTools(server: McpServer): void {
             'it; nothing was applied to the database.',
           ...res
         })
+      } catch (err) {
+        return fail(err instanceof Error ? err.message : String(err))
+      }
+    }
+  )
+
+  // ── data reads (ADR-0003 — AI Read Allowlist, default-deny) ───────────────
+  server.registerTool(
+    'list_allowed_tables',
+    {
+      title: 'List allowed tables',
+      description:
+        'List the tables an AI may read on a connection (the AI Read Allowlist), each ' +
+        'marked schema-only or row-readable, with a masked-column count. Requires the ' +
+        'data-reads grant.',
+      inputSchema: { connectionId: z.string() }
+    },
+    async ({ connectionId }) => {
+      try {
+        return json(listAllowedTables(connectionId))
+      } catch (err) {
+        return fail(err instanceof Error ? err.message : String(err))
+      }
+    }
+  )
+
+  server.registerTool(
+    'describe_table',
+    {
+      title: 'Describe table',
+      description:
+        'Columns / indexes / relations for one allowlisted table (masked columns ' +
+        'omitted). No row data. Requires the table to be on the AI Read Allowlist.',
+      inputSchema: {
+        connectionId: z.string(),
+        table: z.string(),
+        schema: z.string().optional()
+      }
+    },
+    async ({ connectionId, table, schema }) => {
+      try {
+        return json(await describeAllowedTable(connectionId, table, schema))
+      } catch (err) {
+        return fail(err instanceof Error ? err.message : String(err))
+      }
+    }
+  )
+
+  server.registerTool(
+    'read_rows',
+    {
+      title: 'Read rows',
+      description:
+        'Read a bounded sample of rows from an allowlisted table (masked columns ' +
+        'omitted). limit is capped by the server max. Requires a row-readable grant.',
+      inputSchema: {
+        connectionId: z.string(),
+        table: z.string(),
+        schema: z.string().optional(),
+        limit: z.number().int().positive().optional(),
+        offset: z.number().int().nonnegative().optional()
+      }
+    },
+    async ({ connectionId, table, schema, limit, offset }) => {
+      try {
+        return json(await readAllowedRows(connectionId, table, schema, limit, offset))
       } catch (err) {
         return fail(err instanceof Error ? err.message : String(err))
       }

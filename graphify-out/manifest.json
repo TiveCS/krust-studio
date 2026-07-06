@@ -385,8 +385,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/shared/types.ts": {
-    "mtime": 1783360856.4615235,
-    "ast_hash": "23d99cba726aab1a2a816fa142c07458",
+    "mtime": 1783361382.997988,
+    "ast_hash": "530161d4761cfcfd4684f8a5e946052f",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/index.html": {
@@ -960,8 +960,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/mcp/tools.ts": {
-    "mtime": 1783360966.6320257,
-    "ast_hash": "81f17e55f94afc2accc6652934323693",
+    "mtime": 1783361475.174707,
+    "ast_hash": "cf11bfc69f9fed25b4bd64a2d547e9fa",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/store/mcp.ts": {
@@ -970,8 +970,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/McpSettings.tsx": {
-    "mtime": 1783360597.4778545,
-    "ast_hash": "b016f50ccf5f8a5c3182a431cb18966c",
+    "mtime": 1783361573.8397756,
+    "ast_hash": "424c4d9bc38623f55f7e7c2f3e9964ef",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/mcp/proposals.ts": {
@@ -987,6 +987,11 @@
   "krust-studio-app/src/renderer/src/store/schemaSync.ts": {
     "mtime": 1783361119.0948079,
     "ast_hash": "c64cf2536493db8b179d80f4c4a047a2",
+    "semantic_hash": ""
+  },
+  "krust-studio-app/src/main/mcp/reads.ts": {
+    "mtime": 1783361401.2086325,
+    "ast_hash": "5f173a07dea4af9c8b242fb4010ee38b",
     "semantic_hash": ""
   }
 }
