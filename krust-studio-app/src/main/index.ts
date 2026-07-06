@@ -177,7 +177,7 @@ app.whenReady().then(() => {
   // start the MCP server if it was left enabled (ADR-0022) — lazy, off by default
   try {
     setMcpAppVersion(app.getVersion())
-    startMcpServer()
+    void startMcpServer()
   } catch {
     // a bind failure must never block app startup; status surfaces the error
   }

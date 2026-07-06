@@ -94,34 +94,47 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
   await transport.handleRequest(req, res, body)
 }
 
-/** (re)start the HTTP server on the configured port when enabled. Idempotent. */
-export function startMcpServer(): McpStatus {
+/** (re)start the HTTP server on the configured port when enabled. Idempotent.
+ *  Resolves only once the socket is bound (or has errored), so the returned
+ *  status is accurate — not a "still binding" snapshot. */
+export async function startMcpServer(): Promise<McpStatus> {
   const cfg = getMcpConfig()
   stopMcpServer()
   if (!cfg.enabled) return mcpServerStatus()
   lastError = undefined
-  try {
-    const s = createServer((req, res) => {
-      handle(req, res).catch((err) => {
-        try {
-          sendJson(res, 500, { error: err instanceof Error ? err.message : 'server error' })
-        } catch {
-          // response already sent
-        }
+  await new Promise<void>((resolve) => {
+    let settled = false
+    const done = (): void => {
+      if (settled) return
+      settled = true
+      resolve()
+    }
+    try {
+      const s = createServer((req, res) => {
+        handle(req, res).catch((err) => {
+          try {
+            sendJson(res, 500, { error: err instanceof Error ? err.message : 'server error' })
+          } catch {
+            // response already sent
+          }
+        })
       })
-    })
-    s.on('error', (err) => {
+      s.on('error', (err) => {
+        lastError = err instanceof Error ? err.message : String(err)
+        http = null
+        boundPort = 0
+        done()
+      })
+      s.listen(cfg.port, HOST, () => {
+        http = s
+        boundPort = cfg.port
+        done()
+      })
+    } catch (err) {
       lastError = err instanceof Error ? err.message : String(err)
-      http = null
-      boundPort = 0
-    })
-    s.listen(cfg.port, HOST, () => {
-      boundPort = cfg.port
-    })
-    http = s
-  } catch (err) {
-    lastError = err instanceof Error ? err.message : String(err)
-  }
+      done()
+    }
+  })
   return mcpServerStatus()
 }
 
