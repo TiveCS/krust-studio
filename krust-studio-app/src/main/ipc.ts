@@ -20,6 +20,7 @@ import {
   setMcpGrant
 } from './store/mcp'
 import { startMcpServer, mcpServerStatus } from './mcp/server'
+import { readMcpAudit } from './store/mcpAudit'
 import {
   listProposals,
   commitProposal,
@@ -379,6 +380,7 @@ export function registerIpc(): void {
   ipcMain.handle('mcp:setNotifyOnProposal', (_e, on: boolean) => setNotifyOnProposal(on))
   ipcMain.handle('mcp:getGrant', (_e, id: string) => getMcpGrant(id))
   ipcMain.handle('mcp:setGrant', (_e, id: string, grant: McpGrant) => setMcpGrant(id, grant))
+  ipcMain.handle('mcp:audit', (_e, limit?: number) => readMcpAudit(limit))
 
   ipcMain.handle('schemaSync:list', () => listProposals())
   ipcMain.handle(

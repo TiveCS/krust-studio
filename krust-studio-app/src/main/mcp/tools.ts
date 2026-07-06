@@ -1,7 +1,8 @@
 import { z } from 'zod'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { listConnections } from '../store/connections'
+import { listConnections, getConnectionConfig } from '../store/connections'
 import { getMcpGrant } from '../store/mcp'
+import { auditMcp } from '../store/mcpAudit'
 import { introspectSchema } from './introspect'
 import { addProposal, type ProposeInput } from './proposals'
 import { listAllowedTables, describeAllowedTable, readAllowedRows } from './reads'
@@ -52,6 +53,22 @@ function fail(message: string): {
   return { content: [{ type: 'text', text: message }], isError: true }
 }
 
+/** log one MCP call to the AI Access Audit (ADR-0022) */
+function logCall(
+  tool: string,
+  o: { connectionId?: string; target?: string; client: string; ok: boolean; detail?: string }
+): void {
+  auditMcp({
+    tool,
+    connectionId: o.connectionId,
+    connectionName: o.connectionId ? getConnectionConfig(o.connectionId)?.name : undefined,
+    target: o.target,
+    client: o.client,
+    ok: o.ok,
+    detail: o.detail
+  })
+}
+
 /**
  * Register the MCP tool surface (ADR-0022). Default-deny: a connection appears /
  * is usable only for the capabilities it was granted. No raw SQL; no DB writes.
@@ -68,7 +85,7 @@ export function registerMcpTools(server: McpServer): void {
         'at least one grant appear. Names/engines only — no secrets.',
       inputSchema: {}
     },
-    async () => {
+    async (_args, extra) => {
       const rows = listConnections()
         .map((c) => {
           const g = getMcpGrant(c.id)
@@ -86,6 +103,11 @@ export function registerMcpTools(server: McpServer): void {
           }
         })
         .filter((c) => c.grants.dataReads || c.grants.introspection || c.grants.propose)
+      logCall('list_connections', {
+        client: clientName(extra),
+        ok: true,
+        detail: `${rows.length} connection(s)`
+      })
       return json({ connections: rows })
     }
   )
@@ -105,11 +127,21 @@ export function registerMcpTools(server: McpServer): void {
         connectionId: z.string().describe('connection id from list_connections')
       }
     },
-    async ({ connectionId }) => {
+    async ({ connectionId }, extra) => {
+      const client = clientName(extra)
       try {
-        return json(await introspectSchema(connectionId))
+        const res = await introspectSchema(connectionId)
+        logCall('introspect_schema', {
+          connectionId,
+          client,
+          ok: true,
+          detail: `${res.tables.length} table(s)`
+        })
+        return json(res)
       } catch (err) {
-        return fail(err instanceof Error ? err.message : String(err))
+        const detail = err instanceof Error ? err.message : String(err)
+        logCall('introspect_schema', { connectionId, client, ok: false, detail })
+        return fail(detail)
       }
     }
   )
@@ -155,6 +187,12 @@ export function registerMcpTools(server: McpServer): void {
       const client = clientName(extra)
       try {
         const res = await addProposal(input, client)
+        logCall('propose_schema_ops', {
+          connectionId: args.connectionId,
+          client,
+          ok: true,
+          detail: `${res.createTables} create, ${res.alters} alter, ${res.reportOnly} report`
+        })
         return json({
           staged: true,
           message:
@@ -163,7 +201,9 @@ export function registerMcpTools(server: McpServer): void {
           ...res
         })
       } catch (err) {
-        return fail(err instanceof Error ? err.message : String(err))
+        const detail = err instanceof Error ? err.message : String(err)
+        logCall('propose_schema_ops', { connectionId: args.connectionId, client, ok: false, detail })
+        return fail(detail)
       }
     }
   )
@@ -179,11 +219,21 @@ export function registerMcpTools(server: McpServer): void {
         'data-reads grant.',
       inputSchema: { connectionId: z.string() }
     },
-    async ({ connectionId }) => {
+    async ({ connectionId }, extra) => {
+      const client = clientName(extra)
       try {
-        return json(listAllowedTables(connectionId))
+        const res = listAllowedTables(connectionId)
+        logCall('list_allowed_tables', {
+          connectionId,
+          client,
+          ok: true,
+          detail: `${res.tables.length} table(s)`
+        })
+        return json(res)
       } catch (err) {
-        return fail(err instanceof Error ? err.message : String(err))
+        const detail = err instanceof Error ? err.message : String(err)
+        logCall('list_allowed_tables', { connectionId, client, ok: false, detail })
+        return fail(detail)
       }
     }
   )
@@ -201,11 +251,16 @@ export function registerMcpTools(server: McpServer): void {
         schema: z.string().optional()
       }
     },
-    async ({ connectionId, table, schema }) => {
+    async ({ connectionId, table, schema }, extra) => {
+      const client = clientName(extra)
       try {
-        return json(await describeAllowedTable(connectionId, table, schema))
+        const res = await describeAllowedTable(connectionId, table, schema)
+        logCall('describe_table', { connectionId, target: table, client, ok: true })
+        return json(res)
       } catch (err) {
-        return fail(err instanceof Error ? err.message : String(err))
+        const detail = err instanceof Error ? err.message : String(err)
+        logCall('describe_table', { connectionId, target: table, client, ok: false, detail })
+        return fail(detail)
       }
     }
   )
@@ -225,11 +280,24 @@ export function registerMcpTools(server: McpServer): void {
         offset: z.number().int().nonnegative().optional()
       }
     },
-    async ({ connectionId, table, schema, limit, offset }) => {
+    async ({ connectionId, table, schema, limit, offset }, extra) => {
+      const client = clientName(extra)
       try {
-        return json(await readAllowedRows(connectionId, table, schema, limit, offset))
+        const res = (await readAllowedRows(connectionId, table, schema, limit, offset)) as {
+          rows: unknown[]
+        }
+        logCall('read_rows', {
+          connectionId,
+          target: table,
+          client,
+          ok: true,
+          detail: `${res.rows.length} row(s)`
+        })
+        return json(res)
       } catch (err) {
-        return fail(err instanceof Error ? err.message : String(err))
+        const detail = err instanceof Error ? err.message : String(err)
+        logCall('read_rows', { connectionId, target: table, client, ok: false, detail })
+        return fail(detail)
       }
     }
   )

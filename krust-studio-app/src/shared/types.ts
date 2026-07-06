@@ -1172,6 +1172,23 @@ export interface SchemaSyncApi {
   onProposal: (cb: (p: SchemaSyncProposal) => void) => () => void
 }
 
+/** one AI Access Audit entry — every MCP call is logged, never auto-purged */
+export interface McpAuditEntry {
+  ts: number
+  /** the MCP tool called */
+  tool: string
+  /** connection id + name when the call targeted one */
+  connectionId?: string
+  connectionName?: string
+  /** table / op / summary the call touched */
+  target?: string
+  /** calling client label (best-effort, from the request) */
+  client: string
+  ok: boolean
+  /** error message on failure, or a short success note (e.g. row count) */
+  detail?: string
+}
+
 export interface McpApi {
   status: () => Promise<McpStatus>
   getConfig: () => Promise<McpConfig>
@@ -1181,6 +1198,8 @@ export interface McpApi {
   setNotifyOnProposal: (on: boolean) => Promise<void>
   getGrant: (connectionId: string) => Promise<McpGrant>
   setGrant: (connectionId: string, grant: McpGrant) => Promise<void>
+  /** recent AI Access Audit entries (newest first) */
+  audit: (limit?: number) => Promise<McpAuditEntry[]>
 }
 
 export interface KrustApi {

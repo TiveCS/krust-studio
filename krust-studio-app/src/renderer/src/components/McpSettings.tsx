@@ -10,6 +10,7 @@ import type {
   McpStatus,
   McpGrant,
   McpAllowEntry,
+  McpAuditEntry,
   ConnectionSummary
 } from '../../../shared/types'
 
@@ -25,17 +26,20 @@ export function McpSettings({ open }: { open: boolean }): React.JSX.Element {
   const [busy, setBusy] = useState(false)
   const [showToken, setShowToken] = useState(false)
   const [portDraft, setPortDraft] = useState('')
+  const [audit, setAudit] = useState<McpAuditEntry[]>([])
 
   const refresh = async (): Promise<void> => {
-    const [s, c, conns] = await Promise.all([
+    const [s, c, conns, log] = await Promise.all([
       window.api.mcp.status(),
       window.api.mcp.getConfig(),
-      window.api.connections.list()
+      window.api.connections.list(),
+      window.api.mcp.audit(200)
     ])
     setStatus(s)
     setConfig(c)
     setPortDraft(String(c.port))
     setConnections(conns)
+    setAudit(log)
   }
 
   useEffect(() => {
@@ -227,6 +231,47 @@ export function McpSettings({ open }: { open: boolean }): React.JSX.Element {
             <ConnectionGrant key={conn.id} conn={conn} />
           ))}
         </div>
+      </div>
+
+      {/* AI Access Audit */}
+      <div className="space-y-2 border-t pt-4">
+        <div className="flex items-center gap-2">
+          <div className="text-xs font-medium">Recent AI access</div>
+          <button
+            onClick={() => void window.api.mcp.audit(200).then(setAudit)}
+            className="text-muted-foreground hover:text-foreground"
+            title="Refresh"
+          >
+            <RefreshCw className="size-3" />
+          </button>
+          <span className="text-[10px] text-muted-foreground/70">
+            every MCP call is logged — never auto-purged
+          </span>
+        </div>
+        {audit.length === 0 ? (
+          <p className="text-[11px] text-muted-foreground/60">No AI access yet.</p>
+        ) : (
+          <div className="max-h-56 space-y-0.5 overflow-auto rounded border border-border/60 p-2">
+            {audit.map((e, i) => (
+              <div key={i} className="flex items-center gap-2 text-[10px]">
+                <span className="text-muted-foreground/70">
+                  {new Date(e.ts).toLocaleTimeString()}
+                </span>
+                <span className={cn(e.ok ? 'text-emerald-500' : 'text-destructive')}>
+                  {e.ok ? '✓' : '✗'}
+                </span>
+                <span className="font-mono text-foreground">{e.tool}</span>
+                {e.connectionName && (
+                  <span className="text-muted-foreground">{e.connectionName}</span>
+                )}
+                {e.target && <span className="font-mono text-muted-foreground">{e.target}</span>}
+                <span className="ml-auto truncate text-muted-foreground/60" title={e.client}>
+                  {e.detail ?? e.client}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

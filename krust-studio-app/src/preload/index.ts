@@ -150,7 +150,8 @@ const api: KrustApi = {
     setNotifyOnProposal: (on: boolean) => ipcRenderer.invoke('mcp:setNotifyOnProposal', on),
     getGrant: (connectionId: string) => ipcRenderer.invoke('mcp:getGrant', connectionId),
     setGrant: (connectionId: string, grant: McpGrant) =>
-      ipcRenderer.invoke('mcp:setGrant', connectionId, grant)
+      ipcRenderer.invoke('mcp:setGrant', connectionId, grant),
+    audit: (limit?: number) => ipcRenderer.invoke('mcp:audit', limit)
   },
   schemaSync: {
     list: () => ipcRenderer.invoke('schemaSync:list'),
