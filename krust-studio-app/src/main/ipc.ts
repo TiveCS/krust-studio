@@ -1,5 +1,6 @@
 import { ipcMain, dialog, BrowserWindow, app } from 'electron'
 import { writeFileSync, readFileSync } from 'fs'
+import { join } from 'path'
 import {
   listConnections,
   saveConnection,
@@ -381,6 +382,11 @@ export function registerIpc(): void {
   ipcMain.handle('mcp:getGrant', (_e, id: string) => getMcpGrant(id))
   ipcMain.handle('mcp:setGrant', (_e, id: string, grant: McpGrant) => setMcpGrant(id, grant))
   ipcMain.handle('mcp:audit', (_e, limit?: number) => readMcpAudit(limit))
+  ipcMain.handle('mcp:bridgePath', () => {
+    const p = join(app.getAppPath(), 'resources', 'mcp-bridge.mjs')
+    // packaged: the file is asarUnpack'd next to the asar, not inside it
+    return app.isPackaged ? p.replace('app.asar', 'app.asar.unpacked') : p
+  })
 
   ipcMain.handle('schemaSync:list', () => listProposals())
   ipcMain.handle(

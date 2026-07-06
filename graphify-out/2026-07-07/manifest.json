@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/ipc.ts": {
-    "mtime": 1783360993.76687,
-    "ast_hash": "5e030786e822ed90a189a673a65b14a2",
+    "mtime": 1783361806.2252667,
+    "ast_hash": "0a22e70d5ddb93de94ad7baa383aeea0",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/store/connections.ts": {
@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/preload/index.ts": {
-    "mtime": 1783361007.4925296,
-    "ast_hash": "22ae5c0806e671805867f605bd3c4c52",
+    "mtime": 1783361815.3067763,
+    "ast_hash": "6dd429427da0fedd5255b7eb501fcea7",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/App.tsx": {
@@ -385,8 +385,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/shared/types.ts": {
-    "mtime": 1783361382.997988,
-    "ast_hash": "530161d4761cfcfd4684f8a5e946052f",
+    "mtime": 1783361671.3306675,
+    "ast_hash": "4ba05e81b0ec5559334c00beec1f2199",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/index.html": {
@@ -960,8 +960,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/mcp/tools.ts": {
-    "mtime": 1783361475.174707,
-    "ast_hash": "cf11bfc69f9fed25b4bd64a2d547e9fa",
+    "mtime": 1783361792.5747783,
+    "ast_hash": "debe9ca8e334c0a762ef1bff68b55086",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/store/mcp.ts": {
@@ -970,8 +970,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/McpSettings.tsx": {
-    "mtime": 1783361573.8397756,
-    "ast_hash": "424c4d9bc38623f55f7e7c2f3e9964ef",
+    "mtime": 1783361862.971892,
+    "ast_hash": "8ddb21042691cbb859598190158ed6c8",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/mcp/proposals.ts": {
@@ -992,6 +992,11 @@
   "krust-studio-app/src/main/mcp/reads.ts": {
     "mtime": 1783361401.2086325,
     "ast_hash": "5f173a07dea4af9c8b242fb4010ee38b",
+    "semantic_hash": ""
+  },
+  "krust-studio-app/src/main/store/mcpAudit.ts": {
+    "mtime": 1783361682.5707083,
+    "ast_hash": "b33935479655eb33645f04ecf3952d82",
     "semantic_hash": ""
   }
 }

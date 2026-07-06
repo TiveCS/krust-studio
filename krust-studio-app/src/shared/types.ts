@@ -1200,6 +1200,8 @@ export interface McpApi {
   setGrant: (connectionId: string, grant: McpGrant) => Promise<void>
   /** recent AI Access Audit entries (newest first) */
   audit: (limit?: number) => Promise<McpAuditEntry[]>
+  /** absolute path to the stdio bridge script (for stdio-first agents) */
+  bridgePath: () => Promise<string>
 }
 
 export interface KrustApi {

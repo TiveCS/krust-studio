@@ -151,7 +151,8 @@ const api: KrustApi = {
     getGrant: (connectionId: string) => ipcRenderer.invoke('mcp:getGrant', connectionId),
     setGrant: (connectionId: string, grant: McpGrant) =>
       ipcRenderer.invoke('mcp:setGrant', connectionId, grant),
-    audit: (limit?: number) => ipcRenderer.invoke('mcp:audit', limit)
+    audit: (limit?: number) => ipcRenderer.invoke('mcp:audit', limit),
+    bridgePath: () => ipcRenderer.invoke('mcp:bridgePath')
   },
   schemaSync: {
     list: () => ipcRenderer.invoke('schemaSync:list'),

@@ -27,19 +27,22 @@ export function McpSettings({ open }: { open: boolean }): React.JSX.Element {
   const [showToken, setShowToken] = useState(false)
   const [portDraft, setPortDraft] = useState('')
   const [audit, setAudit] = useState<McpAuditEntry[]>([])
+  const [bridgePath, setBridgePath] = useState('')
 
   const refresh = async (): Promise<void> => {
-    const [s, c, conns, log] = await Promise.all([
+    const [s, c, conns, log, bp] = await Promise.all([
       window.api.mcp.status(),
       window.api.mcp.getConfig(),
       window.api.connections.list(),
-      window.api.mcp.audit(200)
+      window.api.mcp.audit(200),
+      window.api.mcp.bridgePath()
     ])
     setStatus(s)
     setConfig(c)
     setPortDraft(String(c.port))
     setConnections(conns)
     setAudit(log)
+    setBridgePath(bp)
   }
 
   useEffect(() => {
@@ -195,6 +198,33 @@ export function McpSettings({ open }: { open: boolean }): React.JSX.Element {
               <RefreshCw className="size-3.5" />
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* client setup */}
+      <div className="space-y-2 border-t pt-4">
+        <div className="text-xs font-medium">Connect an AI client</div>
+        <p className="text-[11px] text-muted-foreground">
+          HTTP-native clients (Claude Code) connect to the endpoint directly. stdio-first clients
+          (Codex CLI, others) spawn the bundled bridge.
+        </p>
+        <div className="space-y-1">
+          <div className="text-[10px] font-medium text-muted-foreground">
+            Streamable HTTP (e.g. Claude Code)
+          </div>
+          <Snippet
+            text={`claude mcp add --transport http krust ${endpoint} --header "Authorization: Bearer ${config.token}"`}
+            onCopy={copy}
+          />
+        </div>
+        <div className="space-y-1">
+          <div className="text-[10px] font-medium text-muted-foreground">
+            stdio bridge (e.g. Codex CLI) — command &amp; env
+          </div>
+          <Snippet
+            text={`node ${bridgePath || '<mcp-bridge.mjs>'}\nKRUST_MCP_URL=${endpoint}\nKRUST_MCP_TOKEN=${config.token}`}
+            onCopy={copy}
+          />
         </div>
       </div>
 
@@ -437,6 +467,29 @@ function AllowlistEditor({
           Add
         </Button>
       </form>
+    </div>
+  )
+}
+
+function Snippet({
+  text,
+  onCopy
+}: {
+  text: string
+  onCopy: (text: string, what: string) => void
+}): React.JSX.Element {
+  return (
+    <div className="flex items-start gap-1.5 rounded border border-border/60 bg-muted/20 p-1.5">
+      <pre className="min-w-0 flex-1 overflow-x-auto whitespace-pre-wrap break-all font-mono text-[10px] leading-relaxed">
+        {text}
+      </pre>
+      <button
+        onClick={() => onCopy(text, 'Config')}
+        title="Copy"
+        className="shrink-0 text-muted-foreground hover:text-foreground"
+      >
+        <Copy className="size-3" />
+      </button>
     </div>
   )
 }

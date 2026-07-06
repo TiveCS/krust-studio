@@ -80,7 +80,12 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
     return sendJson(res, 400, { error: err instanceof Error ? err.message : 'bad request' })
   }
   const server = buildServer()
-  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined })
+  // stateless + JSON responses (not SSE) so the stdio bridge is a plain
+  // request→response pass-through for stdio-first agents (Codex CLI).
+  const transport = new StreamableHTTPServerTransport({
+    sessionIdGenerator: undefined,
+    enableJsonResponse: true
+  })
   res.on('close', () => {
     void transport.close()
     void server.close()
