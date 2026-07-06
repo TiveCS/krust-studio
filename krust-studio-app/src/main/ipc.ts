@@ -10,6 +10,17 @@ import {
 } from './store/connections'
 import { loadWorkspace, saveWorkspace } from './store/workspace'
 import { listTemplates, saveTemplate, removeTemplate } from './store/templates'
+import {
+  getMcpConfig,
+  setMcpEnabled,
+  setMcpPort,
+  regenerateMcpToken,
+  setNotifyOnProposal,
+  getMcpGrant,
+  setMcpGrant
+} from './store/mcp'
+import { startMcpServer, mcpServerStatus } from './mcp/server'
+import type { McpGrant } from '../shared/types'
 import { runBackup, restorePreview, restoreRun } from './db/backup'
 import { testConnection } from './db/test-connection'
 import {
@@ -346,6 +357,22 @@ export function registerIpc(): void {
   ipcMain.handle('routine:drop', (_e, id: string, ref: RoutineRef) =>
     dropRoutine(id, ref)
   )
+
+  // ── MCP server + Schema Sync (ADR-0022) ──
+  ipcMain.handle('mcp:status', () => mcpServerStatus())
+  ipcMain.handle('mcp:getConfig', () => getMcpConfig())
+  ipcMain.handle('mcp:setEnabled', (_e, on: boolean) => {
+    setMcpEnabled(on)
+    return startMcpServer()
+  })
+  ipcMain.handle('mcp:setPort', (_e, port: number) => {
+    setMcpPort(port)
+    return startMcpServer()
+  })
+  ipcMain.handle('mcp:regenerateToken', () => regenerateMcpToken())
+  ipcMain.handle('mcp:setNotifyOnProposal', (_e, on: boolean) => setNotifyOnProposal(on))
+  ipcMain.handle('mcp:getGrant', (_e, id: string) => getMcpGrant(id))
+  ipcMain.handle('mcp:setGrant', (_e, id: string, grant: McpGrant) => setMcpGrant(id, grant))
 
   ipcMain.handle('workspace:load', () => loadWorkspace())
   ipcMain.handle('workspace:save', (_e, data: WorkspaceData) => saveWorkspace(data))

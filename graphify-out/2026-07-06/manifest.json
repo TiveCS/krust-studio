@@ -170,8 +170,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/QueryView.tsx": {
-    "mtime": 1782343568.0279515,
-    "ast_hash": "0357329ceeba1781d40235fdef84f19b",
+    "mtime": 1783346022.9614959,
+    "ast_hash": "7a9306b73454bb45397b54705d2aeb26",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/SettingsModal.tsx": {
@@ -185,8 +185,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/SqlEditor.tsx": {
-    "mtime": 1782745200.5707154,
-    "ast_hash": "2d88e596455ecc45021bae756359035c",
+    "mtime": 1783346010.285524,
+    "ast_hash": "6997413a3352b91c658bac282a4b7895",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/StructureEditor.tsx": {
@@ -490,8 +490,8 @@
     "semantic_hash": "8453e4e9363dec88cec0240f77c01901"
   },
   "docs/TODO.md": {
-    "mtime": 1783341971.789459,
-    "ast_hash": "eabe38130b4d7f3a487285b073ca838e",
+    "mtime": 1783346092.2834718,
+    "ast_hash": "57a7a078fa1a4f00c75d5543894cbaea",
     "semantic_hash": ""
   },
   "docs/adr/0001-electron-over-tauri.md": {

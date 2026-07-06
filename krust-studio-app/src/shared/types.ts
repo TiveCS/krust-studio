@@ -1029,6 +1029,87 @@ export interface RoutineApi {
   drop: (id: string, ref: RoutineRef) => Promise<{ statements: string[] }>
 }
 
+// ─────────────────── MCP server + Schema Sync (ADR-0022) ───────────────────
+// In-app Model Context Protocol server: an AI client inspects schema (and, later,
+// sampled data) and proposes ADDITIVE schema ops that stage into Schema Sync for
+// human review — never auto-writes the DB. Default-deny per connection.
+
+/** per-connection MCP capability grants (default-deny — absent = nothing granted) */
+export interface McpGrant {
+  /** structured DATA reads via the AI Read Allowlist (phase 3) */
+  dataReads?: boolean
+  /** whole-connection STRUCTURE introspection (no rows) — feeds Schema Sync */
+  introspection?: boolean
+  /** accept staged schema-op proposals (never commits) */
+  propose?: boolean
+  /** glob patterns hidden from introspection (internal tables), e.g. `audit.*` */
+  introspectExcludes?: string[]
+}
+
+/** MCP server config as surfaced to Settings (token included — local, user-owned) */
+export interface McpConfig {
+  enabled: boolean
+  /** loopback port the in-app server binds (127.0.0.1) */
+  port: number
+  /** per-install bearer token clients present on every call */
+  token: string
+  /** toast when an agent proposes (badge always shows regardless) */
+  notifyOnProposal: boolean
+  /** default + hard-max sample size for read_rows (phase 3) */
+  readSampleDefault: number
+  readSampleMax: number
+  /** per-connection grants, keyed by connection id */
+  grants: Record<string, McpGrant>
+}
+
+/** live server status for the Settings panel */
+export interface McpStatus {
+  enabled: boolean
+  /** actually listening right now (enabled + bound OK) */
+  running: boolean
+  port: number
+  /** last bind error, if the server failed to start */
+  error?: string
+}
+
+/** one introspected column (structure only, no data) */
+export interface IntrospectedColumn {
+  name: string
+  type?: string
+  nullable: boolean
+  pk: boolean
+  default: string | null
+  fk?: { refTable: string; refColumn: string; refSchema?: string }
+}
+
+/** one introspected table/view */
+export interface IntrospectedTable {
+  name: string
+  schema?: string
+  type: EntityType
+  columns: IntrospectedColumn[]
+  indexes: { name: string; unique: boolean; columns: string[]; method?: string }[]
+}
+
+/** the whole-connection structure snapshot an agent diffs against */
+export interface IntrospectResult {
+  connectionId: string
+  database: string | null
+  engine: DriverType
+  tables: IntrospectedTable[]
+}
+
+export interface McpApi {
+  status: () => Promise<McpStatus>
+  getConfig: () => Promise<McpConfig>
+  setEnabled: (on: boolean) => Promise<McpStatus>
+  setPort: (port: number) => Promise<McpStatus>
+  regenerateToken: () => Promise<string>
+  setNotifyOnProposal: (on: boolean) => Promise<void>
+  getGrant: (connectionId: string) => Promise<McpGrant>
+  setGrant: (connectionId: string, grant: McpGrant) => Promise<void>
+}
+
 export interface KrustApi {
   connections: ConnectionsApi
   sessions: SessionApi
@@ -1040,4 +1121,5 @@ export interface KrustApi {
   window: WindowControlApi
   redis: RedisApi
   routines: RoutineApi
+  mcp: McpApi
 }

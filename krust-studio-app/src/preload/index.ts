@@ -20,7 +20,8 @@ import type {
   ReadValueOpts,
   RedisCommitBatch,
   RoutineRef,
-  RoutineArg
+  RoutineArg,
+  McpGrant
 } from '../shared/types'
 
 const api: KrustApi = {
@@ -138,6 +139,17 @@ const api: KrustApi = {
     create: (id: string, definition: string) =>
       ipcRenderer.invoke('routine:create', id, definition),
     drop: (id: string, ref: RoutineRef) => ipcRenderer.invoke('routine:drop', id, ref)
+  },
+  mcp: {
+    status: () => ipcRenderer.invoke('mcp:status'),
+    getConfig: () => ipcRenderer.invoke('mcp:getConfig'),
+    setEnabled: (on: boolean) => ipcRenderer.invoke('mcp:setEnabled', on),
+    setPort: (port: number) => ipcRenderer.invoke('mcp:setPort', port),
+    regenerateToken: () => ipcRenderer.invoke('mcp:regenerateToken'),
+    setNotifyOnProposal: (on: boolean) => ipcRenderer.invoke('mcp:setNotifyOnProposal', on),
+    getGrant: (connectionId: string) => ipcRenderer.invoke('mcp:getGrant', connectionId),
+    setGrant: (connectionId: string, grant: McpGrant) =>
+      ipcRenderer.invoke('mcp:setGrant', connectionId, grant)
   },
   workspace: {
     load: () => ipcRenderer.invoke('workspace:load'),

@@ -5,6 +5,7 @@ import { autoUpdater } from 'electron-updater'
 import icon from '../../resources/icon.png?asset'
 import { registerIpc } from './ipc'
 import { getBetaUpdates, setBetaUpdates } from './store/prefs'
+import { startMcpServer, stopMcpServer, setMcpAppVersion } from './mcp/server'
 
 // Startup guard: keep an unexpected main-process error from becoming Electron's
 // raw fatal crash dialog. Log it and show a readable message; the app stays up
@@ -173,6 +174,14 @@ app.whenReady().then(() => {
 
   registerIpc()
 
+  // start the MCP server if it was left enabled (ADR-0022) — lazy, off by default
+  try {
+    setMcpAppVersion(app.getVersion())
+    startMcpServer()
+  } catch {
+    // a bind failure must never block app startup; status surfaces the error
+  }
+
   createWindow()
 
   app.on('activate', function () {
@@ -185,6 +194,10 @@ app.whenReady().then(() => {
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
+app.on('before-quit', () => {
+  stopMcpServer()
+})
+
 app.on('window-all-closed', () => {
   // During an in-app update restart, electron-updater drives the quit itself —
   // quitting here too would race it and abort the install (ADR-0019).

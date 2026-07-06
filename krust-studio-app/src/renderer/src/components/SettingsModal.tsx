@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { RotateCcw, Keyboard, Pin, X, History, Table2, AlignLeft, Bell, Download } from 'lucide-react'
+import { RotateCcw, Keyboard, Pin, X, History, Table2, AlignLeft, Bell, Download, Bot } from 'lucide-react'
+import { McpSettings } from '@/components/McpSettings'
 import {
   Dialog,
   DialogContent,
@@ -60,7 +61,7 @@ export function SettingsModal({
   const [recording, setRecording] = useState<CommandId | null>(null)
   const [search, setSearch] = useState('')
   const [section, setSection] = useState<
-    'keybindings' | 'pinned' | 'history' | 'grid' | 'sql' | 'notifications' | 'updates'
+    'keybindings' | 'pinned' | 'history' | 'grid' | 'sql' | 'notifications' | 'mcp' | 'updates'
   >('keybindings')
   const [pinName, setPinName] = useState('')
   // History settings live in history.db meta (main process), not localStorage.
@@ -206,6 +207,18 @@ export function SettingsModal({
               Notifications
             </button>
             <button
+              onClick={() => setSection('mcp')}
+              className={cn(
+                'flex w-full items-center gap-2 rounded px-2 py-1.5 text-xs font-medium',
+                section === 'mcp'
+                  ? 'bg-accent text-foreground'
+                  : 'text-muted-foreground hover:bg-accent/40'
+              )}
+            >
+              <Bot className="size-3.5" />
+              AI / MCP
+            </button>
+            <button
               onClick={() => setSection('updates')}
               className={cn(
                 'flex w-full items-center gap-2 rounded px-2 py-1.5 text-xs font-medium',
@@ -218,6 +231,9 @@ export function SettingsModal({
               Updates
             </button>
           </div>
+
+          {/* AI / MCP content */}
+          {section === 'mcp' && <McpSettings open={open} />}
 
           {/* grid content */}
           {section === 'grid' && (
