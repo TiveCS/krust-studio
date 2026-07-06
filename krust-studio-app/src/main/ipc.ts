@@ -45,6 +45,7 @@ import {
   redisScan,
   redisKeyMeta,
   redisReadValue,
+  redisKeyTtls,
   redisCommit,
   redisRenameKey,
   redisDeleteKey,
@@ -301,12 +302,16 @@ export function registerIpc(): void {
     (_e, id: string, match: string, cursor: string, count: number) =>
       redisScan(id, match, cursor, count)
   )
-  ipcMain.handle('redis:keyMeta', (_e, id: string, key: string) =>
-    redisKeyMeta(id, key)
+  ipcMain.handle('redis:keyMeta', (_e, id: string, key: string, keyB64?: string) =>
+    redisKeyMeta(id, key, keyB64)
   )
   ipcMain.handle(
     'redis:readValue',
-    (_e, id: string, key: string, opts: ReadValueOpts) => redisReadValue(id, key, opts)
+    (_e, id: string, key: string, opts: ReadValueOpts, keyB64?: string) =>
+      redisReadValue(id, key, opts, keyB64)
+  )
+  ipcMain.handle('redis:keyTtls', (_e, id: string, keysB64: string[]) =>
+    redisKeyTtls(id, keysB64)
   )
   ipcMain.handle('redis:commit', (_e, id: string, batch: RedisCommitBatch) =>
     redisCommit(id, batch)
@@ -316,8 +321,8 @@ export function registerIpc(): void {
     (_e, id: string, from: string, to: string, overwrite: boolean) =>
       redisRenameKey(id, from, to, overwrite)
   )
-  ipcMain.handle('redis:deleteKey', (_e, id: string, key: string) =>
-    redisDeleteKey(id, key)
+  ipcMain.handle('redis:deleteKey', (_e, id: string, key: string, keyB64?: string) =>
+    redisDeleteKey(id, key, keyB64)
   )
 
   // ── Routines: procedures & functions (ADR-0021) ──

@@ -48,13 +48,20 @@ function asBuf(v: unknown): Buffer {
 }
 
 /** decode a collection member for display. Valid UTF-8 → the text; otherwise a
- *  spaced-hex rendering flagged `binary` (the renderer marks it read-only, since
- *  a mangled UTF-8 member can't be safely addressed by HDEL/SREM/etc.). */
-function decodeMember(v: unknown): { text: string; binary: boolean } {
+ *  spaced-hex rendering flagged `binary`, plus `b64` (the raw bytes) so the
+ *  member can still be addressed for removal (HDEL/SREM/…) even though its
+ *  mangled UTF-8 text can't. Binary members aren't edited in place. */
+function decodeMember(v: unknown): { text: string; binary: boolean; b64?: string } {
   const buf = asBuf(v)
   if (isValidUtf8(buf)) return { text: buf.toString('utf8'), binary: false }
   const hex = Array.from(buf, (b) => b.toString(16).padStart(2, '0')).join(' ')
-  return { text: hex, binary: true }
+  return { text: hex, binary: true, b64: buf.toString('base64') }
+}
+
+/** address a key by its exact raw bytes when a base64 form is supplied (binary
+ *  key names), else by the UTF-8 string. node-redis accepts a Buffer key arg. */
+function addr(key: string, keyB64?: string): string | Buffer {
+  return keyB64 ? Buffer.from(keyB64, 'base64') : key
 }
 
 /** normalise a node-redis XRANGE/XREVRANGE entry's message into ordered
@@ -230,6 +237,7 @@ export class RedisDriver implements DriverCore, KeyValueCapable {
         const [type, ttl] = await Promise.all([this.c.type(buf), this.c.pTTL(buf)])
         return {
           key: buf.toString('utf8'),
+          keyB64: buf.toString('base64'),
           type: normalizeType(type),
           ttl: Number(ttl),
           binary
@@ -239,18 +247,29 @@ export class RedisDriver implements DriverCore, KeyValueCapable {
     return { keys: infos, cursor: nextCursor, loaded: infos.length }
   }
 
-  async keyMeta(key: string): Promise<RedisKeyMeta> {
-    const [type, ttl] = await Promise.all([this.c.type(key), this.c.pTTL(key)])
+  /** remaining ms TTL for a batch of keys (addressed by raw bytes), same order */
+  async keyTtls(keysB64: string[]): Promise<number[]> {
+    return Promise.all(
+      keysB64.map(async (b64) => Number(await this.c.pTTL(Buffer.from(b64, 'base64'))))
+    )
+  }
+
+  async keyMeta(key: string, keyB64?: string): Promise<RedisKeyMeta> {
+    const k = addr(key, keyB64)
+    const [type, ttl] = await Promise.all([this.c.type(k), this.c.pTTL(k)])
     const t = normalizeType(type)
     let bytes: number | null = null
     let cardinality: number | null = null
-    if (t === 'string') bytes = Number(await this.c.strLen(key))
-    else cardinality = await this.cardinality(key, t)
+    if (t === 'string') bytes = Number(await this.c.strLen(k))
+    else cardinality = await this.cardinality(k, t)
     return { key, type: t, ttl: Number(ttl), bytes, cardinality }
   }
 
   /** element count for a collection type; null for non-collections */
-  private async cardinality(key: string, type: RedisKeyType): Promise<number | null> {
+  private async cardinality(
+    key: string | Buffer,
+    type: RedisKeyType
+  ): Promise<number | null> {
     switch (type) {
       case 'hash':
         return Number(await this.c.hLen(key))
@@ -269,15 +288,16 @@ export class RedisDriver implements DriverCore, KeyValueCapable {
 
   // ── value read (polymorphic, decision 5) ─────────────────────────────────
 
-  async readValue(key: string, opts: ReadValueOpts): Promise<RedisValuePage> {
-    const type = normalizeType(await this.c.type(key))
+  async readValue(key: string, opts: ReadValueOpts, keyB64?: string): Promise<RedisValuePage> {
+    const k = addr(key, keyB64)
+    const type = normalizeType(await this.c.type(k))
     const count = opts.count > 0 ? opts.count : 200
     const cursor = opts.cursor ?? '0'
     switch (type) {
       case 'none':
         return { type: 'none' }
       case 'string': {
-        const bytes = Number(await this.c.strLen(key))
+        const bytes = Number(await this.c.strLen(k))
         if (bytes > LARGE_STRING_BYTES && !opts.forceLoadLarge) {
           return {
             type: 'string',
@@ -291,7 +311,7 @@ export class RedisDriver implements DriverCore, KeyValueCapable {
           }
         }
         // read raw bytes so non-UTF-8 values are preserved for hex/base64 views
-        const raw = (await this.b.get(key)) as unknown as Buffer | string | null
+        const raw = (await this.b.get(k)) as unknown as Buffer | string | null
         const buf = raw == null ? Buffer.alloc(0) : Buffer.isBuffer(raw) ? raw : Buffer.from(String(raw))
         const binary = !isValidUtf8(buf)
         return {
@@ -306,49 +326,50 @@ export class RedisDriver implements DriverCore, KeyValueCapable {
       }
       case 'hash': {
         // buffer view so non-UTF-8 field names/values surface as binary, not mangled
-        const r = await this.b.hScan(key, cursor, { COUNT: count })
+        const r = await this.b.hScan(k, cursor, { COUNT: count })
         return {
           type: 'hash',
           fields: r.entries.map((e) => {
             const f = decodeMember(e.field)
             const v = decodeMember(e.value)
-            return { field: f.text, value: v.text, binary: f.binary || v.binary }
+            // address the field for removal by its raw bytes when it's binary
+            return { field: f.text, value: v.text, binary: f.binary || v.binary, b64: f.b64 }
           }),
           cursor: String(r.cursor)
         }
       }
       case 'set': {
-        const r = await this.b.sScan(key, cursor, { COUNT: count })
+        const r = await this.b.sScan(k, cursor, { COUNT: count })
         return {
           type: 'set',
           members: r.members.map((m) => {
             const d = decodeMember(m)
-            return { value: d.text, binary: d.binary }
+            return { value: d.text, binary: d.binary, b64: d.b64 }
           }),
           cursor: String(r.cursor)
         }
       }
       case 'zset': {
-        const r = await this.b.zScan(key, cursor, { COUNT: count })
+        const r = await this.b.zScan(k, cursor, { COUNT: count })
         return {
           type: 'zset',
           members: r.members.map((m) => {
             const d = decodeMember(m.value)
-            return { member: d.text, score: Number(m.score), binary: d.binary }
+            return { member: d.text, score: Number(m.score), binary: d.binary, b64: d.b64 }
           }),
           cursor: String(r.cursor)
         }
       }
       case 'list': {
-        const length = Number(await this.c.lLen(key))
+        const length = Number(await this.c.lLen(k))
         const start = opts.start ?? 0
         const end = Math.min(start + count - 1, length - 1)
-        const items = end >= start ? await this.b.lRange(key, start, end) : []
+        const items = end >= start ? await this.b.lRange(k, start, end) : []
         return {
           type: 'list',
           items: items.map((i) => {
             const d = decodeMember(i)
-            return { value: d.text, binary: d.binary }
+            return { value: d.text, binary: d.binary, b64: d.b64 }
           }),
           start,
           end,
@@ -356,7 +377,7 @@ export class RedisDriver implements DriverCore, KeyValueCapable {
         }
       }
       case 'stream': {
-        const entries = await this.c.xRevRange(key, '+', '-', { COUNT: count })
+        const entries = await this.c.xRevRange(k, '+', '-', { COUNT: count })
         return {
           type: 'stream',
           entries: entries.map((e) => ({
@@ -417,11 +438,12 @@ export class RedisDriver implements DriverCore, KeyValueCapable {
     return { ok: true, commitGroup: randomUUID() }
   }
 
-  async deleteKey(key: string): Promise<RedisCommitResult> {
+  async deleteKey(key: string, keyB64?: string): Promise<RedisCommitResult> {
+    const k = addr(key, keyB64)
     try {
-      await this.c.unlink(key)
+      await this.c.unlink(k)
     } catch {
-      await this.c.del(key)
+      await this.c.del(k)
     }
     return { ok: true, commitGroup: randomUUID() }
   }

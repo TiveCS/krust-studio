@@ -835,6 +835,9 @@ export type RedisKeyType =
 export interface RedisKeyInfo {
   /** key name; binary-safe (escaped for display by the renderer) */
   key: string
+  /** raw key bytes, base64 — the authoritative address (binary names can't
+   *  round-trip through `key`). Read/delete of a binary key uses this. */
+  keyB64: string
   type: RedisKeyType
   /** remaining ms TTL: -1 = no expiry, -2 = key missing, null = not yet fetched */
   ttl: number | null
@@ -879,21 +882,27 @@ export type RedisValuePage =
     }
   | {
       type: 'hash'
-      /** `binary` true when the field name or value held non-UTF-8 bytes (read-only) */
-      fields: { field: string; value: string; binary?: boolean }[]
+      /** `binary` true when the field name or value held non-UTF-8 bytes. `b64` is
+       *  the raw field bytes (present only for binary fields) — used to address a
+       *  binary field for removal (HDEL); such fields aren't editable in place. */
+      fields: { field: string; value: string; binary?: boolean; b64?: string }[]
       cursor: string
     }
   | {
       type: 'list'
-      items: { value: string; binary?: boolean }[]
+      items: { value: string; binary?: boolean; b64?: string }[]
       start: number
       end: number
       length: number
     }
-  | { type: 'set'; members: { value: string; binary?: boolean }[]; cursor: string }
+  | {
+      type: 'set'
+      members: { value: string; binary?: boolean; b64?: string }[]
+      cursor: string
+    }
   | {
       type: 'zset'
-      members: { member: string; score: number; binary?: boolean }[]
+      members: { member: string; score: number; binary?: boolean; b64?: string }[]
       cursor: string
     }
   | {
@@ -974,12 +983,16 @@ export interface RedisApi {
     cursor: string,
     count: number
   ) => Promise<RedisScanResult>
-  keyMeta: (id: string, key: string) => Promise<RedisKeyMeta>
+  keyMeta: (id: string, key: string, keyB64?: string) => Promise<RedisKeyMeta>
   readValue: (
     id: string,
     key: string,
-    opts: ReadValueOpts
+    opts: ReadValueOpts,
+    /** raw key bytes (base64) — address a binary-named key by its exact bytes */
+    keyB64?: string
   ) => Promise<RedisValuePage>
+  /** remaining ms TTL for a batch of keys (addressed by raw bytes), same order */
+  keyTtls: (id: string, keysB64: string[]) => Promise<number[]>
   /** run a staged value-commit (WATCH+MULTI/EXEC). Read-only blocked in main. */
   commit: (id: string, batch: RedisCommitBatch) => Promise<RedisCommitResult>
   /** rename a key (RENAMENX unless overwrite). Read-only blocked. */
@@ -990,7 +1003,7 @@ export interface RedisApi {
     overwrite: boolean
   ) => Promise<RedisCommitResult>
   /** delete a key (UNLINK→DEL). Read-only blocked. Destructive. */
-  deleteKey: (id: string, key: string) => Promise<RedisCommitResult>
+  deleteKey: (id: string, key: string, keyB64?: string) => Promise<RedisCommitResult>
 }
 
 /** Procedures & functions (ADR-0021). Only mysql/postgres connections. */

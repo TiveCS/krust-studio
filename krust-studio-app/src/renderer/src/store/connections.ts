@@ -57,7 +57,15 @@ export interface Tab {
   kind?: 'history' | 'connection-editor' | 'backup' | 'redis-key' | 'routine'
   /** redis-key tab identity; value + staged-edit state live in the useRedis
    *  store keyed by tab id (decision 3: fat-Tab marker, heavy state external) */
-  redisKey?: { dbIndex: number; key: string; type: RedisKeyType }
+  redisKey?: {
+    dbIndex: number
+    key: string
+    type: RedisKeyType
+    /** raw key bytes (base64) — addresses a binary key name; undefined for UTF-8 */
+    keyB64?: string
+    /** the key name held non-UTF-8 bytes → read/delete only (no edit/rename/TTL) */
+    binary?: boolean
+  }
   /** routine tab identity (absent on a new-routine draft, ADR-0021) */
   routineRef?: RoutineRef
   /** loaded routine metadata — transient (re-fetched on mount) */
@@ -235,7 +243,12 @@ interface ConnectionsState {
   /** Open/focus the Backup & Restore tab for the current connection (singleton). */
   openBackupTab: () => void
   /** Open/focus a Redis Key tab (one per key+db); value state lives in useRedis. */
-  openRedisKey: (key: string, type: RedisKeyType, dbIndex: number) => void
+  openRedisKey: (
+    key: string,
+    type: RedisKeyType,
+    dbIndex: number,
+    opts?: { keyB64?: string; binary?: boolean }
+  ) => void
   /** Open/focus a connection-editor tab. `connectionId` null = new connection. */
   openConnectionEditorTab: (connectionId: string | null) => void
   /** Update an editor tab's stored connectionId after saving a new connection. */
@@ -859,9 +872,13 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       set((s) => ({ tabs: [...s.tabs, tab], activeTabId: tab.id }))
     },
 
-    openRedisKey: (key, type, dbIndex) => {
+    openRedisKey: (key, type, dbIndex, opts) => {
       const existing = get().tabs.find(
-        (t) => t.kind === 'redis-key' && t.redisKey?.key === key && t.redisKey?.dbIndex === dbIndex
+        (t) =>
+          t.kind === 'redis-key' &&
+          t.redisKey?.dbIndex === dbIndex &&
+          // match binary keys by their exact bytes, UTF-8 keys by name
+          (opts?.keyB64 ? t.redisKey?.keyB64 === opts.keyB64 : t.redisKey?.key === key)
       )
       if (existing) {
         set({ activeTabId: existing.id })
@@ -870,7 +887,7 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       const tab: Tab = {
         id: crypto.randomUUID(),
         kind: 'redis-key',
-        redisKey: { dbIndex, key, type },
+        redisKey: { dbIndex, key, type, keyB64: opts?.keyB64, binary: opts?.binary },
         entity: { name: key },
         data: null, loading: false, error: null, pageIndex: 0, total: null,
         counting: false, filters: [], filterMode: 'builder', rawWhere: '',

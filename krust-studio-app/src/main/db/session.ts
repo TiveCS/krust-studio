@@ -605,16 +605,25 @@ export async function redisScan(
   return withRetryRedis(id, (d) => d.scanKeys(match, cursor, count))
 }
 
-export async function redisKeyMeta(id: string, key: string): Promise<RedisKeyMeta> {
-  return withRetryRedis(id, (d) => d.keyMeta(key))
+export async function redisKeyMeta(
+  id: string,
+  key: string,
+  keyB64?: string
+): Promise<RedisKeyMeta> {
+  return withRetryRedis(id, (d) => d.keyMeta(key, keyB64))
 }
 
 export async function redisReadValue(
   id: string,
   key: string,
-  opts: ReadValueOpts
+  opts: ReadValueOpts,
+  keyB64?: string
 ): Promise<RedisValuePage> {
-  return withRetryRedis(id, (d) => d.readValue(key, opts))
+  return withRetryRedis(id, (d) => d.readValue(key, opts, keyB64))
+}
+
+export async function redisKeyTtls(id: string, keysB64: string[]): Promise<number[]> {
+  return withRetryRedis(id, (d) => d.keyTtls(keysB64))
 }
 
 export async function redisCommit(
@@ -671,10 +680,14 @@ export async function redisRenameKey(
   return res
 }
 
-export async function redisDeleteKey(id: string, key: string): Promise<RedisCommitResult> {
+export async function redisDeleteKey(
+  id: string,
+  key: string,
+  keyB64?: string
+): Promise<RedisCommitResult> {
   const config = getConnectionConfig(id)
   if (config?.readOnly) throw new Error('Connection is read-only; writes are blocked')
-  const res = await withRetryRedis(id, (d) => d.deleteKey(key))
+  const res = await withRetryRedis(id, (d) => d.deleteKey(key, keyB64))
   if (res.ok) {
     await capture({
       connectionId: id,

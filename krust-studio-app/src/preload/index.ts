@@ -115,16 +115,18 @@ const api: KrustApi = {
       ipcRenderer.invoke('redis:selectDb', id, index),
     scan: (id: string, match: string, cursor: string, count: number) =>
       ipcRenderer.invoke('redis:scan', id, match, cursor, count),
-    keyMeta: (id: string, key: string) =>
-      ipcRenderer.invoke('redis:keyMeta', id, key),
-    readValue: (id: string, key: string, opts: ReadValueOpts) =>
-      ipcRenderer.invoke('redis:readValue', id, key, opts),
+    keyMeta: (id: string, key: string, keyB64?: string) =>
+      ipcRenderer.invoke('redis:keyMeta', id, key, keyB64),
+    readValue: (id: string, key: string, opts: ReadValueOpts, keyB64?: string) =>
+      ipcRenderer.invoke('redis:readValue', id, key, opts, keyB64),
+    keyTtls: (id: string, keysB64: string[]) =>
+      ipcRenderer.invoke('redis:keyTtls', id, keysB64),
     commit: (id: string, batch: RedisCommitBatch) =>
       ipcRenderer.invoke('redis:commit', id, batch),
     renameKey: (id: string, from: string, to: string, overwrite: boolean) =>
       ipcRenderer.invoke('redis:renameKey', id, from, to, overwrite),
-    deleteKey: (id: string, key: string) =>
-      ipcRenderer.invoke('redis:deleteKey', id, key)
+    deleteKey: (id: string, key: string, keyB64?: string) =>
+      ipcRenderer.invoke('redis:deleteKey', id, key, keyB64)
   },
   routines: {
     list: (id: string) => ipcRenderer.invoke('routine:list', id),

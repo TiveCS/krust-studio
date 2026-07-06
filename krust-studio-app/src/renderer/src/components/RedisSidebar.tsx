@@ -42,7 +42,7 @@ export function RedisSidebar(): React.JSX.Element {
   const activeTabId = useConnections((s) => s.activeTabId)
   const tabs = useConnections((s) => s.tabs)
 
-  const { connId, dbInfo, list, init, setMatch, rescan, scanMore, selectDb, pruneExpired } =
+  const { connId, dbInfo, list, init, setMatch, rescan, scanMore, selectDb, pruneExpired, resyncTtls } =
     useRedis()
   const [addOpen, setAddOpen] = useState(false)
   // 1s tick drives the live TTL countdown and drops keys as they expire
@@ -60,6 +60,15 @@ export function RedisSidebar(): React.JSX.Element {
     }, 1000)
     return () => clearInterval(id)
   }, [pruneExpired])
+
+  // periodically re-sync PTTL of loaded keys so the live countdown corrects for
+  // external PERSIST / re-EXPIRE that happened since the last scan (the 1s tick
+  // only counts down from the scan-time snapshot).
+  useEffect(() => {
+    if (!connId) return
+    const id = setInterval(() => void resyncTtls(), 15_000)
+    return () => clearInterval(id)
+  }, [connId, resyncTtls])
 
   const activeKey = tabs.find((t) => t.id === activeTabId)?.redisKey?.key
   const dbCount = dbInfo?.count ?? 16
@@ -133,15 +142,15 @@ export function RedisSidebar(): React.JSX.Element {
           const badge = TYPE_BADGE[k.type]
           return (
             <button
-              key={k.key}
-              disabled={k.binary}
-              onClick={() => !k.binary && openRedisKey(k.key, k.type, current)}
+              key={k.keyB64}
+              onClick={() =>
+                openRedisKey(k.key, k.type, current, { keyB64: k.keyB64, binary: k.binary })
+              }
               className={cn(
                 'flex w-full items-center gap-2 rounded px-2 py-1 text-left text-xs hover:bg-accent',
-                activeKey === k.key && 'bg-accent',
-                k.binary && 'cursor-not-allowed opacity-60 hover:bg-transparent'
+                activeKey === k.key && 'bg-accent'
               )}
-              title={k.binary ? `${k.key} (binary key name — not editable here)` : k.key}
+              title={k.binary ? `${k.key} (binary key name — read/delete only)` : k.key}
             >
               <span className={cn('w-9 shrink-0 font-mono', badge.cls)}>{badge.label}</span>
               <span className="flex-1 truncate font-mono">{k.key}</span>

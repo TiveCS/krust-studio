@@ -129,13 +129,33 @@ rename, large-string gate, ACL-denied `CONFIG GET databases`.
   message whatever node-redis hands back (flat map object, `[field,value]` tuple
   array, or flat `[f,v,…]` array) and preserves field order/duplicates.
 
+## beta.3 second pass (compiles + builds, not live-tested)
+
+- **Binary key names — read + delete.** `RedisKeyInfo` now carries `keyB64` (raw
+  key bytes); `readValue`/`keyMeta`/`deleteKey` take an optional `keyB64` and
+  address the key by its exact bytes (node-redis Buffer key) via `addr()`. The
+  sidebar opens binary keys (was blocked); their tab is **read + delete only**
+  (`ident.binary` → rename/TTL/commit/member-edit hidden, a `binary · read-only`
+  header badge). Threaded through session → ipc → preload → store.
+- **Binary collection member removal.** Binary hash/set/zset/list members now
+  carry their raw bytes (`b64`) to the renderer; the remove button is enabled and
+  stages a binary-arg removal (`HDEL`/`SREM`/`ZREM`/`LREM` with `{ b64 }`).
+  In-place *editing* of a binary member is still out of scope (removal + UTF-8
+  re-add covers it).
+- **Live TTL re-sync.** `useRedis.resyncTtls()` pipelines `PTTL` for the loaded
+  keys (addressed by `keyB64`) and re-stamps their absolute `expiresAt`; the
+  sidebar runs it every 15s, correcting countdown drift from an external
+  `PERSIST`/re-`EXPIRE`. Backend `keyTtls(keysB64)` + `redis:keyTtls` IPC.
+- **Delete-key confirm simplified.** The key-name typing step is gone — the
+  delete dialog is a plain **Yes / No** with the key name highlighted as danger
+  (red). Rename still uses its typed-overwrite guard.
+
 ## Known gaps / deliberate simplifications (remaining beta follow-ups)
 
-- **Binary key names read/delete** — flagged + blocked, not yet read/delete-only
-  (needs a base64-keyed identity through scan/readValue/deleteKey).
-- **Binary collection members** — read/display only; no binary member editing.
-- TTL countdown drifts on external `PERSIST`/re-`EXPIRE` until the next rescan
-  (no periodic `pTTL` re-sync of loaded keys yet).
+- **Binary collection members** — removable + read/display; no in-place binary
+  member *editing* or binary member *creation* (add row is UTF-8 only).
+- Stream entry field rendering hardened for reply-shape, but the field model is
+  still a flat display; deep/nested stream payloads unverified against a server.
 
 ## Commits on feat/v1.7.0 (this pass)
 

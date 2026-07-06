@@ -94,7 +94,9 @@ rows, or SQL.
   deletion, expiry, or type change blocks commit and offers Reload or explicit
   Force overwrite.
 - Rename uses `RENAMENX`; overwrite requires a second typed confirmation.
-- Delete uses `UNLINK`, falling back to `DEL`, with typed key-name confirmation.
+- Delete uses `UNLINK`, falling back to `DEL`, behind a plain Yes/No confirm with
+  the key name highlighted as danger (the earlier typed-key-name step was dropped
+  in beta.3 as needless friction for a reversible-by-restore-only op).
 - No general undo and no hidden value backups.
 - Read-only connections expose browsing only and are enforced in the main
   process.

@@ -144,17 +144,21 @@ export interface KeyValueCapable {
   dbInfo(): Promise<RedisDbInfo>
   /** incremental SCAN page (never KEYS); cursor '0' starts, '0' returned = done */
   scanKeys(match: string, cursor: string, count: number): Promise<RedisScanResult>
-  /** TYPE + PTTL + cheap size for one key */
-  keyMeta(key: string): Promise<RedisKeyMeta>
-  /** polymorphic value read, discriminated by key type */
-  readValue(key: string, opts: ReadValueOpts): Promise<RedisValuePage>
+  /** TYPE + PTTL + cheap size for one key. `keyB64` addresses a binary name. */
+  keyMeta(key: string, keyB64?: string): Promise<RedisKeyMeta>
+  /** polymorphic value read, discriminated by key type. `keyB64` addresses a
+   *  binary key name by its exact raw bytes (a mangled UTF-8 string can't). */
+  readValue(key: string, opts: ReadValueOpts, keyB64?: string): Promise<RedisValuePage>
+  /** remaining ms TTL for a batch of keys (addressed by raw bytes), same order.
+   *  Used for the periodic live-countdown re-sync of loaded sidebar keys. */
+  keyTtls(keysB64: string[]): Promise<number[]>
   /** staged value-commit (WATCH+MULTI/EXEC); returns a conflict instead on a
    *  tripped WATCH so the UI can offer Reload / compatibility-gated Force. */
   commit(batch: RedisCommitBatch): Promise<RedisCommitResult>
   /** RENAMENX unless overwrite; guarded by the UI's typed confirm */
   renameKey(from: string, to: string, overwrite: boolean): Promise<RedisCommitResult>
-  /** UNLINK→DEL; destructive, guarded by the UI's typed confirm */
-  deleteKey(key: string): Promise<RedisCommitResult>
+  /** UNLINK→DEL; destructive. `keyB64` addresses a binary name. */
+  deleteKey(key: string, keyB64?: string): Promise<RedisCommitResult>
 }
 
 /** A Redis driver: lifecycle + key/value, nothing relational. */

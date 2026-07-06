@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/driver.ts": {
-    "mtime": 1783158897.956802,
-    "ast_hash": "adb023b7aa73c39575c39c5e73e79434",
+    "mtime": 1783343589.5510745,
+    "ast_hash": "c1053beaa0a0642e109ac80e0debc9bd",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/drivers/mysql.ts": {
@@ -30,8 +30,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/session.ts": {
-    "mtime": 1783158942.6810079,
-    "ast_hash": "b16308b92a642479cdee0708b91dba22",
+    "mtime": 1783343733.0293758,
+    "ast_hash": "041e60788c3471c403f785234aedc1ea",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/test-connection.ts": {
@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/ipc.ts": {
-    "mtime": 1783158998.9375572,
-    "ast_hash": "d894d9e21b6333c916375d957a3e92c8",
+    "mtime": 1783343764.7712502,
+    "ast_hash": "f2b8ae50716dd3587fd0169d11373f16",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/store/connections.ts": {
@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/preload/index.ts": {
-    "mtime": 1783159128.497788,
-    "ast_hash": "9fccf60e9a8f2920c3a02fd003fa103e",
+    "mtime": 1783343783.458537,
+    "ast_hash": "8e55bafca1e9305d4fc9d609b4764e35",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/App.tsx": {
@@ -370,8 +370,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/store/connections.ts": {
-    "mtime": 1783159191.9464827,
-    "ast_hash": "3ce5aaccd1c08c69a386113cbc36d4ad",
+    "mtime": 1783343835.3918207,
+    "ast_hash": "283fdcf32c5c160be64341831214f5b8",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/store/settings.ts": {
@@ -385,8 +385,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/shared/types.ts": {
-    "mtime": 1783341645.1419518,
-    "ast_hash": "ebc090f4a39f4521fe8c95f58be011c8",
+    "mtime": 1783343566.8564875,
+    "ast_hash": "54dbf6873ae44734eb79ba458317ba27",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/index.html": {
@@ -490,8 +490,8 @@
     "semantic_hash": "8453e4e9363dec88cec0240f77c01901"
   },
   "docs/TODO.md": {
-    "mtime": 1783158117.1800232,
-    "ast_hash": "74101a6e5c528962856d68870888bc0e",
+    "mtime": 1783341971.789459,
+    "ast_hash": "eabe38130b4d7f3a487285b073ca838e",
     "semantic_hash": ""
   },
   "docs/adr/0001-electron-over-tauri.md": {
@@ -800,8 +800,8 @@
     "semantic_hash": ""
   },
   "docs/release/v1.7.0/plan.md": {
-    "mtime": 1782742615.776944,
-    "ast_hash": "f2173d22414d4af87ea3178d8ee7bf41",
+    "mtime": 1783344440.4598174,
+    "ast_hash": "aaf2ec260e7e3612b5afc6aee59fb77b",
     "semantic_hash": ""
   },
   "krust-studio-app/scripts/sql-format.test.ts": {
@@ -830,8 +830,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/drivers/redis.ts": {
-    "mtime": 1783341684.539767,
-    "ast_hash": "1e54a23174ed7793b587b67afdd17ac1",
+    "mtime": 1783343712.7905452,
+    "ast_hash": "e66d543361ffd64efa562a58c87c6871",
     "semantic_hash": ""
   },
   "krust-studio-app/src/shared/capabilities.ts": {
@@ -840,23 +840,23 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/RedisKeyView.tsx": {
-    "mtime": 1783341747.9313643,
-    "ast_hash": "0c6109bdc289aa32ff178000adc55fe3",
+    "mtime": 1783344345.1125655,
+    "ast_hash": "6f17f164e0fed2bc98702a12bbc0ecfa",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/RedisSidebar.tsx": {
-    "mtime": 1782778734.785213,
-    "ast_hash": "7ccd25dc487b2bbf1cc4660a2b060964",
+    "mtime": 1783344303.728699,
+    "ast_hash": "2e134d81b173cd877e90b6c4639e7e0c",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/store/redis.ts": {
-    "mtime": 1782778815.5837884,
-    "ast_hash": "c1fa4972a96488c26af542b55a69debd",
+    "mtime": 1783343930.7076485,
+    "ast_hash": "9313f1c7449d92a95e5f003153348a82",
     "semantic_hash": ""
   },
   "docs/release/v1.7.0/redis-status.md": {
-    "mtime": 1782780477.5934806,
-    "ast_hash": "bc31a8368d961c301b308cdb3f5016c5",
+    "mtime": 1783344425.8303905,
+    "ast_hash": "875f177e46cb84693ccb6c9841b9e243",
     "semantic_hash": ""
   },
   "testing/seed/package.json": {

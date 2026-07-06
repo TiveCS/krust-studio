@@ -19,15 +19,16 @@ export type StagedEdit =
   /** binary string write — exact raw bytes (base64) from a hex/base64 editor */
   | { kind: 'string-set-bin'; b64: string; bytes: number }
   | { kind: 'hash-set'; field: string; value: string }
-  | { kind: 'hash-del'; field: string }
+  /** `fieldB64` addresses a binary field name for removal (HDEL by raw bytes) */
+  | { kind: 'hash-del'; field: string; fieldB64?: string }
   | { kind: 'set-add'; member: string }
-  | { kind: 'set-del'; member: string }
+  | { kind: 'set-del'; member: string; memberB64?: string }
   | { kind: 'zset-set'; member: string; score: number }
-  | { kind: 'zset-del'; member: string }
+  | { kind: 'zset-del'; member: string; memberB64?: string }
   | { kind: 'list-set'; index: number; value: string }
   | { kind: 'list-push'; side: 'L' | 'R'; value: string }
   | { kind: 'list-pop'; side: 'L' | 'R' }
-  | { kind: 'list-removeval'; count: number; value: string }
+  | { kind: 'list-removeval'; count: number; value: string; valueB64?: string }
   | { kind: 'stream-add'; fields: [string, string][] }
 
 /** initial value for a manually-created key (Redis can't hold an empty key) */
@@ -92,9 +93,16 @@ interface RedisState {
   scanMore: () => Promise<void>
   /** drop locally-expired keys from the list (TTL countdown reached zero) */
   pruneExpired: () => void
+  /** re-fetch PTTL for the loaded keys and re-stamp their live-countdown expiry
+   *  (corrects drift from an external PERSIST / re-EXPIRE since the last scan) */
+  resyncTtls: () => Promise<void>
   selectDb: (index: number) => Promise<void>
 
-  loadValue: (tabId: string, key: string, opts?: { cursor?: string; start?: number; force?: boolean }) => Promise<void>
+  loadValue: (
+    tabId: string,
+    key: string,
+    opts?: { cursor?: string; start?: number; force?: boolean; keyB64?: string }
+  ) => Promise<void>
   stage: (tabId: string, edit: StagedEdit) => void
   unstage: (tabId: string, index: number) => void
   clearStaged: (tabId: string) => void
@@ -104,7 +112,7 @@ interface RedisState {
   /** re-run the commit after the user acknowledged the empty-delete warning */
   confirmEmptyCommit: (tabId: string, key: string, type: RedisKeyType) => Promise<boolean>
   cancelEmptyDelete: (tabId: string) => void
-  deleteKey: (key: string) => Promise<void>
+  deleteKey: (key: string, keyB64?: string) => Promise<void>
   renameKey: (from: string, to: string, overwrite: boolean) => Promise<void>
   /** create a new key in the current db; resolves to an error string or null on success */
   createKey: (name: string, input: NewKeyInput, ttlSeconds?: number) => Promise<string | null>
@@ -200,6 +208,30 @@ export const useRedis = create<RedisState>((set, get) => ({
       return { list: { ...s.list, keys } }
     }),
 
+  resyncTtls: async () => {
+    const { connId, list } = get()
+    if (!connId || list.keys.length === 0) return
+    // one pipelined PTTL per loaded key, addressed by raw bytes (binary-safe)
+    const keysB64 = list.keys.map((k) => k.keyB64)
+    let ttls: number[]
+    try {
+      ttls = await window.api.redis.keyTtls(connId, keysB64)
+    } catch {
+      return // transient — the 1s prune/countdown keeps working off the last stamp
+    }
+    const now = Date.now()
+    // re-key by keyB64 so the update survives a concurrent scan reordering rows
+    const byB64 = new Map(keysB64.map((b64, i) => [b64, ttls[i]]))
+    set((s) => {
+      const keys = s.list.keys.map((k) => {
+        const ttl = byB64.get(k.keyB64)
+        if (ttl === undefined) return k
+        return { ...k, ttl, expiresAt: ttl >= 0 ? now + ttl : null }
+      })
+      return { list: { ...s.list, keys } }
+    })
+  },
+
   selectDb: async (index) => {
     const { connId } = get()
     if (!connId) return
@@ -214,17 +246,22 @@ export const useRedis = create<RedisState>((set, get) => ({
     if (!connId) return
     patchTab(set, tabId, { loading: true, error: null })
     try {
-      const page = await window.api.redis.readValue(connId, key, {
-        cursor: opts?.cursor,
-        start: opts?.start,
-        count: PAGE,
-        forceLoadLarge: opts?.force
-      })
+      const page = await window.api.redis.readValue(
+        connId,
+        key,
+        {
+          cursor: opts?.cursor,
+          start: opts?.start,
+          count: PAGE,
+          forceLoadLarge: opts?.force
+        },
+        opts?.keyB64
+      )
       // refresh meta (TTL + cardinality) on a full (re)load, not on paging
       const isPaging = opts?.cursor !== undefined || opts?.start !== undefined
       const meta = isPaging
         ? get().tabs[tabId]?.meta ?? null
-        : await window.api.redis.keyMeta(connId, key).catch(() => null)
+        : await window.api.redis.keyMeta(connId, key, opts?.keyB64).catch(() => null)
       patchTab(set, tabId, { page, meta, loading: false })
     } catch (err) {
       patchTab(set, tabId, { loading: false, error: msg(err) })
@@ -263,10 +300,10 @@ export const useRedis = create<RedisState>((set, get) => ({
     doCommit(get, set, tabId, key, type, { force: false, confirmEmptyDelete: true }),
   cancelEmptyDelete: (tabId) => patchTab(set, tabId, { emptyDelete: null }),
 
-  deleteKey: async (key) => {
+  deleteKey: async (key, keyB64) => {
     const { connId } = get()
     if (!connId) return
-    await window.api.redis.deleteKey(connId, key)
+    await window.api.redis.deleteKey(connId, key, keyB64)
     await get().rescan()
   },
 
@@ -374,19 +411,29 @@ export function buildCommands(
         cmds.push(cmd(['HSET', key, e.field, e.value], `HSET ${key} ${e.field}`, false))
         break
       case 'hash-del':
-        cmds.push(cmd(['HDEL', key, e.field], `HDEL ${key} ${e.field}`, true))
+        cmds.push(
+          cmd(['HDEL', key, e.fieldB64 ? { b64: e.fieldB64 } : e.field], `HDEL ${key} ${e.field}`, true)
+        )
         break
       case 'set-add':
         cmds.push(cmd(['SADD', key, e.member], `SADD ${key}`, false))
         break
       case 'set-del':
-        cmds.push(cmd(['SREM', key, e.member], `SREM ${key}`, true))
+        cmds.push(
+          cmd(['SREM', key, e.memberB64 ? { b64: e.memberB64 } : e.member], `SREM ${key}`, true)
+        )
         break
       case 'zset-set':
         cmds.push(cmd(['ZADD', key, String(e.score), e.member], `ZADD ${key} ${e.member}`, false))
         break
       case 'zset-del':
-        cmds.push(cmd(['ZREM', key, e.member], `ZREM ${key} ${e.member}`, true))
+        cmds.push(
+          cmd(
+            ['ZREM', key, e.memberB64 ? { b64: e.memberB64 } : e.member],
+            `ZREM ${key} ${e.member}`,
+            true
+          )
+        )
         break
       case 'list-set':
         cmds.push(cmd(['LSET', key, String(e.index), e.value], `LSET ${key} ${e.index}`, false))
@@ -406,7 +453,13 @@ export function buildCommands(
         )
         break
       case 'list-removeval':
-        cmds.push(cmd(['LREM', key, String(e.count), e.value], `LREM ${key}`, true))
+        cmds.push(
+          cmd(
+            ['LREM', key, String(e.count), e.valueB64 ? { b64: e.valueB64 } : e.value],
+            `LREM ${key}`,
+            true
+          )
+        )
         break
       case 'stream-add':
         cmds.push(

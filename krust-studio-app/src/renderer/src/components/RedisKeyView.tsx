@@ -50,10 +50,12 @@ export function RedisKeyView(): React.JSX.Element {
   const ident = tab?.redisKey
   const tabState = redis.tabs[tabId]
 
+  const kb = ident?.keyB64
+
   useEffect(() => {
     // also re-run when connId becomes available (restored tab mounts before the
     // sidebar's init sets the redis connection)
-    if (ident && tabId && redis.connId) void redis.loadValue(tabId, ident.key)
+    if (ident && tabId && redis.connId) void redis.loadValue(tabId, ident.key, { keyB64: kb })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabId, ident?.key, redis.connId])
 
@@ -62,7 +64,7 @@ export function RedisKeyView(): React.JSX.Element {
   const ttlMs = tabState?.meta?.ttl
   useEffect(() => {
     if (!ident || !tabId || ttlMs === undefined || ttlMs < 0) return
-    const id = setTimeout(() => void redis.loadValue(tabId, ident.key), ttlMs + 250)
+    const id = setTimeout(() => void redis.loadValue(tabId, ident.key, { keyB64: kb }), ttlMs + 250)
     return () => clearTimeout(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabId, ident?.key, ttlMs])
@@ -71,6 +73,9 @@ export function RedisKeyView(): React.JSX.Element {
     return <div className="p-6 text-sm text-muted-foreground">No key selected.</div>
   }
 
+  // a binary key NAME can only be addressed by its raw bytes — read + delete
+  // only (no edit/rename/TTL/commit, since staging addresses by the UTF-8 name)
+  const binaryKey = !!ident.binary
   const page = tabState?.page ?? null
   const staged = tabState?.staged ?? []
   const commands = buildCommands(ident.key, staged, tabState?.ttlChange)
@@ -81,7 +86,8 @@ export function RedisKeyView(): React.JSX.Element {
       <Header
         tab={tab}
         ttl={tabState?.meta?.ttl ?? null}
-        onReload={() => void redis.loadValue(tabId, ident.key, { force: true })}
+        binaryKey={binaryKey}
+        onReload={() => void redis.loadValue(tabId, ident.key, { force: true, keyB64: kb })}
         onClose={() => closeTab(tabId)}
       />
 
@@ -119,7 +125,7 @@ export function RedisKeyView(): React.JSX.Element {
             Key changed under you ({tabState.conflict.kind.replace('-', ' ')}).
           </p>
           <div className="mt-1 flex gap-2">
-            <Button size="xs" variant="secondary" onClick={() => void redis.loadValue(tabId, ident.key)}>
+            <Button size="xs" variant="secondary" onClick={() => void redis.loadValue(tabId, ident.key, { keyB64: kb })}>
               Reload
             </Button>
             {tabState.conflict.forceAllowed && (
@@ -137,12 +143,19 @@ export function RedisKeyView(): React.JSX.Element {
         ) : tabState?.error ? (
           <div className="rounded border border-destructive/40 p-2 text-xs text-destructive">{tabState.error}</div>
         ) : page ? (
-          <ValueBody tabId={tabId} keyName={ident.key} page={page} stage={(e) => redis.stage(tabId, e)} loadMore={(o) => void redis.loadValue(tabId, ident.key, o)} />
+          <ValueBody
+            tabId={tabId}
+            keyName={ident.key}
+            page={page}
+            readonly={binaryKey}
+            stage={(e) => redis.stage(tabId, e)}
+            loadMore={(o) => void redis.loadValue(tabId, ident.key, { ...o, keyB64: kb })}
+          />
         ) : null}
       </div>
 
       {/* staged command preview + commit (decision 16) */}
-      {(commands.length > 0 || staged.length > 0) && (
+      {!binaryKey && (commands.length > 0 || staged.length > 0) && (
         <div className="border-t border-border bg-card/40 p-2">
           <div className="mb-1 flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">
@@ -159,7 +172,7 @@ export function RedisKeyView(): React.JSX.Element {
                   const ok = await redis.commit(tabId, ident.key, ident.type)
                   if (ok) {
                     toast.success('Committed')
-                    void redis.loadValue(tabId, ident.key)
+                    void redis.loadValue(tabId, ident.key, { keyB64: kb })
                   }
                 }}
               >
@@ -184,11 +197,14 @@ export function RedisKeyView(): React.JSX.Element {
 function Header({
   tab,
   ttl,
+  binaryKey,
   onReload,
   onClose
 }: {
   tab: Tab
   ttl: number | null
+  /** binary key name → read + delete only (rename/TTL hidden) */
+  binaryKey: boolean
   onReload: () => void
   onClose: () => void
 }): React.JSX.Element {
@@ -198,7 +214,6 @@ function Header({
   const [newName, setNewName] = useState(ident.key)
   const [overwrite, setOverwrite] = useState(false)
   const [delOpen, setDelOpen] = useState(false)
-  const [confirmDel, setConfirmDel] = useState('')
   const [expiryOpen, setExpiryOpen] = useState(false)
   const [expirySecs, setExpirySecs] = useState('')
 
@@ -230,6 +245,14 @@ function Header({
       <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
         {ident.type}
       </span>
+      {binaryKey && (
+        <span
+          className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] uppercase text-amber-400"
+          title="Binary key name — read and delete only"
+        >
+          binary · read-only
+        </span>
+      )}
       {ttl !== null && (
         <span
           className="flex items-center gap-1 rounded bg-muted/60 px-1.5 py-0.5 text-[10px] text-muted-foreground"
@@ -245,10 +268,12 @@ function Header({
       </Button>
 
       {/* expiry (stages PEXPIRE/PERSIST into the value-commit) */}
-      <Button size="xs" variant="ghost" onClick={() => setExpiryOpen((v) => !v)}>
-        <Clock className="size-3.5" /> TTL
-      </Button>
-      {expiryOpen && (
+      {!binaryKey && (
+        <Button size="xs" variant="ghost" onClick={() => setExpiryOpen((v) => !v)}>
+          <Clock className="size-3.5" /> TTL
+        </Button>
+      )}
+      {!binaryKey && expiryOpen && (
         <div className="flex items-center gap-1">
           <input
             value={expirySecs}
@@ -271,10 +296,12 @@ function Header({
         </div>
       )}
 
-      {/* rename — separate guarded action, in a dialog */}
-      <Button size="xs" variant="ghost" onClick={openRename}>
-        <Pencil className="size-3.5" /> Rename
-      </Button>
+      {/* rename — separate guarded action, in a dialog (UTF-8 keys only) */}
+      {!binaryKey && (
+        <Button size="xs" variant="ghost" onClick={openRename}>
+          <Pencil className="size-3.5" /> Rename
+        </Button>
+      )}
       <Dialog open={renameOpen} onOpenChange={setRenameOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -321,50 +348,45 @@ function Header({
         </DialogContent>
       </Dialog>
 
-      {/* delete — typed key-name confirmation, in a dialog */}
+      {/* delete — simple yes/no confirm; the key name is highlighted as danger */}
       <Button
         size="xs"
         variant="ghost"
         className="text-destructive"
         title="Delete key"
-        onClick={() => {
-          setConfirmDel('')
-          setDelOpen(true)
-        }}
+        onClick={() => setDelOpen(true)}
       >
         <Trash2 className="size-3.5" /> Delete
       </Button>
       <Dialog open={delOpen} onOpenChange={setDelOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Delete key</DialogTitle>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="size-4" /> Delete key
+            </DialogTitle>
             <DialogDescription>
-              This permanently removes <span className="font-mono">{ident.key}</span> and its value.
-              Type the key name to confirm.
+              Permanently remove{' '}
+              <span className="rounded bg-destructive/10 px-1 font-mono font-medium text-destructive">
+                {ident.key}
+              </span>{' '}
+              and its value? This cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <Input
-            autoFocus
-            value={confirmDel}
-            onChange={(e) => setConfirmDel(e.target.value)}
-            placeholder={ident.key}
-            className="font-mono"
-          />
           <DialogFooter>
             <Button variant="ghost" onClick={() => setDelOpen(false)}>
-              Cancel
+              No
             </Button>
             <Button
               variant="destructive"
-              disabled={confirmDel !== ident.key}
+              autoFocus
               onClick={async () => {
-                await redis.deleteKey(ident.key)
+                await redis.deleteKey(ident.key, ident.keyB64)
                 toast.success('Deleted')
                 setDelOpen(false)
                 onClose()
               }}
             >
-              <Trash2 className="size-3.5" /> Delete
+              <Trash2 className="size-3.5" /> Yes, delete
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -404,31 +426,37 @@ function ValueBody({
   tabId,
   keyName,
   page,
+  readonly,
   stage,
   loadMore
 }: {
   tabId: string
   keyName: string
   page: import('../../../shared/types').RedisValuePage
+  /** binary key name → the whole value is read-only (can't be safely addressed) */
+  readonly?: boolean
   stage: (e: StagedEdit) => void
   loadMore: (opts: { cursor?: string; start?: number }) => void
 }): React.JSX.Element {
   void tabId
   void keyName
+  const ro = readonly ?? false
   switch (page.type) {
     case 'string':
-      return <StringEditor page={page} stage={stage} />
+      return <StringEditor page={page} stage={stage} readonly={ro} />
     case 'hash':
       return (
         <MemberGrid
           columns={['field', 'value']}
           rows={page.fields.map((f) => [f.field, f.value])}
           rowBinary={page.fields.map((f) => f.binary ?? false)}
+          rowB64={page.fields.map((f) => f.b64)}
+          readonly={ro}
           cursor={page.cursor}
           onMore={(c) => loadMore({ cursor: c })}
           onAdd={(vals) => stage({ kind: 'hash-set', field: vals[0], value: vals[1] })}
           onEditValue={(row, value) => stage({ kind: 'hash-set', field: row[0], value })}
-          onRemove={(row) => stage({ kind: 'hash-del', field: row[0] })}
+          onRemove={(row, b64) => stage({ kind: 'hash-del', field: row[0], fieldB64: b64 })}
         />
       )
     case 'set':
@@ -437,10 +465,12 @@ function ValueBody({
           columns={['member']}
           rows={page.members.map((m) => [m.value])}
           rowBinary={page.members.map((m) => m.binary ?? false)}
+          rowB64={page.members.map((m) => m.b64)}
+          readonly={ro}
           cursor={page.cursor}
           onMore={(c) => loadMore({ cursor: c })}
           onAdd={(vals) => stage({ kind: 'set-add', member: vals[0] })}
-          onRemove={(row) => stage({ kind: 'set-del', member: row[0] })}
+          onRemove={(row, b64) => stage({ kind: 'set-del', member: row[0], memberB64: b64 })}
         />
       )
     case 'zset':
@@ -449,11 +479,13 @@ function ValueBody({
           columns={['member', 'score']}
           rows={page.members.map((m) => [m.member, String(m.score)])}
           rowBinary={page.members.map((m) => m.binary ?? false)}
+          rowB64={page.members.map((m) => m.b64)}
+          readonly={ro}
           cursor={page.cursor}
           onMore={(c) => loadMore({ cursor: c })}
           onAdd={(vals) => stage({ kind: 'zset-set', member: vals[0], score: Number(vals[1]) || 0 })}
           onEditValue={(row, value) => stage({ kind: 'zset-set', member: row[0], score: Number(value) || 0 })}
-          onRemove={(row) => stage({ kind: 'zset-del', member: row[0] })}
+          onRemove={(row, b64) => stage({ kind: 'zset-del', member: row[0], memberB64: b64 })}
         />
       )
     case 'list':
@@ -463,14 +495,22 @@ function ValueBody({
           start={page.start}
           end={page.end}
           length={page.length}
+          readonly={ro}
           onMore={() => loadMore({ start: page.end + 1 })}
           onSet={(index, value) => stage({ kind: 'list-set', index, value })}
           onPush={(side, value) => stage({ kind: 'list-push', side, value })}
-          onRemove={(value) => stage({ kind: 'list-removeval', count: 1, value })}
+          onRemove={(value, b64) => stage({ kind: 'list-removeval', count: 1, value, valueB64: b64 })}
         />
       )
     case 'stream':
-      return <StreamViewer entries={page.entries} onMore={() => loadMore({})} onAppend={(fields) => stage({ kind: 'stream-add', fields })} />
+      return (
+        <StreamViewer
+          entries={page.entries}
+          readonly={ro}
+          onMore={() => loadMore({})}
+          onAppend={(fields) => stage({ kind: 'stream-add', fields })}
+        />
+      )
     case 'none':
       return <p className="text-sm text-muted-foreground">Key not found (it may have been deleted or expired).</p>
     default:
@@ -505,10 +545,12 @@ function hexToBytes(hex: string): Uint8Array {
 
 function StringEditor({
   page,
-  stage
+  stage,
+  readonly
 }: {
   page: Extract<import('../../../shared/types').RedisValuePage, { type: 'string' }>
   stage: (e: StagedEdit) => void
+  readonly?: boolean
 }): React.JSX.Element {
   // original value in each representation, derived once from the raw bytes
   const orig = React.useMemo(() => {
@@ -662,20 +704,23 @@ function StringEditor({
         <textarea
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
+          readOnly={readonly}
           className="min-h-0 w-full flex-1 resize-none rounded border border-border bg-transparent p-2 font-mono text-xs outline-none focus:border-ring"
           spellCheck={false}
         />
       )}
 
       <div className="flex shrink-0 items-center gap-2">
-        <Button
-          size="xs"
-          variant="secondary"
-          disabled={!dirty || (mode === 'json' && jsonView === 'tree')}
-          onClick={onStage}
-        >
-          Stage value
-        </Button>
+        {!readonly && (
+          <Button
+            size="xs"
+            variant="secondary"
+            disabled={!dirty || (mode === 'json' && jsonView === 'tree')}
+            onClick={onStage}
+          >
+            Stage value
+          </Button>
+        )}
         <span className="text-[11px] text-muted-foreground">
           {page.bytes} bytes · {page.encoding}
         </span>
@@ -688,6 +733,8 @@ function MemberGrid({
   columns,
   rows,
   rowBinary,
+  rowB64,
+  readonly,
   cursor,
   onMore,
   onAdd,
@@ -696,13 +743,17 @@ function MemberGrid({
 }: {
   columns: string[]
   rows: string[][]
-  /** per-row flag: the field/member held non-UTF-8 bytes — read-only (shown as hex) */
+  /** per-row flag: the field/member held non-UTF-8 bytes — shown as hex, no inline edit */
   rowBinary?: boolean[]
+  /** per-row raw bytes (base64) for binary members — addresses them for removal */
+  rowB64?: (string | undefined)[]
+  /** whole grid read-only (binary key name) — no add/edit/remove */
+  readonly?: boolean
   cursor: string
   onMore: (cursor: string) => void
   onAdd: (vals: string[]) => void
   onEditValue?: (row: string[], value: string) => void
-  onRemove: (row: string[]) => void
+  onRemove: (row: string[], b64?: string) => void
 }): React.JSX.Element {
   const [draft, setDraft] = useState<string[]>(columns.map(() => ''))
   return (
@@ -725,7 +776,7 @@ function MemberGrid({
             <tr key={i} className="border-t border-border/50">
               {row.map((cell, ci) => (
                 <td key={ci} className="px-2 py-1 font-mono">
-                  {ci === row.length - 1 && onEditValue && !binary ? (
+                  {ci === row.length - 1 && onEditValue && !binary && !readonly ? (
                     <input
                       defaultValue={cell}
                       onBlur={(e) => e.target.value !== cell && onEditValue(row, e.target.value)}
@@ -744,8 +795,10 @@ function MemberGrid({
                 </td>
               ))}
               <td className="px-1">
-                {!binary && (
-                  <button onClick={() => onRemove(row)} title="Stage remove">
+                {/* binary members can't be edited in place but CAN be removed
+                    (addressed by their raw bytes); read-only keys allow neither */}
+                {!readonly && (
+                  <button onClick={() => onRemove(row, rowB64?.[i])} title="Stage remove">
                     <Trash2 className="size-3.5 text-muted-foreground hover:text-destructive" />
                   </button>
                 )}
@@ -753,32 +806,34 @@ function MemberGrid({
             </tr>
             )
           })}
-          {/* add-member row */}
-          <tr className="border-t border-border/50">
-            {columns.map((c, ci) => (
-              <td key={c} className="px-2 py-1">
-                <input
-                  value={draft[ci]}
-                  onChange={(e) => setDraft((d) => d.map((v, j) => (j === ci ? e.target.value : v)))}
-                  placeholder={c}
-                  className="w-full rounded border border-border bg-transparent px-1 font-mono"
-                />
+          {/* add-member row (UTF-8 only; binary members created elsewhere) */}
+          {!readonly && (
+            <tr className="border-t border-border/50">
+              {columns.map((c, ci) => (
+                <td key={c} className="px-2 py-1">
+                  <input
+                    value={draft[ci]}
+                    onChange={(e) => setDraft((d) => d.map((v, j) => (j === ci ? e.target.value : v)))}
+                    placeholder={c}
+                    className="w-full rounded border border-border bg-transparent px-1 font-mono"
+                  />
+                </td>
+              ))}
+              <td className="px-1">
+                <button
+                  onClick={() => {
+                    if (draft[0].trim()) {
+                      onAdd(draft)
+                      setDraft(columns.map(() => ''))
+                    }
+                  }}
+                  title="Stage add"
+                >
+                  <Plus className="size-3.5 text-muted-foreground hover:text-foreground" />
+                </button>
               </td>
-            ))}
-            <td className="px-1">
-              <button
-                onClick={() => {
-                  if (draft[0].trim()) {
-                    onAdd(draft)
-                    setDraft(columns.map(() => ''))
-                  }
-                }}
-                title="Stage add"
-              >
-                <Plus className="size-3.5 text-muted-foreground hover:text-foreground" />
-              </button>
-            </td>
-          </tr>
+            </tr>
+          )}
         </tbody>
       </table>
       {cursor !== '0' && (
@@ -795,37 +850,41 @@ function ListEditor({
   start,
   end,
   length,
+  readonly,
   onMore,
   onSet,
   onPush,
   onRemove
 }: {
-  items: { value: string; binary?: boolean }[]
+  items: { value: string; binary?: boolean; b64?: string }[]
   start: number
   end: number
   length: number
+  readonly?: boolean
   onMore: () => void
   onSet: (index: number, value: string) => void
   onPush: (side: 'L' | 'R', value: string) => void
-  onRemove: (value: string) => void
+  onRemove: (value: string, b64?: string) => void
 }): React.JSX.Element {
   const [push, setPush] = useState('')
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-1">
-        <input
-          value={push}
-          onChange={(e) => setPush(e.target.value)}
-          placeholder="value"
-          className="h-6 flex-1 rounded border border-border bg-transparent px-1 font-mono text-xs"
-        />
-        <Button size="xs" variant="ghost" onClick={() => push && (onPush('L', push), setPush(''))}>
-          Prepend
-        </Button>
-        <Button size="xs" variant="ghost" onClick={() => push && (onPush('R', push), setPush(''))}>
-          Append
-        </Button>
-      </div>
+      {!readonly && (
+        <div className="flex items-center gap-1">
+          <input
+            value={push}
+            onChange={(e) => setPush(e.target.value)}
+            placeholder="value"
+            className="h-6 flex-1 rounded border border-border bg-transparent px-1 font-mono text-xs"
+          />
+          <Button size="xs" variant="ghost" onClick={() => push && (onPush('L', push), setPush(''))}>
+            Prepend
+          </Button>
+          <Button size="xs" variant="ghost" onClick={() => push && (onPush('R', push), setPush(''))}>
+            Append
+          </Button>
+        </div>
+      )}
       <table className="w-full text-xs">
         <tbody>
           {items.map((it, i) => {
@@ -835,11 +894,13 @@ function ListEditor({
               <tr key={index} className="border-t border-border/50">
                 <td className="w-12 px-2 py-1 text-muted-foreground">{index}</td>
                 <td className="px-2 py-1 font-mono">
-                  {binary ? (
+                  {binary || readonly ? (
                     <span className="flex items-center gap-1 truncate">
-                      <span className="rounded bg-amber-500/15 px-1 text-[9px] uppercase text-amber-400">
-                        bin
-                      </span>
+                      {binary && (
+                        <span className="rounded bg-amber-500/15 px-1 text-[9px] uppercase text-amber-400">
+                          bin
+                        </span>
+                      )}
                       {it.value}
                     </span>
                   ) : (
@@ -851,8 +912,8 @@ function ListEditor({
                   )}
                 </td>
                 <td className="px-1">
-                  {!binary && (
-                    <button onClick={() => onRemove(it.value)} title="Stage remove (LREM)">
+                  {!readonly && (
+                    <button onClick={() => onRemove(it.value, it.b64)} title="Stage remove (LREM)">
                       <Trash2 className="size-3.5 text-muted-foreground hover:text-destructive" />
                     </button>
                   )}
@@ -876,10 +937,12 @@ function ListEditor({
 
 function StreamViewer({
   entries,
+  readonly,
   onMore,
   onAppend
 }: {
   entries: { id: string; fields: [string, string][] }[]
+  readonly?: boolean
   onMore: () => void
   onAppend: (fields: [string, string][]) => void
 }): React.JSX.Element {
@@ -887,13 +950,15 @@ function StreamViewer({
   const [value, setValue] = useState('')
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-1">
-        <input value={field} onChange={(e) => setField(e.target.value)} placeholder="field" className="h-6 w-32 rounded border border-border bg-transparent px-1 font-mono text-xs" />
-        <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="value" className="h-6 flex-1 rounded border border-border bg-transparent px-1 font-mono text-xs" />
-        <Button size="xs" variant="ghost" onClick={() => field && (onAppend([[field, value]]), setField(''), setValue(''))}>
-          <Plus className="size-3.5" /> XADD
-        </Button>
-      </div>
+      {!readonly && (
+        <div className="flex items-center gap-1">
+          <input value={field} onChange={(e) => setField(e.target.value)} placeholder="field" className="h-6 w-32 rounded border border-border bg-transparent px-1 font-mono text-xs" />
+          <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="value" className="h-6 flex-1 rounded border border-border bg-transparent px-1 font-mono text-xs" />
+          <Button size="xs" variant="ghost" onClick={() => field && (onAppend([[field, value]]), setField(''), setValue(''))}>
+            <Plus className="size-3.5" /> XADD
+          </Button>
+        </div>
+      )}
       <div className="space-y-1 font-mono text-[11px]">
         {entries.map((e) => (
           <div key={e.id} className="rounded border border-border/50 p-1.5">
