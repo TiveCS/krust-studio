@@ -32,6 +32,7 @@ import {
 import type {
   ApplyResult,
   ChangeSet,
+  IntrospectedTable,
   CreateTableSpec,
   EntityInfo,
   EntityRef,
@@ -479,6 +480,94 @@ export class MysqlDriver implements DbDriver, RoutineCapable {
     )) as [RowDataPacket[], FieldPacket[]]
     const engine = (engRows[0] as { engine?: string } | undefined)?.engine
     return { columns, indexes, relations, engine: engine ?? undefined }
+  }
+
+  /** whole-schema structure in 4 information_schema queries (MCP fast path) */
+  async bulkIntrospect(): Promise<IntrospectedTable[]> {
+    if (!this.activeDb) return []
+    const conn = await this.ensure()
+    const q = async (sql: string): Promise<RowDataPacket[]> =>
+      (await conn.query(sql))[0] as RowDataPacket[]
+
+    const tblRows = await q(
+      `SELECT TABLE_NAME AS name,
+              CASE WHEN TABLE_TYPE = 'VIEW' THEN 'view' ELSE 'table' END AS type
+         FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()`
+    )
+    const colRows = await q(
+      `SELECT TABLE_NAME AS tbl, COLUMN_NAME AS name, COLUMN_TYPE AS type,
+              (IS_NULLABLE = 'YES') AS nullable, COLUMN_DEFAULT AS dflt,
+              (COLUMN_KEY = 'PRI') AS pk
+         FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE()
+        ORDER BY TABLE_NAME, ORDINAL_POSITION`
+    )
+    const fkRows = await q(
+      `SELECT TABLE_NAME AS tbl, COLUMN_NAME AS col,
+              REFERENCED_TABLE_NAME AS refTable, REFERENCED_COLUMN_NAME AS refColumn
+         FROM information_schema.KEY_COLUMN_USAGE
+        WHERE TABLE_SCHEMA = DATABASE() AND REFERENCED_TABLE_NAME IS NOT NULL`
+    )
+    const idxRows = await q(
+      `SELECT TABLE_NAME AS tbl, INDEX_NAME AS name, (NON_UNIQUE = 0) AS uniq,
+              COLUMN_NAME AS col
+         FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE()
+        ORDER BY TABLE_NAME, INDEX_NAME, SEQ_IN_INDEX`
+    )
+
+    const fkMap = new Map<string, { refTable: string; refColumn: string }>()
+    for (const f of fkRows as unknown as {
+      tbl: string
+      col: string
+      refTable: string
+      refColumn: string
+    }[]) {
+      fkMap.set(`${f.tbl}.${f.col}`, { refTable: f.refTable, refColumn: f.refColumn })
+    }
+
+    const tables = new Map<string, IntrospectedTable>()
+    for (const t of tblRows as unknown as { name: string; type: string }[]) {
+      tables.set(t.name, {
+        name: t.name,
+        type: t.type === 'view' ? 'view' : 'table',
+        columns: [],
+        indexes: []
+      })
+    }
+    for (const c of colRows as unknown as {
+      tbl: string
+      name: string
+      type: string
+      nullable: number
+      dflt: string | null
+      pk: number
+    }[]) {
+      tables.get(c.tbl)?.columns.push({
+        name: c.name,
+        type: c.type,
+        nullable: !!c.nullable,
+        pk: !!c.pk,
+        default: c.dflt ?? null,
+        fk: fkMap.get(`${c.tbl}.${c.name}`)
+      })
+    }
+    const idxAcc = new Map<string, { name: string; unique: boolean; columns: string[] }>()
+    for (const r of idxRows as unknown as {
+      tbl: string
+      name: string
+      uniq: number
+      col: string
+    }[]) {
+      const ik = `${r.tbl}.${r.name}`
+      let g = idxAcc.get(ik)
+      if (!g) {
+        g = { name: r.name, unique: !!r.uniq, columns: [] }
+        idxAcc.set(ik, g)
+        tables.get(r.tbl)?.indexes.push(g)
+      }
+      g.columns.push(r.col)
+    }
+
+    return [...tables.values()]
   }
 
   async listReferencingTables(entity: EntityRef): Promise<ReferencingTable[]> {

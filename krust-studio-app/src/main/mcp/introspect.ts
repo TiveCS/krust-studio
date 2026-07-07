@@ -1,4 +1,4 @@
-import { listEntities, describeTable } from '../db/session'
+import { listEntities, describeTable, bulkIntrospect } from '../db/session'
 import { getConnectionConfig } from '../store/connections'
 import { getMcpGrant } from '../store/mcp'
 import type { IntrospectResult, IntrospectedTable } from '../../shared/types'
@@ -31,10 +31,31 @@ export async function introspectSchema(connectionId: string): Promise<Introspect
     throw new Error('Schema introspection is not granted for this connection')
   }
   const excludes = grant.introspectExcludes ?? []
+  const keep = (name: string, schema?: string): boolean => !isExcluded(name, schema, excludes)
 
+  // Fast path: one bulk pass (a few catalog queries) instead of N sequential
+  // describeTable round-trips — critical on a remote/serverless DB (65 tables
+  // went from ~63s to a couple of round-trips). If a bulk query errors, fall
+  // through to the reliable per-table path rather than failing introspection.
+  let bulk: IntrospectedTable[] | null = null
+  try {
+    bulk = await bulkIntrospect(connectionId)
+  } catch {
+    bulk = null
+  }
+  if (bulk) {
+    return {
+      connectionId,
+      database: config.database ?? null,
+      engine: config.driver,
+      tables: bulk.filter((t) => keep(t.name, t.schema))
+    }
+  }
+
+  // Fallback: per-table describe (sqlite — local + fast; or a driver with no
+  // bulk path).
   const entities = await listEntities(connectionId)
-  const visible = entities.filter((e) => !isExcluded(e.name, e.schema, excludes))
-
+  const visible = entities.filter((e) => keep(e.name, e.schema))
   const tables: IntrospectedTable[] = []
   for (const e of visible) {
     const s = await describeTable(connectionId, { name: e.name, schema: e.schema })

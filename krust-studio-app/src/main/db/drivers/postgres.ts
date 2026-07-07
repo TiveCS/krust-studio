@@ -19,6 +19,7 @@ import {
 import type {
   ApplyResult,
   ChangeSet,
+  IntrospectedTable,
   ColumnInfo,
   CreateTableSpec,
   EntityInfo,
@@ -280,6 +281,142 @@ export class PostgresDriver implements DbDriver, RoutineCapable {
       primaryKey: pkRes.rows.map((r: { name: string }) => r.name),
       foreignKeys
     }
+  }
+
+  /** whole-schema structure in ~5 catalog queries (MCP introspection fast path) */
+  async bulkIntrospect(): Promise<IntrospectedTable[]> {
+    const client = await this.ensure()
+    const EXCL = "n.nspname NOT IN ('pg_catalog','information_schema')"
+    const REL = "c.relkind IN ('r','p','v','m')"
+
+    const tblRes = await client.query(
+      `SELECT n.nspname AS schema, c.relname AS name,
+              CASE WHEN c.relkind IN ('v','m') THEN 'view' ELSE 'table' END AS type
+         FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE ${REL} AND ${EXCL}
+        ORDER BY n.nspname, c.relname`
+    )
+    const colRes = await client.query(
+      `SELECT n.nspname AS schema, c.relname AS "table", a.attname AS name,
+              format_type(a.atttypid, a.atttypmod) AS type,
+              (NOT a.attnotnull) AS nullable,
+              pg_get_expr(ad.adbin, ad.adrelid) AS "default"
+         FROM pg_attribute a
+         JOIN pg_class c ON c.oid = a.attrelid
+         JOIN pg_namespace n ON n.oid = c.relnamespace
+         LEFT JOIN pg_attrdef ad ON ad.adrelid = a.attrelid AND ad.adnum = a.attnum
+        WHERE a.attnum > 0 AND NOT a.attisdropped AND ${REL} AND ${EXCL}
+        ORDER BY n.nspname, c.relname, a.attnum`
+    )
+    const pkRes = await client.query(
+      `SELECT n.nspname AS schema, c.relname AS "table", a.attname AS col
+         FROM pg_constraint con
+         JOIN pg_class c ON c.oid = con.conrelid
+         JOIN pg_namespace n ON n.oid = c.relnamespace
+         JOIN unnest(con.conkey) AS k(attnum) ON true
+         JOIN pg_attribute a ON a.attrelid = con.conrelid AND a.attnum = k.attnum
+        WHERE con.contype = 'p' AND ${EXCL}`
+    )
+    const fkRes = await client.query(
+      `SELECT n.nspname AS schema, c.relname AS "table", a.attname AS col,
+              fn.nspname AS "refSchema", fc.relname AS "refTable", fa.attname AS "refColumn"
+         FROM pg_constraint con
+         JOIN pg_class c ON c.oid = con.conrelid
+         JOIN pg_namespace n ON n.oid = c.relnamespace
+         JOIN pg_class fc ON fc.oid = con.confrelid
+         JOIN pg_namespace fn ON fn.oid = fc.relnamespace
+         JOIN unnest(con.conkey) WITH ORDINALITY AS k(attnum, ko) ON true
+         JOIN unnest(con.confkey) WITH ORDINALITY AS f(attnum, fo) ON k.ko = f.fo
+         JOIN pg_attribute a ON a.attrelid = con.conrelid AND a.attnum = k.attnum
+         JOIN pg_attribute fa ON fa.attrelid = con.confrelid AND fa.attnum = f.attnum
+        WHERE con.contype = 'f' AND ${EXCL}`
+    )
+    const idxRes = await client.query(
+      `SELECT n.nspname AS schema, c.relname AS "table", ic.relname AS name,
+              ix.indisunique AS "unique", a.attname AS col, k.ord
+         FROM pg_index ix
+         JOIN pg_class c ON c.oid = ix.indrelid
+         JOIN pg_class ic ON ic.oid = ix.indexrelid
+         JOIN pg_namespace n ON n.oid = c.relnamespace
+         JOIN unnest(ix.indkey) WITH ORDINALITY AS k(attnum, ord) ON true
+         JOIN pg_attribute a ON a.attrelid = ix.indrelid AND a.attnum = k.attnum
+        WHERE ${EXCL} AND a.attnum > 0
+        ORDER BY n.nspname, c.relname, ic.relname, k.ord`
+    )
+
+    const key = (s: string, t: string): string => `${s}.${t}`
+    const pkSet = new Set(
+      (pkRes.rows as { schema: string; table: string; col: string }[]).map(
+        (r) => `${key(r.schema, r.table)}.${r.col}`
+      )
+    )
+    const fkMap = new Map<string, { refTable: string; refColumn: string; refSchema?: string }>()
+    for (const f of fkRes.rows as {
+      schema: string
+      table: string
+      col: string
+      refTable: string
+      refColumn: string
+      refSchema: string
+    }[]) {
+      fkMap.set(`${key(f.schema, f.table)}.${f.col}`, {
+        refTable: f.refTable,
+        refColumn: f.refColumn,
+        refSchema: f.refSchema
+      })
+    }
+
+    const tables = new Map<string, IntrospectedTable>()
+    for (const t of tblRes.rows as { schema: string; name: string; type: string }[]) {
+      tables.set(key(t.schema, t.name), {
+        name: t.name,
+        schema: t.schema,
+        type: t.type === 'view' ? 'view' : 'table',
+        columns: [],
+        indexes: []
+      })
+    }
+    for (const c of colRes.rows as {
+      schema: string
+      table: string
+      name: string
+      type: string
+      nullable: boolean
+      default: string | null
+    }[]) {
+      const tk = key(c.schema, c.table)
+      const tbl = tables.get(tk)
+      if (!tbl) continue
+      tbl.columns.push({
+        name: c.name,
+        type: c.type,
+        nullable: c.nullable,
+        pk: pkSet.has(`${tk}.${c.name}`),
+        default: c.default ?? null,
+        fk: fkMap.get(`${tk}.${c.name}`)
+      })
+    }
+    // group index rows into per-index column lists
+    const idxAcc = new Map<string, { name: string; unique: boolean; columns: string[] }>()
+    for (const r of idxRes.rows as {
+      schema: string
+      table: string
+      name: string
+      unique: boolean
+      col: string
+    }[]) {
+      const tk = key(r.schema, r.table)
+      const ik = `${tk}.${r.name}`
+      let g = idxAcc.get(ik)
+      if (!g) {
+        g = { name: r.name, unique: r.unique, columns: [] }
+        idxAcc.set(ik, g)
+        tables.get(tk)?.indexes.push(g)
+      }
+      g.columns.push(r.col)
+    }
+
+    return [...tables.values()]
   }
 
   async countRows(entity: EntityRef, filters?: Filter[], rawWhere?: string): Promise<number> {

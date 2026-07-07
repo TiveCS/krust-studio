@@ -5,18 +5,18 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/driver.ts": {
-    "mtime": 1783360797.7144432,
-    "ast_hash": "85b772cb48872e776558442833db86c4",
+    "mtime": 1783383069.275084,
+    "ast_hash": "e236162b896758093e892ab706782c55",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/drivers/mysql.ts": {
-    "mtime": 1783360780.5253477,
-    "ast_hash": "2dc82df032b9cbd26c13752a55f6cfe5",
+    "mtime": 1783383440.7656908,
+    "ast_hash": "34acd0b6dd5442aa7612c43362688bbb",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/drivers/postgres.ts": {
-    "mtime": 1783360770.8348167,
-    "ast_hash": "f081b22f225b3fbfc169840acb232d3a",
+    "mtime": 1783383119.5442135,
+    "ast_hash": "b68bd10165ed4c8a7064385f55b8c10b",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/drivers/sqlite.ts": {
@@ -30,8 +30,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/session.ts": {
-    "mtime": 1783360806.2766976,
-    "ast_hash": "2a67b76c85085d71ac99295f37a41887",
+    "mtime": 1783383346.0084577,
+    "ast_hash": "102a8e1855f2b800770bce005afd1187",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/db/test-connection.ts": {
@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/ConnectionSwitcher.tsx": {
-    "mtime": 1780583509.7679307,
-    "ast_hash": "700d094b04997be32a7a0cc450ad4a8c",
+    "mtime": 1783382814.266257,
+    "ast_hash": "99d0f6285d86f572ede8855bc645caef",
     "semantic_hash": ""
   },
   "krust-studio-app/src/renderer/src/components/DataGrid.tsx": {
@@ -950,8 +950,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/mcp/introspect.ts": {
-    "mtime": 1783360282.729438,
-    "ast_hash": "800f50d21324920f4a15f718040aa0c7",
+    "mtime": 1783383510.960573,
+    "ast_hash": "4453cafe7eccd8433622ad4c82d62748",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/mcp/server.ts": {

@@ -1,7 +1,7 @@
 # Graph Report - Krust Studio  (2026-07-07)
 
 ## Corpus Check
-- 192 files · ~149,113 words
+- 192 files · ~149,169 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `422ce957`
+- Built from commit: `bba50a4e`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -173,14 +173,14 @@
 ## Surprising Connections (you probably didn't know these)
 - `Electron + electron-vite + React 19 Stack` --references--> `shadcn/ui`  [INFERRED]
   krust-studio-app/README.md → llm.md
+- `ConnectionSwitcher()` --calls--> `useConnections`  [INFERRED]
+  krust-studio-app/src/renderer/src/components/ConnectionSwitcher.tsx → krust-studio-app/src/renderer/src/store/connections.ts
 - `BackupDialog()` --calls--> `useConnections`  [INFERRED]
   krust-studio-app/src/renderer/src/components/BackupDialog.tsx → krust-studio-app/src/renderer/src/store/connections.ts
 - `BackupView()` --calls--> `useConnections`  [INFERRED]
   krust-studio-app/src/renderer/src/components/BackupView.tsx → krust-studio-app/src/renderer/src/store/connections.ts
 - `ColumnsEditor()` --calls--> `cn()`  [INFERRED]
   krust-studio-app/src/renderer/src/components/ColumnsEditor.tsx → krust-studio-app/src/renderer/src/lib/utils.ts
-- `ConnectionSwitcher()` --calls--> `useConnections`  [INFERRED]
-  krust-studio-app/src/renderer/src/components/ConnectionSwitcher.tsx → krust-studio-app/src/renderer/src/store/connections.ts
 
 ## Import Cycles
 - None detected.
@@ -636,7 +636,7 @@ Cohesion: 0.60
 Nodes (4): buildDelete(), buildInsert(), buildUpdate(), applyChanges()
 
 ## Knowledge Gaps
-- **586 isolated node(s):** `1.7.0 beta release — IN PROGRESS`, `beta.1 — browse / execute / create+drop — BUILT (2026-07-02, typecheck + build green; not yet live-tested)`, `beta.2 — MySQL safe replacement`, `P0 — next: inline filter builder + raw WHERE — DONE`, `v1.3.4 — fix (data-loss feel) — DONE (merged 69c7791, manually verified)` (+581 more)
+- **586 isolated node(s):** `DRIVER_LABEL`, `1.7.0 beta release — IN PROGRESS`, `beta.1 — browse / execute / create+drop — BUILT (2026-07-02, typecheck + build green; not yet live-tested)`, `beta.2 — MySQL safe replacement`, `P0 — next: inline filter builder + raw WHERE — DONE` (+581 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **32 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -644,14 +644,14 @@ Nodes (4): buildDelete(), buildInsert(), buildUpdate(), applyChanges()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `cn()` connect `utils sidebar` to `Community 134`, `Community 143`, `Community 144`, `context menu`, `dropdown menu`, `SettingsModal tsx`, `Community 150`, `PostgresDriver connect`, `Community 151`, `Community 152`, `dialog tsx`, `sheet tsx`, `command tsx`, `Community 35`, `JsonViewerPanel tsx`, `popover tsx`, `Community 53`, `Community 60`, `alert tsx`, `tooltip tsx`, `TitleBar tsx`, `mobile useIsMobile`, `button tsx`, `combobox tsx`, `checkbox tsx`, `input tsx`, `separator tsx`, `skeleton tsx`, `Community 126`?**
-  _High betweenness centrality (0.079) - this node is a cross-community bridge._
+  _High betweenness centrality (0.078) - this node is a cross-community bridge._
 - **Why does `useConnections` connect `Community 146` to `tsx ConnectionSwitcher`, `Community 129`, `JsonViewerPanel tsx`, `Community 27`, `Community 108`, `MysqlDriver alterTable`, `connections ConnectionWorkspace`, `Community 82`, `Community 117`, `Community 118`, `PostgresDriver connect`, `SettingsModal tsx`, `BackupDialog tsx`, `Community 122`, `Community 123`?**
-  _High betweenness centrality (0.018) - this node is a cross-community bridge._
+  _High betweenness centrality (0.017) - this node is a cross-community bridge._
 - **Why does `useSettings` connect `SettingsModal tsx` to `Community 146`, `connections ConnectionWorkspace`?**
   _High betweenness centrality (0.015) - this node is a cross-community bridge._
 - **Are the 92 inferred relationships involving `cn()` (e.g. with `AppSidebar()` and `ColumnsEditor()`) actually correct?**
   _`cn()` has 92 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `1.7.0 beta release — IN PROGRESS`, `beta.1 — browse / execute / create+drop — BUILT (2026-07-02, typecheck + build green; not yet live-tested)`, `beta.2 — MySQL safe replacement` to the rest of the system?**
+- **What connects `DRIVER_LABEL`, `1.7.0 beta release — IN PROGRESS`, `beta.1 — browse / execute / create+drop — BUILT (2026-07-02, typecheck + build green; not yet live-tested)` to the rest of the system?**
   _587 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `readStore writeStore` be split into smaller, more focused modules?**
   _Cohesion score 0.1278825995807128 - nodes in this community are weakly interconnected._

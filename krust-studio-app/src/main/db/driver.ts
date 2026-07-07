@@ -13,6 +13,7 @@ import type {
   QueryPlan,
   RawQueryResult,
   ReferencingTable,
+  IntrospectedTable,
   RowsResult,
   SchemaOp,
   SearchResult,
@@ -95,6 +96,10 @@ export interface TabularCapable {
   listReferencingTables(entity: EntityRef): Promise<ReferencingTable[]>
   /** the CREATE statement for a table/view; pg reconstructs from catalog. */
   getCreateSql(entity: EntityRef): Promise<string>
+  /** Optional whole-schema structure in a handful of catalog queries — used by
+   *  MCP introspection to avoid N sequential describeTable round-trips (which is
+   *  brutal on a remote/serverless DB). Falls back to per-table when absent. */
+  bulkIntrospect?(): Promise<IntrospectedTable[]>
 }
 
 /** staged data-grid edits → DML (relational engines). */

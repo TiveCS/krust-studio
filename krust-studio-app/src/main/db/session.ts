@@ -12,6 +12,7 @@ import type {
   QueryPlan,
   QueryResult,
   ReferencingTable,
+  IntrospectedTable,
   RowsResult,
   SchemaOp,
   SearchResult,
@@ -245,6 +246,12 @@ export async function listReferencingTables(
   entity: EntityRef
 ): Promise<ReferencingTable[]> {
   return withRetry(id, (d) => d.listReferencingTables(entity))
+}
+
+/** whole-schema structure in one bulk pass when the driver supports it; null
+ *  falls the caller back to per-table describeTable (MCP introspection). */
+export async function bulkIntrospect(id: string): Promise<IntrospectedTable[] | null> {
+  return withRetry(id, (d) => (d.bulkIntrospect ? d.bulkIntrospect() : Promise.resolve(null)))
 }
 
 export async function getCreateSql(
