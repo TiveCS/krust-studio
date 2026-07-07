@@ -490,8 +490,8 @@
     "semantic_hash": "8453e4e9363dec88cec0240f77c01901"
   },
   "docs/TODO.md": {
-    "mtime": 1783346092.2834718,
-    "ast_hash": "57a7a078fa1a4f00c75d5543894cbaea",
+    "mtime": 1783362340.1242094,
+    "ast_hash": "cd6f530981d246045e727a92cd0d7816",
     "semantic_hash": ""
   },
   "docs/adr/0001-electron-over-tauri.md": {
@@ -945,8 +945,8 @@
     "semantic_hash": ""
   },
   "docs/adr/0022-mcp-schema-sync-proposed-ops.md": {
-    "mtime": 1783352183.8664355,
-    "ast_hash": "ae546b5889aac7c96fa5d8f647d4b2db",
+    "mtime": 1783362314.7749414,
+    "ast_hash": "3233b2fa0f2985e73f6e167528260215",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/mcp/introspect.ts": {
@@ -1002,6 +1002,11 @@
   "krust-studio-app/resources/mcp-bridge.mjs": {
     "mtime": 1783362001.7241576,
     "ast_hash": "ca6e8d52246ddb9477aa796bf4ff52f4",
+    "semantic_hash": ""
+  },
+  "docs/release/v1.7.0/mcp-status.md": {
+    "mtime": 1783362307.122452,
+    "ast_hash": "0158bdb0af5b9ed0abd2d4d788f5e792",
     "semantic_hash": ""
   }
 }

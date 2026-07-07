@@ -15,7 +15,8 @@ import { useConnections } from '@/store/connections'
 const DRIVER_LABEL: Record<string, string> = {
   mysql: 'MySQL',
   postgres: 'Postgres',
-  sqlite: 'SQLite'
+  sqlite: 'SQLite',
+  redis: 'Redis'
 }
 
 function StatusDot({ status }: { status: string }): React.JSX.Element | null {

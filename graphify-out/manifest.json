@@ -40,8 +40,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/index.ts": {
-    "mtime": 1783360429.8150177,
-    "ast_hash": "55d80ce3d9d042f64a23ca2b64febbb3",
+    "mtime": 1783380716.1053107,
+    "ast_hash": "624bff0473b1076c4ff60504c7e40524",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/ipc.ts": {
@@ -955,8 +955,8 @@
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/mcp/server.ts": {
-    "mtime": 1783361985.52574,
-    "ast_hash": "b19454c7bd5390da049c90ec41f06a93",
+    "mtime": 1783380707.4444203,
+    "ast_hash": "da536f497e8606cd8c6f53396f0729c7",
     "semantic_hash": ""
   },
   "krust-studio-app/src/main/mcp/tools.ts": {
