@@ -6,7 +6,7 @@ import { auditMcp } from '../store/mcpAudit'
 import { introspectSchema } from './introspect'
 import { addProposal, type ProposeInput } from './proposals'
 import { listAllowedTables, describeAllowedTable, readAllowedRows } from './reads'
-import type { CreateTableSpec, SchemaOp } from '../../shared/types'
+import type { CreateTableSpec, Filter, SchemaOp } from '../../shared/types'
 
 const zColumn = z.object({
   name: z.string(),
@@ -40,6 +40,31 @@ const zReport = z.object({
   codeSpec: z.string().optional(),
   dbSpec: z.string().optional()
 })
+
+/** structured read predicate — matches Krust's Filter (no raw SQL) */
+const zFilter = z.object({
+  column: z.string(),
+  op: z.enum([
+    'eq',
+    'neq',
+    'lt',
+    'lte',
+    'gt',
+    'gte',
+    'like',
+    'notlike',
+    'in',
+    'between',
+    'isnull',
+    'notnull'
+  ]),
+  value: z.string().default(''),
+  value2: z.string().optional().describe('second bound for BETWEEN'),
+  conj: z.enum(['and', 'or']).optional().describe('join to previous filter in the same group'),
+  group: z.number().int().optional(),
+  groupConj: z.enum(['and', 'or']).optional()
+})
+const zSort = z.object({ column: z.string(), dir: z.enum(['asc', 'desc']) })
 
 /** wrap a JSON payload as an MCP text-content tool result */
 function json(payload: unknown): { content: { type: 'text'; text: string }[] } {
@@ -271,19 +296,37 @@ export function registerMcpTools(server: McpServer): void {
       title: 'Read rows',
       description:
         'Read a bounded sample of rows from an allowlisted table (masked columns ' +
-        'omitted). limit is capped by the server max. Requires a row-readable grant.',
+        'omitted). Use STRUCTURED filter/orderBy/columns to target a big table — ' +
+        'there is no raw SQL/WHERE. Every column named in filter/orderBy/columns ' +
+        'must be allowlisted and unmasked, else the call is rejected. limit is ' +
+        'capped by the server max. Requires a row-readable grant.',
       inputSchema: {
         connectionId: z.string(),
         table: z.string(),
         schema: z.string().optional(),
         limit: z.number().int().positive().optional(),
-        offset: z.number().int().nonnegative().optional()
+        offset: z.number().int().nonnegative().optional(),
+        filter: z
+          .array(zFilter)
+          .optional()
+          .describe('structured predicate (AND/OR groups); no raw SQL'),
+        orderBy: z.array(zSort).optional().describe('multi-column sort'),
+        columns: z
+          .array(z.string())
+          .optional()
+          .describe('project only these columns (must be allowlisted + unmasked)')
       }
     },
-    async ({ connectionId, table, schema, limit, offset }, extra) => {
+    async ({ connectionId, table, schema, limit, offset, filter, orderBy, columns }, extra) => {
       const client = clientName(extra)
       try {
-        const res = (await readAllowedRows(connectionId, table, schema, limit, offset)) as {
+        const res = (await readAllowedRows(connectionId, table, schema, {
+          limit,
+          offset,
+          filter: filter as Filter[] | undefined,
+          orderBy,
+          columns
+        })) as {
           rows: unknown[]
         }
         logCall('read_rows', {

@@ -16,6 +16,15 @@ HTTP/SSE transport gains a thin **stdio bridge** (no secrets/state) so stdio-fir
 agents (Codex CLI) reach the same server — this does *not* reopen the rejection of
 a *stateful* standalone binary below; the bridge is a dumb pipe.
 
+**Refined (1.7.0-beta.5):** `read_rows` gains **structured** `filter` / `orderBy` /
+`columns` (Krust's `Filter[]`/`Sort[]`, compiled via the same `buildWhereClause`
+the grid uses) so an agent can target a big table instead of paging blind. This
+does *not* reopen the arbitrary-SQL rejection below: **no raw WHERE** — a raw
+predicate could probe a masked column one boolean at a time (oracle leak), so any
+column named in `filter`/`orderBy`/`columns` must itself be allowlisted **and
+unmasked**, enforced at the tool boundary. The structured shape keeps the
+allowlist + masks the security boundary, exactly as decided here.
+
 ## Context
 
 A recurring pain: the author is pulled onto projects mid-stream and has to figure

@@ -4,7 +4,11 @@ Date: 2026-05-28
 
 ## Status
 
-Accepted
+Accepted. **Amended by [ADR-0023](0023-typed-schema-and-data-changesets.md):** a
+Changeset is no longer DDL-only — it now carries a *kind* (Schema=DDL /
+Data=DML), never mixed in storage. Everything below (raw, unsquashed,
+chronological, capture-and-handoff, not a migration tool) holds unchanged for
+both kinds.
 
 ## Context
 

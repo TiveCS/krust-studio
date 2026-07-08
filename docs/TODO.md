@@ -21,6 +21,48 @@ Prioritized. Top group = highest value (matches CONTEXT.md + Beekeeper parity).
       param helpers + viewer Pretty toggle.
 
 
+## P0 — v1.7.0-beta.5: read_rows filter + typed data changesets — BUILT (typecheck + build green; not yet live-tested)
+
+Design resolved via `/grill-with-docs` (2026-07-07). Live MCP test on the office
+laptop surfaced two gaps + one UI bug. See [ADR-0023](adr/0023-typed-schema-and-data-changesets.md)
+(typed changesets, amends ADR-0002), the [ADR-0003](adr/0003-mcp-read-only-structured-tools.md)
+beta.5 refinement (read_rows filters), and CONTEXT.md **Changeset** / **AI Read
+Allowlist**.
+
+- [x] **`read_rows` structured filter (the live blocker).** Done. `readAllowedRows`
+      ([mcp/reads.ts]) + the `read_rows` tool ([mcp/tools.ts]) now take **structured**
+      `filter` (`Filter[]` → the existing `readRows`/`buildWhereClause`), `orderBy`
+      (`Sort[]`), and a `columns` projection. **No raw WHERE** — every column named in
+      filter/orderBy/columns is validated against the table's describe∧unmasked set
+      and rejected otherwise (masked-column oracle-leak guard). Reuses the
+      driver-layer filter machinery; no new SQL surface.
+- [x] **Typed Schema/Data changesets.** Done. `changesets.kind` column (default
+      `schema` — existing rows migrate as Schema-kind); legacy `active_cs:<conn>`
+      meta migrated to `active_cs:schema:<conn>`; second `active_cs:data:<conn>`
+      slot. Capture auto-attaches DDL→active Schema (unchanged) and DML→active Data
+      **only when set**; **destructive DML** (`TRUNCATE`, no-`WHERE` `DELETE`/
+      `UPDATE`) never auto-attaches. `Changeset.kind` threaded through types / IPC /
+      preload. Redis stays out (SQL-only export).
+- [x] **Kind-scoped rail + Unassigned.** Done. `HistoryView` rail groups changesets
+      into **Schema** and **Data** sections, each with a `+` (kind-typed create) and
+      its own **Unassigned** inbox; the Move menu only offers same-kind targets;
+      `assignEntries` enforces stream=kind at the store.
+- [x] **Export-together.** Done. Rail header **Download** → picker dialog → select
+      any changesets → `exportChangesetsTogether` (`buildMergedChangesetSql`), one
+      `.sql` **interleaved by execution timestamp** across all chosen, marks each
+      Exported. Individual export unchanged.
+- [x] **Fix hidden changeset menu (bug).** Done. The three-dots trigger is now
+      `opacity-60 group-hover:opacity-100` (full on the selected row), so
+      set-active/rename/export/delete are discoverable without hovering.
+
+**Follow-ups (not blocking beta.5, note for live test):**
+- Manual promotion of a **destructive DML** entry into a Data changeset via the
+  Move menu is currently a plain action — the auto-attach guard (never auto) holds,
+  but the *manual* move is not yet behind the destructive/typed confirm ADR-0023
+  describes. Add the typed confirm on that path.
+- Live-verify: real agent `read_rows` with a filter against a big table; DML
+  auto-attach to an active Data changeset; export-together interleave order.
+
 ## P0 — v1.7.0: Procedures & Functions (Routines) — beta.1 BUILT (needs live test)
 
 Design resolved via `/grill-with-docs` (2026-07-02). See

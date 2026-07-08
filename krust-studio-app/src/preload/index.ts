@@ -14,6 +14,7 @@ import type {
   IndexSpec,
   HistoryQuery,
   HistoryStream,
+  ChangesetKind,
   WorkspaceData,
   BackupSpec,
   TableTemplate,
@@ -205,8 +206,12 @@ const api: KrustApi = {
       ipcRenderer.invoke('history:clear', connectionId, stream),
     listChangesets: (connectionId: string) =>
       ipcRenderer.invoke('history:listChangesets', connectionId),
-    createChangeset: (connectionId: string, name: string, ticket?: string) =>
-      ipcRenderer.invoke('history:createChangeset', connectionId, name, ticket),
+    createChangeset: (
+      connectionId: string,
+      name: string,
+      ticket?: string,
+      kind?: ChangesetKind
+    ) => ipcRenderer.invoke('history:createChangeset', connectionId, name, ticket, kind),
     renameChangeset: (id: number, name: string, ticket?: string) =>
       ipcRenderer.invoke('history:renameChangeset', id, name, ticket),
     deleteChangeset: (id: number) =>
@@ -217,6 +222,8 @@ const api: KrustApi = {
       ipcRenderer.invoke('history:assignEntries', entryIds, changesetId),
     exportChangeset: (id: number) =>
       ipcRenderer.invoke('history:exportChangeset', id),
+    exportChangesetsTogether: (ids: number[]) =>
+      ipcRenderer.invoke('history:exportChangesetsTogether', ids),
     deleteEntries: (ids: number[]) =>
       ipcRenderer.invoke('history:deleteEntries', ids),
     getAutoAttachDestructive: () =>

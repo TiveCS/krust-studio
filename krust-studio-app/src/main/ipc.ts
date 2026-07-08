@@ -85,7 +85,9 @@ import {
   setActiveChangeset,
   assignEntries,
   buildChangesetSql,
+  buildMergedChangesetSql,
   markExported,
+  markExportedMany,
   deleteEntries,
   getAutoAttachDestructive,
   setAutoAttachDestructive,
@@ -101,6 +103,7 @@ import type {
   IndexSpec,
   HistoryQuery,
   HistoryStream,
+  ChangesetKind,
   WorkspaceData,
   BackupSpec,
   ReadValueOpts,
@@ -449,8 +452,8 @@ export function registerIpc(): void {
   )
   ipcMain.handle(
     'history:createChangeset',
-    (_e, connectionId: string, name: string, ticket?: string) =>
-      createChangeset(connectionId, name, ticket)
+    (_e, connectionId: string, name: string, ticket?: string, kind?: ChangesetKind) =>
+      createChangeset(connectionId, name, ticket, kind)
   )
   ipcMain.handle(
     'history:renameChangeset',
@@ -495,6 +498,23 @@ export function registerIpc(): void {
       if (result.canceled || !result.filePath) return { saved: false }
       writeFileSync(result.filePath, built.sql, 'utf-8')
       await markExported(id)
+      return { saved: true, path: result.filePath }
+    }
+  )
+  ipcMain.handle(
+    'history:exportChangesetsTogether',
+    async (e, ids: number[]): Promise<{ saved: boolean; path?: string }> => {
+      const built = await buildMergedChangesetSql(ids)
+      if (!built) return { saved: false }
+      const win = BrowserWindow.fromWebContents(e.sender) ?? undefined
+      const result = await dialog.showSaveDialog(win!, {
+        title: 'Export changesets together',
+        defaultPath: 'changesets-merged.sql',
+        filters: [{ name: 'SQL', extensions: ['sql'] }]
+      })
+      if (result.canceled || !result.filePath) return { saved: false }
+      writeFileSync(result.filePath, built.sql, 'utf-8')
+      await markExportedMany(ids)
       return { saved: true, path: result.filePath }
     }
   )

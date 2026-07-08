@@ -211,9 +211,10 @@ Log of executed database commands, split into distinct streams (never mixed):
   separate stream rather than folded into Data Mutation: it is a distinct command
   class (not SQL DML), mirroring the Routine Execution precedent. Commands from
   one staged commit share a **commit group** (the `MULTI`/`EXEC` batch) and are
-  ordered as executed. Redis commands **never** enter a **Changeset** (that
-  export is SQL-DDL only). `DEL`, `UNLINK`, and setting an expiry in the past are
-  flagged **Destructive**.
+  ordered as executed. Redis commands **never** enter a **Changeset** — the
+  changeset export is **SQL only** (Schema=DDL, Data=DML) and Redis is a distinct
+  non-SQL command class with no `.sql` handoff. `DEL`, `UNLINK`, and setting an
+  expiry in the past are flagged **Destructive**.
 
 The dividing rule is **object shape vs row contents**: a statement that changes
 the existence or shape of an object is **Schema Mutation**; one that changes only
@@ -275,19 +276,48 @@ does not use migration tooling (avoided due to data-loss fear) — this captured
 script *is* their handoff artifact.
 
 ### Changeset
-A named (ticket/feature-tied) group of **Captured DDL** statements, kept in the
-exact chronological order they were applied — never squashed. Exported as a
-single commented `.sql` file (each statement annotated with timestamp + target
-object) for the DevOps prod handoff. Raw steps are preserved deliberately:
-squashing to a net-result script would be migration-style logic, which the team
-avoids for data-loss reasons.
+A named (ticket/feature-tied) group of captured statements, kept in the exact
+chronological order they were applied — never squashed. Exported as a commented
+`.sql` file (each statement annotated with timestamp + target object) for the
+DevOps prod handoff. Raw steps are preserved deliberately: squashing to a
+net-result script would be migration-style logic, which the team avoids for
+data-loss reasons.
 
-Lifecycle: an **active changeset** can be set, and captured DDL auto-attaches to
-it. DDL captured with no active changeset lands in an **Unassigned** inbox (never
-lost). The user can always manually move/regroup statements between changesets
-and out of the inbox — automation is for convenience, but every assignment is
-overridable. Status: Draft → Exported. Persisted in the configurable data
-directory, tied to a connection, with name/ticket metadata.
+**Typed — a changeset has a kind, and kinds never mix in storage:**
+
+- **Schema changeset** — groups **Captured DDL** (`CREATE`/`ALTER`/`DROP` …),
+  the original migration-handoff artifact (ADR-0002).
+- **Data changeset** — groups **Data Mutation** DML (`INSERT`/`UPDATE`/`DELETE`)
+  for the seed/reference-data handoff, the same "hand-applied to prod by DevOps"
+  need applied to data. A statement only attaches to a **matching-kind**
+  changeset. The separation is enforced by the type, not by user discipline —
+  the same "history streams are never mixed" instinct applied to the export
+  artifact, and it keeps a destructive data-wipe (**TRUNCATE**, § **Destructive**)
+  out of a schema handoff by construction.
+
+**Export-together (the flexible escape hatch).** Storage stays cleanly separated,
+but at export the user can select a Schema changeset **and** a Data changeset and
+**"Export together"** into a single `.sql` — statements **interleaved in
+execution-time order** (a data backfill can legitimately belong *between* two DDL
+steps), never schema-block-then-data-block. Separation is the source of truth;
+the merged file is a render, not a persistent fused changeset. (The recurring
+*separate for convenience, but let the user override non-destructively at the
+moment of use* value.)
+
+Lifecycle: there are **two independent, optional active slots** — one active
+Schema changeset and one active Data changeset. Setting a slot active is the
+explicit opt-in to auto-attach for that kind: captured DDL auto-attaches to the
+active Schema changeset, captured DML to the active Data changeset. **With no
+active slot of that kind, nothing auto-attaches** — statements stay in their
+history stream, addable later (the guard against a Data changeset sweeping up
+scratch edits: you only collect data changes once you say so). **Destructive DML
+never auto-attaches** even with an active Data changeset — it lands in
+**Unassigned** and is promoted manually behind the destructive/typed confirm
+(consistent with the schema destructive rule). Statements captured with no active
+slot land in an **Unassigned** inbox (never lost); the user can always manually
+move/regroup between same-kind changesets and out of the inbox. Status:
+Draft → Exported. Persisted in the configurable data directory, tied to a
+connection, with kind + name/ticket metadata.
 
 Design value (recurring): *automate for convenience, but never force trust —
 the user must be able to inspect and override anything automatic.*
@@ -730,7 +760,13 @@ the calling client's identity (from the MCP `initialize` handshake) so it's clea
 Exposed only through fixed **structured tools**, never arbitrary SQL. Three tool
 families, three separate gates:
 - **Data reads** (`list_allowed_tables`, `describe_table`,
-  `read_rows(table, filter, limit)`) — governed by the **AI Read Allowlist**.
+  `read_rows(table, filter, orderBy, columns, limit)`) — governed by the **AI
+  Read Allowlist**. `read_rows` takes **structured** `filter`/`orderBy`/`columns`
+  (Krust's `Filter[]`/`Sort[]`, compiled to a parameterized WHERE via the same
+  `buildWhereClause` the grid uses) — **never raw SQL/WHERE**: a raw predicate
+  could probe a masked column one boolean at a time (oracle leak), so any column
+  named in `filter`/`orderBy`/`columns` must itself be allowlisted **and
+  unmasked**, else the call is rejected at the tool boundary.
 - **Schema introspection** (`introspect_schema`) — governed by the separate
   **Schema Introspection** scope (see below).
 - **Schema-op proposal** (`propose_schema_ops`) — stages **Proposed Schema Ops**

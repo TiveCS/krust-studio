@@ -42,6 +42,7 @@ import { cn } from '@/lib/utils'
 import { useConnections } from '@/store/connections'
 import type {
   Changeset,
+  ChangesetKind,
   HistoryEntry,
   HistoryStream
 } from '../../../shared/types'
@@ -49,7 +50,11 @@ import type {
 type View =
   | { kind: 'stream'; stream: HistoryStream }
   | { kind: 'changeset'; id: number }
-  | { kind: 'unassigned' }
+  | { kind: 'unassigned'; csKind: ChangesetKind }
+
+/** the history stream that belongs to each changeset kind */
+const kindStream = (k: ChangesetKind): HistoryStream =>
+  k === 'data' ? 'data_mutation' : 'table_mutation'
 
 function when(ts: number): string {
   return new Date(ts).toLocaleString()
@@ -98,12 +103,31 @@ export function HistoryView(): React.JSX.Element {
     id?: number
     name: string
     ticket: string
+    /** which kind this changeset is (create only; rename keeps its kind) */
+    kind?: ChangesetKind
     /** entry ids to move into the changeset right after it's created */
     assignIds?: number[]
   } | null>(null)
+  /** export-together picker: null = closed, else the set of chosen changeset ids */
+  const [exportPick, setExportPick] = useState<Set<number> | null>(null)
 
   const csName = (id: number | null): string =>
     id == null ? '' : (changesets.find((c) => c.id === id)?.name ?? `#${id}`)
+
+  const schemaCs = changesets.filter((c) => c.kind === 'schema')
+  const dataCs = changesets.filter((c) => c.kind === 'data')
+
+  /** the changeset-kind the current view operates on, or null if not groupable */
+  const currentKind: ChangesetKind | null =
+    view.kind === 'changeset'
+      ? (changesets.find((c) => c.id === view.id)?.kind ?? null)
+      : view.kind === 'unassigned'
+        ? view.csKind
+        : view.kind === 'stream' && view.stream === 'table_mutation'
+          ? 'schema'
+          : view.kind === 'stream' && view.stream === 'data_mutation'
+            ? 'data'
+            : null
 
   const loadChangesets = useCallback(async (): Promise<void> => {
     if (!openConnectionId) return setChangesets([])
@@ -120,7 +144,11 @@ export function HistoryView(): React.JSX.Element {
           ? { connectionId: openConnectionId, stream: view.stream }
           : view.kind === 'changeset'
             ? { connectionId: openConnectionId, changesetId: view.id }
-            : { connectionId: openConnectionId, unassigned: true }
+            : {
+                connectionId: openConnectionId,
+                unassigned: true,
+                stream: kindStream(view.csKind)
+              }
       setEntries(await window.api.history.list({ ...q, limit: 500 }))
       setSelected(new Set())
     } finally {
@@ -135,11 +163,8 @@ export function HistoryView(): React.JSX.Element {
     void loadEntries()
   }, [loadEntries])
 
-  // DDL contexts can group/move into changesets
-  const isDdlView =
-    view.kind === 'changeset' ||
-    view.kind === 'unassigned' ||
-    (view.kind === 'stream' && view.stream === 'table_mutation')
+  // groupable contexts (schema DDL or data DML) can move into a same-kind changeset
+  const isDdlView = currentKind !== null
 
   const toggle = (id: number): void =>
     setSelected((prev) => {
@@ -178,9 +203,11 @@ export function HistoryView(): React.JSX.Element {
     await refreshAll()
   }
 
-  const setActive = async (id: number, active: boolean): Promise<void> => {
+  const setActive = async (id: number): Promise<void> => {
     if (!openConnectionId) return
-    await window.api.history.setActiveChangeset(openConnectionId, active ? null : id)
+    // store toggles the changeset's own kind slot (passing the id, never null,
+    // so we never clear the *other* kind's active slot)
+    await window.api.history.setActiveChangeset(openConnectionId, id)
     await loadChangesets()
   }
 
@@ -199,6 +226,16 @@ export function HistoryView(): React.JSX.Element {
     await refreshAll()
   }
 
+  const exportTogether = async (): Promise<void> => {
+    if (!exportPick || exportPick.size === 0) return
+    const res = await window.api.history.exportChangesetsTogether([...exportPick])
+    if (res.saved) {
+      toast.success('Exported changesets together', { description: res.path })
+      setExportPick(null)
+      await loadChangesets()
+    }
+  }
+
   const submitDialog = async (): Promise<void> => {
     if (!dialog || !openConnectionId) return
     const name = dialog.name.trim()
@@ -208,7 +245,8 @@ export function HistoryView(): React.JSX.Element {
         const cs = await window.api.history.createChangeset(
           openConnectionId,
           name,
-          dialog.ticket.trim() || undefined
+          dialog.ticket.trim() || undefined,
+          dialog.kind ?? 'schema'
         )
         if (dialog.assignIds?.length) {
           await window.api.history.assignEntries(dialog.assignIds, cs.id)
@@ -258,6 +296,96 @@ export function HistoryView(): React.JSX.Element {
       active ? 'bg-accent text-foreground' : 'text-muted-foreground hover:bg-accent/50'
     )
 
+  const changesetRow = (c: Changeset): React.JSX.Element => {
+    const selectedView = view.kind === 'changeset' && view.id === c.id
+    return (
+      <div key={c.id} className="group flex items-center">
+        <button
+          onClick={() => setView({ kind: 'changeset', id: c.id })}
+          className={railItem(selectedView)}
+        >
+          <GitBranch className="size-3.5 shrink-0" />
+          <span className="flex-1 truncate">{c.name}</span>
+          {c.active && <Star className="size-3 shrink-0 fill-amber-400 text-amber-400" />}
+          {c.status === 'exported' && <span className="text-[9px] text-primary">exp</span>}
+          <span className="text-[10px] text-muted-foreground/60">{c.count}</span>
+        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            {/* persistently visible (ADR-0023): hover-only was undiscoverable */}
+            <button
+              title="Changeset actions"
+              className={cn(
+                'rounded p-0.5 text-muted-foreground opacity-60 hover:bg-accent hover:text-foreground group-hover:opacity-100',
+                selectedView && 'opacity-100'
+              )}
+            >
+              <MoreVertical className="size-3.5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onSelect={() => void setActive(c.id)}>
+              <Star />
+              {c.active ? 'Clear active' : 'Set active'}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() =>
+                setDialog({
+                  mode: 'rename',
+                  id: c.id,
+                  name: c.name,
+                  ticket: c.ticket ?? ''
+                })
+              }
+            >
+              <Pencil />
+              Rename…
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => void exportCs(c.id)} disabled={c.count === 0}>
+              <Download />
+              Export .sql
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive" onSelect={() => void removeCs(c.id)}>
+              <Trash2 />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    )
+  }
+
+  const changesetGroup = (
+    label: string,
+    kind: ChangesetKind,
+    list: Changeset[]
+  ): React.JSX.Element => (
+    <div className="mt-1">
+      <div className="flex items-center justify-between px-1 py-1">
+        <span className="text-[10px] font-medium uppercase text-muted-foreground">
+          {label}
+        </span>
+        <button
+          onClick={() => setDialog({ mode: 'create', name: '', ticket: '', kind })}
+          disabled={!openConnectionId}
+          title={`New ${label.toLowerCase()} changeset`}
+          className="rounded p-0.5 text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40"
+        >
+          <Plus className="size-3.5" />
+        </button>
+      </div>
+      {list.map(changesetRow)}
+      <button
+        onClick={() => setView({ kind: 'unassigned', csKind: kind })}
+        className={railItem(view.kind === 'unassigned' && view.csKind === kind)}
+      >
+        <Inbox className="size-3.5 shrink-0" />
+        <span className="flex-1">Unassigned</span>
+      </button>
+    </div>
+  )
+
   return (
     <div className="flex h-full min-h-0">
       {/* left rail */}
@@ -267,94 +395,29 @@ export function HistoryView(): React.JSX.Element {
             Changesets
           </span>
           <button
-            onClick={() => setDialog({ mode: 'create', name: '', ticket: '' })}
-            disabled={!openConnectionId}
-            title="New changeset"
+            onClick={() => setExportPick(new Set())}
+            disabled={changesets.length === 0}
+            title="Export changesets together (one .sql)"
             className="rounded p-0.5 text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40"
           >
-            <Plus className="size-3.5" />
+            <Download className="size-3.5" />
           </button>
         </div>
 
         {changesets.length === 0 && (
           <p className="px-2 py-1 text-[11px] text-muted-foreground/70">
-            No changesets. Create one to group captured DDL.
+            No changesets. Create a Schema (DDL) or Data (DML) changeset to group
+            captured statements for the DevOps handoff.
           </p>
         )}
-        {changesets.map((c) => {
-          const selectedView = view.kind === 'changeset' && view.id === c.id
-          return (
-            <div key={c.id} className="group flex items-center">
-              <button
-                onClick={() => setView({ kind: 'changeset', id: c.id })}
-                className={railItem(selectedView)}
-              >
-                <GitBranch className="size-3.5 shrink-0" />
-                <span className="flex-1 truncate">{c.name}</span>
-                {c.active && (
-                  <Star className="size-3 shrink-0 fill-amber-400 text-amber-400" />
-                )}
-                {c.status === 'exported' && (
-                  <span className="text-[9px] text-primary">exp</span>
-                )}
-                <span className="text-[10px] text-muted-foreground/60">
-                  {c.count}
-                </span>
-              </button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="rounded p-0.5 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-accent">
-                    <MoreVertical className="size-3.5" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onSelect={() => void setActive(c.id, c.active)}>
-                    <Star />
-                    {c.active ? 'Clear active' : 'Set active'}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() =>
-                      setDialog({
-                        mode: 'rename',
-                        id: c.id,
-                        name: c.name,
-                        ticket: c.ticket ?? ''
-                      })
-                    }
-                  >
-                    <Pencil />
-                    Rename…
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() => void exportCs(c.id)}
-                    disabled={c.count === 0}
-                  >
-                    <Download />
-                    Export .sql
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onSelect={() => void removeCs(c.id)}
-                  >
-                    <Trash2 />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          )
-        })}
 
-        <button
-          onClick={() => setView({ kind: 'unassigned' })}
-          className={cn(railItem(view.kind === 'unassigned'), 'mt-1')}
-        >
-          <Inbox className="size-3.5 shrink-0" />
-          <span className="flex-1">Unassigned</span>
-        </button>
+        {changesetGroup('Schema', 'schema', schemaCs)}
+        {changesetGroup('Data', 'data', dataCs)}
 
         <div className="my-2 border-t border-border" />
+        <span className="px-1 text-[10px] font-medium uppercase text-muted-foreground">
+          Streams
+        </span>
         <button
           onClick={() => setView({ kind: 'stream', stream: 'table_mutation' })}
           className={railItem(view.kind === 'stream' && view.stream === 'table_mutation')}
@@ -388,7 +451,7 @@ export function HistoryView(): React.JSX.Element {
             {view.kind === 'changeset'
               ? csName(view.id)
               : view.kind === 'unassigned'
-                ? 'Unassigned'
+                ? `Unassigned (${view.csKind === 'data' ? 'Data' : 'Schema'})`
                 : view.stream === 'table_mutation'
                   ? 'Schema Mutation'
                   : view.stream === 'data_mutation'
@@ -430,9 +493,12 @@ export function HistoryView(): React.JSX.Element {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                {/* kind-scoped: only same-kind changesets can receive these entries */}
                 {changesets
                   .filter(
-                    (c) => !(view.kind === 'changeset' && view.id === c.id)
+                    (c) =>
+                      c.kind === currentKind &&
+                      !(view.kind === 'changeset' && view.id === c.id)
                   )
                   .map((c) => (
                     <DropdownMenuItem key={c.id} onSelect={() => void moveTo(c.id)}>
@@ -453,12 +519,13 @@ export function HistoryView(): React.JSX.Element {
                       mode: 'create',
                       name: '',
                       ticket: '',
+                      kind: currentKind ?? 'schema',
                       assignIds: [...selected]
                     })
                   }
                 >
                   <Plus />
-                  New changeset…
+                  New {currentKind ?? 'schema'} changeset…
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -681,7 +748,9 @@ export function HistoryView(): React.JSX.Element {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {dialog?.mode === 'create' ? 'New changeset' : 'Rename changeset'}
+              {dialog?.mode === 'create'
+                ? `New ${dialog?.kind ?? 'schema'} changeset`
+                : 'Rename changeset'}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
@@ -709,6 +778,64 @@ export function HistoryView(): React.JSX.Element {
             </Button>
             <Button onClick={() => void submitDialog()} disabled={!dialog?.name.trim()}>
               {dialog?.mode === 'create' ? 'Create' : 'Save'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* export-together (ADR-0023): pick any changesets → one interleaved .sql */}
+      <Dialog open={exportPick !== null} onOpenChange={(o) => !o && setExportPick(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Export changesets together</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Pick the changesets to merge into one <code>.sql</code>. Statements are
+            interleaved in execution-time order (not squashed).
+          </p>
+          <div className="max-h-64 space-y-1 overflow-auto">
+            {(['schema', 'data'] as ChangesetKind[]).map((k) => {
+              const list = k === 'schema' ? schemaCs : dataCs
+              if (list.length === 0) return null
+              return (
+                <div key={k}>
+                  <span className="px-1 text-[10px] font-medium uppercase text-muted-foreground">
+                    {k}
+                  </span>
+                  {list.map((c) => (
+                    <label
+                      key={c.id}
+                      className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-xs hover:bg-accent/50"
+                    >
+                      <Checkbox
+                        checked={exportPick?.has(c.id) ?? false}
+                        onCheckedChange={() =>
+                          setExportPick((prev) => {
+                            const next = new Set(prev ?? [])
+                            next.has(c.id) ? next.delete(c.id) : next.add(c.id)
+                            return next
+                          })
+                        }
+                      />
+                      <GitBranch className="size-3.5 shrink-0 text-muted-foreground" />
+                      <span className="flex-1 truncate">{c.name}</span>
+                      <span className="text-[10px] text-muted-foreground/60">{c.count}</span>
+                    </label>
+                  ))}
+                </div>
+              )
+            })}
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setExportPick(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => void exportTogether()}
+              disabled={!exportPick || exportPick.size === 0}
+            >
+              <Download />
+              Export {exportPick?.size ? `${exportPick.size}` : ''}
             </Button>
           </DialogFooter>
         </DialogContent>

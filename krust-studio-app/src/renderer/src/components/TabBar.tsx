@@ -66,14 +66,36 @@ export function TabBar(): React.JSX.Element | null {
   useEffect(() => {
     const el = stripRef.current
     if (!el) return
+    // Wheel notches arrive as big discrete deltas, so `scrollLeft += deltaY`
+    // jumps per notch (blocky). Accumulate into a target and ease scrollLeft
+    // toward it with rAF so a notch glides instead of snapping.
+    let target = el.scrollLeft
+    let raf = 0
+    const max = (): number => el.scrollWidth - el.clientWidth
+    const step = (): void => {
+      const diff = target - el.scrollLeft
+      if (Math.abs(diff) < 0.5) {
+        el.scrollLeft = target
+        raf = 0
+        return
+      }
+      el.scrollLeft += diff * 0.22 // lerp factor → ~smooth glide
+      raf = requestAnimationFrame(step)
+    }
     const onWheel = (e: WheelEvent): void => {
       if (e.deltaY === 0 || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return
       if (el.scrollWidth <= el.clientWidth) return
-      el.scrollLeft += e.deltaY
       e.preventDefault()
+      // resync the target if a drag/other source moved scroll since last frame
+      if (raf === 0) target = el.scrollLeft
+      target = Math.max(0, Math.min(max(), target + e.deltaY))
+      if (raf === 0) raf = requestAnimationFrame(step)
     }
     el.addEventListener('wheel', onWheel, { passive: false })
-    return () => el.removeEventListener('wheel', onWheel)
+    return () => {
+      el.removeEventListener('wheel', onWheel)
+      if (raf) cancelAnimationFrame(raf)
+    }
   }, [openConnectionId])
 
   if (tabs.length === 0 && !openConnectionId) return null

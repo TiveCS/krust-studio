@@ -325,7 +325,10 @@ export interface HistoryQuery {
   offset?: number
 }
 
-/** A named group of Captured DDL, raw chronological order (ADR 0002). */
+/** schema = Captured DDL; data = Data Mutation DML (ADR-0023) */
+export type ChangesetKind = 'schema' | 'data'
+
+/** A named group of captured statements, raw chronological order (ADR 0002/0023). */
 export interface Changeset {
   id: number
   connectionId: string
@@ -336,8 +339,10 @@ export interface Changeset {
   exportedAt: number | null
   /** number of captured statements in this changeset */
   count: number
-  /** whether this is the active (auto-attach) changeset for its connection */
+  /** whether this is the active (auto-attach) changeset for its kind + connection */
   active: boolean
+  /** schema (DDL) or data (DML) — kinds never mix in one changeset (ADR-0023) */
+  kind: ChangesetKind
 }
 
 /** what `session.ts` records after a successful mutation */
@@ -363,7 +368,8 @@ export interface HistoryApi {
   createChangeset: (
     connectionId: string,
     name: string,
-    ticket?: string
+    ticket?: string,
+    kind?: ChangesetKind
   ) => Promise<Changeset>
   renameChangeset: (id: number, name: string, ticket?: string) => Promise<void>
   deleteChangeset: (id: number) => Promise<void>
@@ -379,6 +385,10 @@ export interface HistoryApi {
   ) => Promise<void>
   /** build the commented .sql and save it via the OS dialog; marks Exported */
   exportChangeset: (id: number) => Promise<{ saved: boolean; path?: string }>
+  /** export several changesets as one .sql, interleaved by execution time (ADR-0023) */
+  exportChangesetsTogether: (
+    ids: number[]
+  ) => Promise<{ saved: boolean; path?: string }>
   /** hard-delete specific entries by id (like bulk Clear but id-targeted) */
   deleteEntries: (ids: number[]) => Promise<void>
   /** global toggle: auto-attach destructive DDL (DROP) to the active changeset */

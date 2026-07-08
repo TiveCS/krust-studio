@@ -44,7 +44,8 @@ async function getDb(): Promise<DatabaseSync> {
       ticket        TEXT,
       status        TEXT    NOT NULL DEFAULT 'draft',
       created_at    INTEGER NOT NULL,
-      exported_at   INTEGER
+      exported_at   INTEGER,
+      kind          TEXT    NOT NULL DEFAULT 'schema'
     );
     CREATE TABLE IF NOT EXISTS meta (
       key   TEXT PRIMARY KEY,
@@ -66,16 +67,56 @@ async function getDb(): Promise<DatabaseSync> {
   if (!cols.some((c) => c.name === 'commit_group')) {
     db.exec('ALTER TABLE history_entries ADD COLUMN commit_group TEXT')
   }
+  // typed changesets (ADR-0023): kind column — pre-existing changesets are Schema.
+  const csCols = db
+    .prepare('PRAGMA table_info(changesets)')
+    .all() as Array<{ name: string }>
+  if (!csCols.some((c) => c.name === 'kind')) {
+    db.exec("ALTER TABLE changesets ADD COLUMN kind TEXT NOT NULL DEFAULT 'schema'")
+  }
+  // migrate the old single active slot (`active_cs:<conn>`) → the schema slot
+  // (`active_cs:schema:<conn>`). Old keys never carry a kind segment.
+  const legacy = db
+    .prepare("SELECT key, value FROM meta WHERE key LIKE 'active_cs:%'")
+    .all() as Array<{ key: string; value: string }>
+  for (const row of legacy) {
+    const rest = row.key.slice('active_cs:'.length)
+    if (rest.startsWith('schema:') || rest.startsWith('data:')) continue
+    db.prepare('DELETE FROM meta WHERE key = ?').run(row.key)
+    db.prepare(
+      'INSERT INTO meta (key, value) VALUES (?, ?) ' +
+        'ON CONFLICT(key) DO UPDATE SET value = excluded.value'
+    ).run(`active_cs:schema:${rest}`, row.value)
+  }
   return db
 }
 
-const activeKey = (connectionId: string): string => `active_cs:${connectionId}`
+type ChangesetKind = 'schema' | 'data'
 
-function getActiveId(d: DatabaseSync, connectionId: string): number | null {
+/** the history stream that belongs in each changeset kind */
+const kindStream = (kind: ChangesetKind): string =>
+  kind === 'data' ? 'data_mutation' : 'table_mutation'
+
+const activeKey = (connectionId: string, kind: ChangesetKind): string =>
+  `active_cs:${kind}:${connectionId}`
+
+function getActiveId(
+  d: DatabaseSync,
+  connectionId: string,
+  kind: ChangesetKind
+): number | null {
   const row = d
     .prepare('SELECT value FROM meta WHERE key = ?')
-    .get(activeKey(connectionId)) as { value: string } | undefined
+    .get(activeKey(connectionId, kind)) as { value: string } | undefined
   return row ? Number(row.value) : null
+}
+
+function getChangesetKind(d: DatabaseSync, id: number): ChangesetKind | null {
+  const row = d.prepare('SELECT kind FROM changesets WHERE id = ?').get(id) as
+    | { kind: string }
+    | undefined
+  if (!row) return null
+  return row.kind === 'data' ? 'data' : 'schema'
 }
 
 // Global toggle: when ON (default), destructive table-mutation DDL (DROP TABLE/
@@ -108,13 +149,22 @@ export async function capture(input: CaptureInput): Promise<void> {
   try {
     const d = await getDb()
     const destructive = input.destructive ? 1 : 0
-    // Table-Mutation DDL auto-attaches to the active changeset. Non-destructive
-    // always; destructive (DROP TABLE/VIEW) only when the global toggle is on
-    // (default). When off, destructive entries land in Unassigned for manual move.
-    const autoAttach =
-      input.stream === 'table_mutation' &&
-      (!input.destructive || getAutoAttachDestructiveSync(d))
-    const changesetId = autoAttach ? getActiveId(d, input.connectionId) : null
+    // Auto-attach to the active changeset of the matching kind (ADR-0023):
+    //  • Schema DDL (table_mutation) → active SCHEMA changeset. Non-destructive
+    //    always; destructive (DROP TABLE/VIEW) only when the global toggle is on.
+    //  • DML (data_mutation) → active DATA changeset, and only when non-destructive
+    //    (TRUNCATE / no-WHERE DELETE|UPDATE never auto-attach — Unassigned).
+    // With no active slot of that kind, nothing attaches (stays in history).
+    let changesetId: number | null = null
+    if (input.stream === 'table_mutation') {
+      if (!input.destructive || getAutoAttachDestructiveSync(d)) {
+        changesetId = getActiveId(d, input.connectionId, 'schema')
+      }
+    } else if (input.stream === 'data_mutation') {
+      if (!input.destructive) {
+        changesetId = getActiveId(d, input.connectionId, 'data')
+      }
+    }
     d.prepare(
       `INSERT INTO history_entries
          (ts, connection_id, stream, source, statement, status, affected, entity, error, changeset_id, destructive, commit_group)
@@ -154,7 +204,10 @@ export async function listHistory(query: HistoryQuery): Promise<HistoryEntry[]> 
     where.push('changeset_id = ?')
     params.push(query.changesetId)
   } else if (query.unassigned) {
-    where.push("stream = 'table_mutation' AND changeset_id IS NULL")
+    // Unassigned inbox — a specific kind's stream when `stream` is given
+    // (rail: schema inbox = table_mutation, data inbox = data_mutation), else both.
+    where.push('changeset_id IS NULL')
+    if (!query.stream) where.push("stream IN ('table_mutation', 'data_mutation')")
   }
   const limit = Math.max(1, Math.min(2000, query.limit ?? 500))
   const offset = Math.max(0, query.offset ?? 0)
@@ -190,36 +243,43 @@ export async function listChangesets(
   connectionId: string
 ): Promise<Changeset[]> {
   const d = await getDb()
-  const active = getActiveId(d, connectionId)
+  const activeSchema = getActiveId(d, connectionId, 'schema')
+  const activeData = getActiveId(d, connectionId, 'data')
   const rows = d
     .prepare(
       `SELECT c.id, c.connection_id AS connectionId, c.name, c.ticket,
               c.status, c.created_at AS createdAt, c.exported_at AS exportedAt,
+              c.kind,
               (SELECT count(*) FROM history_entries h WHERE h.changeset_id = c.id) AS count
          FROM changesets c
         WHERE c.connection_id = ?
         ORDER BY c.created_at DESC`
     )
-    .all(connectionId) as unknown as Omit<Changeset, 'active'>[]
-  return rows.map((r) => ({ ...r, active: r.id === active }))
+    .all(connectionId) as unknown as Array<Omit<Changeset, 'active'>>
+  return rows.map((r) => ({
+    ...r,
+    kind: r.kind === 'data' ? 'data' : 'schema',
+    active: r.id === activeSchema || r.id === activeData
+  }))
 }
 
 export async function createChangeset(
   connectionId: string,
   name: string,
-  ticket?: string
+  ticket?: string,
+  kind: ChangesetKind = 'schema'
 ): Promise<Changeset> {
   const d = await getDb()
   const now = Date.now()
   const res = d
     .prepare(
-      `INSERT INTO changesets (connection_id, name, ticket, status, created_at)
-       VALUES (?, ?, ?, 'draft', ?)`
+      `INSERT INTO changesets (connection_id, name, ticket, status, created_at, kind)
+       VALUES (?, ?, ?, 'draft', ?, ?)`
     )
-    .run(connectionId, name, ticket ?? null, now)
+    .run(connectionId, name, ticket ?? null, now, kind)
   const id = Number(res.lastInsertRowid)
-  // a freshly created changeset becomes the active auto-attach target
-  setActiveSync(d, connectionId, id)
+  // a freshly created changeset becomes the active auto-attach target for its kind
+  setActiveSync(d, connectionId, kind, id)
   return {
     id,
     connectionId,
@@ -229,6 +289,7 @@ export async function createChangeset(
     createdAt: now,
     exportedAt: null,
     count: 0,
+    kind,
     active: true
   }
 }
@@ -248,36 +309,56 @@ export async function renameChangeset(
 
 export async function deleteChangeset(id: number): Promise<void> {
   const d = await getDb()
+  const kind = getChangesetKind(d, id)
   // entries revert to the Unassigned inbox (never lost)
   d.prepare(
     'UPDATE history_entries SET changeset_id = NULL WHERE changeset_id = ?'
   ).run(id)
   d.prepare('DELETE FROM changesets WHERE id = ?').run(id)
-  // clear any meta rows pointing at it
-  d.prepare('DELETE FROM meta WHERE value = ?').run(String(id))
+  // clear the active slot if it pointed at this changeset
+  if (kind) {
+    d.prepare('DELETE FROM meta WHERE key LIKE ? AND value = ?').run(
+      `active_cs:${kind}:%`,
+      String(id)
+    )
+  }
 }
 
 function setActiveSync(
   d: DatabaseSync,
   connectionId: string,
+  kind: ChangesetKind,
   changesetId: number | null
 ): void {
   if (changesetId == null) {
-    d.prepare('DELETE FROM meta WHERE key = ?').run(activeKey(connectionId))
+    d.prepare('DELETE FROM meta WHERE key = ?').run(activeKey(connectionId, kind))
   } else {
     d.prepare(
       'INSERT INTO meta (key, value) VALUES (?, ?) ' +
         'ON CONFLICT(key) DO UPDATE SET value = excluded.value'
-    ).run(activeKey(connectionId), String(changesetId))
+    ).run(activeKey(connectionId, kind), String(changesetId))
   }
 }
 
+/**
+ * Toggle/set the active changeset. `null` clears both kind slots (generic). A
+ * changeset id **toggles** its own kind's slot: if it is already the active one,
+ * clear that kind; otherwise make it active (replacing any other active of the
+ * same kind — one active per kind). Never touches the other kind's slot.
+ */
 export async function setActiveChangeset(
   connectionId: string,
   changesetId: number | null
 ): Promise<void> {
   const d = await getDb()
-  setActiveSync(d, connectionId, changesetId)
+  if (changesetId == null) {
+    setActiveSync(d, connectionId, 'schema', null)
+    setActiveSync(d, connectionId, 'data', null)
+    return
+  }
+  const kind = getChangesetKind(d, changesetId) ?? 'schema'
+  const current = getActiveId(d, connectionId, kind)
+  setActiveSync(d, connectionId, kind, current === changesetId ? null : changesetId)
 }
 
 export async function assignEntries(
@@ -287,13 +368,31 @@ export async function assignEntries(
   if (entryIds.length === 0) return
   const d = await getDb()
   const placeholders = entryIds.map(() => '?').join(', ')
+  if (changesetId == null) {
+    // move to Unassigned — any schema/data mutation entry
+    d.prepare(
+      `UPDATE history_entries SET changeset_id = NULL
+        WHERE id IN (${placeholders})
+          AND stream IN ('table_mutation', 'data_mutation')`
+    ).run(...(entryIds as never[]))
+    return
+  }
+  // kind-scoped: only entries of the changeset's stream may attach (ADR-0023)
+  const kind = getChangesetKind(d, changesetId) ?? 'schema'
   d.prepare(
     `UPDATE history_entries SET changeset_id = ?
-      WHERE id IN (${placeholders}) AND (stream = 'table_mutation' OR destructive = 1)`
-  ).run(changesetId, ...(entryIds as never[]))
+      WHERE id IN (${placeholders}) AND stream = ?`
+  ).run(changesetId, ...(entryIds as never[]), kindStream(kind))
 }
 
-/** Build the commented .sql handoff script for a changeset (oldest → newest). */
+function renderStmt(r: { ts: number; statement: string; entity: string | null }): string {
+  const stmt = r.statement.trimEnd()
+  const withSemi = stmt.endsWith(';') ? stmt : stmt + ';'
+  const tag = `-- ${new Date(r.ts).toISOString()}${r.entity ? ` · ${r.entity}` : ''}`
+  return `${tag}\n${withSemi}`
+}
+
+/** Build the commented .sql handoff script for one changeset (oldest → newest). */
 export async function buildChangesetSql(id: number): Promise<{
   name: string
   ticket: string | null
@@ -301,18 +400,23 @@ export async function buildChangesetSql(id: number): Promise<{
 } | null> {
   const d = await getDb()
   const cs = d
-    .prepare('SELECT name, ticket FROM changesets WHERE id = ?')
-    .get(id) as { name: string; ticket: string | null } | undefined
+    .prepare('SELECT name, ticket, kind FROM changesets WHERE id = ?')
+    .get(id) as { name: string; ticket: string | null; kind: string } | undefined
   if (!cs) return null
+  const kind: ChangesetKind = cs.kind === 'data' ? 'data' : 'schema'
   const rows = d
     .prepare(
       `SELECT ts, statement, entity FROM history_entries
-        WHERE changeset_id = ? AND stream = 'table_mutation'
+        WHERE changeset_id = ? AND stream = ?
         ORDER BY ts ASC, id ASC`
     )
-    .all(id) as Array<{ ts: number; statement: string; entity: string | null }>
+    .all(id, kindStream(kind)) as Array<{
+    ts: number
+    statement: string
+    entity: string | null
+  }>
   const header = [
-    `-- Changeset: ${cs.name}`,
+    `-- Changeset: ${cs.name} (${kind})`,
     cs.ticket ? `-- Ticket: ${cs.ticket}` : null,
     `-- Generated by Krust Studio at ${new Date().toISOString()}`,
     `-- ${rows.length} statement(s), raw chronological order (not squashed)`,
@@ -320,15 +424,58 @@ export async function buildChangesetSql(id: number): Promise<{
   ]
     .filter((l) => l !== null)
     .join('\n')
-  const body = rows
-    .map((r) => {
-      const stmt = r.statement.trimEnd()
-      const withSemi = stmt.endsWith(';') ? stmt : stmt + ';'
-      const tag = `-- ${new Date(r.ts).toISOString()}${r.entity ? ` · ${r.entity}` : ''}`
-      return `${tag}\n${withSemi}`
-    })
-    .join('\n\n')
+  const body = rows.map(renderStmt).join('\n\n')
   return { name: cs.name, ticket: cs.ticket, sql: `${header}\n${body}\n` }
+}
+
+/**
+ * Export-together (ADR-0023): merge several changesets into one `.sql`, statements
+ * **interleaved by execution timestamp** across all of them (a data backfill can
+ * belong between two DDL steps). Storage stays separate; this is a render.
+ */
+export async function buildMergedChangesetSql(ids: number[]): Promise<{
+  sql: string
+  names: string[]
+} | null> {
+  if (ids.length === 0) return null
+  const d = await getDb()
+  const csRows = d
+    .prepare(
+      `SELECT id, name, kind FROM changesets WHERE id IN (${ids.map(() => '?').join(', ')})`
+    )
+    .all(...(ids as never[])) as Array<{ id: number; name: string; kind: string }>
+  if (csRows.length === 0) return null
+  const names = csRows.map((c) => `${c.name} (${c.kind === 'data' ? 'data' : 'schema'})`)
+  const rows = d
+    .prepare(
+      `SELECT ts, statement, entity FROM history_entries
+        WHERE changeset_id IN (${ids.map(() => '?').join(', ')})
+          AND stream IN ('table_mutation', 'data_mutation')
+        ORDER BY ts ASC, id ASC`
+    )
+    .all(...(ids as never[])) as Array<{
+    ts: number
+    statement: string
+    entity: string | null
+  }>
+  const header = [
+    `-- Merged export: ${names.join(', ')}`,
+    `-- Generated by Krust Studio at ${new Date().toISOString()}`,
+    `-- ${rows.length} statement(s), interleaved by execution time (not squashed)`,
+    ''
+  ].join('\n')
+  const body = rows.map(renderStmt).join('\n\n')
+  return { sql: `${header}\n${body}\n`, names }
+}
+
+export async function markExportedMany(ids: number[]): Promise<void> {
+  if (ids.length === 0) return
+  const d = await getDb()
+  const now = Date.now()
+  d.prepare(
+    `UPDATE changesets SET status = 'exported', exported_at = ?
+      WHERE id IN (${ids.map(() => '?').join(', ')})`
+  ).run(now, ...(ids as never[]))
 }
 
 export async function deleteEntries(ids: number[]): Promise<void> {

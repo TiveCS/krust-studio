@@ -99,46 +99,58 @@ function FkExpand({
   value: unknown
 }): React.JSX.Element {
   const [open, setOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
   const [parent, setParent] = useState<{
+    /** the FK value this parent was fetched for — stale when the value changes */
+    forValue: string
     columns: ColumnInfo[]
     row: Record<string, unknown> | null
     fks: ForeignKey[]
   } | null>(null)
 
-  const toggle = async (): Promise<void> => {
-    const next = !open
-    setOpen(next)
-    if (next && !parent) {
-      setLoading(true)
-      try {
-        const res = await window.api.sessions.readRows(
-          connId,
-          { name: fk.refTable, schema: fk.refSchema },
-          1,
-          0,
-          [{ column: fk.refColumn, op: 'eq', value: String(value) }]
-        )
+  const key = String(value)
+  const ready = parent?.forValue === key
+  // derived (no setState): spinner shows while expanded but the parent is missing
+  // or was fetched for a previous row's FK value
+  const loading = open && !ready
+
+  // Fetch the parent whenever expanded, and re-fetch when the FK `value` changes
+  // (selecting another row reuses this same instance), so the nested data follows
+  // the selection instead of sticking on the previously-fetched row. The only
+  // state writes here are async (in the promise), never synchronous.
+  useEffect(() => {
+    if (!open || ready) return
+    let cancelled = false
+    window.api.sessions
+      .readRows(connId, { name: fk.refTable, schema: fk.refSchema }, 1, 0, [
+        { column: fk.refColumn, op: 'eq', value: key }
+      ])
+      .then((res) => {
+        if (cancelled) return
         setParent({
+          forValue: key,
           columns: res.columns,
           row: res.rows[0] ?? null,
           fks: res.foreignKeys
         })
-      } catch (err) {
+      })
+      .catch((err) => {
+        if (cancelled) return
         toast.error(err instanceof Error ? err.message : String(err))
         setOpen(false)
-      } finally {
-        setLoading(false)
-      }
+      })
+    return () => {
+      cancelled = true
     }
-  }
+  }, [open, ready, key, connId, fk.refTable, fk.refSchema, fk.refColumn])
+
+  const toggle = (): void => setOpen((o) => !o)
 
   return (
     <>
       <span className="inline-flex items-center gap-1">
         {prim(value)}
         <button
-          onClick={() => void toggle()}
+          onClick={toggle}
           title={`Expand ${fk.refTable}`}
           className="text-primary/70 hover:text-primary"
         >
@@ -150,7 +162,7 @@ function FkExpand({
         </button>
         {loading && <Loader2 className="size-3 animate-spin" />}
       </span>
-      {open && parent && (
+      {open && ready && parent && (
         <div className="mt-1 ml-3 rounded border border-border/50 bg-muted/20 p-1.5">
           <div className="mb-1 text-[10px] uppercase text-muted-foreground/60">
             {fk.refTable}
@@ -287,7 +299,7 @@ export function JsonViewerPanel({
           e.preventDefault()
           drag.current = { startX: e.clientX, startW: width }
         }}
-        className="absolute top-0 left-0 z-10 h-full w-1 cursor-col-resize hover:bg-ring"
+        className="absolute top-0 -left-1 z-10 h-full w-2.5 cursor-col-resize hover:bg-ring/60"
       />
       <div className="flex h-9 shrink-0 items-center gap-2 border-b border-border px-3">
         <span className="truncate text-xs font-medium">{title}</span>

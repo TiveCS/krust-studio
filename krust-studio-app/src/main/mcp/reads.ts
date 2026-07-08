@@ -1,7 +1,7 @@
 import { describeTable, readRows } from '../db/session'
 import { getConnectionConfig } from '../store/connections'
 import { getMcpConfig, getMcpGrant } from '../store/mcp'
-import type { McpAllowEntry } from '../../shared/types'
+import type { Filter, McpAllowEntry, Sort } from '../../shared/types'
 
 /**
  * Structured, read-only DATA tools (ADR-0003) gated by the per-connection AI Read
@@ -69,26 +69,81 @@ export async function describeAllowedTable(
   }
 }
 
+export interface ReadRowsInput {
+  limit?: number
+  offset?: number
+  /** structured predicate (Krust Filter[]) — compiled to a parameterized WHERE */
+  filter?: Filter[]
+  /** multi-column sort */
+  orderBy?: Sort[]
+  /** projection — restrict the result to these columns (must be allowlisted) */
+  columns?: string[]
+}
+
+/**
+ * Read a bounded sample from an allowlisted table (ADR-0003, refined beta.5).
+ * Filtering/sorting/projection are **structured** (Filter[]/Sort[]) — never raw
+ * SQL. Every column referenced in filter/orderBy/columns must itself be
+ * **allowlisted and unmasked**, else the call is rejected: a raw or masked-column
+ * predicate could probe a masked value one boolean at a time (oracle leak).
+ */
 export async function readAllowedRows(
   connectionId: string,
   table: string,
-  schema?: string,
-  limit?: number,
-  offset?: number
+  schema: string | undefined,
+  input: ReadRowsInput
 ): Promise<unknown> {
   const allow = requireDataReads(connectionId)
   const entry = findEntry(allow, table, schema)
   if (!entry) throw new Error(`Table not on the AI Read Allowlist: ${table}`)
   if (!entry.data) throw new Error(`Row data is not allowed for ${table} (schema-only grant)`)
   const cfg = getMcpConfig()
-  const n = Math.min(limit ?? cfg.readSampleDefault, cfg.readSampleMax)
+  const n = Math.min(input.limit ?? cfg.readSampleDefault, cfg.readSampleMax)
   const masked = new Set((entry.maskColumns ?? []).map((c) => c.toLowerCase()))
-  const res = await readRows(connectionId, { name: table, schema }, n, offset ?? 0)
-  const columns = res.columns.filter((c) => !masked.has(c.name.toLowerCase()))
+
+  // the set of columns the AI is allowed to SEE for this table (real ∧ unmasked)
+  const filters = input.filter ?? []
+  const orderBy = input.orderBy ?? []
+  const projection = input.columns ?? []
+  const referenced = [
+    ...filters.map((f) => f.column),
+    ...orderBy.map((o) => o.column),
+    ...projection
+  ].filter(Boolean)
+  if (referenced.length) {
+    const desc = await describeTable(connectionId, { name: table, schema })
+    const visible = new Set(
+      desc.columns.map((c) => c.name.toLowerCase()).filter((c) => !masked.has(c))
+    )
+    for (const col of referenced) {
+      if (!visible.has(col.toLowerCase())) {
+        throw new Error(
+          `Column "${col}" is not readable on ${table} ` +
+            `(not on the allowlist or masked) — cannot filter/sort/select on it`
+        )
+      }
+    }
+  }
+
+  const res = await readRows(
+    connectionId,
+    { name: table, schema },
+    n,
+    input.offset ?? 0,
+    filters.length ? filters : undefined,
+    orderBy.length ? orderBy : undefined
+    // NOTE: rawWhere is deliberately never passed — structured only (no oracle leak)
+  )
+  const wanted = projection.length
+    ? new Set(projection.map((c) => c.toLowerCase()))
+    : null
+  const columns = res.columns.filter(
+    (c) => !masked.has(c.name.toLowerCase()) && (!wanted || wanted.has(c.name.toLowerCase()))
+  )
   const rows = res.rows.map((row) => {
     const out: Record<string, unknown> = {}
     for (const c of columns) out[c.name] = row[c.name]
     return out
   })
-  return { table, schema, limit: n, offset: offset ?? 0, columns, rows }
+  return { table, schema, limit: n, offset: input.offset ?? 0, columns, rows }
 }
