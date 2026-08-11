@@ -12,7 +12,7 @@ import { HistoryView } from '@/components/HistoryView'
 import { BackupView } from '@/components/BackupView'
 import { RedisKeyView } from '@/components/RedisKeyView'
 import { RoutineView } from '@/components/RoutineView'
-import { SchemaSyncView } from '@/components/SchemaSyncView'
+import { AiProposalsView } from '@/components/AiProposalsView'
 import { CommandPalette } from '@/components/CommandPalette'
 import { useSchemaSync } from '@/store/schemaSync'
 import { Toaster } from '@/components/ui/sonner'
@@ -181,7 +181,7 @@ function App(): React.JSX.Element {
   } else if (activeTab?.kind === 'routine') {
     content = <RoutineView key={activeTab.id} />
   } else if (activeTab?.kind === 'schema-sync') {
-    content = <SchemaSyncView />
+    content = <AiProposalsView />
   } else if (activeTab) {
     content = <TableTabView />
   } else {

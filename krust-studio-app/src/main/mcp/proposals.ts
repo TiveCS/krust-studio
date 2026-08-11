@@ -5,11 +5,22 @@ import {
   describeTable,
   createTable,
   alterTable,
-  previewAlter
+  previewAlter,
+  applyRowChanges
 } from '../db/session'
 import { getConnectionConfig } from '../store/connections'
+import {
+  saveProposal,
+  listProposals as listStoredProposals,
+  getProposal as getStoredProposal,
+  deleteProposal as deleteStoredProposal,
+  resolveChangesetFor
+} from '../store/history'
+import { validateAndRender, type ProposeDataInput } from './writes'
 import type {
   CreateTableSpec,
+  DataCommitResult,
+  DataProposal,
   SchemaOp,
   SchemaSyncProposal,
   SchemaSyncCommitResult,
@@ -27,8 +38,16 @@ export interface ProposeInput {
   reportOnly?: SchemaSyncReportItem[]
 }
 
-/** pending proposals, in memory — cleared on quit (transient by design). */
-const pending = new Map<string, SchemaSyncProposal>()
+/**
+ * Pending proposals are **persisted** in `history.db` (ADR-0024), not held in
+ * memory: an agent works while the user is elsewhere, so a proposal has to
+ * survive quit, crash, and the unattended auto-update restart of ADR-0019.
+ */
+async function loadPending(id: string): Promise<SchemaSyncProposal | null> {
+  const row = await getStoredProposal(id)
+  if (!row || row.kind !== 'schema') return null
+  return JSON.parse(row.payload) as SchemaSyncProposal
+}
 
 function push(channel: string, payload: unknown): void {
   for (const w of BrowserWindow.getAllWindows()) {
@@ -91,7 +110,15 @@ export async function addProposal(
     alters,
     reportOnly: input.reportOnly ?? []
   }
-  pending.set(proposal.id, proposal)
+  await saveProposal({
+    id: proposal.id,
+    connectionId: proposal.connectionId,
+    kind: 'schema',
+    client,
+    createdAt: proposal.receivedAt,
+    changesetName: proposal.changesetName ?? null,
+    payload: JSON.stringify(proposal)
+  })
   push('mcp:proposal', proposal)
   return {
     id: proposal.id,
@@ -101,12 +128,15 @@ export async function addProposal(
   }
 }
 
-export function listProposals(): SchemaSyncProposal[] {
-  return [...pending.values()].sort((a, b) => b.receivedAt - a.receivedAt)
+export async function listProposals(): Promise<SchemaSyncProposal[]> {
+  const rows = await listStoredProposals('schema')
+  return rows
+    .map((r) => JSON.parse(r.payload) as SchemaSyncProposal)
+    .sort((a, b) => b.receivedAt - a.receivedAt)
 }
 
-export function dismissProposal(id: string): void {
-  pending.delete(id)
+export async function dismissProposal(id: string): Promise<void> {
+  await deleteStoredProposal(id)
 }
 
 /** current table/column shape for reconcile — a set of "table" + "table.column" */
@@ -159,7 +189,7 @@ export async function commitProposal(
   id: string,
   opts: { changesetName?: string; excludeKeys?: string[] }
 ): Promise<SchemaSyncCommitResult> {
-  const p = pending.get(id)
+  const p = await loadPending(id)
   if (!p) throw new Error('Proposal not found (it may have been dismissed)')
   const config = getConnectionConfig(p.connectionId)
   if (config?.readOnly) {
@@ -207,7 +237,7 @@ export async function commitProposal(
     }
   }
 
-  if (conflicts.length === 0) pending.delete(id)
+  if (conflicts.length === 0) await deleteStoredProposal(id)
   return { ran, skipped, conflicts, changesetName: opts.changesetName ?? p.changesetName }
 }
 
@@ -226,7 +256,7 @@ function describeOp(op: SchemaOp): string {
 
 /** the handoff .sql from the proposal's draft DDL (works without executing) */
 export async function exportProposalSql(id: string): Promise<string> {
-  const p = pending.get(id)
+  const p = await loadPending(id)
   if (!p) throw new Error('Proposal not found')
   const lines: string[] = [
     `-- Krust Studio — Schema Sync export`,
@@ -248,6 +278,147 @@ export async function exportProposalSql(id: string): Promise<string> {
   if (p.reportOnly.length) {
     lines.push('-- report-only (not applied — review manually):')
     for (const r of p.reportOnly) lines.push(`--   ${r.table}: ${r.kind} — ${r.detail}`)
+  }
+  return lines.join('\n')
+}
+
+// ───────────────────── Data proposals (ADR-0024) ─────────────────────
+// The DML counterpart to the schema half above. Same contract: staged, never
+// executed by the tool call, committed only by a human through the normal
+// capture path.
+
+/** stable key for one row change — the review UI uses it to deselect items */
+export function dataChangeKey(i: number): string {
+  return `data:${i}`
+}
+
+async function loadDataProposal(id: string): Promise<DataProposal | null> {
+  const row = await getStoredProposal(id)
+  if (!row || row.kind !== 'data') return null
+  return JSON.parse(row.payload) as DataProposal
+}
+
+/**
+ * Accept a data proposal from an MCP client: validate every change against the
+ * AI Write Allowlist, render its DML (dry-run — no execution), persist it, and
+ * push it to the renderer so the AI Proposals tab badges + (optionally) toasts.
+ * Never writes the DB.
+ */
+export async function addDataProposal(
+  input: ProposeDataInput,
+  client: string
+): Promise<{ id: string; changes: number; estimatedRows: number | null }> {
+  const config = getConnectionConfig(input.connectionId)
+  if (!config) throw new Error(`Unknown connection: ${input.connectionId}`)
+
+  const changes = await validateAndRender(input)
+  const proposal: DataProposal = {
+    id: randomUUID(),
+    connectionId: input.connectionId,
+    connectionName: config.name,
+    client,
+    receivedAt: Date.now(),
+    changesetName: input.changesetName,
+    changes
+  }
+  await saveProposal({
+    id: proposal.id,
+    connectionId: proposal.connectionId,
+    kind: 'data',
+    client,
+    createdAt: proposal.receivedAt,
+    changesetName: proposal.changesetName ?? null,
+    payload: JSON.stringify(proposal)
+  })
+  push('mcp:dataProposal', proposal)
+
+  const counted = changes.filter((c) => typeof c.estimatedRows === 'number')
+  return {
+    id: proposal.id,
+    changes: changes.length,
+    estimatedRows: counted.length
+      ? counted.reduce((n, c) => n + (c.estimatedRows ?? 0), 0)
+      : null
+  }
+}
+
+export async function listDataProposals(): Promise<DataProposal[]> {
+  const rows = await listStoredProposals('data')
+  return rows
+    .map((r) => JSON.parse(r.payload) as DataProposal)
+    .sort((a, b) => b.receivedAt - a.receivedAt)
+}
+
+export async function dismissDataProposal(id: string): Promise<void> {
+  await deleteStoredProposal(id)
+}
+
+/**
+ * Commit a data proposal on a writable connection. Statements run in one
+ * transaction through `applyRowChanges`, capturing as source `ai` bound to the
+ * proposal's changeset. Read-only connections are blocked here (main guard) —
+ * Export still works, which is the "script the handoff" case.
+ */
+export async function commitDataProposal(
+  id: string,
+  opts: { changesetName?: string; excludeKeys?: string[] }
+): Promise<DataCommitResult> {
+  const p = await loadDataProposal(id)
+  if (!p) throw new Error('Proposal not found (it may have been dismissed)')
+  const config = getConnectionConfig(p.connectionId)
+  if (config?.readOnly) {
+    throw new Error(
+      'Connection is read-only — commit is blocked. Export the .sql instead.'
+    )
+  }
+  const exclude = new Set(opts.excludeKeys ?? [])
+  const selected = p.changes.filter((_, i) => !exclude.has(dataChangeKey(i)))
+  if (!selected.length) throw new Error('No changes selected')
+
+  const changesetName = opts.changesetName ?? p.changesetName
+  const changesetId = await resolveChangesetFor(
+    p.connectionId,
+    'data',
+    changesetName
+  )
+
+  const ran: string[] = []
+  const failed: string[] = []
+  let affected = 0
+  try {
+    const res = await applyRowChanges(p.connectionId, selected, { changesetId })
+    affected = res.affected
+    ran.push(...(res.statements ?? []))
+    await deleteStoredProposal(id)
+  } catch (err) {
+    // The whole batch is one transaction — a failure rolled everything back, so
+    // the proposal stays staged for the user to fix or dismiss.
+    failed.push(err instanceof Error ? err.message : String(err))
+  }
+  return { ran, failed, affected, changesetName }
+}
+
+/** the handoff .sql from the proposal's rendered DML (works without executing) */
+export async function exportDataProposalSql(id: string): Promise<string> {
+  const p = await loadDataProposal(id)
+  if (!p) throw new Error('Proposal not found')
+  const lines: string[] = [
+    `-- Krust Studio — AI data proposal export`,
+    `-- connection: ${p.connectionName}`,
+    p.changesetName ? `-- changeset: ${p.changesetName}` : `-- changeset: (none)`,
+    `-- proposed by: ${p.client}`,
+    `-- generated: ${new Date().toISOString()}`,
+    `-- ${p.changes.length} statement(s) — review before running on production`,
+    ''
+  ]
+  for (const c of p.changes) {
+    const rows =
+      typeof c.estimatedRows === 'number'
+        ? ` · ~${c.estimatedRows} row(s) at draft time`
+        : ''
+    lines.push(`-- ${c.verb.toUpperCase()} ${c.table}${rows}`)
+    lines.push(`${(c.sql ?? '-- (SQL unavailable)').trim()};`)
+    lines.push('')
   }
   return lines.join('\n')
 }

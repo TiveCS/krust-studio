@@ -887,8 +887,9 @@ export const useConnections = create<ConnectionsState>((set, get) => {
       }
       const tab: Tab = {
         id: crypto.randomUUID(),
+        // kind stays 'schema-sync' — an internal id, not the label (ADR-0024)
         kind: 'schema-sync',
-        entity: { name: 'Schema Sync' },
+        entity: { name: 'AI Proposals' },
         data: null, loading: false, error: null, pageIndex: 0, total: null,
         counting: false, filters: [], filterMode: 'builder', rawWhere: '',
         filterError: null, orderBy: [], edits: {}, deletes: [],

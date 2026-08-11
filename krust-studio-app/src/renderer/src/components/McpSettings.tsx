@@ -11,13 +11,20 @@ import type {
   McpGrant,
   McpAllowEntry,
   McpAuditEntry,
-  ConnectionSummary
+  ConnectionSummary,
+  DmlVerb
 } from '../../../shared/types'
 
 /**
- * Settings → AI / MCP (ADR-0022). Global master toggle + port + token, and
- * per-connection capability grants (default-deny): schema introspection (+ exclude
- * globs), accept-proposals, and data reads (+ the AI Read Allowlist with masks).
+ * Settings → AI / MCP (ADR-0022, extended by ADR-0024). Global master toggle +
+ * port + token, and per-connection capability grants (default-deny): schema
+ * introspection (+ exclude globs), accept-proposals, table data reads/writes
+ * (the AI Read + Write Allowlist, per-table and per-verb, with column masks),
+ * history reads (+ redact globs), and the Data-changeset auto-attach verbs.
+ *
+ * Laid out **tall, not dense**: a per-table, per-verb grant grid is a security
+ * posture the user has to take in at a glance, so this scrolls rather than
+ * crams.
  */
 export function McpSettings({ open }: { open: boolean }): React.JSX.Element {
   const [status, setStatus] = useState<McpStatus | null>(null)
@@ -307,14 +314,41 @@ export function McpSettings({ open }: { open: boolean }): React.JSX.Element {
   )
 }
 
+/**
+ * One section per stacked capability, full width, with room to read (ADR-0024).
+ * A per-table, per-verb grant grid is a security posture — it has to be legible
+ * at a glance, so this trades vertical space for clarity rather than cramming.
+ */
+function GrantSection({
+  title,
+  blurb,
+  children
+}: {
+  title: string
+  blurb?: React.ReactNode
+  children: React.ReactNode
+}): React.JSX.Element {
+  return (
+    <section className="space-y-2 border-t border-border/60 pt-3 first:border-0 first:pt-0">
+      <div>
+        <h5 className="text-xs font-medium">{title}</h5>
+        {blurb && <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">{blurb}</p>}
+      </div>
+      {children}
+    </section>
+  )
+}
+
 function ConnectionGrant({ conn }: { conn: ConnectionSummary }): React.JSX.Element {
   const [grant, setGrant] = useState<McpGrant | null>(null)
   const [excludesDraft, setExcludesDraft] = useState('')
+  const [redactDraft, setRedactDraft] = useState('')
 
   useEffect(() => {
     void window.api.mcp.getGrant(conn.id).then((g) => {
       setGrant(g)
       setExcludesDraft((g.introspectExcludes ?? []).join('\n'))
+      setRedactDraft((g.historyRedact ?? []).join('\n'))
     })
   }, [conn.id])
 
@@ -328,9 +362,9 @@ function ConnectionGrant({ conn }: { conn: ConnectionSummary }): React.JSX.Eleme
   const set = (patch: Partial<McpGrant>): void => save({ ...grant, ...patch })
 
   return (
-    <div className="rounded border border-border/60 p-2">
+    <div className="space-y-4 rounded-lg border border-border/60 p-4">
       <div className="flex items-center gap-2">
-        <span className="font-mono text-xs font-medium">{conn.name}</span>
+        <span className="font-mono text-sm font-medium">{conn.name}</span>
         <span className="rounded bg-muted px-1 text-[9px] uppercase text-muted-foreground">
           {conn.driver}
         </span>
@@ -340,62 +374,211 @@ function ConnectionGrant({ conn }: { conn: ConnectionSummary }): React.JSX.Eleme
           </span>
         )}
       </div>
-      <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
-        <label className="flex items-center gap-1.5 text-[11px]">
-          <Checkbox
-            checked={!!grant.introspection}
-            onCheckedChange={(c) => set({ introspection: c === true })}
+
+      <GrantSection
+        title="Schema"
+        blurb="Let an agent read this connection's structure and propose additive schema fixes. Proposals are staged for your review — they are never applied to the database."
+      >
+        <div className="space-y-1.5">
+          <label className="flex items-center gap-2 text-xs">
+            <Checkbox
+              checked={!!grant.introspection}
+              onCheckedChange={(c) => set({ introspection: c === true })}
+            />
+            Schema introspection — tables, columns, types, keys. No row data.
+          </label>
+          <label className="flex items-center gap-2 text-xs">
+            <Checkbox
+              checked={!!grant.propose}
+              onCheckedChange={(c) => set({ propose: c === true })}
+            />
+            Accept schema proposals
+          </label>
+        </div>
+        {grant.introspection && (
+          <div className="space-y-1 pt-1">
+            <label className="text-[11px] text-muted-foreground">
+              Hide these from introspection — one glob per line
+            </label>
+            <textarea
+              value={excludesDraft}
+              onChange={(e) => setExcludesDraft(e.target.value)}
+              onBlur={() =>
+                set({
+                  introspectExcludes: excludesDraft
+                    .split('\n')
+                    .map((s) => s.trim())
+                    .filter(Boolean)
+                })
+              }
+              rows={3}
+              spellCheck={false}
+              placeholder="__EFMigrationsHistory&#10;audit.*"
+              className="w-full rounded border border-border bg-transparent p-1.5 font-mono text-[11px] outline-none focus:border-ring"
+            />
+          </div>
+        )}
+      </GrantSection>
+
+      <GrantSection
+        title="Table data"
+        blurb="Nothing is readable or writable until you list it below. A table can be readable without being writable; it is never writable without being readable."
+      >
+        <div className="space-y-1.5">
+          <label className="flex items-center gap-2 text-xs">
+            <Checkbox
+              checked={!!grant.dataReads}
+              onCheckedChange={(c) => set({ dataReads: c === true })}
+            />
+            Allow reading rows
+          </label>
+          <label className="flex items-center gap-2 text-xs">
+            <Checkbox
+              checked={!!grant.dataWrites}
+              onCheckedChange={(c) => set({ dataWrites: c === true })}
+            />
+            Allow proposing row changes
+            <span className="text-[11px] text-muted-foreground">
+              — staged for review, never applied directly
+            </span>
+          </label>
+        </div>
+        {(grant.dataReads || grant.dataWrites) && (
+          <AllowlistEditor
+            grant={grant}
+            showWrite={!!grant.dataWrites}
+            onChange={(a) => set({ allowlist: a })}
           />
-          Schema introspection
+        )}
+      </GrantSection>
+
+      <GrantSection
+        title="Query history"
+        blurb="Let an agent read the SQL Krust has already run here, and list your changesets. Useful for 'what changed last week?' — but history stores statements with their values written in, so it can show data the allowlist above would hide."
+      >
+        <label className="flex items-center gap-2 text-xs">
+          <Checkbox
+            checked={!!grant.historyReads}
+            onCheckedChange={(c) => set({ historyReads: c === true })}
+          />
+          Allow reading history and changesets
         </label>
-        <label className="flex items-center gap-1.5 text-[11px]">
+        {grant.historyReads && (
+          <div className="space-y-1 pt-1">
+            <label className="text-[11px] text-muted-foreground">
+              Hide the SQL text for these tables — one glob per line. Their entries still
+              appear, with the table, time and row count, but the statement is withheld.
+            </label>
+            <textarea
+              value={redactDraft}
+              onChange={(e) => setRedactDraft(e.target.value)}
+              onBlur={() =>
+                set({
+                  historyRedact: redactDraft
+                    .split('\n')
+                    .map((s) => s.trim())
+                    .filter(Boolean)
+                })
+              }
+              rows={3}
+              spellCheck={false}
+              placeholder="users&#10;*_secret"
+              className="w-full rounded border border-border bg-transparent p-1.5 font-mono text-[11px] outline-none focus:border-ring"
+            />
+          </div>
+        )}
+      </GrantSection>
+
+      <GrantSection
+        title="Auto-attach to Data changeset"
+        blurb={
+          <>
+            When a Data changeset is active, row changes you make here can be collected
+            into it automatically, ready to export as a .sql handoff. Pick which kinds of
+            change get collected. Anything not collected still appears in Data Mutation
+            history — it lands in the Unassigned inbox, and you can add it to a changeset
+            by hand at any time. Nothing is ever lost.
+          </>
+        }
+      >
+        <DataAttachEditor conn={conn} />
+      </GrantSection>
+    </div>
+  )
+}
+
+/**
+ * Per-connection auto-attach verbs (ADR-0024). Lives on the ConnectionConfig,
+ * not the MCP grant — it governs *every* row change on this connection, not
+ * only the AI's.
+ */
+function DataAttachEditor({ conn }: { conn: ConnectionSummary }): React.JSX.Element {
+  // Absent means ALL — an existing connection carried over from an older build
+  // must keep auto-attaching, not silently stop.
+  const verbs = new Set<DmlVerb>(conn.dataAttachVerbs ?? ['insert', 'update', 'delete'])
+  const unscoped = conn.dataAttachUnscoped === true
+
+  const persist = (patch: Partial<ConnectionSummary>): void => {
+    const { hasPassword: _hasPassword, ...config } = { ...conn, ...patch }
+    void window.api.connections.save({ config })
+  }
+
+  const toggleVerb = (v: DmlVerb, on: boolean): void => {
+    const next = new Set(verbs)
+    if (on) next.add(v)
+    else next.delete(v)
+    persist({ dataAttachVerbs: (['insert', 'update', 'delete'] as DmlVerb[]).filter((x) => next.has(x)) })
+  }
+
+  const LABEL: Record<DmlVerb, string> = {
+    insert: 'INSERT — new rows',
+    update: 'UPDATE — changes to existing rows',
+    delete: 'DELETE — removing specific rows'
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="space-y-1.5">
+        {(['insert', 'update', 'delete'] as DmlVerb[]).map((v) => (
+          <label key={v} className="flex items-center gap-2 text-xs">
+            <Checkbox
+              checked={verbs.has(v)}
+              onCheckedChange={(c) => toggleVerb(v, c === true)}
+            />
+            {LABEL[v]}
+          </label>
+        ))}
+      </div>
+      <div className="space-y-1 border-t border-border/60 pt-3">
+        <label className="flex items-start gap-2 text-xs">
           <Checkbox
-            checked={!!grant.propose}
-            onCheckedChange={(c) => set({ propose: c === true })}
+            className="mt-0.5"
+            checked={unscoped}
+            onCheckedChange={(c) => persist({ dataAttachUnscoped: c === true })}
           />
-          Accept schema proposals
-        </label>
-        <label className="flex items-center gap-1.5 text-[11px]">
-          <Checkbox
-            checked={!!grant.dataReads}
-            onCheckedChange={(c) => set({ dataReads: c === true })}
-          />
-          Data reads
+          <span>
+            Also collect whole-table wipes
+            <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">
+              TRUNCATE, and DELETE / UPDATE written without a WHERE clause. These hit every
+              row in the table, so they are left out by default even when the boxes above
+              are ticked — an accidental one should not ride silently into a script DevOps
+              runs on production. They still go to Unassigned; add them deliberately.
+            </span>
+          </span>
         </label>
       </div>
-      {grant.dataReads && <AllowlistEditor grant={grant} onChange={(a) => set({ allowlist: a })} />}
-      {grant.introspection && (
-        <div className="mt-1.5 space-y-1">
-          <label className="text-[10px] text-muted-foreground">
-            Introspection excludes (one glob per line — hidden from the diff)
-          </label>
-          <textarea
-            value={excludesDraft}
-            onChange={(e) => setExcludesDraft(e.target.value)}
-            onBlur={() =>
-              set({
-                introspectExcludes: excludesDraft
-                  .split('\n')
-                  .map((s) => s.trim())
-                  .filter(Boolean)
-              })
-            }
-            rows={2}
-            spellCheck={false}
-            placeholder="__EFMigrationsHistory&#10;audit.*"
-            className="w-full rounded border border-border bg-transparent p-1 font-mono text-[11px] outline-none focus:border-ring"
-          />
-        </div>
-      )}
     </div>
   )
 }
 
 function AllowlistEditor({
   grant,
+  showWrite,
   onChange
 }: {
   grant: McpGrant
+  /** render the per-verb write columns (only meaningful with dataWrites on) */
+  showWrite: boolean
   onChange: (a: McpAllowEntry[]) => void
 }): React.JSX.Element {
   const list = grant.allowlist ?? []
@@ -411,57 +594,102 @@ function AllowlistEditor({
     setName('')
   }
 
+  const toggleVerb = (i: number, v: DmlVerb, on: boolean): void => {
+    const cur = new Set(list[i].write ?? [])
+    if (on) cur.add(v)
+    else cur.delete(v)
+    update(i, {
+      write: (['insert', 'update', 'delete'] as DmlVerb[]).filter((x) => cur.has(x))
+    })
+  }
+
   return (
-    <div className="mt-2 space-y-1.5 rounded border border-border/60 p-2">
-      <div className="text-[10px] font-medium text-muted-foreground">
-        AI Read Allowlist — only these tables are readable (default-deny)
-      </div>
-      {list.length === 0 && (
-        <div className="text-[10px] text-muted-foreground/60">
-          No tables allowed yet — the AI can read nothing on this connection.
+    <div className="mt-2 space-y-2 rounded border border-border/60 p-3">
+      {list.length === 0 ? (
+        <div className="text-[11px] text-muted-foreground">
+          No tables listed — the AI can see nothing on this connection. Add one below.
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-[10px] uppercase tracking-wide text-muted-foreground">
+            <span className="w-44">Table</span>
+            <span className="w-16">Read rows</span>
+            {showWrite && <span className="w-44">Propose changes</span>}
+            <span className="flex-1">Hide columns</span>
+          </div>
+          {list.map((e, i) => (
+            <div key={i} className="flex flex-wrap items-center gap-2">
+              <span className="w-44 truncate font-mono text-xs">{e.table}</span>
+              <span className="w-16">
+                <Checkbox
+                  checked={e.data}
+                  onCheckedChange={(c) => update(i, { data: c === true })}
+                />
+              </span>
+              {showWrite && (
+                <span className="flex w-44 items-center gap-2">
+                  {(['insert', 'update', 'delete'] as DmlVerb[]).map((v) => (
+                    <label
+                      key={v}
+                      className="flex items-center gap-1 text-[10px] uppercase text-muted-foreground"
+                      title={
+                        e.data
+                          ? undefined
+                          : 'Enable "Read rows" first — a table is never writable without being readable'
+                      }
+                    >
+                      <Checkbox
+                        disabled={!e.data}
+                        checked={(e.write ?? []).includes(v)}
+                        onCheckedChange={(c) => toggleVerb(i, v, c === true)}
+                      />
+                      {v.slice(0, 3)}
+                    </label>
+                  ))}
+                </span>
+              )}
+              <Input
+                value={(e.maskColumns ?? []).join(', ')}
+                onChange={(ev) =>
+                  update(i, {
+                    maskColumns: ev.target.value
+                      .split(',')
+                      .map((s) => s.trim())
+                      .filter(Boolean)
+                  })
+                }
+                placeholder="e.g. password_hash, email"
+                className="h-7 flex-1 text-[11px]"
+              />
+              <button
+                onClick={() => remove(i)}
+                className="px-1 text-muted-foreground hover:text-destructive"
+                title="Remove"
+              >
+                <span className="text-sm">×</span>
+              </button>
+            </div>
+          ))}
         </div>
       )}
-      {list.map((e, i) => (
-        <div key={i} className="flex flex-wrap items-center gap-1.5">
-          <span className="w-40 truncate font-mono text-[11px]">{e.table}</span>
-          <label className="flex items-center gap-1 text-[10px]">
-            <Checkbox checked={e.data} onCheckedChange={(c) => update(i, { data: c === true })} />
-            rows
-          </label>
-          <Input
-            value={(e.maskColumns ?? []).join(', ')}
-            onChange={(ev) =>
-              update(i, {
-                maskColumns: ev.target.value
-                  .split(',')
-                  .map((s) => s.trim())
-                  .filter(Boolean)
-              })
-            }
-            placeholder="mask columns (comma)"
-            className="h-6 flex-1 text-[11px]"
-          />
-          <button
-            onClick={() => remove(i)}
-            className="text-muted-foreground hover:text-destructive"
-            title="Remove"
-          >
-            <span className="text-xs">×</span>
-          </button>
-        </div>
-      ))}
+      {showWrite && (
+        <p className="text-[11px] leading-snug text-muted-foreground">
+          Hidden columns cannot be read, filtered on, or written to. Whole-table writes are
+          always refused — the agent must say which rows it means.
+        </p>
+      )}
       <form
         onSubmit={(e) => {
           e.preventDefault()
           add()
         }}
-        className="flex gap-1.5 pt-0.5"
+        className="flex gap-2 pt-1"
       >
         <Input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="table name to allow…"
-          className="h-6 flex-1 text-[11px]"
+          className="h-7 flex-1 text-[11px]"
         />
         <Button type="submit" size="xs" variant="secondary" disabled={!name.trim()}>
           Add

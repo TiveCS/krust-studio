@@ -15,6 +15,7 @@ import {
   buildUpdate,
   buildDelete,
   buildInsert,
+  buildRowChangeSql,
   buildCreateTable,
   fkActionClause,
   defaultIndexName,
@@ -42,6 +43,7 @@ import type {
   ForeignKey,
   IndexSpec,
   PlanNode,
+  ProposedRowChange,
   QueryPlan,
   RawQueryResult,
   ReferencingTable,
@@ -336,6 +338,36 @@ export class MysqlDriver implements DbDriver, RoutineCapable {
       where.params
     )) as [RowDataPacket[], FieldPacket[]]
     return Number((rows[0] as { c: number | bigint }).c)
+  }
+
+  async countPredicate(entity: EntityRef, filters: Filter[]): Promise<number> {
+    return this.countRows(entity, filters)
+  }
+
+  async applyRowChanges(
+    changes: ProposedRowChange[],
+    dryRun = false
+  ): Promise<ApplyResult> {
+    const built = buildRowChangeSql(changes, quoteIdent, () => '?', '?')
+    if (dryRun) return { affected: 0, statements: built.map((b) => b.rendered) }
+    const statements: string[] = []
+    let affected = 0
+    await (await this.ensure()).beginTransaction()
+    try {
+      for (const b of built) {
+        const [res] = (await this.conn!.query(b.sql, b.params)) as [
+          ResultSetHeader,
+          FieldPacket[]
+        ]
+        affected += res.affectedRows ?? 0
+        statements.push(b.rendered)
+      }
+      await this.conn?.commit()
+      return { affected, statements }
+    } catch (err) {
+      await this.conn?.rollback()
+      throw err
+    }
   }
 
   async applyChanges(

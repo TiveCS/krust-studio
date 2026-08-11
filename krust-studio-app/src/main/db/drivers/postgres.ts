@@ -10,6 +10,7 @@ import {
   buildUpdate,
   buildDelete,
   buildInsert,
+  buildRowChangeSql,
   buildCreateTable,
   fkActionClause,
   defaultIndexName,
@@ -30,6 +31,7 @@ import type {
   ForeignKey,
   IndexSpec,
   PlanNode,
+  ProposedRowChange,
   QueryPlan,
   RawQueryResult,
   ReferencingTable,
@@ -468,6 +470,37 @@ export class PostgresDriver implements DbDriver, RoutineCapable {
     return {
       columns: cols.map((c) => ({ name: c.name, type: c.type })),
       rows: res.rows as Record<string, unknown>[]
+    }
+  }
+
+  async countPredicate(entity: EntityRef, filters: Filter[]): Promise<number> {
+    return this.countRows(entity, filters)
+  }
+
+  async applyRowChanges(
+    changes: ProposedRowChange[],
+    dryRun = false
+  ): Promise<ApplyResult> {
+    const built = buildRowChangeSql(
+      changes,
+      quoteIdent,
+      (i) => `$${i + 1}`,
+      '$'
+    )
+    if (dryRun) return { affected: 0, statements: built.map((b) => b.rendered) }
+    const statements: string[] = []
+    let affected = 0
+    await (await this.ensure()).query('BEGIN')
+    try {
+      for (const b of built) {
+        affected += (await (await this.ensure()).query(b.sql, b.params)).rowCount ?? 0
+        statements.push(b.rendered)
+      }
+      await (await this.ensure()).query('COMMIT')
+      return { affected, statements }
+    } catch (err) {
+      await (await this.ensure()).query('ROLLBACK')
+      throw err
     }
   }
 

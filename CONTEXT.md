@@ -224,7 +224,10 @@ filed with `DELETE`, despite being DDL syntactically. This keeps a destructive
 data-wipe out of the schema-migration **Changeset** export by default.
 
 Stored in a local SQLite file in the data directory. Each entry records:
-statement, timestamp, connection, source (`gui`/`manual`), status
+statement, timestamp, connection, source (`gui` / `manual` / `ai` — GUI-generated,
+hand-typed in the SQL editor, or committed from an **AI Proposal**; history is
+filterable by origin, so "what did the agent change last week?" is answerable),
+status
 (success/error), affected-row count — not result sets — and a **Destructive**
 flag (see below). Retention differs by stream: **Data Retrieval** auto-trims on a
 rolling cap (high volume, low long-term value); **Data Mutation**, **Schema
@@ -318,6 +321,18 @@ slot land in an **Unassigned** inbox (never lost); the user can always manually
 move/regroup between same-kind changesets and out of the inbox. Status:
 Draft → Exported. Persisted in the configurable data directory, tied to a
 connection, with kind + name/ticket metadata.
+
+**What a Data changeset collects is per-connection and configurable** (Settings →
+the connection): three verb toggles — `INSERT`, `UPDATE`, `DELETE`, all on by
+default — plus a separate **"Also collect whole-table wipes"** toggle, off by
+default, covering `TRUNCATE` and `DELETE`/`UPDATE` written without a `WHERE`
+(i.e. the **Destructive** set). Both gates must pass for a captured statement to
+auto-attach; anything that fails still lands in **Unassigned**, addable by hand.
+Per-connection rather than global because it tracks the *database's* role (a
+reference-data DB collects `UPDATE` only), and the wipes toggle is separate
+because an accidental unscoped `DELETE` must not ride silently into a script
+DevOps runs on production. The verb gate has no schema-side equivalent —
+Schema changesets keep the single global **Auto-attach destructive DDL** toggle.
 
 Design value (recurring): *automate for convenience, but never force trust —
 the user must be able to inspect and override anything automatic.*
@@ -757,8 +772,8 @@ the token pastes into each client's own config. The **AI Access Audit** records
 the calling client's identity (from the MCP `initialize` handshake) so it's clear
 *which* agent read or proposed.
 
-Exposed only through fixed **structured tools**, never arbitrary SQL. Three tool
-families, three separate gates:
+Exposed only through fixed **structured tools**, never arbitrary SQL. Five tool
+families, five separate gates:
 - **Data reads** (`list_allowed_tables`, `describe_table`,
   `read_rows(table, filter, orderBy, columns, limit)`) — governed by the **AI
   Read Allowlist**. `read_rows` takes **structured** `filter`/`orderBy`/`columns`
@@ -770,12 +785,17 @@ families, three separate gates:
 - **Schema introspection** (`introspect_schema`) — governed by the separate
   **Schema Introspection** scope (see below).
 - **Schema-op proposal** (`propose_schema_ops`) — stages **Proposed Schema Ops**
-  into a **Schema Sync** review; **never commits to the DB**.
+  into **AI Proposals**; **never commits to the DB**.
+- **Data-change proposal** (`propose_data_changes`) — stages a **Proposed Data
+  Change** into **AI Proposals**; **never commits to the DB**. Governed by the
+  **AI Write Allowlist** (per-table, per-verb).
+- **History reads** (`read_history`, `list_changesets`) — governed by the separate
+  **History Read** scope, with a per-connection **redact list** (see below).
 
 The server lives in the running app, so it reuses the same live connections and
 enforcement (no second path to secrets). **The AI can never write to the
-database**: MCP can only *propose* staged schema ops — a human reviews and
-commits them through the normal path.
+database**: MCP can only *propose* staged schema ops and row changes — a human
+reviews and commits them through the normal path.
 
 ### AI Read Allowlist
 Default-deny permission set governing what **data** the **MCP Server** may read.
@@ -783,7 +803,31 @@ Granularity is per (connection → table); each allowed table is marked schema-o
 or schema+data, with per-table **column exclusions** to mask sensitive fields
 (password hashes, emails, tokens). Nothing is readable unless explicitly allowed.
 This gate covers row **data** only — whole-schema *structure* visibility is the
-separate **Schema Introspection** scope.
+separate **Schema Introspection** scope, and the ability to *change* rows is the
+separate **AI Write Allowlist**.
+
+### AI Write Allowlist
+Default-deny permission set governing which rows the **MCP Server** may propose
+changes to. Granularity is per (connection → table → **verb**): a table may allow
+`insert`, `update`, `delete` in any combination, or none. Absent = no writes.
+Sits alongside the **AI Read Allowlist** on the same per-table entry, behind its
+own connection-level master switch — a table can be readable and not writable,
+but never writable without being readable (an agent must see a row before it may
+change it).
+
+Two boundary rules, enforced at the tool call, not in the UI:
+
+- **Predicate columns follow the read rules.** A proposed change targets rows by
+  a structured `Filter[]` predicate (the same shape `read_rows` takes — never raw
+  SQL). Every column named in the predicate must itself be allowlisted **and
+  unmasked**, exactly as for reads.
+- **Unscoped writes are rejected.** The predicate is required and must be
+  non-empty, and `TRUNCATE` is not exposed at all — so a **Destructive** DML
+  statement cannot even be *staged* over MCP. Whole-table operations stay in the
+  GUI, where the typed confirmation already lives.
+
+Deliberately **default-deny like the read side** — a denylist ("everything except
+X") was considered and rejected: one forgotten exception is a silent grant.
 
 ### Schema Introspection
 A connection-level scope (one on/off toggle, **distinct** from the per-table
@@ -793,8 +837,76 @@ row data**. Kept separate because structure is not the sensitive asset (data is)
 and a per-table default-deny allowlist makes drift detection impossible: you
 can't see what's *missing*. Feeds **Schema Sync**.
 
+### History Read
+A connection-level scope (one on/off toggle, default off) letting the MCP server
+read **Query History** and **Changeset** listings for that connection —
+`read_history` (by stream, by changeset, or the Unassigned inbox) and
+`list_changesets` (name, kind, status, entry count, which slot is active).
+
+Kept separate from the **AI Read Allowlist** because history is a *side channel
+around it*: history stores DML as display-rendered SQL with values inlined
+(ADR-0008), so a raw history read would return
+`UPDATE users SET password_hash='…'` — bypassing both the allowlist and its
+column masks.
+
+Within a granted connection history is **open by default** (the change story is
+only useful whole), narrowed by a per-connection **redact list** of table globs.
+A redacted table's entries still appear with full metadata — timestamp, stream,
+verb, table, affected count, **Destructive** flag, changeset — but the
+**statement text is withheld**. The agent learns *that* something changed and
+*when*, never *what to*. Entries with no recorded table are metadata-only too.
+
+Hiding entries outright was rejected: silent gaps make an agent reason from an
+incomplete timeline. Scrubbing literals out of the statement text was also
+rejected — it needs a per-dialect SQL parser, the parser-as-security-boundary
+that ADR-0003 refused.
+
+### AI Proposals
+The tab where staged, **un-committed** AI output waits for human review — the
+single surface for everything an agent has drafted but nothing it has applied.
+Nothing listed here has touched the database.
+
+Holds two proposal types, never mixed within one proposal:
+
+- **Schema proposal** — **Proposed Schema Ops** from a **Schema Sync** run.
+- **Data proposal** — a **Proposed Data Change** from `propose_data_changes`.
+
+Each proposal binds to exactly **one Changeset of its own kind** (a Schema
+proposal to a Schema changeset, a Data proposal to a Data changeset), so the
+typed-changeset invariant holds unchanged. An agent wanting both (add a column,
+then backfill it) sends two proposals.
+
+Proposals are **persisted** (in `history.db`, beside changesets), so they survive
+quit, crash, and an unattended auto-update restart (ADR-0019) — the point is that
+an agent works while the human is elsewhere.
+
+Each carries its origin (which agent, when), a per-item checkbox, the rendered
+SQL preview, and **Commit / Export / Dismiss**. On a **read-only** connection
+Commit is blocked but **Export still works** — the "verify Prod drift + script
+the handoff" case, applied to data as well as schema.
+
+_Avoid_: "Schema Sync tab" — Schema Sync is the **workflow**; AI Proposals is the
+**surface** its output lands on.
+
+### Proposed Data Change
+A staged set of row changes an AI hands Krust through `propose_data_changes` —
+the data-side counterpart to a **Proposed Schema Op**. Structured and
+engine-agnostic: an `insert` carries column→value maps; an `update` carries a
+structured `Filter[]` predicate plus the columns to set; a `delete` carries a
+predicate. Krust renders the dialect-correct DML.
+
+**Rows are targeted by predicate, not primary key.** Deliberate: the handoff
+artifact is applied to a *different database* than the one it was drafted
+against, where surrogate keys do not correspond — only a business identifier
+(`WHERE code = 'ACME'`) survives the trip. It also keeps the exported `.sql`
+readable: one set-based `UPDATE`, not eight hundred key-scoped ones.
+
+Consequences the review surface must carry: the affected-row count is shown at
+review and **re-counted at commit** (ADR-0005), because the matching row set can
+drift between drafting and approval.
+
 ### Schema Sync
-A workflow (and its own tab, like Backup) that reconciles a live DB against an
+A workflow (whose output lands in **AI Proposals**) that reconciles a live DB against an
 external code model — the motivating case is **.NET EF Core entity classes** whose
 tables are applied by hand (no migration tooling, per ADR-0002). The AI reads the
 entities (in the repo, via its own file access) and the DB **structure** (via
@@ -805,7 +917,7 @@ current DB.
 
 - **Target.** The AI picks the connection conversationally (`list_connections`,
   names/engines only) — there is no stored code↔connection binding.
-- **Run surface.** The tab lists proposed **additive** ops (dependency-ordered —
+- **Run surface.** Its **AI Proposals** entry lists proposed **additive** ops (dependency-ordered —
   parent tables before FK-bearing children — each with its generated DDL preview)
   plus a **report-only** section (§ **Proposed Schema Op**). Each report-only
   finding shows the code-inferred spec vs the live DB spec side-by-side and can be
@@ -833,7 +945,7 @@ A single structured, engine-agnostic schema operation the AI hands Krust through
 vocabulary** (`addColumn`, `createTable`, `addIndex`, `addForeignKey`, and the
 `alterColumn`/`dropColumn`/`dropIndex`/`dropForeignKey` promotions), keyed by
 table. Krust turns it into dialect-correct DDL via its existing generator (Krust
-owns dialect, ADR-0002) and stages it into **Schema Sync** for review — it is
+owns dialect, ADR-0002) and stages it into **AI Proposals** for review — it is
 **never** raw AI-authored SQL and **never** auto-committed. Only **additive** ops
 (`createTable`/`addColumn`/`addIndex`/`addForeignKey`) are auto-staged; type/
 nullability changes, drops of DB objects absent from code, and default/constraint
@@ -847,27 +959,38 @@ The MCP surface is configured across three tiers, following the default-deny +
 - **Global** (Settings → **AI / MCP**): master MCP server on/off, bound port,
   auth token (view/regenerate), `read_rows` default sample size + hard-max
   ceiling, and the **notify-on-proposal** toast (on/off, default on).
-- **Per-connection** (default-deny — a fresh connection exposes nothing): three
+- **Per-connection** (default-deny — a fresh connection exposes nothing): five
   independent capability grants — **AI data reads** (→ **AI Read Allowlist**,
-  per-table + column masks), **Schema Introspection** (on/off + an exclusion-glob
+  per-table + column masks), **AI data writes** (→ **AI Write Allowlist**,
+  per-table + per-verb), **Schema Introspection** (on/off + an exclusion-glob
   list, seeded `__EFMigrationsHistory`, to hide internal tables/schemas from the
-  diff), and **accept schema-op proposals** (on/off). Persisted with the
-  connection, like `readOnly`.
+  diff), **History Read** (on/off + a redact-glob list), and **accept schema-op
+  proposals** (on/off). Persisted with the connection, like `readOnly`.
 - **Locked** (never configurable — safety invariants): audit is always on and
-  never auto-purged; the AI never auto-commits; no raw SQL; `readOnly` enforcement
-  stands. There is deliberately **no "auto-approve trusted agent"** setting — it
-  would erode the human-commit guarantee.
+  never auto-purged; the AI never auto-commits; no raw SQL; unscoped DML is never
+  proposable; `readOnly` enforcement stands. There is deliberately **no
+  "auto-approve trusted agent"** setting — it would erode the human-commit
+  guarantee.
 
-When an agent proposes, the ops land in the **Schema Sync** tab with a badge; a
-toast (if enabled) names the agent + connection. Arrival never steals focus.
+Panels are laid out **tall, not dense** — full-width stacked sections with room
+to read. A per-table, per-verb grant grid is a security posture the user must be
+able to take in at a glance; scrolling is cheaper than cramming.
+
+When an agent proposes, the proposal lands in the **AI Proposals** tab with a
+badge; a toast (if enabled) names the agent + connection. Arrival never steals
+focus.
 
 ### AI Access Audit
-Every MCP call — data read, **schema introspection**, and **schema-op proposal**
-— is logged to a dedicated audit stream: timestamp, tool called, connection,
-table/op, row count, and which columns were masked. Never auto-purged. A live
-indicator shows when the AI is actively reading or proposing. Same no-silent /
-control-everything instinct as **Schema Mutation** history, applied to the AI's
-access.
+Every MCP call — data read, **schema introspection**, **history read**,
+**schema-op proposal**, and **data-change proposal** — is logged to a dedicated
+audit stream: timestamp, tool called, connection, table/op, row count, and which
+columns were masked or redacted. Never auto-purged. A live indicator shows when
+the AI is actively reading or proposing. Same no-silent / control-everything
+instinct as **Schema Mutation** history, applied to the AI's access.
+
+Distinct from **Query History**: the audit records what the AI *asked for*;
+history records what actually *ran* against the database. A proposal that is
+never committed appears in the audit and never in history.
 
 ## Decisions
 

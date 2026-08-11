@@ -48,6 +48,71 @@ tools/call all return JSON). Not yet exercised from a real agent against a real 
 - `main/store/mcpAudit.ts`: append-only `mcp-audit.jsonl`, never auto-purged;
   every tool logs ts/tool/connection/target/client/ok/detail.
 
+## Data proposals + history reads + auto-attach verbs (ADR-0024, 2026-08-11)
+
+Typecheck + `pnpm build` green; `pnpm test` passes (5/5).
+
+### Tools (9 total now)
+- **`propose_data_changes`** — staged row changes (insert/update/delete),
+  predicate-targeted (`Filter[]`, never PK, because the `.sql` runs on a
+  different DB where surrogate keys differ). Gated by the **AI Write Allowlist**
+  (`McpGrant.dataWrites` + per-table `McpAllowEntry.write[]`). Rejects an empty
+  predicate and exposes no TRUNCATE, so Destructive DML cannot be staged at all.
+- **`read_history`** / **`list_changesets`** — behind a new `historyReads` grant;
+  open within the connection, narrowed by a `historyRedact` glob list that
+  withholds statement text but keeps metadata.
+- `list_connections` now reports the two new grants.
+
+### Main process
+- `driver.ts`: `buildPredicateUpdate` / `buildPredicateDelete` /
+  `buildRowChangeSql`; `TabularMutCapable` gains `applyRowChanges` (with
+  `dryRun`) + `countPredicate`, implemented in all three SQL drivers.
+- `session.ts`: `applyRowChanges` / `countPredicate`; captures as **`source:
+  'ai'`** bound to the proposal's changeset.
+  **Bug fixed:** `captureAll` defaulted `destructive` to `false`, so
+  `applyChanges` never flagged one — it now detects per statement.
+- `CaptureInput.changesetId` overrides auto-attach for a proposal commit, which
+  also closes ADR-0022's "changeset binding is display-only" follow-up.
+- `history.ts`: `proposals` table (durable proposals), `dmlVerbOf`, the
+  per-connection auto-attach gate, `source` filter, `resolveChangesetFor`.
+- `mcp/writes.ts`, `mcp/history.ts` new; `mcp/proposals.ts` moved off the
+  in-memory `Map` onto `history.db` for **both** kinds.
+
+### Renderer
+- `SchemaSyncView` → **`AiProposalsView`**: Schema and Data sections, per-change
+  checkbox, rendered SQL, affected-row estimate, Commit / Export / Dismiss. Tab
+  label is "AI Proposals"; the internal tab kind stays `'schema-sync'` (it is
+  never persisted, but the string is load-bearing in three files).
+- Settings → AI / MCP rebuilt **tall**: stacked full-width sections (Schema /
+  Table data / Query history / Auto-attach), a per-table per-verb grant grid, and
+  plain-language auto-attach copy that never uses the word "destructive".
+
+### Verified against a real DB (not just typecheck)
+- **Backward compat** — a 250-row pre-ADR-0023 `history.db` migrates with 0 rows
+  lost: `source='ai'` accepted (no CHECK constraint), old sources intact,
+  changesets default to `kind='schema'`, the legacy `active_cs:<conn>` slot moves
+  to `active_cs:schema:<conn>`, `proposals` created.
+- **Auto-attach gate** — 15 cases. Critically: a connection with **no**
+  `dataAttachVerbs` still collects all three verbs (the silent-stop trap), while
+  unscoped `DELETE`/`UPDATE`/`TRUNCATE` still go to Unassigned unless the wipes
+  box is ticked.
+- **Generated DML** — `buildRowChangeSql` output executed against SQLite:
+  predicate UPDATE hit exactly the matching rows, scoped DELETE removed one,
+  INSERT round-tripped a value containing a quote, executed SQL stayed
+  parameterized while the rendered export form inlined and escaped correctly,
+  and the builder refuses an empty predicate.
+
+### Known gaps in this slice
+- **No live agent / live MySQL-Postgres run yet** — the same gate as the 1.7.0
+  MCP work above.
+- Proposals for a deleted connection are only pruned by an explicit
+  `pruneOrphanProposals` call, which nothing invokes yet.
+- History `source` is not yet surfaced or filterable in the History view UI; the
+  column and the IPC query field exist, the UI affordance does not.
+- The per-connection auto-attach panel lives in Settings → AI / MCP alongside the
+  grants. It governs *all* row changes on that connection, not only the AI's, so
+  it arguably belongs in Settings → History too.
+
 ## Not yet done / follow-ups
 - **Live agent + live DB verification** (the real gate): connect Claude Code +
   Codex, introspect, propose from an EF Core diff, reconcile-commit, export.

@@ -16,7 +16,22 @@ export interface ConnectionConfig {
   redisDb?: number
   /** mark prod: blocks all mutation paths (enforced in main) */
   readOnly?: boolean
+  /**
+   * Which DML verbs auto-attach to the active **Data** changeset (ADR-0024).
+   * **Absent means all three** — an existing connection upgraded from an older
+   * build must keep auto-attaching, never silently stop.
+   */
+  dataAttachVerbs?: DmlVerb[]
+  /**
+   * Also auto-attach "whole-table wipes" — TRUNCATE and DELETE/UPDATE written
+   * without a WHERE (the **Destructive** set). Absent/false = they land in the
+   * Unassigned inbox instead (ADR-0023's rule, now overridable per connection).
+   */
+  dataAttachUnscoped?: boolean
 }
+
+/** the DML verbs a Data changeset can collect (ADR-0024) */
+export type DmlVerb = 'insert' | 'update' | 'delete'
 
 /** what the renderer receives — never includes the password */
 export interface ConnectionSummary extends ConnectionConfig {
@@ -291,14 +306,21 @@ export type HistoryStream =
   /** an explicitly-confirmed stored-procedure CALL (ADR-0021) */
   | 'routine_execution'
 
+/**
+ * Where a captured statement came from (ADR-0024 adds `ai`). Stored as free text
+ * in `history.db` — no CHECK constraint — so widening this needs **no migration**
+ * and cannot disturb existing rows.
+ */
+export type HistorySource = 'gui' | 'manual' | 'ai'
+
 export interface HistoryEntry {
   id: number
   /** epoch ms */
   ts: number
   connectionId: string
   stream: HistoryStream
-  /** gui-generated vs hand-typed (all gui until the SQL editor lands) */
-  source: 'gui' | 'manual'
+  /** GUI-generated / hand-typed in the SQL editor / committed from an AI Proposal */
+  source: HistorySource
   statement: string
   status: 'success' | 'error'
   /** affected-row count for DML; null for DDL */
@@ -321,6 +343,8 @@ export interface HistoryQuery {
   changesetId?: number
   /** filter to entries with no changeset (the Unassigned inbox) */
   unassigned?: boolean
+  /** filter by origin — gui / manual / ai (ADR-0024) */
+  source?: HistorySource
   limit?: number
   offset?: number
 }
@@ -349,13 +373,19 @@ export interface Changeset {
 export interface CaptureInput {
   connectionId: string
   stream: HistoryStream
-  source: 'gui' | 'manual'
+  source: HistorySource
   statement: string
   status: 'success' | 'error'
   affected?: number | null
   entity?: string | null
   error?: string | null
   destructive?: boolean
+  /**
+   * Bind this statement to a specific changeset, bypassing the auto-attach rule
+   * (ADR-0024). Used when committing an AI Proposal, which is bound to one
+   * changeset by construction. Undefined = normal auto-attach.
+   */
+  changesetId?: number | null
   /** groups commands from one Redis staged commit */
   commitGroup?: string | null
 }
@@ -1052,6 +1082,12 @@ export interface McpAllowEntry {
   data: boolean
   /** column names masked out of describe_table + read_rows (secrets) */
   maskColumns?: string[]
+  /**
+   * The **AI Write Allowlist** for this table (ADR-0024): which DML verbs the AI
+   * may *propose*. Absent/empty = no writes. A table is never writable without
+   * `data: true` — an agent must be able to see a row before changing it.
+   */
+  write?: DmlVerb[]
 }
 
 /** per-connection MCP capability grants (default-deny — absent = nothing granted) */
@@ -1066,6 +1102,16 @@ export interface McpGrant {
   propose?: boolean
   /** glob patterns hidden from introspection (internal tables), e.g. `audit.*` */
   introspectExcludes?: string[]
+  /** master switch for staged DATA writes (per-table+verb via `allowlist.write`) */
+  dataWrites?: boolean
+  /** the History Read scope — read_history / list_changesets (ADR-0024) */
+  historyReads?: boolean
+  /**
+   * Table globs whose history entries come back **metadata-only** (statement text
+   * withheld). History is open by default inside a granted connection; this
+   * narrows it. Not a hide-list — the entry still appears.
+   */
+  historyRedact?: string[]
 }
 
 /** MCP server config as surfaced to Settings (token included — local, user-owned) */
@@ -1162,6 +1208,56 @@ export interface SchemaSyncProposal {
   reportOnly: SchemaSyncReportItem[]
 }
 
+// ─────────────── Data proposals (ADR-0024) — the DML counterpart ───────────────
+
+/**
+ * One proposed row change (ADR-0024). Rows are targeted by a **structured
+ * predicate**, never by primary key: the exported `.sql` is applied to a
+ * *different* database (dev drafts, prod runs) where surrogate keys do not
+ * correspond — only a business identifier survives the trip.
+ */
+export interface ProposedRowChange {
+  verb: DmlVerb
+  table: string
+  schema?: string
+  /** insert: the new row's column→value map */
+  values?: Record<string, unknown>
+  /** update: columns to set */
+  set?: Record<string, unknown>
+  /**
+   * update/delete: the structured predicate (same `Filter[]` shape `read_rows`
+   * takes). **Required and non-empty** — unscoped DML is rejected at the tool
+   * boundary, so a Destructive statement can never be staged over MCP.
+   */
+  where?: Filter[]
+  /** rendered, dialect-correct DML — display + export (Krust owns dialect) */
+  sql?: string
+  /** rows matching `where` when the proposal was drafted; re-counted at commit */
+  estimatedRows?: number
+}
+
+/** a staged Data proposal from an MCP client — never auto-committed */
+export interface DataProposal {
+  id: string
+  connectionId: string
+  connectionName: string
+  client: string
+  receivedAt: number
+  changesetName?: string
+  changes: ProposedRowChange[]
+}
+
+/** stable per-change key the review UI uses to deselect items */
+export type DataChangeKey = string
+
+/** outcome of committing a Data proposal */
+export interface DataCommitResult {
+  ran: string[]
+  failed: string[]
+  affected: number
+  changesetName?: string
+}
+
 /** outcome of committing a proposal after re-introspection reconcile */
 export interface SchemaSyncCommitResult {
   ran: string[]
@@ -1170,6 +1266,11 @@ export interface SchemaSyncCommitResult {
   changesetName?: string
 }
 
+/**
+ * The **AI Proposals** surface (ADR-0024) — one tab holding both proposal kinds.
+ * Named `schemaSync` on the API for wire compatibility with the shipped channel
+ * names; the *workflow* Schema Sync is now only the schema half.
+ */
 export interface SchemaSyncApi {
   list: () => Promise<SchemaSyncProposal[]>
   commit: (
@@ -1180,6 +1281,16 @@ export interface SchemaSyncApi {
   dismiss: (id: string) => Promise<void>
   /** subscribe to new proposals pushed from the MCP server; returns an unsubscribe */
   onProposal: (cb: (p: SchemaSyncProposal) => void) => () => void
+
+  // ── data proposals (ADR-0024) ──
+  listData: () => Promise<DataProposal[]>
+  commitData: (
+    id: string,
+    opts: { changesetName?: string; excludeKeys?: string[] }
+  ) => Promise<DataCommitResult>
+  exportDataSql: (id: string) => Promise<string>
+  dismissData: (id: string) => Promise<void>
+  onDataProposal: (cb: (p: DataProposal) => void) => () => void
 }
 
 /** one AI Access Audit entry — every MCP call is logged, never auto-purged */

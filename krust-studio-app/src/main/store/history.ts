@@ -1,9 +1,11 @@
 import type { DatabaseSync } from 'node:sqlite'
 import { join } from 'path'
 import { getDataDir } from './paths'
+import { getConnectionConfig } from './connections'
 import type {
   CaptureInput,
   Changeset,
+  DmlVerb,
   HistoryEntry,
   HistoryQuery
 } from '../../shared/types'
@@ -51,6 +53,20 @@ async function getDb(): Promise<DatabaseSync> {
       key   TEXT PRIMARY KEY,
       value TEXT
     );
+    -- Staged AI Proposals (ADR-0024). Durable so an unattended agent's work
+    -- survives quit / crash / an auto-update restart (ADR-0019). Purely
+    -- additive: a new table never disturbs an existing history.db.
+    CREATE TABLE IF NOT EXISTS proposals (
+      id             TEXT    PRIMARY KEY,
+      connection_id  TEXT    NOT NULL,
+      kind           TEXT    NOT NULL,
+      client         TEXT,
+      created_at     INTEGER NOT NULL,
+      changeset_name TEXT,
+      payload        TEXT    NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_proposals_kind_created
+      ON proposals (kind, created_at DESC);
   `)
   // migrations: add columns to pre-existing history_entries tables
   const cols = db
@@ -144,24 +160,64 @@ export async function setAutoAttachDestructive(on: boolean): Promise<void> {
   ).run(AUTO_ATTACH_DESTRUCTIVE_KEY, on ? '1' : '0')
 }
 
+/** every verb — the fallback when a connection has no explicit setting */
+const ALL_DML_VERBS: DmlVerb[] = ['insert', 'update', 'delete']
+
+/**
+ * The DML verb a captured statement performs, or null when it isn't one of the
+ * three (e.g. TRUNCATE, which is Data Mutation but not an INSERT/UPDATE/DELETE).
+ * Leading-keyword match, same approach as `isDestructiveStatement`.
+ */
+export function dmlVerbOf(sql: string): DmlVerb | null {
+  const body = sql.replace(/^\s*(\/\*[\s\S]*?\*\/|--[^\n]*\n)*\s*/, '').trimStart()
+  if (/^INSERT\b/i.test(body) || /^REPLACE\b/i.test(body)) return 'insert'
+  if (/^UPDATE\b/i.test(body)) return 'update'
+  if (/^DELETE\b/i.test(body)) return 'delete'
+  return null
+}
+
+/**
+ * Which verbs auto-attach to the active Data changeset for this connection
+ * (ADR-0024). **Absent means all three** — an existing connection carried over
+ * from an older build must keep auto-attaching, not silently stop.
+ */
+function dataAttachRule(connectionId: string): {
+  verbs: Set<DmlVerb>
+  unscoped: boolean
+} {
+  const cfg = getConnectionConfig(connectionId)
+  const verbs = cfg?.dataAttachVerbs ?? ALL_DML_VERBS
+  return { verbs: new Set(verbs), unscoped: cfg?.dataAttachUnscoped === true }
+}
+
 /** Record one captured statement. Best-effort: never let logging break a mutation. */
 export async function capture(input: CaptureInput): Promise<void> {
   try {
     const d = await getDb()
     const destructive = input.destructive ? 1 : 0
-    // Auto-attach to the active changeset of the matching kind (ADR-0023):
+    // Auto-attach to the active changeset of the matching kind (ADR-0023/0024):
     //  • Schema DDL (table_mutation) → active SCHEMA changeset. Non-destructive
     //    always; destructive (DROP TABLE/VIEW) only when the global toggle is on.
-    //  • DML (data_mutation) → active DATA changeset, and only when non-destructive
-    //    (TRUNCATE / no-WHERE DELETE|UPDATE never auto-attach — Unassigned).
+    //  • DML (data_mutation) → active DATA changeset, gated by the connection's
+    //    verb set AND the whole-table-wipes toggle. Both gates must pass.
     // With no active slot of that kind, nothing attaches (stays in history).
+    // An explicit `changesetId` (an AI Proposal commit, bound to one changeset
+    // by construction — ADR-0024) overrides the whole rule.
     let changesetId: number | null = null
-    if (input.stream === 'table_mutation') {
+    if (input.changesetId !== undefined) {
+      changesetId = input.changesetId
+    } else if (input.stream === 'table_mutation') {
       if (!input.destructive || getAutoAttachDestructiveSync(d)) {
         changesetId = getActiveId(d, input.connectionId, 'schema')
       }
     } else if (input.stream === 'data_mutation') {
-      if (!input.destructive) {
+      const rule = dataAttachRule(input.connectionId)
+      const verb = dmlVerbOf(input.statement)
+      // A statement with no INSERT/UPDATE/DELETE head (TRUNCATE) is only eligible
+      // via the wipes toggle; the three verbs need their own box ticked too.
+      const verbOk = verb ? rule.verbs.has(verb) : rule.unscoped
+      const scopeOk = !input.destructive || rule.unscoped
+      if (verbOk && scopeOk) {
         changesetId = getActiveId(d, input.connectionId, 'data')
       }
     }
@@ -199,6 +255,10 @@ export async function listHistory(query: HistoryQuery): Promise<HistoryEntry[]> 
   if (query.stream) {
     where.push('stream = ?')
     params.push(query.stream)
+  }
+  if (query.source) {
+    where.push('source = ?')
+    params.push(query.source)
   }
   if (typeof query.changesetId === 'number') {
     where.push('changeset_id = ?')
@@ -492,4 +552,105 @@ export async function markExported(id: number): Promise<void> {
   d.prepare(
     "UPDATE changesets SET status = 'exported', exported_at = ? WHERE id = ?"
   ).run(Date.now(), id)
+}
+
+// ---- Staged AI Proposals (ADR-0024) ---------------------------------------
+// Durable replacement for the in-memory pending Map: an agent works while the
+// user is elsewhere, so a proposal must survive quit / crash / auto-update.
+
+export interface StoredProposal {
+  id: string
+  connectionId: string
+  kind: 'schema' | 'data'
+  client: string | null
+  createdAt: number
+  changesetName: string | null
+  /** the kind-specific proposal body, JSON */
+  payload: string
+}
+
+export async function saveProposal(p: StoredProposal): Promise<void> {
+  const d = await getDb()
+  d.prepare(
+    `INSERT INTO proposals
+       (id, connection_id, kind, client, created_at, changeset_name, payload)
+     VALUES (?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET payload = excluded.payload,
+                                   changeset_name = excluded.changeset_name`
+  ).run(
+    p.id,
+    p.connectionId,
+    p.kind,
+    p.client,
+    p.createdAt,
+    p.changesetName,
+    p.payload
+  )
+}
+
+export async function listProposals(
+  kind: 'schema' | 'data'
+): Promise<StoredProposal[]> {
+  const d = await getDb()
+  return d
+    .prepare(
+      `SELECT id, connection_id AS connectionId, kind, client,
+              created_at AS createdAt, changeset_name AS changesetName, payload
+         FROM proposals WHERE kind = ? ORDER BY created_at ASC`
+    )
+    .all(kind) as unknown as StoredProposal[]
+}
+
+export async function getProposal(id: string): Promise<StoredProposal | null> {
+  const d = await getDb()
+  const row = d
+    .prepare(
+      `SELECT id, connection_id AS connectionId, kind, client,
+              created_at AS createdAt, changeset_name AS changesetName, payload
+         FROM proposals WHERE id = ?`
+    )
+    .get(id) as unknown as StoredProposal | undefined
+  return row ?? null
+}
+
+export async function deleteProposal(id: string): Promise<void> {
+  const d = await getDb()
+  d.prepare('DELETE FROM proposals WHERE id = ?').run(id)
+}
+
+/** drop proposals for connections that no longer exist (best-effort housekeeping) */
+export async function pruneOrphanProposals(liveIds: string[]): Promise<void> {
+  const d = await getDb()
+  const rows = d
+    .prepare('SELECT DISTINCT connection_id AS id FROM proposals')
+    .all() as Array<{ id: string }>
+  const live = new Set(liveIds)
+  for (const r of rows) {
+    if (!live.has(r.id)) {
+      d.prepare('DELETE FROM proposals WHERE connection_id = ?').run(r.id)
+    }
+  }
+}
+
+/**
+ * Find-or-create the changeset a committing proposal binds to (ADR-0022's
+ * "one run, one changeset", now kind-aware). A named changeset is reused if one
+ * of the right kind already exists, else created; with no name the active slot
+ * of that kind is used, and if there is none the caller gets null (statements
+ * land in Unassigned, never lost).
+ */
+export async function resolveChangesetFor(
+  connectionId: string,
+  kind: ChangesetKind,
+  name?: string
+): Promise<number | null> {
+  const d = await getDb()
+  if (!name?.trim()) return getActiveId(d, connectionId, kind)
+  const existing = d
+    .prepare(
+      'SELECT id FROM changesets WHERE connection_id = ? AND kind = ? AND name = ?'
+    )
+    .get(connectionId, kind, name.trim()) as { id: number } | undefined
+  if (existing) return existing.id
+  return (await createChangeset(connectionId, name.trim(), undefined, kind)).id
 }

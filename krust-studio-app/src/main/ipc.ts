@@ -26,7 +26,11 @@ import {
   listProposals,
   commitProposal,
   exportProposalSql,
-  dismissProposal
+  dismissProposal,
+  listDataProposals,
+  commitDataProposal,
+  exportDataProposalSql,
+  dismissDataProposal
 } from './mcp/proposals'
 import type { McpGrant } from '../shared/types'
 import { runBackup, restorePreview, restoreRun } from './db/backup'
@@ -399,6 +403,16 @@ export function registerIpc(): void {
   )
   ipcMain.handle('schemaSync:export', (_e, id: string) => exportProposalSql(id))
   ipcMain.handle('schemaSync:dismiss', (_e, id: string) => dismissProposal(id))
+
+  // data proposals — the DML half of AI Proposals (ADR-0024)
+  ipcMain.handle('dataProposal:list', () => listDataProposals())
+  ipcMain.handle(
+    'dataProposal:commit',
+    (_e, id: string, opts: { changesetName?: string; excludeKeys?: string[] }) =>
+      commitDataProposal(id, opts)
+  )
+  ipcMain.handle('dataProposal:export', (_e, id: string) => exportDataProposalSql(id))
+  ipcMain.handle('dataProposal:dismiss', (_e, id: string) => dismissDataProposal(id))
 
   ipcMain.handle('workspace:load', () => loadWorkspace())
   ipcMain.handle('workspace:save', (_e, data: WorkspaceData) => saveWorkspace(data))

@@ -4,9 +4,17 @@ import { listConnections, getConnectionConfig } from '../store/connections'
 import { getMcpGrant } from '../store/mcp'
 import { auditMcp } from '../store/mcpAudit'
 import { introspectSchema } from './introspect'
-import { addProposal, type ProposeInput } from './proposals'
+import { addProposal, addDataProposal, type ProposeInput } from './proposals'
 import { listAllowedTables, describeAllowedTable, readAllowedRows } from './reads'
-import type { CreateTableSpec, Filter, SchemaOp } from '../../shared/types'
+import { readHistory, listConnectionChangesets } from './history'
+import type {
+  CreateTableSpec,
+  Filter,
+  HistorySource,
+  HistoryStream,
+  ProposedRowChange,
+  SchemaOp
+} from '../../shared/types'
 
 const zColumn = z.object({
   name: z.string(),
@@ -66,6 +74,28 @@ const zFilter = z.object({
 })
 const zSort = z.object({ column: z.string(), dir: z.enum(['asc', 'desc']) })
 
+/** one proposed row change — predicate-targeted, never primary-key (ADR-0024) */
+const zRowChange = z.object({
+  verb: z.enum(['insert', 'update', 'delete']),
+  table: z.string(),
+  schema: z.string().optional(),
+  values: z
+    .record(z.string(), z.unknown())
+    .optional()
+    .describe('insert only — the new row as a column→value map'),
+  set: z
+    .record(z.string(), z.unknown())
+    .optional()
+    .describe('update only — the columns to set'),
+  where: z
+    .array(zFilter)
+    .optional()
+    .describe(
+      'update/delete only — structured predicate. REQUIRED and non-empty: an ' +
+        'unscoped UPDATE/DELETE is rejected. No raw SQL.'
+    )
+})
+
 /** wrap a JSON payload as an MCP text-content tool result */
 function json(payload: unknown): { content: { type: 'text'; text: string }[] } {
   return { content: [{ type: 'text', text: JSON.stringify(payload, null, 2) }] }
@@ -106,8 +136,10 @@ export function registerMcpTools(server: McpServer): void {
       title: 'List connections',
       description:
         'List the database connections exposed to MCP, with the capabilities granted ' +
-        '(data reads / schema introspection / accept proposals). Only connections with ' +
-        'at least one grant appear. Names/engines only — no secrets.',
+        '(data reads / data writes / history reads / schema introspection / accept ' +
+        'proposals). Only connections with at least one grant appear. Names/engines ' +
+        'only — no secrets. `readOnly: true` means commits are blocked on that ' +
+        'connection; proposals can still be staged and exported as .sql.',
       inputSchema: {}
     },
     async (_args, extra) => {
@@ -122,12 +154,21 @@ export function registerMcpTools(server: McpServer): void {
             database: c.database ?? null,
             grants: {
               dataReads: !!g.dataReads,
+              dataWrites: !!g.dataWrites,
+              historyReads: !!g.historyReads,
               introspection: !!g.introspection,
               propose: !!g.propose
             }
           }
         })
-        .filter((c) => c.grants.dataReads || c.grants.introspection || c.grants.propose)
+        .filter(
+          (c) =>
+            c.grants.dataReads ||
+            c.grants.dataWrites ||
+            c.grants.historyReads ||
+            c.grants.introspection ||
+            c.grants.propose
+        )
       logCall('list_connections', {
         client: clientName(extra),
         ok: true,
@@ -228,6 +269,174 @@ export function registerMcpTools(server: McpServer): void {
       } catch (err) {
         const detail = err instanceof Error ? err.message : String(err)
         logCall('propose_schema_ops', { connectionId: args.connectionId, client, ok: false, detail })
+        return fail(detail)
+      }
+    }
+  )
+
+  // ── propose_data_changes (ADR-0024) ───────────────────────────────────────
+  server.registerTool(
+    'propose_data_changes',
+    {
+      title: 'Propose data changes',
+      description:
+        'Propose row changes (INSERT / UPDATE / DELETE) for a connection. These ' +
+        'are STAGED into Krust Studio for a human to review and commit — they are ' +
+        'NEVER applied to the database by this call. Rows are targeted by a ' +
+        'STRUCTURED predicate, never by primary key, because the exported .sql is ' +
+        'usually applied to a different database where surrogate keys differ; use ' +
+        'a business identifier (e.g. where code = "ACME"). Each table+verb must be ' +
+        'granted on the AI Write Allowlist, every column you name must be ' +
+        'allowlisted and unmasked, and `where` is REQUIRED and non-empty for ' +
+        'update/delete — unscoped whole-table writes are rejected. Use read_rows ' +
+        'first to confirm which rows your predicate matches.',
+      inputSchema: {
+        connectionId: z.string(),
+        changesetName: z
+          .string()
+          .optional()
+          .describe('ticket/feature name for the Data changeset these bind to'),
+        changes: z.array(zRowChange).min(1)
+      }
+    },
+    async (args, extra) => {
+      const client = clientName(extra)
+      const grant = getMcpGrant(args.connectionId)
+      if (!grant.dataWrites) {
+        logCall('propose_data_changes', {
+          connectionId: args.connectionId,
+          client,
+          ok: false,
+          detail: 'data writes not granted'
+        })
+        return fail('This connection does not accept data-change proposals')
+      }
+      try {
+        const res = await addDataProposal(
+          {
+            connectionId: args.connectionId,
+            changesetName: args.changesetName,
+            changes: args.changes as ProposedRowChange[]
+          },
+          client
+        )
+        logCall('propose_data_changes', {
+          connectionId: args.connectionId,
+          client,
+          ok: true,
+          detail: `${res.changes} change(s), ~${res.estimatedRows ?? '?'} row(s)`
+        })
+        return json({
+          staged: true,
+          message:
+            'Data proposal staged in Krust Studio → AI Proposals. A human will ' +
+            'review and commit it; nothing was applied to the database.',
+          ...res
+        })
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err)
+        logCall('propose_data_changes', {
+          connectionId: args.connectionId,
+          client,
+          ok: false,
+          detail
+        })
+        return fail(detail)
+      }
+    }
+  )
+
+  // ── history reads (ADR-0024 — History Read scope) ─────────────────────────
+  server.registerTool(
+    'read_history',
+    {
+      title: 'Read query history',
+      description:
+        'Read the Query History Krust captured for a connection — the exact SQL ' +
+        'it ran, with timestamp, affected rows, destructive flag and changeset. ' +
+        'Defaults to the two mutation streams (data_mutation + table_mutation). ' +
+        'Entries for tables on the history redact list come back with metadata ' +
+        'but no statement text. Requires the history-reads grant.',
+      inputSchema: {
+        connectionId: z.string(),
+        stream: z
+          .enum([
+            'data_mutation',
+            'table_mutation',
+            'data_retrieval',
+            'redis_mutation',
+            'routine_execution'
+          ])
+          .optional()
+          .describe('omit for both mutation streams'),
+        changesetId: z
+          .number()
+          .int()
+          .optional()
+          .describe("read one changeset's statements (see list_changesets)"),
+        unassigned: z
+          .boolean()
+          .optional()
+          .describe('only entries in the Unassigned inbox (no changeset)'),
+        source: z
+          .enum(['gui', 'manual', 'ai'])
+          .optional()
+          .describe('filter by origin: GUI edit, hand-typed SQL, or AI proposal'),
+        limit: z.number().int().positive().optional(),
+        offset: z.number().int().nonnegative().optional()
+      }
+    },
+    async ({ connectionId, stream, changesetId, unassigned, source, limit, offset }, extra) => {
+      const client = clientName(extra)
+      try {
+        const res = await readHistory(connectionId, {
+          stream: stream as HistoryStream | undefined,
+          changesetId,
+          unassigned,
+          source: source as HistorySource | undefined,
+          limit,
+          offset
+        })
+        logCall('read_history', {
+          connectionId,
+          client,
+          ok: true,
+          detail: `${res.entries.length} entr(ies), ${res.redactedCount} redacted`
+        })
+        return json(res)
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err)
+        logCall('read_history', { connectionId, client, ok: false, detail })
+        return fail(detail)
+      }
+    }
+  )
+
+  server.registerTool(
+    'list_changesets',
+    {
+      title: 'List changesets',
+      description:
+        'List the Changesets on a connection — name, kind (schema = DDL / data = ' +
+        'DML), status, statement count, and which is the active auto-attach slot ' +
+        'for its kind. Use the id with read_history to read a changeset\'s ' +
+        'statements. Requires the history-reads grant.',
+      inputSchema: { connectionId: z.string() }
+    },
+    async ({ connectionId }, extra) => {
+      const client = clientName(extra)
+      try {
+        const res = await listConnectionChangesets(connectionId)
+        logCall('list_changesets', {
+          connectionId,
+          client,
+          ok: true,
+          detail: `${res.changesets.length} changeset(s)`
+        })
+        return json(res)
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err)
+        logCall('list_changesets', { connectionId, client, ok: false, detail })
         return fail(detail)
       }
     }

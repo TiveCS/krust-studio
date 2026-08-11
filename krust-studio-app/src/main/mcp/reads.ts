@@ -17,7 +17,7 @@ function requireDataReads(connectionId: string): McpAllowEntry[] {
   return grant.allowlist ?? []
 }
 
-function findEntry(
+export function findEntry(
   allow: McpAllowEntry[],
   table: string,
   schema?: string
@@ -27,6 +27,36 @@ function findEntry(
       e.table.toLowerCase() === table.toLowerCase() &&
       (e.schema ?? '').toLowerCase() === (schema ?? '').toLowerCase()
   )
+}
+
+/**
+ * Reject any column the AI is not allowed to *see* on this table (ADR-0003's
+ * oracle-leak rule). Shared by reads and writes: a predicate that could probe a
+ * masked column one boolean at a time leaks it just as surely whether the
+ * statement is a SELECT or an UPDATE.
+ */
+export async function assertColumnsVisible(
+  connectionId: string,
+  table: string,
+  schema: string | undefined,
+  entry: McpAllowEntry,
+  referenced: string[]
+): Promise<void> {
+  const cols = referenced.filter(Boolean)
+  if (!cols.length) return
+  const masked = new Set((entry.maskColumns ?? []).map((c) => c.toLowerCase()))
+  const desc = await describeTable(connectionId, { name: table, schema })
+  const visible = new Set(
+    desc.columns.map((c) => c.name.toLowerCase()).filter((c) => !masked.has(c))
+  )
+  for (const col of cols) {
+    if (!visible.has(col.toLowerCase())) {
+      throw new Error(
+        `Column "${col}" is not readable on ${table} ` +
+          `(not on the allowlist or masked) — cannot filter/sort/select on it`
+      )
+    }
+  }
 }
 
 export function listAllowedTables(connectionId: string): {

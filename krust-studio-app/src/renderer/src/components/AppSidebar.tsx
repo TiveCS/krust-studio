@@ -105,7 +105,7 @@ export function AppSidebar(): React.JSX.Element {
   const historyActive = activeTabKind === 'history'
   const backupActive = activeTabKind === 'backup'
   const schemaSyncActive = activeTabKind === 'schema-sync'
-  const proposalCount = useSchemaSync((s) => s.proposals.length)
+  const proposalCount = useSchemaSync((s) => s.proposals.length + s.dataProposals.length)
   const [filter, setFilter] = useState('')
   const [schemaFilter, setSchemaFilter] = useState('all')
   const [templatesOpen, setTemplatesOpen] = useState(false)
@@ -323,7 +323,7 @@ export function AppSidebar(): React.JSX.Element {
               </button>
               <button
                 onClick={() => openSchemaSyncTab()}
-                title="Schema Sync (AI proposals)"
+                title="AI Proposals — staged agent work awaiting review"
                 className={cn(
                   'relative rounded p-1 hover:bg-accent hover:text-foreground',
                   schemaSyncActive ? 'text-primary' : 'text-muted-foreground'

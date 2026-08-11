@@ -10,6 +10,7 @@ import type {
   Filter,
   FilterOp,
   IndexSpec,
+  ProposedRowChange,
   QueryPlan,
   RawQueryResult,
   ReferencingTable,
@@ -105,6 +106,21 @@ export interface TabularCapable {
 /** staged data-grid edits → DML (relational engines). */
 export interface TabularMutCapable {
   applyChanges(entity: EntityRef, changes: ChangeSet): Promise<ApplyResult>
+  /**
+   * Apply **predicate-scoped** row changes from a committed AI Data Proposal
+   * (ADR-0024), all in one transaction. Distinct from `applyChanges`, which keys
+   * every edit on a primary key: these target rows by a structured predicate so
+   * the same statements survive the dev→prod handoff.
+   *
+   * `dryRun` renders the DML without executing — drives the review preview and
+   * the read-only export path.
+   */
+  applyRowChanges(
+    changes: ProposedRowChange[],
+    dryRun?: boolean
+  ): Promise<ApplyResult>
+  /** rows a proposal's predicate currently matches — the affected-row preview */
+  countPredicate(entity: EntityRef, filters: Filter[]): Promise<number>
 }
 
 /** schema mutation / DDL (relational engines). */
@@ -475,6 +491,93 @@ export function buildUpdate(
     sql: `UPDATE ${target} SET ${setSql} WHERE ${whereSql}`,
     params
   }
+}
+
+/**
+ * Build one parameterized **predicate-scoped** UPDATE (ADR-0024) — the set-based
+ * counterpart to `buildUpdate`, which keys on a primary key. Used for AI Data
+ * Proposals, whose `.sql` is applied to a different database where surrogate
+ * keys do not correspond; only a business-identifier predicate survives.
+ *
+ * The predicate is **required and non-empty** — an unscoped UPDATE is Destructive
+ * and is rejected before reaching here, but this guards the invariant at the
+ * builder too, so no caller can produce one by accident.
+ */
+export function buildPredicateUpdate(
+  target: string,
+  set: Record<string, unknown>,
+  filters: Filter[],
+  quote: (s: string) => string,
+  placeholder: (i: number) => string
+): { sql: string; params: unknown[] } {
+  const cols = Object.keys(set)
+  if (cols.length === 0) throw new Error('UPDATE has no columns to set')
+  const params: unknown[] = []
+  const setSql = cols
+    .map((c) => {
+      params.push(set[c])
+      return `${quote(c)} = ${placeholder(params.length - 1)}`
+    })
+    .join(', ')
+  const where = buildWhere(filters, quote, (i) => placeholder(i + params.length))
+  if (!where.clause) throw new Error('UPDATE requires a non-empty predicate')
+  return {
+    sql: `UPDATE ${target} SET ${setSql}${where.clause}`,
+    params: [...params, ...where.params]
+  }
+}
+
+/** Build one parameterized **predicate-scoped** DELETE (ADR-0024). */
+export function buildPredicateDelete(
+  target: string,
+  filters: Filter[],
+  quote: (s: string) => string,
+  placeholder: (i: number) => string
+): { sql: string; params: unknown[] } {
+  const where = buildWhere(filters, quote, placeholder)
+  if (!where.clause) throw new Error('DELETE requires a non-empty predicate')
+  return { sql: `DELETE FROM ${target}${where.clause}`, params: where.params }
+}
+
+/**
+ * Compile a committed AI Data Proposal's changes into executable, parameterized
+ * DML plus its display-rendered form (ADR-0024). Shared by every SQL driver —
+ * only `quote` / `placeholder` / the render style differ per engine.
+ *
+ * Executed SQL stays **parameterized**; the rendered string is display-only, for
+ * history capture and the `.sql` export (ADR-0008's invariant, unchanged).
+ */
+export function buildRowChangeSql(
+  changes: ProposedRowChange[],
+  quote: (s: string) => string,
+  placeholder: (i: number) => string,
+  renderStyle: '?' | '$'
+): { sql: string; params: unknown[]; rendered: string }[] {
+  return changes.map((c) => {
+    const target = c.schema
+      ? `${quote(c.schema)}.${quote(c.table)}`
+      : quote(c.table)
+    let built: { sql: string; params: unknown[] } | null
+    if (c.verb === 'insert') {
+      built = buildInsert(target, c.values ?? {}, quote, placeholder)
+      if (!built) throw new Error(`INSERT into ${c.table} has no column values`)
+    } else if (c.verb === 'update') {
+      built = buildPredicateUpdate(
+        target,
+        c.set ?? {},
+        c.where ?? [],
+        quote,
+        placeholder
+      )
+    } else {
+      built = buildPredicateDelete(target, c.where ?? [], quote, placeholder)
+    }
+    return {
+      sql: built.sql,
+      params: built.params,
+      rendered: renderSql(built.sql, built.params, renderStyle)
+    }
+  })
 }
 
 const SQL_OP: Record<FilterOp, string> = {

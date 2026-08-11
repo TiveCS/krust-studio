@@ -10,6 +10,7 @@ import {
   buildUpdate,
   buildDelete,
   buildInsert,
+  buildRowChangeSql,
   buildCreateTable,
   defaultIndexName,
   classifyStatement,
@@ -27,6 +28,7 @@ import type {
   ForeignKey,
   IndexSpec,
   PlanNode,
+  ProposedRowChange,
   QueryPlan,
   RawQueryResult,
   ReferencingTable,
@@ -204,6 +206,35 @@ export class SqliteDriver implements DbDriver {
       type: i.type?.toLowerCase() || undefined
     }))
     return { columns, rows }
+  }
+
+  async countPredicate(entity: EntityRef, filters: Filter[]): Promise<number> {
+    return this.countRows(entity, filters)
+  }
+
+  async applyRowChanges(
+    changes: ProposedRowChange[],
+    dryRun = false
+  ): Promise<ApplyResult> {
+    const built = buildRowChangeSql(changes, quoteIdent, () => '?', '?')
+    if (dryRun) return { affected: 0, statements: built.map((b) => b.rendered) }
+    if (!this.db) throw new Error('Not connected')
+    const statements: string[] = []
+    let affected = 0
+    this.db.exec('BEGIN')
+    try {
+      for (const b of built) {
+        affected += Number(
+          this.db.prepare(b.sql).run(...(b.params as never[])).changes ?? 0
+        )
+        statements.push(b.rendered)
+      }
+      this.db.exec('COMMIT')
+      return { affected, statements }
+    } catch (err) {
+      this.db.exec('ROLLBACK')
+      throw err
+    }
   }
 
   async applyChanges(

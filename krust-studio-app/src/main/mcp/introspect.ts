@@ -10,6 +10,14 @@ function globToRegExp(glob: string): RegExp {
   return new RegExp(`^${esc}$`, 'i')
 }
 
+export function matchesGlobs(
+  name: string,
+  schema: string | undefined,
+  globs: string[]
+): boolean {
+  return isExcluded(name, schema, globs)
+}
+
 function isExcluded(name: string, schema: string | undefined, globs: string[]): boolean {
   const qualified = schema ? `${schema}.${name}` : name
   return globs.some((g) => {

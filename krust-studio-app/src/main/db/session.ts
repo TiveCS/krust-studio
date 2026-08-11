@@ -13,6 +13,7 @@ import type {
   QueryResult,
   ReferencingTable,
   IntrospectedTable,
+  ProposedRowChange,
   RowsResult,
   SchemaOp,
   SearchResult,
@@ -28,6 +29,7 @@ import { RedisDriver as RedisDriverImpl } from './drivers/redis'
 import { getConnectionConfig, getStoredPassword } from '../store/connections'
 import { capture } from '../store/history'
 import type {
+  HistorySource,
   HistoryStream,
   ReadValueOpts,
   RedisCommitBatch,
@@ -99,25 +101,32 @@ function isDestructiveStatement(sql: string): boolean {
   return false
 }
 
-/** Record captured statements (best-effort; capture() swallows its own errors). */
+/**
+ * Record captured statements (best-effort; capture() swallows its own errors).
+ * `destructive` defaults to **per-statement detection** rather than `false`: the
+ * caller usually cannot know, and getting it wrong lets an unscoped statement
+ * ride into a changeset export (ADR-0024).
+ */
 async function captureAll(
   connectionId: string,
   stream: HistoryStream,
   statements: string[],
   entity: string | null,
   affected: number | null = null,
-  destructive = false
+  destructive?: boolean,
+  opts: { source?: HistorySource; changesetId?: number | null } = {}
 ): Promise<void> {
   for (const statement of statements) {
     await capture({
       connectionId,
       stream,
-      source: 'gui',
+      source: opts.source ?? 'gui',
       statement,
       status: 'success',
       entity,
       affected,
-      destructive
+      destructive: destructive ?? isDestructiveStatement(statement),
+      ...(opts.changesetId !== undefined ? { changesetId: opts.changesetId } : {})
     })
   }
 }
@@ -232,6 +241,52 @@ export async function applyChanges(
   const res = await withRetry(id, (d) => d.applyChanges(entity, changes))
   await captureAll(id, 'data_mutation', res.statements ?? [], entity.name)
   return res
+}
+
+/**
+ * Apply a committed AI Data Proposal's predicate-scoped row changes (ADR-0024).
+ * Runs in one transaction, captures each statement as **source `ai`** bound to
+ * the proposal's changeset, and honours the read-only guard like every other
+ * mutation path. `dryRun` renders the DML without touching the DB — it drives
+ * the review preview and the read-only export.
+ */
+export async function applyRowChanges(
+  id: string,
+  changes: ProposedRowChange[],
+  opts: { dryRun?: boolean; changesetId?: number | null } = {}
+): Promise<ApplyResult> {
+  if (changes.length === 0) return { affected: 0, statements: [] }
+  if (opts.dryRun) {
+    if (!sessions.has(id)) await connectSession(id)
+    return rel(id).applyRowChanges(changes, true)
+  }
+  const config = getConnectionConfig(id)
+  if (config?.readOnly)
+    throw new Error('Connection is read-only; writes are blocked')
+  const res = await withRetry(id, (d) => d.applyRowChanges(changes, false))
+  // One entity label per capture call, so group by table to keep it accurate.
+  const rendered = res.statements ?? []
+  for (let i = 0; i < rendered.length; i++) {
+    await captureAll(
+      id,
+      'data_mutation',
+      [rendered[i]],
+      changes[i]?.table ?? null,
+      null,
+      undefined,
+      { source: 'ai', changesetId: opts.changesetId }
+    )
+  }
+  return res
+}
+
+/** rows a proposal's predicate currently matches — the affected-row preview */
+export async function countPredicate(
+  id: string,
+  entity: EntityRef,
+  filters: Filter[]
+): Promise<number> {
+  return withRetry(id, (d) => d.countPredicate(entity, filters))
 }
 
 export async function describeTable(

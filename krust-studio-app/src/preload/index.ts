@@ -23,7 +23,8 @@ import type {
   RoutineRef,
   RoutineArg,
   McpGrant,
-  SchemaSyncProposal
+  SchemaSyncProposal,
+  DataProposal
 } from '../shared/types'
 
 const api: KrustApi = {
@@ -165,6 +166,17 @@ const api: KrustApi = {
       const handler = (_: unknown, p: SchemaSyncProposal): void => cb(p)
       ipcRenderer.on('mcp:proposal', handler)
       return () => ipcRenderer.removeListener('mcp:proposal', handler)
+    },
+    // data proposals — the DML half of AI Proposals (ADR-0024)
+    listData: () => ipcRenderer.invoke('dataProposal:list'),
+    commitData: (id: string, opts: { changesetName?: string; excludeKeys?: string[] }) =>
+      ipcRenderer.invoke('dataProposal:commit', id, opts),
+    exportDataSql: (id: string) => ipcRenderer.invoke('dataProposal:export', id),
+    dismissData: (id: string) => ipcRenderer.invoke('dataProposal:dismiss', id),
+    onDataProposal: (cb: (p: DataProposal) => void) => {
+      const handler = (_: unknown, p: DataProposal): void => cb(p)
+      ipcRenderer.on('mcp:dataProposal', handler)
+      return () => ipcRenderer.removeListener('mcp:dataProposal', handler)
     }
   },
   workspace: {
