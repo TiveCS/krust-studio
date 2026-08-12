@@ -1,7 +1,7 @@
 import { listEntities, describeTable, bulkIntrospect } from '../db/session'
 import { getConnectionConfig } from '../store/connections'
 import { getMcpGrant } from '../store/mcp'
-import type { IntrospectResult, IntrospectedTable } from '../../shared/types'
+import type { EntityInfo, IntrospectResult, IntrospectedTable } from '../../shared/types'
 
 /** tiny glob: `*` matches any run of chars; matching is case-insensitive and
  *  tested against both `name` and `schema.name` so `audit.*` or `*_log` work. */
@@ -24,6 +24,42 @@ function isExcluded(name: string, schema: string | undefined, globs: string[]): 
     const re = globToRegExp(g)
     return re.test(name) || re.test(qualified)
   })
+}
+
+/**
+ * Table and view NAMES only — no columns, no keys, no rows, no counts.
+ *
+ * Deliberately gated more loosely than `introspectSchema`: any connection the
+ * user has granted *something* can be enumerated, without the introspection
+ * grant. A connection with no grants at all stays invisible, so default-deny
+ * still holds at the connection boundary (ADR-0022, amended). The motivating
+ * case is diffing which tables exist between two connections — staging against
+ * a dev audit database — which should not require handing over full structure.
+ *
+ * The connection's exclude globs still apply: they are an instruction the user
+ * typed, and a tool that quietly ignored them would be a surprise.
+ */
+export async function listConnectionTables(
+  connectionId: string
+): Promise<{ connectionId: string; tables: EntityInfo[] }> {
+  const config = getConnectionConfig(connectionId)
+  if (!config) throw new Error(`Unknown connection: ${connectionId}`)
+  const grant = getMcpGrant(connectionId)
+  const anyGrant =
+    !!grant.introspection ||
+    !!grant.propose ||
+    !!grant.dataReads ||
+    !!grant.dataWrites ||
+    !!grant.historyReads
+  if (!anyGrant) {
+    throw new Error('This connection is not exposed to MCP')
+  }
+  const excludes = grant.introspectExcludes ?? []
+  const entities = await listEntities(connectionId)
+  return {
+    connectionId,
+    tables: entities.filter((e) => !isExcluded(e.name, e.schema, excludes))
+  }
 }
 
 /**

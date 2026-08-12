@@ -21,6 +21,11 @@ tools/call all return JSON). Not yet exercised from a real agent against a real 
 
 ### Tools
 - `list_connections` — granted-only, names/engines, no secrets.
+- `list_tables` — table/view **names only** (name, schema, type); no columns,
+  keys, rows or counts. Available on any connection with at least one grant, so
+  it does not need the introspection grant; exclude globs still apply. Built for
+  diffing which tables exist between two connections (call once per connection).
+  See the ADR-0022 amendment on why this reads under any grant.
 - `introspect_schema` — whole-connection structure, no rows, exclude globs
   (seeded `__EFMigrationsHistory`). Reuses `listEntities`/`describeTable`.
 - `propose_schema_ops` — additive `createTables`/`alters` (SchemaOp) + `reportOnly`;

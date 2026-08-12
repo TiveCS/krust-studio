@@ -28,6 +28,8 @@ interface ComboboxProps {
   autoOpen?: boolean
   /** notified when the popover opens/closes */
   onOpenChange?: (open: boolean) => void
+  /** short muted note shown beside an option, e.g. "active" / "exported" */
+  hint?: (option: string) => string | undefined
 }
 
 export function Combobox({
@@ -39,7 +41,8 @@ export function Combobox({
   disabled = false,
   className,
   autoOpen = false,
-  onOpenChange
+  onOpenChange,
+  hint
 }: ComboboxProps): React.JSX.Element {
   const [open, setOpenState] = useState(autoOpen)
   const [query, setQuery] = useState('')
@@ -107,7 +110,12 @@ export function Combobox({
             <CommandGroup>
               {options.map((o) => (
                 <CommandItem key={o} value={o} onSelect={() => commit(o)}>
-                  {o}
+                  <span className="truncate">{o}</span>
+                  {hint?.(o) && (
+                    <span className="ml-2 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">
+                      {hint(o)}
+                    </span>
+                  )}
                   {value === o && <Check className="ml-auto size-4" />}
                 </CommandItem>
               ))}

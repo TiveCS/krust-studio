@@ -4,6 +4,37 @@ All notable changes to Krust Studio. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions are git tags
 (`vX.Y.Z`) published as GitHub Releases.
 
+## [Unreleased] — 1.7.0
+
+Prerelease work on `feat/v1.7.0`; folded into the `1.7.0` entry on release.
+Changes below shipped in `1.7.0-beta.7`.
+
+### Added
+- **`list_tables` MCP tool** — table and view names only (no columns, keys, rows
+  or counts), for comparing which tables exist between two connections. Works on
+  any connection with at least one grant, so it does not require the schema
+  introspection grant; the connection's exclude globs still apply. See the
+  [ADR-0022](docs/adr/0022-mcp-schema-sync-proposed-ops.md) amendment.
+
+### Changed
+- **Per-connection MCP cards collapse** — Settings → AI / MCP shows each
+  connection as an accordion, closed by default, with the granted capabilities
+  summarised on the collapsed header. Several can be open at once; expansion is
+  not remembered between visits.
+- **Changeset fields are now pickers** — the changeset box on both AI Proposal
+  kinds lists the existing changesets of that kind, marking the active one and
+  any already exported, while still accepting a new name typed in. Empty still
+  means the active changeset.
+
+### Fixed
+- **Auto-attach checkboxes did nothing** — the per-connection *Auto-attach to
+  Data changeset* verbs wrote to disk but never repainted, so clicks looked
+  ignored. They now update immediately, roll back and report if the save fails.
+- **Destructive-DDL toggle could not be clicked** — if reading the setting
+  failed, Settings → History left *Auto-attach destructive DDL* stuck checked
+  and disabled, with no way to turn it off and no error shown. The read now
+  falls back to the default and surfaces the failure.
+
 ## [1.6.6] — 2026-06-24
 
 ### Added

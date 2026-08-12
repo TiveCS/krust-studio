@@ -97,3 +97,23 @@ ADR-0005. Several forks were resolved (via `/grill-with-docs`):
   the user can correct the AI in-conversation and re-propose.
 - Krust never learns .NET/EF — the same Schema Sync surface works for any
   ORM/language whose model an AI can read.
+
+## Amendment (1.7.0-beta.7): `list_tables` reads under any grant
+
+`list_tables` returns table and view **names** — no columns, keys, rows or
+counts — and is gated on the connection having *at least one* grant of any kind,
+rather than on the introspection grant specifically.
+
+This is a deliberate loosening of the rule above, recorded here so it is not
+mistaken for an oversight. Default-deny still holds where it carries the weight:
+a connection with no grants at all remains invisible to the AI, so opting a
+production connection in is still an explicit act. What changes is which
+capability lets an agent read names once a connection is already exposed.
+
+The motivating case is comparing which tables exist between two connections — a
+staging database against a dev audit database. Under the original rule that
+required handing over full structure on both, which is a much larger disclosure
+than the question needs. The connection's introspection exclude globs still
+apply: they are an instruction the user typed, and a tool that ignored them
+would be a surprise. Calls are audited under their own tool name, so a name
+listing is distinguishable from a structure dump in the AI Access Audit.

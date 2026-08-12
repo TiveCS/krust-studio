@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { RotateCcw, Keyboard, Pin, X, History, Table2, AlignLeft, Bell, Download, Bot } from 'lucide-react'
 import { McpSettings } from '@/components/McpSettings'
 import {
@@ -65,9 +66,10 @@ export function SettingsModal({
   >('keybindings')
   const [pinName, setPinName] = useState('')
   // History settings live in history.db meta (main process), not localStorage.
-  const [autoAttachDestructive, setAutoAttachDestructive] = useState<
-    boolean | null
-  >(null)
+  // Seeded with the documented default rather than null: a null that renders as
+  // "checked and disabled" is indistinguishable from a working toggle you
+  // cannot click, which is exactly how the 1.7.0-beta.6 bug presented.
+  const [autoAttachDestructive, setAutoAttachDestructive] = useState(true)
   // Update channel lives main-side (prefs.json); read/toggle over IPC.
   const [betaUpdates, setBetaUpdates] = useState<boolean | null>(null)
   const [appVersion, setAppVersion] = useState('')
@@ -78,6 +80,14 @@ export function SettingsModal({
     void window.api.history
       .getAutoAttachDestructive()
       .then(setAutoAttachDestructive)
+      .catch((err) => {
+        // Keep the default rather than leaving the control in limbo, and say
+        // so — this read failing silently is what made the toggle look dead.
+        setAutoAttachDestructive(true)
+        toast.error(
+          `Could not read the destructive-DDL setting: ${err instanceof Error ? err.message : String(err)}`
+        )
+      })
     void window.electron.ipcRenderer
       .invoke('update:getChannel')
       .then((r: { beta: boolean; version: string }) => {
@@ -594,12 +604,19 @@ export function SettingsModal({
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-xs font-medium">
                   <Checkbox
-                    checked={autoAttachDestructive ?? true}
-                    disabled={autoAttachDestructive === null}
+                    checked={autoAttachDestructive}
                     onCheckedChange={(c) => {
                       const on = c === true
+                      const prev = autoAttachDestructive
                       setAutoAttachDestructive(on)
-                      void window.api.history.setAutoAttachDestructive(on)
+                      void window.api.history
+                        .setAutoAttachDestructive(on)
+                        .catch((err) => {
+                          setAutoAttachDestructive(prev)
+                          toast.error(
+                            `Could not save the setting: ${err instanceof Error ? err.message : String(err)}`
+                          )
+                        })
                     }}
                   />
                   Auto-attach destructive DDL to the active changeset

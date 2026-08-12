@@ -4,6 +4,12 @@ import { Copy, RefreshCw, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@/components/ui/accordion'
 import { cn } from '@/lib/utils'
 import type {
   McpConfig,
@@ -35,6 +41,10 @@ export function McpSettings({ open }: { open: boolean }): React.JSX.Element {
   const [portDraft, setPortDraft] = useState('')
   const [audit, setAudit] = useState<McpAuditEntry[]>([])
   const [bridgePath, setBridgePath] = useState('')
+  // Which connection cards are expanded. Reset on every open: the whole point
+  // of collapsing them is that Settings does not greet you with a wall of
+  // checkboxes, and remembering the expansion would undo that.
+  const [expanded, setExpanded] = useState<string[]>([])
 
   const refresh = async (): Promise<void> => {
     const [s, c, conns, log, bp] = await Promise.all([
@@ -53,7 +63,9 @@ export function McpSettings({ open }: { open: boolean }): React.JSX.Element {
   }
 
   useEffect(() => {
-    if (open) void refresh()
+    if (!open) return
+    setExpanded([])
+    void refresh()
   }, [open])
 
   if (!config || !status) {
@@ -264,9 +276,24 @@ export function McpSettings({ open }: { open: boolean }): React.JSX.Element {
           {connections.length === 0 && (
             <span className="text-[11px] text-muted-foreground/60">No connections yet.</span>
           )}
-          {connections.map((conn) => (
-            <ConnectionGrant key={conn.id} conn={conn} />
-          ))}
+          <Accordion
+            type="multiple"
+            value={expanded}
+            onValueChange={setExpanded}
+            className="space-y-2"
+          >
+            {connections.map((conn) => (
+              <ConnectionGrant
+                key={conn.id}
+                conn={conn}
+                onSaved={(saved) =>
+                  setConnections((list) =>
+                    list.map((c) => (c.id === saved.id ? saved : c))
+                  )
+                }
+              />
+            ))}
+          </Accordion>
         </div>
       </div>
 
@@ -339,7 +366,29 @@ function GrantSection({
   )
 }
 
-function ConnectionGrant({ conn }: { conn: ConnectionSummary }): React.JSX.Element {
+/**
+ * What this connection currently exposes, in the few words that fit on a
+ * collapsed header. Default-deny is the posture, so "no access" has to be
+ * readable without opening the card.
+ */
+function grantSummary(grant: McpGrant | null): string {
+  if (!grant) return '…'
+  const parts: string[] = []
+  if (grant.introspection) parts.push('schema')
+  if (grant.propose) parts.push('proposals')
+  if (grant.dataReads || grant.dataWrites) parts.push('rows')
+  if (grant.historyReads) parts.push('history')
+  return parts.length ? parts.join(' · ') : 'no access'
+}
+
+function ConnectionGrant({
+  conn,
+  onSaved
+}: {
+  conn: ConnectionSummary
+  /** lift the saved connection so the parent list stops showing stale values */
+  onSaved: (saved: ConnectionSummary) => void
+}): React.JSX.Element {
   const [grant, setGrant] = useState<McpGrant | null>(null)
   const [excludesDraft, setExcludesDraft] = useState('')
   const [redactDraft, setRedactDraft] = useState('')
@@ -357,13 +406,17 @@ function ConnectionGrant({ conn }: { conn: ConnectionSummary }): React.JSX.Eleme
     void window.api.mcp.setGrant(conn.id, next)
   }
 
-  if (!grant) return <div className="h-8" />
-
-  const set = (patch: Partial<McpGrant>): void => save({ ...grant, ...patch })
+  const set = (patch: Partial<McpGrant>): void => {
+    if (!grant) return
+    save({ ...grant, ...patch })
+  }
 
   return (
-    <div className="space-y-4 rounded-lg border border-border/60 p-4">
-      <div className="flex items-center gap-2">
+    <AccordionItem
+      value={conn.id}
+      className="rounded-lg border border-border/60 px-4 last:border-b"
+    >
+      <AccordionTrigger className="gap-2">
         <span className="font-mono text-sm font-medium">{conn.name}</span>
         <span className="rounded bg-muted px-1 text-[9px] uppercase text-muted-foreground">
           {conn.driver}
@@ -373,137 +426,156 @@ function ConnectionGrant({ conn }: { conn: ConnectionSummary }): React.JSX.Eleme
             read-only
           </span>
         )}
-      </div>
-
-      <GrantSection
-        title="Schema"
-        blurb="Let an agent read this connection's structure and propose additive schema fixes. Proposals are staged for your review — they are never applied to the database."
-      >
-        <div className="space-y-1.5">
-          <label className="flex items-center gap-2 text-xs">
-            <Checkbox
-              checked={!!grant.introspection}
-              onCheckedChange={(c) => set({ introspection: c === true })}
-            />
-            Schema introspection — tables, columns, types, keys. No row data.
-          </label>
-          <label className="flex items-center gap-2 text-xs">
-            <Checkbox
-              checked={!!grant.propose}
-              onCheckedChange={(c) => set({ propose: c === true })}
-            />
-            Accept schema proposals
-          </label>
-        </div>
-        {grant.introspection && (
-          <div className="space-y-1 pt-1">
-            <label className="text-[11px] text-muted-foreground">
-              Hide these from introspection — one glob per line
-            </label>
-            <textarea
-              value={excludesDraft}
-              onChange={(e) => setExcludesDraft(e.target.value)}
-              onBlur={() =>
-                set({
-                  introspectExcludes: excludesDraft
-                    .split('\n')
-                    .map((s) => s.trim())
-                    .filter(Boolean)
-                })
-              }
-              rows={3}
-              spellCheck={false}
-              placeholder="__EFMigrationsHistory&#10;audit.*"
-              className="w-full rounded border border-border bg-transparent p-1.5 font-mono text-[11px] outline-none focus:border-ring"
-            />
+        <span
+          className={cn(
+            'ml-2 truncate text-[11px]',
+            grantSummary(grant) === 'no access'
+              ? 'text-muted-foreground/60'
+              : 'text-muted-foreground'
+          )}
+        >
+          {grantSummary(grant)}
+        </span>
+      </AccordionTrigger>
+      <AccordionContent className="space-y-4 pb-4">
+        {!grant ? (
+          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+            <Loader2 className="size-3.5 animate-spin" /> Loading…
           </div>
-        )}
-      </GrantSection>
-
-      <GrantSection
-        title="Table data"
-        blurb="Nothing is readable or writable until you list it below. A table can be readable without being writable; it is never writable without being readable."
-      >
-        <div className="space-y-1.5">
-          <label className="flex items-center gap-2 text-xs">
-            <Checkbox
-              checked={!!grant.dataReads}
-              onCheckedChange={(c) => set({ dataReads: c === true })}
-            />
-            Allow reading rows
-          </label>
-          <label className="flex items-center gap-2 text-xs">
-            <Checkbox
-              checked={!!grant.dataWrites}
-              onCheckedChange={(c) => set({ dataWrites: c === true })}
-            />
-            Allow proposing row changes
-            <span className="text-[11px] text-muted-foreground">
-              — staged for review, never applied directly
-            </span>
-          </label>
-        </div>
-        {(grant.dataReads || grant.dataWrites) && (
-          <AllowlistEditor
-            grant={grant}
-            showWrite={!!grant.dataWrites}
-            onChange={(a) => set({ allowlist: a })}
-          />
-        )}
-      </GrantSection>
-
-      <GrantSection
-        title="Query history"
-        blurb="Let an agent read the SQL Krust has already run here, and list your changesets. Useful for 'what changed last week?' — but history stores statements with their values written in, so it can show data the allowlist above would hide."
-      >
-        <label className="flex items-center gap-2 text-xs">
-          <Checkbox
-            checked={!!grant.historyReads}
-            onCheckedChange={(c) => set({ historyReads: c === true })}
-          />
-          Allow reading history and changesets
-        </label>
-        {grant.historyReads && (
-          <div className="space-y-1 pt-1">
-            <label className="text-[11px] text-muted-foreground">
-              Hide the SQL text for these tables — one glob per line. Their entries still
-              appear, with the table, time and row count, but the statement is withheld.
-            </label>
-            <textarea
-              value={redactDraft}
-              onChange={(e) => setRedactDraft(e.target.value)}
-              onBlur={() =>
-                set({
-                  historyRedact: redactDraft
-                    .split('\n')
-                    .map((s) => s.trim())
-                    .filter(Boolean)
-                })
-              }
-              rows={3}
-              spellCheck={false}
-              placeholder="users&#10;*_secret"
-              className="w-full rounded border border-border bg-transparent p-1.5 font-mono text-[11px] outline-none focus:border-ring"
-            />
-          </div>
-        )}
-      </GrantSection>
-
-      <GrantSection
-        title="Auto-attach to Data changeset"
-        blurb={
+        ) : (
           <>
-            When a Data changeset is active, row changes you make here can be collected
-            into it automatically, ready to export as a .sql handoff. Pick which kinds of
-            change get collected. Anything not collected still appears in Data Mutation
-            history — it lands in the Unassigned inbox, and you can add it to a changeset
-            by hand at any time. Nothing is ever lost.
+          <GrantSection
+            title="Schema"
+            blurb="Let an agent read this connection's structure and propose additive schema fixes. Proposals are staged for your review — they are never applied to the database."
+          >
+            <div className="space-y-1.5">
+              <label className="flex items-center gap-2 text-xs">
+                <Checkbox
+                  checked={!!grant.introspection}
+                  onCheckedChange={(c) => set({ introspection: c === true })}
+                />
+                Schema introspection — tables, columns, types, keys. No row data.
+              </label>
+              <label className="flex items-center gap-2 text-xs">
+                <Checkbox
+                  checked={!!grant.propose}
+                  onCheckedChange={(c) => set({ propose: c === true })}
+                />
+                Accept schema proposals
+              </label>
+            </div>
+            {grant.introspection && (
+              <div className="space-y-1 pt-1">
+                <label className="text-[11px] text-muted-foreground">
+                  Hide these from introspection — one glob per line
+                </label>
+                <textarea
+                  value={excludesDraft}
+                  onChange={(e) => setExcludesDraft(e.target.value)}
+                  onBlur={() =>
+                    set({
+                      introspectExcludes: excludesDraft
+                        .split('\n')
+                        .map((s) => s.trim())
+                        .filter(Boolean)
+                    })
+                  }
+                  rows={3}
+                  spellCheck={false}
+                  placeholder="__EFMigrationsHistory&#10;audit.*"
+                  className="w-full rounded border border-border bg-transparent p-1.5 font-mono text-[11px] outline-none focus:border-ring"
+                />
+              </div>
+            )}
+          </GrantSection>
+
+          <GrantSection
+            title="Table data"
+            blurb="Nothing is readable or writable until you list it below. A table can be readable without being writable; it is never writable without being readable."
+          >
+            <div className="space-y-1.5">
+              <label className="flex items-center gap-2 text-xs">
+                <Checkbox
+                  checked={!!grant.dataReads}
+                  onCheckedChange={(c) => set({ dataReads: c === true })}
+                />
+                Allow reading rows
+              </label>
+              <label className="flex items-center gap-2 text-xs">
+                <Checkbox
+                  checked={!!grant.dataWrites}
+                  onCheckedChange={(c) => set({ dataWrites: c === true })}
+                />
+                Allow proposing row changes
+                <span className="text-[11px] text-muted-foreground">
+                  — staged for review, never applied directly
+                </span>
+              </label>
+            </div>
+            {(grant.dataReads || grant.dataWrites) && (
+              <AllowlistEditor
+                grant={grant}
+                showWrite={!!grant.dataWrites}
+                onChange={(a) => set({ allowlist: a })}
+              />
+            )}
+          </GrantSection>
+
+          <GrantSection
+            title="Query history"
+            blurb="Let an agent read the SQL Krust has already run here, and list your changesets. Useful for 'what changed last week?' — but history stores statements with their values written in, so it can show data the allowlist above would hide."
+          >
+            <label className="flex items-center gap-2 text-xs">
+              <Checkbox
+                checked={!!grant.historyReads}
+                onCheckedChange={(c) => set({ historyReads: c === true })}
+              />
+              Allow reading history and changesets
+            </label>
+            {grant.historyReads && (
+              <div className="space-y-1 pt-1">
+                <label className="text-[11px] text-muted-foreground">
+                  Hide the SQL text for these tables — one glob per line. Their entries still
+                  appear, with the table, time and row count, but the statement is withheld.
+                </label>
+                <textarea
+                  value={redactDraft}
+                  onChange={(e) => setRedactDraft(e.target.value)}
+                  onBlur={() =>
+                    set({
+                      historyRedact: redactDraft
+                        .split('\n')
+                        .map((s) => s.trim())
+                        .filter(Boolean)
+                    })
+                  }
+                  rows={3}
+                  spellCheck={false}
+                  placeholder="users&#10;*_secret"
+                  className="w-full rounded border border-border bg-transparent p-1.5 font-mono text-[11px] outline-none focus:border-ring"
+                />
+              </div>
+            )}
+          </GrantSection>
+
+          <GrantSection
+            title="Auto-attach to Data changeset"
+            blurb={
+              <>
+                When a Data changeset is active, row changes you make here can be collected
+                into it automatically, ready to export as a .sql handoff. Pick which kinds of
+                change get collected. Anything not collected still appears in Data Mutation
+                history — it lands in the Unassigned inbox, and you can add it to a changeset
+                by hand at any time. Nothing is ever lost.
+              </>
+            }
+          >
+              <DataAttachEditor conn={conn} onSaved={onSaved} />
+            </GrantSection>
           </>
-        }
-      >
-        <DataAttachEditor conn={conn} />
-      </GrantSection>
-    </div>
+        )}
+      </AccordionContent>
+    </AccordionItem>
   )
 }
 
@@ -512,22 +584,56 @@ function ConnectionGrant({ conn }: { conn: ConnectionSummary }): React.JSX.Eleme
  * not the MCP grant — it governs *every* row change on this connection, not
  * only the AI's.
  */
-function DataAttachEditor({ conn }: { conn: ConnectionSummary }): React.JSX.Element {
+function DataAttachEditor({
+  conn,
+  onSaved
+}: {
+  conn: ConnectionSummary
+  onSaved: (saved: ConnectionSummary) => void
+}): React.JSX.Element {
+  // Held locally, not derived from the prop: the prop only changes when the
+  // whole connection list is refetched, so a purely derived checkbox never
+  // repaints on click and reads as dead.
+  //
   // Absent means ALL — an existing connection carried over from an older build
   // must keep auto-attaching, not silently stop.
-  const verbs = new Set<DmlVerb>(conn.dataAttachVerbs ?? ['insert', 'update', 'delete'])
-  const unscoped = conn.dataAttachUnscoped === true
+  const [verbs, setVerbs] = useState<DmlVerb[]>(
+    conn.dataAttachVerbs ?? ['insert', 'update', 'delete']
+  )
+  const [unscoped, setUnscoped] = useState(conn.dataAttachUnscoped === true)
 
-  const persist = (patch: Partial<ConnectionSummary>): void => {
-    const { hasPassword: _hasPassword, ...config } = { ...conn, ...patch }
-    void window.api.connections.save({ config })
+  /**
+   * Flip the box first, then write. A rejected save rolls the box back and
+   * says so — a silent failure here would leave the UI claiming a collection
+   * rule the export does not actually follow.
+   */
+  const persist = async (next: {
+    dataAttachVerbs: DmlVerb[]
+    dataAttachUnscoped: boolean
+  }): Promise<void> => {
+    const prev = { dataAttachVerbs: verbs, dataAttachUnscoped: unscoped }
+    setVerbs(next.dataAttachVerbs)
+    setUnscoped(next.dataAttachUnscoped)
+    try {
+      const { hasPassword: _hasPassword, ...config } = { ...conn, ...next }
+      onSaved(await window.api.connections.save({ config }))
+    } catch (err) {
+      setVerbs(prev.dataAttachVerbs)
+      setUnscoped(prev.dataAttachUnscoped)
+      toast.error(
+        `Could not save auto-attach settings: ${err instanceof Error ? err.message : String(err)}`
+      )
+    }
   }
 
   const toggleVerb = (v: DmlVerb, on: boolean): void => {
     const next = new Set(verbs)
     if (on) next.add(v)
     else next.delete(v)
-    persist({ dataAttachVerbs: (['insert', 'update', 'delete'] as DmlVerb[]).filter((x) => next.has(x)) })
+    void persist({
+      dataAttachVerbs: (['insert', 'update', 'delete'] as DmlVerb[]).filter((x) => next.has(x)),
+      dataAttachUnscoped: unscoped
+    })
   }
 
   const LABEL: Record<DmlVerb, string> = {
@@ -542,7 +648,7 @@ function DataAttachEditor({ conn }: { conn: ConnectionSummary }): React.JSX.Elem
         {(['insert', 'update', 'delete'] as DmlVerb[]).map((v) => (
           <label key={v} className="flex items-center gap-2 text-xs">
             <Checkbox
-              checked={verbs.has(v)}
+              checked={verbs.includes(v)}
               onCheckedChange={(c) => toggleVerb(v, c === true)}
             />
             {LABEL[v]}
@@ -554,7 +660,9 @@ function DataAttachEditor({ conn }: { conn: ConnectionSummary }): React.JSX.Elem
           <Checkbox
             className="mt-0.5"
             checked={unscoped}
-            onCheckedChange={(c) => persist({ dataAttachUnscoped: c === true })}
+            onCheckedChange={(c) =>
+              void persist({ dataAttachVerbs: verbs, dataAttachUnscoped: c === true })
+            }
           />
           <span>
             Also collect whole-table wipes

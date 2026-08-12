@@ -3,7 +3,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { listConnections, getConnectionConfig } from '../store/connections'
 import { getMcpGrant } from '../store/mcp'
 import { auditMcp } from '../store/mcpAudit'
-import { introspectSchema } from './introspect'
+import { introspectSchema, listConnectionTables } from './introspect'
 import { addProposal, addDataProposal, type ProposeInput } from './proposals'
 import { listAllowedTables, describeAllowedTable, readAllowedRows } from './reads'
 import { readHistory, listConnectionChangesets } from './history'
@@ -175,6 +175,42 @@ export function registerMcpTools(server: McpServer): void {
         detail: `${rows.length} connection(s)`
       })
       return json({ connections: rows })
+    }
+  )
+
+  // ── list_tables ───────────────────────────────────────────────────────────
+  server.registerTool(
+    'list_tables',
+    {
+      title: 'List tables',
+      description:
+        'List the table and view NAMES on a connection — no columns, no keys, ' +
+        'no row data, no counts. Cheaper than introspect_schema and available ' +
+        'on any connection that has at least one grant, so it works without the ' +
+        'introspection grant. Use it to compare which tables exist between two ' +
+        'connections (call it once per connection and diff the results), then ' +
+        'reach for introspect_schema when you need structure. Tables matching ' +
+        "the connection's exclude globs are omitted.",
+      inputSchema: {
+        connectionId: z.string().describe('connection id from list_connections')
+      }
+    },
+    async ({ connectionId }, extra) => {
+      const client = clientName(extra)
+      try {
+        const res = await listConnectionTables(connectionId)
+        logCall('list_tables', {
+          connectionId,
+          client,
+          ok: true,
+          detail: `${res.tables.length} table(s)`
+        })
+        return json(res)
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err)
+        logCall('list_tables', { connectionId, client, ok: false, detail })
+        return fail(detail)
+      }
     }
   )
 

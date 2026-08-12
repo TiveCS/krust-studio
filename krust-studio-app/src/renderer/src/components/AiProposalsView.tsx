@@ -12,13 +12,14 @@ import {
   Table2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Combobox } from '@/components/ui/combobox'
 import { SqlDisplay } from '@/components/SqlDisplay'
 import { cn } from '@/lib/utils'
 import { useSchemaSync } from '@/store/schemaSync'
 import { useConnections } from '@/store/connections'
 import type {
+  Changeset,
   DataProposal,
   DataCommitResult,
   SchemaSyncProposal,
@@ -40,6 +41,47 @@ function alterKey(table: string, i: number): string {
 }
 function dataChangeKey(i: number): string {
   return `data:${i}`
+}
+
+/**
+ * The changesets a proposal may bind to: this connection's, of the proposal's
+ * own kind only (ADR-0023 — kinds never mix). Exported ones stay listed and
+ * selectable so a follow-up can be appended deliberately, marked so that is a
+ * choice rather than an accident. An empty field still means "the active
+ * changeset", and a name typed here that does not exist is created on commit.
+ */
+function useChangesetOptions(
+  connectionId: string,
+  kind: 'schema' | 'data'
+): { names: string[]; hint: (name: string) => string | undefined } {
+  const [changesets, setChangesets] = useState<Changeset[]>([])
+
+  useEffect(() => {
+    let alive = true
+    void window.api.history
+      .listChangesets(connectionId)
+      .then((cs) => {
+        if (alive) setChangesets(cs.filter((c) => c.kind === kind))
+      })
+      .catch(() => {
+        // A failed listing only costs the suggestions — the field still accepts
+        // a typed name, so there is nothing worth interrupting the user for.
+        if (alive) setChangesets([])
+      })
+    return () => {
+      alive = false
+    }
+  }, [connectionId, kind])
+
+  return {
+    names: changesets.map((c) => c.name),
+    hint: (name) => {
+      const c = changesets.find((x) => x.name === name)
+      if (!c) return undefined
+      if (c.active) return 'active'
+      return c.status === 'exported' ? 'exported' : undefined
+    }
+  }
 }
 
 export function AiProposalsView(): React.JSX.Element {
@@ -159,6 +201,7 @@ function DataProposalCard({
   )
   const [excluded, setExcluded] = useState<Set<string>>(new Set())
   const [changeset, setChangeset] = useState(p.changesetName ?? '')
+  const changesetOptions = useChangesetOptions(p.connectionId, 'data')
   const [busy, setBusy] = useState(false)
   const [result, setResult] = useState<DataCommitResult | null>(null)
 
@@ -223,11 +266,14 @@ function DataProposalCard({
           {anyUnknown ? '≈? ' : `~${estimated} `}row{estimated === 1 ? '' : 's'}
         </span>
         <div className="ml-auto flex items-center gap-1.5">
-          <Input
+          <Combobox
             value={changeset}
-            onChange={(e) => setChangeset(e.target.value)}
+            onChange={setChangeset}
+            options={changesetOptions.names}
+            hint={changesetOptions.hint}
+            creatable
             placeholder="data changeset / ticket"
-            className="h-7 w-44 text-xs"
+            className="w-44"
           />
           <Button size="xs" variant="ghost" onClick={() => void exportSql()} title="Export .sql">
             <Download className="size-3.5" /> Export
@@ -329,6 +375,7 @@ function ProposalCard({
   )
   const [excluded, setExcluded] = useState<Set<string>>(new Set())
   const [changeset, setChangeset] = useState(p.changesetName ?? '')
+  const changesetOptions = useChangesetOptions(p.connectionId, 'schema')
   const [busy, setBusy] = useState(false)
   const [result, setResult] = useState<SchemaSyncCommitResult | null>(null)
 
@@ -390,11 +437,14 @@ function ProposalCard({
           {p.reportOnly.length > 0 && ` · ${p.reportOnly.length} report-only`}
         </span>
         <div className="ml-auto flex items-center gap-1.5">
-          <Input
+          <Combobox
             value={changeset}
-            onChange={(e) => setChangeset(e.target.value)}
+            onChange={setChangeset}
+            options={changesetOptions.names}
+            hint={changesetOptions.hint}
+            creatable
             placeholder="changeset / ticket"
-            className="h-7 w-40 text-xs"
+            className="w-40"
           />
           <Button size="xs" variant="ghost" onClick={() => void exportSql()} title="Export .sql">
             <Download className="size-3.5" /> Export
